@@ -262,9 +262,7 @@ if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'm
     require($template->get_template_dir('tpl_modules_mobile_menu.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_mobile_menu.php');
 } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
     require($template->get_template_dir('tpl_modules_mobile_menu.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_mobile_menu.php');
-} else
-
-?>
+} else ?>
 
 <?php /* add any end-of-page code via an observer class */
   $zco_notifier->notify('NOTIFY_FOOTER_END', $current_page);

@@ -12,12 +12,12 @@ class zcDate extends base
     protected $useIntlDate = false;
     protected $useStrftime = false;
     protected $locale;
-    protected //- Only used when $this->useIntlDate is true
-        $strftime2date;
-    protected //- Only used when $this->useStrftime is false
-        $strftime2intl;
-    protected //- Only used when $this->useStrftime is false
-        $debug = false;
+    //- Only used when $this->useIntlDate is true
+    protected $strftime2date;
+    //- Only used when $this->useStrftime is false
+    protected $strftime2intl;
+    //- Only used when $this->useStrftime is false
+    protected $debug = false;
     protected $dateObject;
 
     // -----
