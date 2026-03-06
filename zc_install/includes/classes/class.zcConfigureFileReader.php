@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * file contains zcConfigureFileReader Class
  * @copyright Copyright 2003-2024 Zen Cart Development Team
@@ -119,7 +121,7 @@ class zcConfigureFileReader
         }
 
         // Extract the contents of the define
-        if (preg_match('|^\s*define\(\s*[\'"]' . $searchDefine . '[\'"]\s*,\s*(?!\s*\);)(.+?)\s*\);|m', $this->fileContent, $matches)) {
+        if (preg_match('|^\s*define\(\s*[\'"]' . $searchDefine . '[\'"]\s*,\s*(?!\s*\);)(.+?)\s*\);|m', (string) $this->fileContent, $matches)) {
             return $matches[1];
         }
         return null;
@@ -161,7 +163,7 @@ class zcConfigureFileReader
         $inputs = [];
         foreach ($mapper as $defineKey => $inputsKey) {
             $value = $this->getRawDefine($defineKey);
-            $value = trim($value, "'");
+            $value = trim((string) $value, "'");
             $inputs[$inputsKey] = $value;
         }
         return $inputs;

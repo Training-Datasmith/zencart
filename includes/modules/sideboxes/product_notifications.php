@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * product_notifications sidebox - displays a box inviting the customer to sign up for notifications of updates to current product
  *
@@ -14,11 +16,11 @@ $show_product_notifications = false;
 if (isset($_GET['products_id']) && zen_products_id_valid($_GET['products_id'])) {
     if (zen_is_logged_in() && !zen_in_guest_checkout()) {
         $check_query =
-            "SELECT customers_info_id
-               FROM " . TABLE_CUSTOMERS_INFO . "
-              WHERE customers_info_id = " . (int)$_SESSION['customer_id'] . "
+            'SELECT customers_info_id
+               FROM ' . TABLE_CUSTOMERS_INFO . '
+              WHERE customers_info_id = ' . (int)$_SESSION['customer_id'] . '
                 AND global_product_notifications = 1
-              LIMIT 1";
+              LIMIT 1';
         $check = $db->Execute($check_query);
 
         if (!$check->EOF) {
@@ -33,12 +35,12 @@ if ($show_product_notifications === true) {
     if (isset($_GET['products_id'])) {
         $notification_exists = false;
         if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-           $check_query = 
-                "SELECT customers_id
-                   FROM " . TABLE_PRODUCTS_NOTIFICATIONS . "
-                  WHERE products_id = " . (int)$_GET['products_id'] . "
-                    AND customers_id = " . (int)$_SESSION['customer_id'] . "
-                  LIMIT 1";
+            $check_query =
+                 'SELECT customers_id
+                   FROM ' . TABLE_PRODUCTS_NOTIFICATIONS . '
+                  WHERE products_id = ' . (int)$_GET['products_id'] . '
+                    AND customers_id = ' . (int)$_SESSION['customer_id'] . '
+                  LIMIT 1';
             $check = $db->Execute($check_query);
 
             $notification_exists = !$check->EOF;
@@ -56,4 +58,3 @@ if ($show_product_notifications === true) {
         require $template->get_template_dir($column_box_default, DIR_WS_TEMPLATE, $current_page_base, 'common') . '/' . $column_box_default;
     }
 }
-

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @package statistics
@@ -10,10 +12,10 @@
  * Designed for v1.5.1
  */
 if (!defined('IS_ADMIN_FLAG')) {
- die('Illegal Access');
+    die('Illegal Access');
 }
-$autoLoadConfig[190][] = array('autoType'=>'class',
-                              'loadFile'=>'observers/class.products_viewed_counter.php');
-$autoLoadConfig[190][] = array('autoType'=>'classInstantiate',
-                              'className'=>'products_viewed_counter',
-                              'objectName'=>'products_viewed_counter');
+$autoLoadConfig[190][] = ['autoType' => 'class',
+                              'loadFile' => 'observers/class.products_viewed_counter.php'];
+$autoLoadConfig[190][] = ['autoType' => 'classInstantiate',
+                              'className' => 'products_viewed_counter',
+                              'objectName' => 'products_viewed_counter'];

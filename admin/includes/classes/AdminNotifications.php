@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -10,7 +12,7 @@
 class AdminNotifications
 {
     protected $enabled = true;
-    private $projectNotificationServer;
+    private ?string $projectNotificationServer = null;
 
     public function __construct()
     {
@@ -30,8 +32,9 @@ class AdminNotifications
 
     /**
      * @since ZC v1.5.6
+     * @return mixed[]
      */
-    public function getNotifications($target, $adminId)
+    public function getNotifications($target, $adminId): array
     {
         if ($this->enabled === false) {
             return [];
@@ -58,7 +61,7 @@ class AdminNotifications
      */
     protected function getNotificationInfo()
     {
-        if (empty($this->projectNotificationServer)){
+        if (empty($this->projectNotificationServer)) {
             return [];
         }
         $ch = curl_init();
@@ -70,19 +73,18 @@ class AdminNotifications
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Notification Messages Check');
         $response = curl_exec($ch);
-        $error = curl_error($ch);
+        curl_error($ch);
         $errno = curl_errno($ch);
         if ($errno > 0) {
             return [];
         }
-        $result = json_decode($response, true);
-        return $result;
+        return json_decode($response, true);
     }
 
     /**
      * @since ZC v1.5.6
      */
-    protected function isNotificationAvailable($name, $target, $notification, $savedState)
+    protected function isNotificationAvailable($name, $target, array $notification, $savedState): bool
     {
         if ($notification['target'] !== $target) {
             return false;
@@ -102,7 +104,7 @@ class AdminNotifications
     /**
      * @since ZC v1.5.6
      */
-    protected function isNotificationDismissed($name, $savedState)
+    protected function isNotificationDismissed($name, array $savedState)
     {
         if (!isset($savedState[$name])) {
             return false;
@@ -113,7 +115,7 @@ class AdminNotifications
     /**
      * @since ZC v1.5.6
      */
-    protected function isNotificationInDate($notification, $currentDatetime)
+    protected function isNotificationInDate(array $notification, $currentDatetime): bool
     {
         if (!isset($notification['start-date']) && !isset($notification['end-date'])) {
             return true;
@@ -130,7 +132,7 @@ class AdminNotifications
     /**
      * @since ZC v1.5.6
      */
-    protected function isNotificationInCountry($notification)
+    protected function isNotificationInCountry(array $notification): bool
     {
         if (!isset($notification['countries'])) {
             return true;
@@ -145,25 +147,25 @@ class AdminNotifications
     /**
      * @since ZC v1.5.6
      */
-    protected  function getStoreCountryIso3()
+    protected function getStoreCountryIso3()
     {
         global $db;
 
-        $sql = "SELECT countries_iso_code_3 from " . TABLE_COUNTRIES . " WHERE countries_id = " . STORE_COUNTRY;
+        $sql = 'SELECT countries_iso_code_3 from ' . TABLE_COUNTRIES . ' WHERE countries_id = ' . STORE_COUNTRY;
         $r = $db->execute($sql);
-        $iso3 = $r->fields['countries_iso_code_3'];
-        return $iso3;
+        return $r->fields['countries_iso_code_3'];
     }
 
     /**
      * @since ZC v1.5.6
+     * @return array{dismissed: mixed}[]
      */
-    protected function getSavedState($adminId)
+    protected function getSavedState($adminId): array
     {
         global $db;
 
         $savedState = [];
-        $sql = "SELECT * FROM " . TABLE_ADMIN_NOTIFICATIONS . " WHERE admin_id = :adminId:";
+        $sql = 'SELECT * FROM ' . TABLE_ADMIN_NOTIFICATIONS . ' WHERE admin_id = :adminId:';
         $sql = $db->bindVars($sql, ':adminId:', $adminId, 'integer');
         $results = $db->execute($sql);
         foreach ($results as $result) {
@@ -175,9 +177,9 @@ class AdminNotifications
     /**
      * @since ZC v1.5.6
      */
-    protected function getCurrentDate()
+    protected function getCurrentDate(): \DateTime
     {
-        return new DateTime("now");
+        return new DateTime('now');
     }
 
     /**
@@ -189,7 +191,7 @@ class AdminNotifications
 
         $keys = array_keys($notificationList);
         $keys = implode(',', $keys);
-        $sql = "DELETE FROM " . TABLE_ADMIN_NOTIFICATIONS . " WHERE notification_key NOT IN (:keys:)";
+        $sql = 'DELETE FROM ' . TABLE_ADMIN_NOTIFICATIONS . ' WHERE notification_key NOT IN (:keys:)';
         $sql = $db->bindVars($sql, ':keys:', $keys, 'inConstructString');
         $db->execute($sql);
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -234,7 +235,7 @@ class Product
         }
 
         global $db;
-        $sql = "SELECT products_id FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id=" . (int)self::$product_id;
+        $sql = 'SELECT products_id FROM ' . TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' WHERE products_id=' . (int)self::$product_id;
         $results = $db->Execute($sql, 1);
         return !$results->EOF;
     }
@@ -249,7 +250,7 @@ class Product
         }
 
         global $db;
-        $sql = "SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id=" . (int)self::$product_id;
+        $sql = 'SELECT products_id FROM ' . TABLE_SPECIALS . ' WHERE products_id=' . (int)self::$product_id;
         $results = $db->Execute($sql, 1);
         return !$results->EOF;
     }
@@ -281,7 +282,7 @@ class Product
     /**
      * @since ZC v2.1.0
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         return $this->get($name);
     }
@@ -293,11 +294,11 @@ class Product
     {
         global $db;
 
-        $sql = "SELECT p.*, pt.allow_add_to_cart, pt.type_handler, m.manufacturers_name, m.manufacturers_image
-                FROM " . TABLE_PRODUCTS . " p
-                LEFT JOIN " . TABLE_PRODUCT_TYPES . " pt ON (p.products_type = pt.type_id)
-                LEFT JOIN " . TABLE_MANUFACTURERS . " m USING (manufacturers_id)
-                WHERE p.products_id = " . (int)$product_id;
+        $sql = 'SELECT p.*, pt.allow_add_to_cart, pt.type_handler, m.manufacturers_name, m.manufacturers_image
+                FROM ' . TABLE_PRODUCTS . ' p
+                LEFT JOIN ' . TABLE_PRODUCT_TYPES . ' pt ON (p.products_type = pt.type_id)
+                LEFT JOIN ' . TABLE_MANUFACTURERS . ' m USING (manufacturers_id)
+                WHERE p.products_id = ' . $product_id;
         $product = $db->Execute($sql, 1, true, 900);
 
         if ($product->EOF) {
@@ -316,16 +317,16 @@ class Product
          * Add $data['lang'][code] = [products_name, products_description, etc] for each language
          * @since ZC v2.1.0
          */
-        $sql = "SELECT pd.*
-                FROM " . TABLE_PRODUCTS_DESCRIPTION . " pd
-                WHERE pd.products_id = " . (int)$product_id . "
-                ORDER BY language_id";
+        $sql = 'SELECT pd.*
+                FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
+                WHERE pd.products_id = ' . $product_id . '
+                ORDER BY language_id';
         $pd = $db->Execute($sql, null, true, 900);
         foreach ($pd as $result) {
             unset($result['products_id']);
             $data['lang'][$this->languages[$result['language_id']]] = $result;
         }
-        if (IS_ADMIN_FLAG === false && !isset($data['lang'][$_SESSION['languages_code']])) {
+        if (!isset($data['lang'][$_SESSION['languages_code']])) {
             $data['lang'][$_SESSION['languages_code']] = [
                 'language_id' => $_SESSION['languages_id'],
                 'products_name' => '',
@@ -334,12 +335,12 @@ class Product
                 'products_viewed' => 0,
                 'description_record_missing' => true,
             ];
-            $this->notify('NOTIFY_PRODUCT_DETAILS_NO_DESCRIPTION', (int)$product_id, $data);
+            $this->notify('NOTIFY_PRODUCT_DETAILS_NO_DESCRIPTION', $product_id, $data);
         }
 
         // additional product images
         $data['additional_images'] = [];
-        $sql = "SELECT id, sort_order, additional_image FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " WHERE products_id = $product_id ORDER BY sort_order";
+        $sql = 'SELECT id, sort_order, additional_image FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " WHERE products_id = $product_id ORDER BY sort_order";
         $results = $db->Execute($sql);
         foreach ($results as $additional_image) {
             $data['additional_images'][] = [
@@ -350,7 +351,7 @@ class Product
         }
 
         // count linked categories
-        $sql = "SELECT categories_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc WHERE products_id=" . (int)$product_id;
+        $sql = 'SELECT categories_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc WHERE products_id=' . $product_id;
         $results = $db->Execute($sql, null, true, 900);
         $data['linked_categories_count'] = $results->RecordCount();
         $data['linked_categories'] = [];
@@ -385,7 +386,6 @@ class Product
         $this->languages = $lng->get_language_list();  // [1 => 'en', 2 => 'fr']
     }
 }
-
 
 /* This class essentially deprecates the following functions (note Notifier hook differences):
 zen_get_product_details (er, well, it's now a helper to access this class)

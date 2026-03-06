@@ -12,18 +12,18 @@
 <?php
   // Display all header alerts via messageStack:
   if ($messageStack->size('header') > 0) {
-    echo $messageStack->output('header');
+      echo $messageStack->output('header');
   }
-  if (!empty($_GET['error_message'])) {
-    echo zen_output_string_protected(urldecode($_GET['error_message']));
-  }
-  if (!empty($_GET['info_message'])) {
-   echo zen_output_string_protected($_GET['info_message']);
-  }
+if (!empty($_GET['error_message'])) {
+    echo zen_output_string_protected(urldecode((string) $_GET['error_message']));
+}
+if (!empty($_GET['info_message'])) {
+    echo zen_output_string_protected($_GET['info_message']);
+}
 // check whether to only display errors/alerts, or to also display the rest of the header
 if (isset($flag_disable_header) && $flag_disable_header === true) {
-  // do early-return from this template since $flag_disable_header is true
-  return;
+    // do early-return from this template since $flag_disable_header is true
+    return;
 }
 ?>
 
@@ -37,15 +37,16 @@ if (isset($flag_disable_header) && $flag_disable_header === true) {
     <li><?php echo '<a href="' . HTTP_SERVER . DIR_WS_CATALOG . '">'; ?><?php echo HEADER_TITLE_CATALOG; ?></a></li>
 <?php
     if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-?>
+        ?>
     <li><a href="<?php echo zen_href_link(FILENAME_LOGOFF, '', 'SSL'); ?>"><?php echo HEADER_TITLE_LOGOFF; ?></a></li>
     <li><a href="<?php echo zen_href_link(FILENAME_ACCOUNT, '', 'SSL'); ?>"><?php echo HEADER_TITLE_MY_ACCOUNT; ?></a></li>
 <?php
-      } else {
+    } else {
         if (STORE_STATUS == '0') {
-?>
+            ?>
     <li><a href="<?php echo zen_href_link(FILENAME_LOGIN, '', 'SSL'); ?>"><?php echo HEADER_TITLE_LOGIN; ?></a></li>
-<?php } } ?>
+<?php }
+        } ?>
 
 <?php if ($_SESSION['cart']->count_contents() != 0) { ?>
     <li><a href="<?php echo zen_href_link(FILENAME_SHOPPING_CART, '', 'NONSSL'); ?>"><?php echo HEADER_TITLE_CART_CONTENTS; ?></a></li>
@@ -62,27 +63,27 @@ if (isset($flag_disable_header) && $flag_disable_header === true) {
 
 <!--bof-branding display-->
 <div id="logoWrapper">
-    <div id="logo"><?php echo '<a href="' . HTTP_SERVER . DIR_WS_CATALOG . '">' . zen_image($template->get_template_dir(HEADER_LOGO_IMAGE, DIR_WS_TEMPLATE, $current_page_base,'images'). '/' . HEADER_LOGO_IMAGE, HEADER_ALT_TEXT) . '</a>'; ?></div>
+    <div id="logo"><?php echo '<a href="' . HTTP_SERVER . DIR_WS_CATALOG . '">' . zen_image($template->get_template_dir(HEADER_LOGO_IMAGE, DIR_WS_TEMPLATE, $current_page_base, 'images'). '/' . HEADER_LOGO_IMAGE, HEADER_ALT_TEXT) . '</a>'; ?></div>
 <?php if (HEADER_SALES_TEXT != '' || (SHOW_BANNERS_GROUP_SET2 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET2))) { ?>
     <div id="taglineWrapper">
 <?php
-              if (HEADER_SALES_TEXT != '') {
-?>
+                if (HEADER_SALES_TEXT != '') {
+                    ?>
       <div id="tagline"><?php echo HEADER_SALES_TEXT;?></div>
 <?php
-              }
-?>
+                }
+    ?>
 <?php
-              if (SHOW_BANNERS_GROUP_SET2 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET2)) {
-                if ($banner->RecordCount() > 0) {
-?>
+    if (SHOW_BANNERS_GROUP_SET2 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET2)) {
+        if ($banner->RecordCount() > 0) {
+            ?>
       <div id="bannerTwo" class="banners"><?php echo zen_display_banner('static', $banner);?></div>
 <?php
-                }
-              }
-?>
+        }
+    }
+    ?>
     </div>
-<?php } // no HEADER_SALES_TEXT or SHOW_BANNERS_GROUP_SET2 ?>
+<?php } // no HEADER_SALES_TEXT or SHOW_BANNERS_GROUP_SET2?>
 </div>
 <br class="clearBoth">
 <!--eof-branding display-->
@@ -90,12 +91,12 @@ if (isset($flag_disable_header) && $flag_disable_header === true) {
 <!--eof-header logo and navigation display-->
 
 <!--bof-optional categories tabs navigation display-->
-<?php require($template->get_template_dir('tpl_modules_categories_tabs.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_categories_tabs.php'); ?>
+<?php require($template->get_template_dir('tpl_modules_categories_tabs.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_categories_tabs.php'); ?>
 <!--eof-optional categories tabs navigation display-->
 
 <!--bof-header ezpage links-->
 <?php if (EZPAGES_STATUS_HEADER == '1' or (EZPAGES_STATUS_HEADER == '2' && zen_is_whitelisted_admin_ip())) { ?>
-<?php require($template->get_template_dir('tpl_ezpages_bar_header.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_ezpages_bar_header.php'); ?>
+<?php require($template->get_template_dir('tpl_ezpages_bar_header.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_ezpages_bar_header.php'); ?>
 <?php } ?>
 <!--eof-header ezpage links-->
 </div>

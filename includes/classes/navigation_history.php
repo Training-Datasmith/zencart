@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Navigation_history Class.
  *
@@ -18,9 +20,8 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
 class navigationHistory extends base
 {
-    public
-        $path,
-        $snapshot;
+    public $path;
+    public $snapshot;
 
     public function __construct()
     {
@@ -30,7 +31,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function reset()
+    public function reset(): void
     {
         $this->path = [];
         $this->snapshot = [];
@@ -53,10 +54,10 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function add_current_page()
+    public function add_current_page(): void
     {
         // check whether there are pages which should be blacklisted against entering navigation history
-        if (preg_match('|ajax\.php$|', $_SERVER['SCRIPT_NAME']) && $_GET['act'] !== '') {
+        if (preg_match('|ajax\.php$|', (string) $_SERVER['SCRIPT_NAME']) && $_GET['act'] !== '') {
             return;
         }
 
@@ -72,27 +73,26 @@ class navigationHistory extends base
                 if (isset($cPath)) {
                     if (!isset($this->path[$i]['get']['cPath'])) {
                         continue;
+                    }
+                    if ($this->path[$i]['get']['cPath'] == $cPath) {
+                        array_splice($this->path, ($i + 1));
+                        $set = 'false';
+                        break;
                     } else {
-                        if ($this->path[$i]['get']['cPath'] == $cPath) {
-                            array_splice($this->path, ($i+1));
-                            $set = 'false';
-                            break;
-                        } else {
-                            $old_cPath = explode('_', $this->path[$i]['get']['cPath']);
-                            $new_cPath = explode('_', $cPath);
+                        $old_cPath = explode('_', (string) $this->path[$i]['get']['cPath']);
+                        $new_cPath = explode('_', $cPath);
 
-                            $exit_loop = false;
-                            for ($j=0, $n2=sizeof($old_cPath); $j<$n2; $j++) {
-                                if ($old_cPath[$j] != $new_cPath[$j]) {
-                                    array_splice($this->path, ($i));
-                                    $set = 'true';
-                                    $exit_loop = true;
-                                    break;
-                                }
-                            }
-                            if ($exit_loop == true) {
+                        $exit_loop = false;
+                        for ($j = 0, $n2 = sizeof($old_cPath); $j < $n2; $j++) {
+                            if ($old_cPath[$j] != $new_cPath[$j]) {
+                                array_splice($this->path, ($i));
+                                $set = 'true';
+                                $exit_loop = true;
                                 break;
                             }
+                        }
+                        if ($exit_loop == true) {
+                            break;
                         }
                     }
                 } else {
@@ -104,12 +104,12 @@ class navigationHistory extends base
         }
 
         if ($set === 'true') {
-            $page = (isset($_GET['main_page'])) ? $_GET['main_page'] : FILENAME_DEFAULT;
-             $this->path[] = [
-                'page' => $page,
-                'mode' => $request_type,
-                'get' => $get_vars,
-                'post' => [] /*$_POST*/
+            $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
+            $this->path[] = [
+               'page' => $page,
+               'mode' => $request_type,
+               'get' => $get_vars,
+               'post' => [], /*$_POST*/
             ];
         }
     }
@@ -117,7 +117,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function remove_current_page()
+    public function remove_current_page(): void
     {
         $this->checkProperties();
 
@@ -130,7 +130,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function set_snapshot($page = '')
+    public function set_snapshot($page = ''): void
     {
         global $request_type;
         if (is_array($page)) {
@@ -138,12 +138,12 @@ class navigationHistory extends base
         } else {
             $get_vars = $_GET;
             unset($get_vars['main_page']);
-            $page = (isset($_GET['main_page'])) ? $_GET['main_page'] : FILENAME_DEFAULT;
+            $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
             $this->snapshot = [
                 'page' => $page,
                 'mode' => $request_type,
                 'get' => $get_vars,
-                'post' => [] /*$_POST*/
+                'post' => [], /*$_POST*/
             ];
         }
     }
@@ -151,7 +151,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function clear_snapshot()
+    public function clear_snapshot(): void
     {
         $this->snapshot = [];
     }
@@ -159,7 +159,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function set_path_as_snapshot($history = 0)
+    public function set_path_as_snapshot($history = 0): void
     {
         $this->checkProperties();
 
@@ -168,14 +168,14 @@ class navigationHistory extends base
             'page' => $this->path[$pos]['page'],
             'mode' => $this->path[$pos]['mode'],
             'get' => $this->path[$pos]['get'],
-            'post' => $this->path[$pos]['post']
+            'post' => $this->path[$pos]['post'],
         ];
     }
 
     /**
      * @since ZC v1.0.3
      */
-    public function debug()
+    public function debug(): void
     {
         $this->checkProperties();
 
@@ -203,7 +203,7 @@ class navigationHistory extends base
     /**
      * @since ZC v1.0.3
      */
-    public function unserialize($broken)
+    public function unserialize($broken): void
     {
         foreach ($broken as $kv) {
             $key = $kv['key'];

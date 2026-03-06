@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Specials main_template_vars
  *
@@ -11,4 +13,4 @@
 /// NOTE: THIS FILE CAN BE DELETED SINCE Zen Cart version 2.0.0
 /// NOTE: You cannot merely comment-out the following code; the file must "not exist" in order for it to fallback to default (which is to load the following tpl_ file).
 
-require($template->get_template_dir('tpl_specials_default.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_specials_default.php');
+require($template->get_template_dir('tpl_specials_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_specials_default.php');

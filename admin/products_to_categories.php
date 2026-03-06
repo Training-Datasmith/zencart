@@ -21,20 +21,20 @@ $_GET['current_category_id'] = $current_category_id; // for any redirects
 if (isset($_POST['form'])) {
     switch (true) {
 
-        case($_POST['form'] === 'hide_linked_categories_form'):
+        case ($_POST['form'] === 'hide_linked_categories_form'):
             $_SESSION['hide_linked_categories'] = !empty($_POST['hide_linked_categories']);
             break;
 
-        case($_POST['form'] === 'copy_links_dropdown_form'):
+        case ($_POST['form'] === 'copy_links_dropdown_form'):
             $_SESSION['copy_links_dropdown'] = isset($_POST['copy_links_dropdown']);
             break;
     }
 }
 
 // Verify that at least one product exists
-$result = $db->Execute("SELECT *
-                              FROM " . TABLE_PRODUCTS . "
-                              LIMIT 1");
+$result = $db->Execute('SELECT *
+                              FROM ' . TABLE_PRODUCTS . '
+                              LIMIT 1');
 if ($result->RecordCount() < 1) {
     $messageStack->add_session(ERROR_DEFINE_PRODUCTS, 'caution');
     zen_redirect(zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING));
@@ -54,17 +54,17 @@ if ($action === 'new_cat') {//this form action is from products_previous_next_di
 // set categories and products if not set
 // when prev-next has been changed to a category without products/with subcategories
 if ($products_filter === 0 && !empty($current_category_id)) {
-    $new_product_query = $db->Execute("SELECT ptc.products_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc WHERE ptc.categories_id = " . $current_category_id . " LIMIT 1");
+    $new_product_query = $db->Execute('SELECT ptc.products_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc WHERE ptc.categories_id = ' . $current_category_id . ' LIMIT 1');
     $products_filter = (!$new_product_query->EOF) ? $new_product_query->fields['products_id'] : ''; // Empty if category has no products/has subcategories
     if ($products_filter !== '') {
         $messageStack->add_session(WARNING_PRODUCTS_LINK_TO_CATEGORY_REMOVED, 'caution');
         zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
     }
-// on first entry into page from Admin menu
+    // on first entry into page from Admin menu
 } elseif ($products_filter === 0 && empty($current_category_id)) {
     $reset_categories_id = zen_get_category_tree('', '', TOPMOST_CATEGORY_PARENT_ID, '', '', true);
     $current_category_id = (int)$reset_categories_id[0]['id'];
-    $new_product_query = $db->Execute("SELECT ptc.products_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc WHERE ptc.categories_id = " . $current_category_id . " LIMIT 1");
+    $new_product_query = $db->Execute('SELECT ptc.products_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc WHERE ptc.categories_id = ' . $current_category_id . ' LIMIT 1');
     $products_filter = (!$new_product_query->EOF) ? $new_product_query->fields['products_id'] : '';// Empty if category has no products/has subcategories
     $_GET['products_filter'] = $products_filter;
 }
@@ -149,15 +149,19 @@ if (!empty($action)) {
                     zen_link_product_to_category($target_product_id, $target_category);
                 }
 
-                $messageStack->add_session(sprintf(($copy_categories_type === 'add' ? SUCCESS_LINKED_CATEGORIES_COPIED_TO_TARGET_PRODUCT_ADD : SUCCESS_LINKED_CATEGORIES_COPIED_TO_TARGET_PRODUCT_REPLACE),
-                    count($target_categories_update), $source_product_details, $target_product_details), 'success');
+                $messageStack->add_session(sprintf(
+                    ($copy_categories_type === 'add' ? SUCCESS_LINKED_CATEGORIES_COPIED_TO_TARGET_PRODUCT_ADD : SUCCESS_LINKED_CATEGORIES_COPIED_TO_TARGET_PRODUCT_REPLACE),
+                    count($target_categories_update),
+                    $source_product_details,
+                    $target_product_details
+                ), 'success');
 
                 $exclude_array = ['action', 'products_filter', 'current_category_id'];
                 zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params($exclude_array) . '&products_filter=' . $target_product_id . '&current_category_id=' . $target_product_master_categories_id));
             }
             break;
 
-        // Global Tools: Copy products in Source category as linked products in Target category
+            // Global Tools: Copy products in Source category as linked products in Target category
         case 'copy_products_as_linked':
             $category_id_source = (int)$_POST['category_id_source'];
             $category_id_target = (int)$_POST['category_id_target'];
@@ -169,14 +173,14 @@ if (!empty($action)) {
             // if either category was invalid nothing processes below
 
             // get products from source category
-            $products_to_categories_links_source = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " WHERE categories_id = " . $category_id_source);
+            $products_to_categories_links_source = $db->Execute('SELECT products_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE categories_id = ' . $category_id_source);
             $add_links_array = [];
             foreach ($products_to_categories_links_source as $item) {
                 $add_links_array[] = ['products_id' => $item['products_id']];
             }
 
             // get products from target category
-            $products_to_categories_links_target = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " WHERE categories_id = " . $category_id_target);
+            $products_to_categories_links_target = $db->Execute('SELECT products_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE categories_id = ' . $category_id_target);
             $current_target_links_array = [];
             foreach ($products_to_categories_links_target as $item) {
                 $current_target_links_array[] = ['products_id' => $item['products_id']];
@@ -213,7 +217,7 @@ if (!empty($action)) {
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
             break;
 
-        // Global Tools: Remove products from Target category that are linked from a Reference category
+            // Global Tools: Remove products from Target category that are linked from a Reference category
         case 'remove_linked_products':
 
             $category_id_reference = (int)$_POST['category_id_reference'];
@@ -225,22 +229,22 @@ if (!empty($action)) {
             // if either category was invalid nothing processes below
 
             // get products to be removed as added linked from
-            $products_to_categories_reference_linked = $db->Execute("SELECT ptoc.products_id, p.master_categories_id
-                                                          FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " ptoc
-                                                          LEFT JOIN " . TABLE_PRODUCTS . " p ON ptoc.products_id = p.products_id
-                                                          WHERE ptoc.categories_id = " . $category_id_reference);
+            $products_to_categories_reference_linked = $db->Execute('SELECT ptoc.products_id, p.master_categories_id
+                                                          FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptoc
+                                                          LEFT JOIN ' . TABLE_PRODUCTS . ' p ON ptoc.products_id = p.products_id
+                                                          WHERE ptoc.categories_id = ' . $category_id_reference);
             $reference_links_array = [];
             $master_categories_id_stop = [];
             foreach ($products_to_categories_reference_linked as $item) {
                 if ((int)$item['master_categories_id'] === $category_id_target) { // if a product to be removed has the same master category id as the target category: do NOT remove
                     $master_categories_id_stop[] = [
                         'products_id' => $item['products_id'],
-                        'master_categories_id' => $item['master_categories_id']
+                        'master_categories_id' => $item['master_categories_id'],
                     ];
                 }
                 $reference_links_array[] = [
                     'products_id' => $item['products_id'],
-                    'master_categories_id' => $item['master_categories_id']
+                    'master_categories_id' => $item['master_categories_id'],
                 ];
             }
 
@@ -255,7 +259,7 @@ if (!empty($action)) {
             }
 
             // get products in target category
-            $products_to_categories_target_linked = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " WHERE categories_id = " . $category_id_target);
+            $products_to_categories_target_linked = $db->Execute('SELECT products_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE categories_id = ' . $category_id_target);
             $target_links_array = [];
             foreach ($products_to_categories_target_linked as $item) {
                 $target_links_array[] = ['products_id' => $item['products_id']];
@@ -293,7 +297,7 @@ if (!empty($action)) {
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
             break;
 
-        // Global Tools: Reset the master_categories_id for all products in the selected category
+            // Global Tools: Reset the master_categories_id for all products in the selected category
         case 'reset_products_category_as_master':
 
             $category_id_as_master = (int)$_POST['category_id_as_master'];
@@ -308,36 +312,36 @@ if (!empty($action)) {
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
             break;
 
-        // Change the master category id for the currently selected product
+            // Change the master category id for the currently selected product
         case 'set_master_categories_id':
             zen_set_product_master_categories_id($products_filter, (int)$_GET['master_category']);
 
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
             break;
 
-        // Choose a product to display
+            // Choose a product to display
         case 'set_products_filter':
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter .
                 '&current_category_id=' . $current_category_id .
                 '&target_category_id=' . $target_category_id));
             break;
 
-        // Product to multiple category links: Set the root category from which to display the subcategories for selection
+            // Product to multiple category links: Set the root category from which to display the subcategories for selection
         case 'set_target_category':
             $target_category_id = (int)$_POST['target_category_id'];
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&target_category_id=' . $target_category_id));
             break;
 
-        // Product to multiple category links: Set the root category from which to display the subcategories for selection
+            // Product to multiple category links: Set the root category from which to display the subcategories for selection
         case 'set_default_target_category':
             $default_target_category_id = (int)$_POST['default_target_category_id'];
-            $db->Execute("UPDATE " . TABLE_CONFIGURATION . "
-                    SET configuration_value = " . $default_target_category_id . "
+            $db->Execute('UPDATE ' . TABLE_CONFIGURATION . '
+                    SET configuration_value = ' . $default_target_category_id . "
                     WHERE configuration_key = 'P2C_TARGET_CATEGORY_DEFAULT'");
             zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&target_category_id=' . $default_target_category_id));
             break;
 
-        // Product to multiple category links: Update the product to multiple-categories links
+            // Product to multiple category links: Update the product to multiple-categories links
         case 'update_product':
             if (!isset($_POST['categories_add'])) {//no linked categories are selected
                 $_POST['categories_add'] = [];
@@ -380,8 +384,8 @@ if (!empty($action)) {
 
             // 1- Unlink the product from all the target subcategories. Subsequently below, it will then be (re-)linked into the selected target categories
             $target_categories_ids_string = implode(',', $target_categories_ids);
-// TODO better to compare and unlink only those necessary??
-            $db->Execute("DELETE FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " WHERE products_id = " . $products_filter . " AND categories_id IN (" . $target_categories_ids_string . ")");
+            // TODO better to compare and unlink only those necessary??
+            $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $products_filter . ' AND categories_id IN (' . $target_categories_ids_string . ')');
 
             $verify_current_category_id = ($current_category_id === $current_master_categories_id); // display product in same category after linking?
 
@@ -390,11 +394,11 @@ if (!empty($action)) {
                 if ($new_categories_sort_array[$i] <= 0) {
                     $messageStack->add_session(sprintf(ERROR_CATEGORY_ID_INVALID, $new_categories_sort_array[$i]));
                 } else {
-                    if ($current_category_id === (int)$new_categories_sort_array[$i]) { // is the product still linked to the displayed category?
+                    if ($current_category_id === $new_categories_sort_array[$i]) { // is the product still linked to the displayed category?
                         $verify_current_category_id = true;
                     }
 
-                    $db->Execute("INSERT INTO " . TABLE_PRODUCTS_TO_CATEGORIES . " (products_id, categories_id) VALUES (" . $products_filter . ", " . (int)$new_categories_sort_array[$i] . ")");
+                    $db->Execute('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id) VALUES (' . $products_filter . ', ' . $new_categories_sort_array[$i] . ')');
                 }
             }
             // recalculate price based on new master_categories_id
@@ -406,29 +410,31 @@ if (!empty($action)) {
                     '&target_category_id=' . $target_category_id));
             } else {// if product was unlinked from the current categories_id, show product in it's master category
                 $messageStack->add_session(sprintf(WARNING_PRODUCT_UNLINKED_FROM_CATEGORY, $current_category_name, $current_category_id), 'warning');
-                zen_redirect(zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES,
-                    'products_filter=' . $products_filter . '&current_category_id=' . $current_master_categories_id . '&target_category_id=' . $target_category_id));
+                zen_redirect(zen_href_link(
+                    FILENAME_PRODUCTS_TO_CATEGORIES,
+                    'products_filter=' . $products_filter . '&current_category_id=' . $current_master_categories_id . '&target_category_id=' . $target_category_id
+                ));
             }
             break;
     }
 }
 
 if ($products_filter > 0) {
-    $product_to_copy = $db->Execute("SELECT p.products_id, pd.products_name, p.products_sort_order, p.products_price_sorter, p.products_model, p.master_categories_id, p.products_image
-                                 FROM " . TABLE_PRODUCTS . " p
-                                 LEFT JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd ON (p.products_id = pd.products_id AND pd.language_id = " . (int)$_SESSION['languages_id'] . ")
-                                 WHERE p.products_id = " . $products_filter, 1);
+    $product_to_copy = $db->Execute('SELECT p.products_id, pd.products_name, p.products_sort_order, p.products_price_sorter, p.products_model, p.master_categories_id, p.products_image
+                                 FROM ' . TABLE_PRODUCTS . ' p
+                                 LEFT JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd ON (p.products_id = pd.products_id AND pd.language_id = ' . (int)$_SESSION['languages_id'] . ')
+                                 WHERE p.products_id = ' . $products_filter, 1);
 
-    $product_linked_categories = $db->Execute("SELECT products_id, categories_id FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " WHERE products_id = " . $products_filter);
+    $product_linked_categories = $db->Execute('SELECT products_id, categories_id FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $products_filter);
 }
 
 // hide/show Linked Categories
 if (empty($_SESSION['hide_linked_categories'])) {
-// Build the list of categories within the target category
+    // Build the list of categories within the target category
     $categories_info = [];
     zen_get_categories_info($target_category_id); // loads $categories_info with subcategories of chosen target category
     $target_subcategory_count = count($categories_info);
-    $max_input_vars = @ini_get("max_input_vars");
+    $max_input_vars = @ini_get('max_input_vars');
     if ($target_subcategory_count > $max_input_vars) { //warning when in excess of POST limit
         $messageStack->add(sprintf(WARNING_MAX_INPUT_VARS_LIMIT, $target_subcategory_count, $max_input_vars, 'caution'));
     }
@@ -463,22 +469,22 @@ if (empty($_SESSION['hide_linked_categories'])) {
             <!-- prev-cat-next navigation eof-->
 
             <!-- product selection -->
-            <?php if ($products_filter > 0) {//a product is selected ?>
+            <?php if ($products_filter > 0) {//a product is selected?>
                 <div>
                     <?php
-                    echo zen_draw_form('set_products_filter_id', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_products_filter', 'post', 'class="form-horizontal"');
-                    echo zen_draw_hidden_field('current_category_id', $_GET['current_category_id']);
-                    echo zen_draw_hidden_field('target_category_id', $_GET['target_category_id']);
+                    echo zen_draw_form('set_products_filter_id', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_products_filter', 'post');
+                echo zen_draw_hidden_field('current_category_id', $_GET['current_category_id']);
+                echo zen_draw_hidden_field('target_category_id', $_GET['target_category_id']);
 
-                    $excluded_products = [];
-                    //              $not_for_cart = $db->Execute("select p.products_id from " . TABLE_PRODUCTS . " p left join " . TABLE_PRODUCT_TYPES . " pt on p.products_type= pt.type_id where pt.allow_add_to_cart = 'N'");
-                    //              while (!$not_for_cart->EOF) {
-                    //                $excluded_products[] = $not_for_cart->fields['products_id'];
-                    //                $not_for_cart->MoveNext();
-                    //              }
-                    echo zen_draw_label(TEXT_PRODUCT_TO_VIEW, 'products_filter');
-                    echo zen_draw_pulldown_products('products_filter', 'size="10" class="form-control" id="products_filter" onchange="this.form.submit()"', $excluded_products, true, $products_filter, true, true);
-                    ?>
+                $excluded_products = [];
+                //              $not_for_cart = $db->Execute("select p.products_id from " . TABLE_PRODUCTS . " p left join " . TABLE_PRODUCT_TYPES . " pt on p.products_type= pt.type_id where pt.allow_add_to_cart = 'N'");
+                //              while (!$not_for_cart->EOF) {
+                //                $excluded_products[] = $not_for_cart->fields['products_id'];
+                //                $not_for_cart->MoveNext();
+                //              }
+                echo zen_draw_label(TEXT_PRODUCT_TO_VIEW, 'products_filter');
+                echo zen_draw_pulldown_products('products_filter', 'size="10" class="form-control" id="products_filter" onchange="this.form.submit()"', $excluded_products, true, $products_filter, true, true);
+                ?>
                     <noscript><br><input type="submit" value="<?= IMAGE_DISPLAY ?>"></noscript>
                     <?= '</form>' ?>
                 </div>
@@ -486,36 +492,42 @@ if (empty($_SESSION['hide_linked_categories'])) {
             <!-- product selection eof -->
 
             <!-- master category change -->
-            <?php if ($products_filter > 0) {//a product is selected ?>
+            <?php if ($products_filter > 0) {//a product is selected?>
                 <div class="row">
                     <hr>
                     <h3><?= TEXT_MASTER_CATEGORIES_ID ?></h3>
                     <div class="col-lg-6"><?= TEXT_INFO_MASTER_CATEGORY_CHANGE ?></div>
 
                     <div class="col-lg-6">
-                        <?php if ($product_to_copy->EOF) { //product not linked to ANY category: missing a master category ID/ID invalid ?>
+                        <?php if ($product_to_copy->EOF) { //product not linked to ANY category: missing a master category ID/ID invalid?>
                             <span class="alert"
                                   style="font-size: larger;padding:0;"><?= sprintf(TEXT_PRODUCTS_ID_INVALID, $products_filter) ?></span>
 
-                        <?php } else { //show drop-down for master category re-assignment ?>
+                        <?php } else { //show drop-down for master category re-assignment?>
                             <div class="form-group">
                                 <?php
-                                echo zen_draw_form('restrict_product', FILENAME_PRODUCTS_TO_CATEGORIES, '', 'get', 'class="form-horizontal"', true);
-                                echo zen_draw_hidden_field('action', 'set_master_categories_id');
-                                echo zen_draw_hidden_field('products_filter', $products_filter);
-                                echo zen_draw_hidden_field('current_category_id', $_GET['current_category_id']);
-                                echo zen_hide_session_id();
-                                zen_draw_label(
-                                    zen_icon($product_to_copy->fields['master_categories_id'] > 0 ? 'enabled' : 'disabled', IMAGE_ICON_LINKED, 'lg') .
-                                    '&nbsp;' . TEXT_MASTER_CATEGORIES_ID, 'master_category');
-                                echo zen_draw_pull_down_menu('master_category', zen_get_master_categories_pulldown($products_filter, true), $product_to_copy->fields['master_categories_id'],
-                                    'class="form-control" id="master_category"'); ?>
+                            echo zen_draw_form('restrict_product', FILENAME_PRODUCTS_TO_CATEGORIES, '', 'get');
+                            echo zen_draw_hidden_field('action', 'set_master_categories_id');
+                            echo zen_draw_hidden_field('products_filter', $products_filter);
+                            echo zen_draw_hidden_field('current_category_id', $_GET['current_category_id']);
+                            echo zen_hide_session_id();
+                            zen_draw_label(
+                                zen_icon($product_to_copy->fields['master_categories_id'] > 0 ? 'enabled' : 'disabled', IMAGE_ICON_LINKED, 'lg') .
+                                '&nbsp;' . TEXT_MASTER_CATEGORIES_ID,
+                                'master_category'
+                            );
+                            echo zen_draw_pull_down_menu(
+                                'master_category',
+                                zen_get_master_categories_pulldown($products_filter, true),
+                                $product_to_copy->fields['master_categories_id'],
+                                'class="form-control" id="master_category"'
+                            ); ?>
                                 <button type="submit" class="btn btn-info"><?= IMAGE_UPDATE ?></button>
                                 <?php
-                                if ($product_to_copy->fields['master_categories_id'] < 1) { ?>
+                            if ($product_to_copy->fields['master_categories_id'] < 1) { ?>
                                     <span class="alert" style="font-size: larger;padding:0;"><?= ERROR_DEFINE_PRODUCTS_MASTER_CATEGORIES_ID ?></span>
                                 <?php }
-                                echo '</form>'; ?>
+                            echo '</form>'; ?>
                             </div>
                         <?php } ?>
                     </div>
@@ -528,78 +540,100 @@ if (empty($_SESSION['hide_linked_categories'])) {
         <!-- RIGHT column block (infoBox) -->
         <div class="col-sm-3 col-md-3 col-lg-3">
             <!-- infoBox -->
-            <?php if ($products_filter > 0) {//a product is selected ?>
+            <?php if ($products_filter > 0) {//a product is selected?>
                 <div id="infoBox" style="display:table;margin:0 auto;">
                     <?php
                     $heading = [];
-                    $contents = [];
+                $contents = [];
 
-                    switch ($action) {
-                        case 'edit'://select a different product by ID
-                            $heading[] = ['text' => '<h4>' . TEXT_INFOBOX_HEADING_SELECT_PRODUCT . '</h4>'];
-                            $contents = ['form' => zen_draw_form('product_select_by_id', FILENAME_PRODUCTS_TO_CATEGORIES, '', 'post', 'class="form-horizontal"')];
-                            $contents[] = ['text' => TEXT_SET_PRODUCTS_TO_CATEGORIES_LINKS];
+                switch ($action) {
+                    case 'edit'://select a different product by ID
+                        $heading[] = ['text' => '<h4>' . TEXT_INFOBOX_HEADING_SELECT_PRODUCT . '</h4>'];
+                        $contents = ['form' => zen_draw_form('product_select_by_id', FILENAME_PRODUCTS_TO_CATEGORIES, '', 'post')];
+                        $contents[] = ['text' => TEXT_SET_PRODUCTS_TO_CATEGORIES_LINKS];
+                        $contents[] = [
+                            'text' => zen_draw_label(TEXT_PRODUCTS_ID, 'products_filter', 'class="control-label"') . zen_draw_input_field(
+                                'products_filter',
+                                $products_filter,
+                                'class="form-control"'
+                            ),
+                        ];
+                        $contents[] = [
+                            'align' => 'center',
+                            'text' => '<button type="submit" class="btn btn-primary">' . IMAGE_SELECT . '</button> <a href="' . zen_href_link(
+                                FILENAME_PRODUCTS_TO_CATEGORIES,
+                                'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id
+                            ) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>',
+                        ];
+                        break;
+                    default:
+                        // only show if a Product is selected
+                        if ($products_filter > 0) {
+                            $heading[] = ['text' => '<h4>ID#' . $product_to_copy->fields['products_id'] . ' - ' . $product_to_copy->fields['products_name'] . '</h4>'];
                             $contents[] = [
-                                'text' => zen_draw_label(TEXT_PRODUCTS_ID, 'products_filter', 'class="control-label"') . zen_draw_input_field('products_filter', $products_filter,
-                                        'class="form-control"')
+                                'text' => zen_image(
+                                    DIR_WS_CATALOG_IMAGES . $product_to_copy->fields['products_image'],
+                                    $product_to_copy->fields['products_name'],
+                                    SMALL_IMAGE_WIDTH,
+                                    SMALL_IMAGE_HEIGHT
+                                ),
                             ];
-                            $contents[] = [
-                                'align' => 'center',
-                                'text' => '<button type="submit" class="btn btn-primary">' . IMAGE_SELECT . '</button> <a href="' . zen_href_link(FILENAME_PRODUCTS_TO_CATEGORIES,
-                                        'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'
-                            ];
-                            break;
-                        default:
-                            // only show if a Product is selected
-                            if ($products_filter > 0) {
-                                $heading[] = ['text' => '<h4>ID#' . $product_to_copy->fields['products_id'] . ' - ' . $product_to_copy->fields['products_name'] . '</h4>'];
-                                $contents[] = [
-                                    'text' => zen_image(DIR_WS_CATALOG_IMAGES . $product_to_copy->fields['products_image'], $product_to_copy->fields['products_name'], SMALL_IMAGE_WIDTH,
-                                        SMALL_IMAGE_HEIGHT)
-                                ];
-                                $contents[] = ['text' => TEXT_PRODUCTS_NAME . $product_to_copy->fields['products_name']];
-                                $contents[] = ['text' => TEXT_PRODUCTS_MODEL . $product_to_copy->fields['products_model']];
-                                $contents[] = ['text' => 'Sort Order: ' . $product_to_copy->fields['products_sort_order']];
-                                $contents[] = ['text' => TEXT_PRODUCTS_PRICE . zen_get_products_display_price($products_filter)];
-                                $display_priced_by_attributes = zen_get_products_price_is_priced_by_attributes($products_filter);
-                                $contents[] = ['text' => $display_priced_by_attributes ? '<span class="alert">' . TEXT_PRICED_BY_ATTRIBUTES . '</span>' : ''];
-                                $contents[] = ['text' => zen_get_products_quantity_min_units_display($products_filter, $include_break = false)];
+                            $contents[] = ['text' => TEXT_PRODUCTS_NAME . $product_to_copy->fields['products_name']];
+                            $contents[] = ['text' => TEXT_PRODUCTS_MODEL . $product_to_copy->fields['products_model']];
+                            $contents[] = ['text' => 'Sort Order: ' . $product_to_copy->fields['products_sort_order']];
+                            $contents[] = ['text' => TEXT_PRODUCTS_PRICE . zen_get_products_display_price($products_filter)];
+                            $display_priced_by_attributes = zen_get_products_price_is_priced_by_attributes($products_filter);
+                            $contents[] = ['text' => $display_priced_by_attributes ? '<span class="alert">' . TEXT_PRICED_BY_ATTRIBUTES . '</span>' : ''];
+                            $contents[] = ['text' => zen_get_products_quantity_min_units_display($products_filter, $include_break = false)];
 
-                                switch (true) {
-                                    case ($product_to_copy->fields['master_categories_id'] === 0 && $products_filter > 0):
-                                        $contents[] = ['text' => '<span class="alert">' . ERROR_DEFINE_PRODUCTS_MASTER_CATEGORIES_ID . '</span>'];
-                                        break;
-                                    default:
-                                        $contents[] = [
-                                            'align' => 'center',
-                                            'text' =>
-                                                '<a href="' . zen_href_link(FILENAME_PRODUCT,
-                                                    'action=new_product' . '&cPath=' . zen_get_parent_category_id($products_filter) . '&pID=' . $products_filter . '&product_type=' . zen_get_products_type($products_filter)) . '" class="btn btn-info" role="button">' . IMAGE_EDIT_PRODUCT . '</a>&nbsp;' .
-                                                '<a href="' . zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING,
-                                                    'cPath=' . zen_get_parent_category_id($products_filter) . '&pID=' . $products_filter) . '" class="btn btn-info" role="button">' . BUTTON_CATEGORY_LISTING . '</a><br><br>' .
-                                                '<a href="' . zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER,
-                                                    'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id) . '" class="btn btn-info" role="button">' . IMAGE_EDIT_ATTRIBUTES . '</a>&nbsp;' .
-                                                '<a href="' . zen_href_link(FILENAME_PRODUCTS_PRICE_MANAGER,
-                                                    'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id) . '" class="btn btn-info" role="button">' . IMAGE_PRODUCTS_PRICE_MANAGER . '</a>'
-                                        ];
-                                        $contents[] = ['text' => zen_draw_separator('pixel_black.gif')];
-                                        $contents[] = [
-                                            'align' => 'center',
-                                            'text' => zen_draw_form('new_products_to_categories', FILENAME_PRODUCTS_TO_CATEGORIES,
-                                                    'action=edit&current_category_id=' . $current_category_id) . zen_draw_hidden_field('products_filter',
-                                                    $products_filter) . '<button type="submit" class="btn btn-primary">' . BUTTON_NEW_PRODUCTS_TO_CATEGORIES . '</button></form>'
-                                        ];
-                                        break;
-                                }
+                            switch (true) {
+                                case ($product_to_copy->fields['master_categories_id'] === 0 && $products_filter > 0):
+                                    $contents[] = ['text' => '<span class="alert">' . ERROR_DEFINE_PRODUCTS_MASTER_CATEGORIES_ID . '</span>'];
+                                    break;
+                                default:
+                                    $contents[] = [
+                                        'align' => 'center',
+                                        'text' =>
+                                            '<a href="' . zen_href_link(
+                                                FILENAME_PRODUCT,
+                                                'action=new_product' . '&cPath=' . zen_get_parent_category_id($products_filter) . '&pID=' . $products_filter . '&product_type=' . zen_get_products_type($products_filter)
+                                            ) . '" class="btn btn-info" role="button">' . IMAGE_EDIT_PRODUCT . '</a>&nbsp;' .
+                                            '<a href="' . zen_href_link(
+                                                FILENAME_CATEGORY_PRODUCT_LISTING,
+                                                'cPath=' . zen_get_parent_category_id($products_filter) . '&pID=' . $products_filter
+                                            ) . '" class="btn btn-info" role="button">' . BUTTON_CATEGORY_LISTING . '</a><br><br>' .
+                                            '<a href="' . zen_href_link(
+                                                FILENAME_ATTRIBUTES_CONTROLLER,
+                                                'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id
+                                            ) . '" class="btn btn-info" role="button">' . IMAGE_EDIT_ATTRIBUTES . '</a>&nbsp;' .
+                                            '<a href="' . zen_href_link(
+                                                FILENAME_PRODUCTS_PRICE_MANAGER,
+                                                'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id
+                                            ) . '" class="btn btn-info" role="button">' . IMAGE_PRODUCTS_PRICE_MANAGER . '</a>',
+                                    ];
+                                    $contents[] = ['text' => zen_draw_separator('pixel_black.gif')];
+                                    $contents[] = [
+                                        'align' => 'center',
+                                        'text' => zen_draw_form(
+                                            'new_products_to_categories',
+                                            FILENAME_PRODUCTS_TO_CATEGORIES,
+                                            'action=edit&current_category_id=' . $current_category_id
+                                        ) . zen_draw_hidden_field(
+                                            'products_filter',
+                                            $products_filter
+                                        ) . '<button type="submit" class="btn btn-primary">' . BUTTON_NEW_PRODUCTS_TO_CATEGORIES . '</button></form>',
+                                    ];
+                                    break;
                             }
-                            break;
-                    }
+                        }
+                        break;
+                }
 
-                    if (!empty($heading) && !empty($contents)) {
-                        $box = new box();
-                        echo $box->infoBox($heading, $contents);
-                    }
-                    ?>
+                if (!empty($heading) && !empty($contents)) {
+                    $box = new box();
+                    echo $box->infoBox($heading, $contents);
+                }
+                ?>
                 </div>
             <?php } ?>
             <!-- infoBox eof -->
@@ -617,52 +651,52 @@ if (empty($_SESSION['hide_linked_categories'])) {
                 <?php
                 // button to hide/show the linked categories
                 echo '<div>' . zen_draw_form('hide_linked_categories_form', FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params(), 'post');
-                echo zen_draw_hidden_field('form', 'hide_linked_categories_form');
-                echo zen_draw_hidden_field('hide_linked_categories', (empty($_SESSION['hide_linked_categories']) ? 1 : 0));
-                echo '<button type="submit" class="btn btn-info">' . (empty($_SESSION['hide_linked_categories']) ? BUTTON_HIDE_LINKED_CATEGORIES : BUTTON_SHOW_LINKED_CATEGORIES) . '</button>';
-                echo '</form></div>';
-                if (empty($_SESSION['hide_linked_categories'])) {
-                    echo TEXT_INFO_PRODUCTS_TO_CATEGORIES_LINKER_INTRO; ?>
+         echo zen_draw_hidden_field('form', 'hide_linked_categories_form');
+         echo zen_draw_hidden_field('hide_linked_categories', (empty($_SESSION['hide_linked_categories']) ? 1 : 0));
+         echo '<button type="submit" class="btn btn-info">' . (empty($_SESSION['hide_linked_categories']) ? BUTTON_HIDE_LINKED_CATEGORIES : BUTTON_SHOW_LINKED_CATEGORIES) . '</button>';
+         echo '</form></div>';
+         if (empty($_SESSION['hide_linked_categories'])) {
+             echo TEXT_INFO_PRODUCTS_TO_CATEGORIES_LINKER_INTRO; ?>
                     <div class="form-group text-center">
                         <?php
-                        if ($product_to_copy->fields['master_categories_id'] < 1) { ?>
+                 if ($product_to_copy->fields['master_categories_id'] < 1) { ?>
                             <span class="alert"><?= TEXT_SET_MASTER_CATEGORIES_ID ?></span>
                             <?php
-                        } ?>
+                 } ?>
                     </div>
                     <div><?php // make dropdown to select the base target category, whose subcategories are subsequently displayed
-                        echo zen_draw_form('set_target_category_form', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_target_category' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post');
-                        $select_all_categories_option = [
-                            [
-                                'id' => TOPMOST_CATEGORY_PARENT_ID,
-                                'text' => TEXT_TOP
-                            ]
-                        ];
-                        $category_select_values = zen_get_target_categories_products(TOPMOST_CATEGORY_PARENT_ID, '&nbsp;&nbsp;&nbsp;', $select_all_categories_option);
-                        ?>
+                 echo zen_draw_form('set_target_category_form', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_target_category' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post');
+             $select_all_categories_option = [
+                 [
+                     'id' => TOPMOST_CATEGORY_PARENT_ID,
+                     'text' => TEXT_TOP,
+                 ],
+             ];
+             $category_select_values = zen_get_target_categories_products(TOPMOST_CATEGORY_PARENT_ID, '&nbsp;&nbsp;&nbsp;', $select_all_categories_option);
+             ?>
                         <label><?= TEXT_LABEL_CATEGORY_DISPLAY_ROOT . zen_draw_pull_down_menu('target_category_id', $category_select_values, $target_category_id, 'onChange="this.form.submit();"') ?></label>
                         <?php
-                        echo zen_draw_hidden_field('products_filter', $_GET['products_filter']);
-                        echo zen_hide_session_id();
-                        ?>
+             echo zen_draw_hidden_field('products_filter', $_GET['products_filter']);
+             echo zen_hide_session_id();
+             ?>
                         <noscript><input type="submit" value="<?= IMAGE_DISPLAY ?>"></noscript>
                         <?php
-                        echo '</form>';
-                        if ($target_category_id !== (int)P2C_TARGET_CATEGORY_DEFAULT) { // show a Set Default button if the selected target category is different from the saved default
-                            echo zen_draw_form('set_default_target_category_form', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_default_target_category' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post'); ?>
+             echo '</form>';
+             if ($target_category_id !== (int)P2C_TARGET_CATEGORY_DEFAULT) { // show a Set Default button if the selected target category is different from the saved default
+                 echo zen_draw_form('set_default_target_category_form', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=set_default_target_category' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post'); ?>
                             <button type="submit" class="btn btn-info" title="<?= BUTTON_SET_DEFAULT_TARGET_CATEGORY_TITLE ?>"><?= BUTTON_SET_DEFAULT_TARGET_CATEGORY ?></span></button>
                             <?php
-                            echo zen_draw_hidden_field('default_target_category_id', $target_category_id);
-                            echo '</form>';
-                        } ?>
+                 echo zen_draw_hidden_field('default_target_category_id', $target_category_id);
+                 echo '</form>';
+             } ?>
                     </div>
                     <div>
                         <?php
-                        $selected_categories = [];
-                        foreach ($product_linked_categories as $product_linked_category) {
-                            $selected_categories[] = (int)$product_linked_category['categories_id'];
-                        }
-                        ?>
+             $selected_categories = [];
+             foreach ($product_linked_categories as $product_linked_category) {
+                 $selected_categories[] = (int)$product_linked_category['categories_id'];
+             }
+             ?>
                         <p id="toggleCheckbox">
                             <label><input type="checkbox" onclick="toggle(this)"> <?= TEXT_LABEL_SELECT_ALL_OR_NONE ?></label>
                         </p>
@@ -677,82 +711,86 @@ if (empty($_SESSION['hide_linked_categories'])) {
                     </div>
                     <?php
                     echo zen_draw_form('update', FILENAME_PRODUCTS_TO_CATEGORIES, 'action=update_product&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id . '&target_category_id=' . $target_category_id, 'post');
-                    zen_draw_hidden_field('current_master_categories_id', $product_to_copy->fields['master_categories_id']); ?>
+             zen_draw_hidden_field('current_master_categories_id', $product_to_copy->fields['master_categories_id']); ?>
                     <table class="table-bordered">
                         <thead>
                         <?php $cnt_columns = 0; ?>
                         <tr class="dataTableHeadingRow">
                             <?php
-                            while ($cnt_columns !== (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
-                                $cnt_columns++;
-                                ?>
+                     while ($cnt_columns !== (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
+                         $cnt_columns++;
+                         ?>
                                 <th class="dataTableHeadingContent"><?= TEXT_CATEGORIES_NAME ?></th>
                                 <?php
-                            }
-                            ?>
+                     }
+             ?>
                         </tr>
                         </thead>
                         <tbody>
                         <?php
                         $cnt_columns = 0;
-                        $num_target_categories = count($categories_info);
+             $num_target_categories = count($categories_info);
 
-                        for ($cat_i = 0; $cat_i < $num_target_categories; $cat_i++) {
-                            // Create an object and populate it with the properties expected by the script (an array with
-                            // the category's ID and name stored in a "fields" property)
-                            $categories_list = new stdClass();
-                            $categories_list->fields = $categories_info[$cat_i];
-                            $cnt_columns++;
-                            if (count($selected_categories) !== 0) {
-                                $selected = in_array((int)$categories_list->fields['categories_id'], $selected_categories, true);
-                            } else {
-                                $selected = false;
-                            }
-                            // Add a class to the checkbox so that it can be identified as a target category checkbox, for the purposes of selecting all/none at once
-                            $zc_categories_checkbox = zen_draw_checkbox_field('categories_add[]',
-                            $categories_list->fields['categories_id'], $selected, '', 'class="TargetCategoryCheckbox"');
+             for ($cat_i = 0; $cat_i < $num_target_categories; $cat_i++) {
+                 // Create an object and populate it with the properties expected by the script (an array with
+                 // the category's ID and name stored in a "fields" property)
+                 $categories_list = new stdClass();
+                 $categories_list->fields = $categories_info[$cat_i];
+                 $cnt_columns++;
+                 if (count($selected_categories) !== 0) {
+                     $selected = in_array((int)$categories_list->fields['categories_id'], $selected_categories, true);
+                 } else {
+                     $selected = false;
+                 }
+                 // Add a class to the checkbox so that it can be identified as a target category checkbox, for the purposes of selecting all/none at once
+                 $zc_categories_checkbox = zen_draw_checkbox_field(
+                     'categories_add[]',
+                     $categories_list->fields['categories_id'],
+                     $selected,
+                     ''
+                 );
 
-                            if ($cnt_columns === 1) {
-                                ?>
+                 if ($cnt_columns === 1) {
+                     ?>
                                 <tr class="dataTableRow">
                                 <?php
-                            }
-                            if ((int)$product_to_copy->fields['master_categories_id'] === (int)$categories_list->fields['categories_id']) {
-                               echo '  <td class="dataTableContent" title="' . TEXT_VALID_CATEGORIES_ID . ': ' . $categories_list->fields['categories_id'] . '">' . zen_icon('enabled', TEXT_MASTER_CATEGORIES_ID . ' ' . $product_to_copy->fields['master_categories_id'], 'lg') . '&nbsp;' . htmlspecialchars($categories_list->fields['categories_name'], ENT_COMPAT, CHARSET) . '</td>' . "\n";
-                            } else {
-                               echo '  <td class="dataTableContent"><label class="labelForCheck" title="' . TEXT_VALID_CATEGORIES_ID . ': ' . $categories_list->fields['categories_id'] . '">' . $zc_categories_checkbox . '<span>' . htmlspecialchars($categories_list->fields['categories_name'], ENT_COMPAT, CHARSET) . '</span></label></td>' . "\n";
-                            } // span is required inside label to allow css selection for highlighting when input checked
+                 }
+                 if ((int)$product_to_copy->fields['master_categories_id'] === (int)$categories_list->fields['categories_id']) {
+                     echo '  <td class="dataTableContent" title="' . TEXT_VALID_CATEGORIES_ID . ': ' . $categories_list->fields['categories_id'] . '">' . zen_icon('enabled', TEXT_MASTER_CATEGORIES_ID . ' ' . $product_to_copy->fields['master_categories_id'], 'lg') . '&nbsp;' . htmlspecialchars((string) $categories_list->fields['categories_name'], ENT_COMPAT, CHARSET) . '</td>' . "\n";
+                 } else {
+                     echo '  <td class="dataTableContent"><label class="labelForCheck" title="' . TEXT_VALID_CATEGORIES_ID . ': ' . $categories_list->fields['categories_id'] . '">' . $zc_categories_checkbox . '<span>' . htmlspecialchars((string) $categories_list->fields['categories_name'], ENT_COMPAT, CHARSET) . '</span></label></td>' . "\n";
+                 } // span is required inside label to allow css selection for highlighting when input checked
 
-                            if ($cnt_columns === (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS ||
-                                $cat_i === ($num_target_categories - 1)) {
-                                if ($cat_i === ($num_target_categories - 1) &&
-                                    $cnt_columns !== (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
-                                    while ($cnt_columns < (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
-                                        $cnt_columns++;
-                                        ?>
+                 if ($cnt_columns === (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS ||
+                     $cat_i === ($num_target_categories - 1)) {
+                     if ($cat_i === ($num_target_categories - 1) &&
+                         $cnt_columns !== (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
+                         while ($cnt_columns < (int)MAX_DISPLAY_PRODUCTS_TO_CATEGORIES_COLUMNS) {
+                             $cnt_columns++;
+                             ?>
                                         <td class="dataTableContent">&nbsp;</td>
                                         <?php
-                                    }
-                                }
-                                ?>
+                         }
+                     }
+                     ?>
                                 </tr>
                                 <?php
-                                $cnt_columns = 0;
-                            }
-                        }
-                        ?>
+                     $cnt_columns = 0;
+                 }
+             }
+             ?>
                         </tbody>
                     </table>
                     <div class="form-group text-center">
                         <button type="submit" class="btn btn-primary floatButton"
-                                title="<?= BUTTON_UPDATE_CATEGORY_LINKS . " - " . $product_to_copy->fields['products_name'] ?>"><?= BUTTON_UPDATE_CATEGORY_LINKS . '<br><span>' . $product_to_copy->fields['products_model'] . '<br>' . $product_to_copy->fields['products_name'] . '<br>(#' . $products_filter . ')' ?></span></button>
+                                title="<?= BUTTON_UPDATE_CATEGORY_LINKS . ' - ' . $product_to_copy->fields['products_name'] ?>"><?= BUTTON_UPDATE_CATEGORY_LINKS . '<br><span>' . $product_to_copy->fields['products_model'] . '<br>' . $product_to_copy->fields['products_name'] . '<br>(#' . $products_filter . ')' ?></span></button>
                     </div>
                     <?php echo '</form>';
-                } ?>
+         } ?>
             </div>
         </div>
         <?php
-    } ?>
+     } ?>
     <!-- Linked Categories eof -->
     <!-- Product-Category links block eof-->
 
@@ -768,23 +806,23 @@ if (empty($_SESSION['hide_linked_categories'])) {
                 <?= sprintf(TEXT_INFO_COPY_LINKED_CATEGORIES, ($products_filter > 0 ? ':<p><strong>' . $source_product_details . '</strong></p>' : ' ')); ?>
             </div>
             <?php
-            if ($products_filter > 0) {
-                echo '<br>' . zen_draw_form('copy_links_dropdown_form', FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params(['action']), 'post');
-                echo zen_draw_hidden_field('form', 'copy_links_dropdown_form');
-                echo zen_draw_label(TEXT_LABEL_ENABLE_COPY_LINKS, 'copy_links_dropdown', 'class="control-label"') . ' ';
-                echo zen_draw_checkbox_field('copy_links_dropdown', '1', empty($_SESSION['copy_links_dropdown']) ? false : $_SESSION['copy_links_dropdown'], '', 'id="copy_links_dropdown" onClick="this.form.submit();"');
-                echo '</form>';
+             if ($products_filter > 0) {
+                 echo '<br>' . zen_draw_form('copy_links_dropdown_form', FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params(['action']), 'post');
+                 echo zen_draw_hidden_field('form', 'copy_links_dropdown_form');
+                 echo zen_draw_label(TEXT_LABEL_ENABLE_COPY_LINKS, 'copy_links_dropdown', 'class="control-label"') . ' ';
+                 echo zen_draw_checkbox_field('copy_links_dropdown', '1', empty($_SESSION['copy_links_dropdown']) ? false : $_SESSION['copy_links_dropdown'], '');
+                 echo '</form>';
 
-                if (!empty($_SESSION['copy_links_dropdown'])) {
-                    echo zen_draw_form('copy_linked_categories_to_another_product', FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params('action') . '&action=copy_linked_categories_to_another_product', 'post', 'class="form-horizontal"');
-                    // Get the list of products and build a select gadget
-                    $category_product_tree_array = [];
-                    $category_product_tree_array[] = [
-                        'id' => '',
-                        'text' => TEXT_OPTION_LINKED_CATEGORIES
-                    ];
-                    $category_product_tree_array = zen_get_target_categories_products(TOPMOST_CATEGORY_PARENT_ID, '', $category_product_tree_array, 'product');
-                    ?>
+                 if (!empty($_SESSION['copy_links_dropdown'])) {
+                     echo zen_draw_form('copy_linked_categories_to_another_product', FILENAME_PRODUCTS_TO_CATEGORIES, zen_get_all_get_params('action') . '&action=copy_linked_categories_to_another_product', 'post');
+                     // Get the list of products and build a select gadget
+                     $category_product_tree_array = [];
+                     $category_product_tree_array[] = [
+                         'id' => '',
+                         'text' => TEXT_OPTION_LINKED_CATEGORIES,
+                     ];
+                     $category_product_tree_array = zen_get_target_categories_products(TOPMOST_CATEGORY_PARENT_ID, '', $category_product_tree_array, 'product');
+                     ?>
                     <div class="form-group-row">
                         <div class="col-lg-8">
                             <?= zen_draw_pull_down_menu('target_product_id', $category_product_tree_array, '', 'id="target_product_id"') ?>
@@ -797,9 +835,9 @@ if (empty($_SESSION['hide_linked_categories'])) {
                         </div>
                     </div>
                 <?php
-                    echo '</form>';
-                }
-            } ?>
+                     echo '</form>';
+                 }
+             } ?>
         </div>
         <!-- Copy linked categories from one product to another eof -->
         <hr>
@@ -808,8 +846,7 @@ if (empty($_SESSION['hide_linked_categories'])) {
         <!-- Copy all products from one category to another as linked products -->
         <div id="copyLinkedProducts" class="row dataTableHeadingRow">
             <?= zen_draw_form('linked_copy', FILENAME_PRODUCTS_TO_CATEGORIES,
-                'action=copy_products_as_linked' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post',
-                'class="form-horizontal"') ?>
+                'action=copy_products_as_linked' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post') ?>
             <h3><?= TEXT_HEADING_COPY_ALL_PRODUCTS_TO_CATEGORY_LINKED ?></h3>
             <div class="form-group-row">
                 <?= TEXT_INFO_COPY_ALL_PRODUCTS_TO_CATEGORY_LINKED ?>
@@ -817,13 +854,23 @@ if (empty($_SESSION['hide_linked_categories'])) {
             <div class="form-group-row">
                 <div class="col-lg-4">
                     <?= zen_draw_label(TEXT_LABEL_COPY_ALL_PRODUCTS_TO_CATEGORY_FROM_LINKED, 'category_id_source',
-                            'class="control-label"') . zen_draw_input_field('category_id_source', '', 'id="category_id_source" class="form-control" step="1" min="1"', '',
-                            'number') ?>
+                        'class="control-label"') . zen_draw_input_field(
+                            'category_id_source',
+                            '',
+                            'id="category_id_source" class="form-control" step="1" min="1"',
+                            '',
+                            'number'
+                        ) ?>
                 </div>
                 <div class="col-lg-4">
                     <?= zen_draw_label(TEXT_LABEL_COPY_ALL_PRODUCTS_TO_CATEGORY_TO_LINKED, 'category_id_target',
-                            'class="control-label"') . zen_draw_input_field('category_id_target', '', 'id="category_id_target" class="form-control" step="1" min="1"', '',
-                            'number') ?>
+                        'class="control-label"') . zen_draw_input_field(
+                            'category_id_target',
+                            '',
+                            'id="category_id_target" class="form-control" step="1" min="1"',
+                            '',
+                            'number'
+                        ) ?>
                 </div>
                 <div class="col-lg-4">
                     <button type="submit" class="btn btn-primary"><?= BUTTON_COPY_CATEGORY_LINKED ?></button>
@@ -837,8 +884,7 @@ if (empty($_SESSION['hide_linked_categories'])) {
         <!-- Remove products from one category that are linked to another category -->
         <div id="removeLinkedProducts" class="row dataTableHeadingRow">
             <?= zen_draw_form('linked_remove', FILENAME_PRODUCTS_TO_CATEGORIES,
-                'action=remove_linked_products' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post',
-                'class="form-horizontal"') ?>
+                'action=remove_linked_products' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post') ?>
             <h3><?= TEXT_HEADING_REMOVE_ALL_PRODUCTS_FROM_CATEGORY_LINKED ?></h3>
             <div class="form-group-row">
                 <?= sprintf(TEXT_INFO_REMOVE_ALL_PRODUCTS_TO_CATEGORY_LINKED, $current_category_id) ?>
@@ -846,13 +892,23 @@ if (empty($_SESSION['hide_linked_categories'])) {
             <div class="form-group-row">
                 <div class="col-lg-4">
                     <?= zen_draw_label(TEXT_LABEL_REMOVE_ALL_PRODUCTS_TO_CATEGORY_FROM_LINKED, 'category_id_reference',
-                            'class="control-label"') . zen_draw_input_field('category_id_reference', '', 'id="category_id_reference" class="form-control" step="1" min="1"', '',
-                            'number') ?>
+                        'class="control-label"') . zen_draw_input_field(
+                            'category_id_reference',
+                            '',
+                            'id="category_id_reference" class="form-control" step="1" min="1"',
+                            '',
+                            'number'
+                        ) ?>
                 </div>
                 <div class="col-lg-4">
                     <?= zen_draw_label(TEXT_LABEL_REMOVE_ALL_PRODUCTS_TO_CATEGORY_TO_LINKED, 'category_id_target_remove',
-                            'class="control-label"') . zen_draw_input_field('category_id_target_remove', '', 'id="category_id_target_remove" class="form-control" step="1" min="1"', '',
-                            'number') ?>
+                        'class="control-label"') . zen_draw_input_field(
+                            'category_id_target_remove',
+                            '',
+                            'id="category_id_target_remove" class="form-control" step="1" min="1"',
+                            '',
+                            'number'
+                        ) ?>
                 </div>
                 <div class="col-lg-4">
                     <button type="submit" class="btn btn-primary"><?= BUTTON_REMOVE_CATEGORY_LINKED ?></button>
@@ -865,8 +921,7 @@ if (empty($_SESSION['hide_linked_categories'])) {
         <!-- Reset master_categories_id for all products in the selected category -->
         <div id="resetMasterCategoryIds" class="row dataTableHeadingRow">
             <?= zen_draw_form('master_reset', FILENAME_PRODUCTS_TO_CATEGORIES,
-                'action=reset_products_category_as_master' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post',
-                'class="form-horizontal"') ?>
+                'action=reset_products_category_as_master' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id, 'post') ?>
             <h3><?= TEXT_HEADING_RESET_ALL_PRODUCTS_TO_CATEGORY_MASTER ?></h3>
             <div class="form-group-row">
                 <?= TEXT_INFO_RESET_ALL_PRODUCTS_TO_CATEGORY_MASTER ?>
@@ -874,8 +929,13 @@ if (empty($_SESSION['hide_linked_categories'])) {
             <div class="form-group-row">
                 <div class="col-lg-8">
                     <?= zen_draw_label(TEXT_INFO_RESET_ALL_PRODUCTS_TO_CATEGORY_FROM_MASTER, 'category_id_as_master',
-                            'class="control-label"') . zen_draw_input_field('category_id_as_master', '', ' id="category_id_as_master" class="form-control" step="1" min="1"', '',
-                            'number') ?>
+                        'class="control-label"') . zen_draw_input_field(
+                            'category_id_as_master',
+                            '',
+                            ' id="category_id_as_master" class="form-control" step="1" min="1"',
+                            '',
+                            'number'
+                        ) ?>
                 </div>
                 <div class="col-lg-4">
                     <button type="submit" class="btn btn-danger"><?= BUTTON_RESET_CATEGORY_MASTER ?></button>

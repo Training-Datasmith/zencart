@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -13,23 +15,12 @@ namespace Zencart\InitSystem;
  */
 class InitSystem
 {
-    private $installedPlugins;
     private bool $debug;
     private array $debugList;
     private array $actionList;
 
-    private string $context;
-    private string $loaderPrefix;
-    private $fileSystem;
-    private $pluginManager;
-
-    public function __construct(string $context, string $loaderPrefix, $fileSystem, $pluginManager, $installedPlugins)
+    public function __construct(private readonly string $context, private readonly string $loaderPrefix, private $fileSystem, private $pluginManager, private $installedPlugins)
     {
-        $this->context = $context;
-        $this->loaderPrefix = $loaderPrefix;
-        $this->fileSystem = $fileSystem;
-        $this->pluginManager = $pluginManager;
-        $this->installedPlugins = $installedPlugins;
         $this->debug = false;
         $this->debugList = [];
         $this->actionList = [];
@@ -42,8 +33,7 @@ class InitSystem
     {
         $coreLoaderList = $this->loadAutoLoadersFromSystem('core', DIR_WS_INCLUDES . 'auto_loaders');
         $pluginLoaderList = $this->loadPluginAutoLoaders('plugin');
-        $mainLoaderList = $this->mergeAutoLoaders($coreLoaderList, $pluginLoaderList);
-        return $mainLoaderList;
+        return $this->mergeAutoLoaders($coreLoaderList, $pluginLoaderList);
     }
 
     /**
@@ -92,7 +82,7 @@ class InitSystem
      */
     protected function processActionPointEntry(array $entry): void
     {
-        $autoTypeMethod = 'processAutoType' . ucfirst($entry['autoType']);
+        $autoTypeMethod = 'processAutoType' . ucfirst((string) $entry['autoType']);
         $this->debugList[] = 'Auto Type Method - ' . $autoTypeMethod;
         if (!method_exists($this, $autoTypeMethod)) {
             return;
@@ -140,7 +130,6 @@ class InitSystem
         }
         $this->debugList[] = 'instantiating session bound class - ' . $className . ' as ' . $objectName;
         $this->actionList[] = ['type' => 'sessionClass', 'object' => $objectName, 'class' => $className, 'checkInstantiated' => $checkInstantiated];
-        return;
     }
 
     /**
@@ -161,9 +150,6 @@ class InitSystem
     {
         $filePath = $entry['loadFile'];
         $this->debugList[] = 'processing require - ' . $entry['loadFile'];
-        if ($entry['loaderType'] === 'plugin') {
-
-        }
         $result = 'FAILED';
         if (file_exists($filePath)) {
             $result = 'SUCCESS';
@@ -179,9 +165,6 @@ class InitSystem
     {
         $filePath = $entry['loadFile'];
         $this->debugList[] = 'processing include - ' . $entry['loadFile'];
-        if ($entry['loaderType'] == 'plugin') {
-
-        }
         $result = 'FAILED';
         if (file_exists($filePath)) {
             $result = 'SUCCESS';
@@ -215,8 +198,7 @@ class InitSystem
         $fileList = $this->fileSystem->listFilesFromDirectoryAlphaSorted($rootDir);
         $fileList = $this->processForOverrides($loaderType, $fileList, $rootDir);
         $loaderList = $this->getLoadersFromFileList($fileList);
-        $loaderList = $this->processLoaderListForType($loaderType, $loaderList, $plugin);
-        return $loaderList;
+        return $this->processLoaderListForType($loaderType, $loaderList, $plugin);
     }
 
     /**
@@ -252,7 +234,10 @@ class InitSystem
             }
         }
         foreach ($fileList as $file) {
-            if ($file === $core_loader_file || !$this->fileMatchesLoaderPrefix($file)) {
+            if ($file === $core_loader_file) {
+                continue;
+            }
+            if (!$this->fileMatchesLoaderPrefix($file)) {
                 continue;
             }
             $filePath = $baseDir . '/' . $file;
@@ -350,7 +335,6 @@ class InitSystem
     {
         $relDir = $this->fileSystem->getRelativeDir($filePath);
         $pluginDir = $this->pluginManager->getPluginVersionDirectory($pluginName, $this->installedPlugins);
-        $actualDir = $pluginDir . $this->context . '/' . $relDir;
-        return $actualDir;
+        return $pluginDir . $this->context . '/' . $relDir;
     }
 }

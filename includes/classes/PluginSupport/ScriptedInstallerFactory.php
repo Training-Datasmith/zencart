@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -21,10 +23,9 @@ class ScriptedInstallerFactory
     /**
      * @since ZC v1.5.7
      */
-    public function make($pluginDir): ScriptedInstaller
+    public function make(string $pluginDir): ScriptedInstaller
     {
         require_once $pluginDir . '/Installer/ScriptedInstaller.php';
-        $scriptedInstaller = new \ScriptedInstaller($this->dbConn, $this->errorContainer);
-        return $scriptedInstaller;
+        return new \ScriptedInstaller($this->dbConn, $this->errorContainer);
     }
 }

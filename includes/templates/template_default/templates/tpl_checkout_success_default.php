@@ -15,10 +15,10 @@
 <!--bof -gift certificate- send or spend box-->
 <?php
 // only show when there is a GV balance
-  if ($customer_has_gv_balance ) {
-?>
+  if ($customer_has_gv_balance) {
+      ?>
 <div id="sendSpendWrapper">
-<?php require($template->get_template_dir('tpl_modules_send_or_spend.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_send_or_spend.php'); ?>
+<?php require($template->get_template_dir('tpl_modules_send_or_spend.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_send_or_spend.php'); ?>
 </div>
 <?php
   }
@@ -34,13 +34,13 @@
  * require the html_defined text for checkout success
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 <!-- bof payment-method-alerts -->
 <?php
 if (isset($additional_payment_messages) && $additional_payment_messages != '') {
-?>
+    ?>
   <div class="content">
   <?php echo $additional_payment_messages; ?>
   </div>
@@ -52,16 +52,16 @@ if (isset($additional_payment_messages) && $additional_payment_messages != '') {
 <div id="checkoutSuccessLogoff">
 <?php
   if (isset($_SESSION['customer_guest_id'])) {
-    echo TEXT_CHECKOUT_LOGOFF_GUEST;
+      echo TEXT_CHECKOUT_LOGOFF_GUEST;
   } elseif (isset($_SESSION['customer_id'])) {
-    echo TEXT_CHECKOUT_LOGOFF_CUSTOMER;
+      echo TEXT_CHECKOUT_LOGOFF_CUSTOMER;
   }
 ?>
 </div>
 <div class="buttonRow forward">
-    <a href="<?php echo zen_href_link(FILENAME_CONTACT_US, '', 'SSL'); ?>" id="linkContactUs"><?php echo zen_image_button(BUTTON_IMAGE_CONTACT_US , BUTTON_CONTACT_US_TEXT); ?></a>
-    <a href="<?php echo zen_href_link(FILENAME_ACCOUNT, '', 'SSL'); ?>" id="linkMyAccount"><?php echo zen_image_button(BUTTON_IMAGE_MY_ORDERS , BUTTON_MY_ORDERS_TEXT); ?></a>
-    <a href="<?php echo zen_href_link(FILENAME_LOGOFF, '', 'SSL'); ?>" id="linkLogoff"><?php echo zen_image_button(BUTTON_IMAGE_LOG_OFF , BUTTON_LOG_OFF_ALT); ?></a>
+    <a href="<?php echo zen_href_link(FILENAME_CONTACT_US, '', 'SSL'); ?>" id="linkContactUs"><?php echo zen_image_button(BUTTON_IMAGE_CONTACT_US, BUTTON_CONTACT_US_TEXT); ?></a>
+    <a href="<?php echo zen_href_link(FILENAME_ACCOUNT, '', 'SSL'); ?>" id="linkMyAccount"><?php echo zen_image_button(BUTTON_IMAGE_MY_ORDERS, BUTTON_MY_ORDERS_TEXT); ?></a>
+    <a href="<?php echo zen_href_link(FILENAME_LOGOFF, '', 'SSL'); ?>" id="linkLogoff"><?php echo zen_image_button(BUTTON_IMAGE_LOG_OFF, BUTTON_LOG_OFF_ALT); ?></a>
 </div>
 
 <div id="checkoutSuccessContactLink"><?php echo TEXT_CONTACT_STORE_OWNER;?></div>
@@ -70,7 +70,7 @@ if (isset($additional_payment_messages) && $additional_payment_messages != '') {
 
 <!-- bof order details -->
 <?php
-require($template->get_template_dir('tpl_account_history_info_default.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_account_history_info_default.php');
+require($template->get_template_dir('tpl_account_history_info_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_account_history_info_default.php');
 ?>
 <!-- eof order details -->
 
@@ -82,7 +82,7 @@ require($template->get_template_dir('tpl_account_history_info_default.php',DIR_W
  * announcements related to products they've just purchased.
  **/
     if ($flag_show_products_notification == true) {
-?>
+        ?>
 <fieldset id="csNotifications">
 <legend><?php echo TEXT_NOTIFY_PRODUCTS; ?></legend>
 <?php echo zen_draw_form('order', zen_href_link(FILENAME_ACCOUNT_NOTIFICATIONS, 'action=notify', 'SSL')); ?>

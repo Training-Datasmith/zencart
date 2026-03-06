@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Load in any user functions
  *
@@ -10,21 +12,17 @@
 use Zencart\FileSystem\FileSystem;
 
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 
-$extraFuncsMain = (new FileSystem)->listFilesFromDirectoryAlphaSorted(DIR_WS_FUNCTIONS . 'extra_functions/', '~^[^\._].*\.php$~i');
-$extraFuncsMain = array_map(static function ($item) {
-    return DIR_WS_FUNCTIONS . 'extra_functions/' . $item;
-}, $extraFuncsMain);
+$extraFuncsMain = (new FileSystem())->listFilesFromDirectoryAlphaSorted(DIR_WS_FUNCTIONS . 'extra_functions/', '~^[^\._].*\.php$~i');
+$extraFuncsMain = array_map(static fn ($item) => DIR_WS_FUNCTIONS . 'extra_functions/' . $item, $extraFuncsMain);
 $context = IS_ADMIN_FLAG ? 'admin' : 'catalog';
 $extraFuncsPlugins = [];
 foreach ($installedPlugins as $plugin) {
     $path = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/' . $context . '/' . DIR_WS_FUNCTIONS . 'extra_functions/';
-    $efPluginFile = (new FileSystem)->listFilesFromDirectoryAlphaSorted($path, '~^[^\._].*\.php$~i');
-    $efPluginFile = array_map(static function ($item) use ($path) {
-        return $path . $item;
-    }, $efPluginFile);
+    $efPluginFile = (new FileSystem())->listFilesFromDirectoryAlphaSorted($path, '~^[^\._].*\.php$~i');
+    $efPluginFile = array_map(static fn ($item) => $path . $item, $efPluginFile);
     $extraFuncsPlugins = array_merge($extraFuncsPlugins, $efPluginFile);
 }
 $extraFuncsFiles = array_merge($extraFuncsPlugins, $extraFuncsMain);

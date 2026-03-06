@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * pre-calculate the category path
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -36,7 +38,8 @@ if (zen_not_null($cPath)) {
 
 // determine whether the current page is the home page or a product listing
 //$this_is_home_page = ($current_page=='index' && ((int)$cPath == 0 || $show_welcome == true));
-$this_is_home_page = ($current_page == 'index'
+$this_is_home_page = (
+    $current_page == 'index'
     && (!isset($_GET['cPath']) || $_GET['cPath'] == '')
     && (!isset($_GET['manufacturers_id']) || $_GET['manufacturers_id'] == '')
     && (!isset($_GET['typefilter']) || $_GET['typefilter'] == '')

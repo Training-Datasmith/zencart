@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -18,10 +20,9 @@ use Zencart\PluginSupport\PluginStatus;
 class PluginManager
 {
     public function __construct(
-        private PluginControlRepository $pluginControl,
-        private PluginControlVersionRepository $pluginControlVersion
-    )
-    {
+        private readonly PluginControlRepository $pluginControl,
+        private readonly PluginControlVersionRepository $pluginControlVersion
+    ) {
     }
 
     /**
@@ -92,8 +93,7 @@ class PluginManager
         if (empty($pluginId)) {
             return false;
         }
-        $isAvailable = plugin_version_check_for_updates($pluginId, $currentVersion);
-        return $isAvailable;
+        return plugin_version_check_for_updates($pluginId, $currentVersion);
     }
 
     /**
@@ -109,7 +109,7 @@ class PluginManager
         $ids_csv = '';
         foreach ($plugins as $plugin) {
             $pluginsById[$plugin['zc_contrib_id']] = $plugin;
-            $ids_csv .= (int)trim($plugin['zc_contrib_id']) . ',';
+            $ids_csv .= (int)trim((string) $plugin['zc_contrib_id']) . ',';
         }
 
         $results = $this->getLatestPluginVersionsOnline($ids_csv);
@@ -129,7 +129,7 @@ class PluginManager
             return false; // @TODO or return original $plugins array?
         }
 
-        $present_zc_version = 'v' . preg_replace('/[^0-9.]/', '', zen_get_zcversion());
+        $present_zc_version = 'v' . preg_replace('/[^0-9.]/', '', (string) zen_get_zcversion());
 
         foreach ($results as $result) {
             $unique_key = $pluginsById[$result['id']]['unique_key'];
@@ -169,8 +169,8 @@ class PluginManager
 
         if (!is_array($data)) {
             try {
-                $data = json_decode($data, true);
-            } catch (\Exception $exception) {
+                $data = json_decode((string) $data, true);
+            } catch (\Exception) {
                 if (LOG_PLUGIN_VERSIONCHECK_FAILURES) {
                     error_log('CURL error checking plugin versions (in batch): ' . print_r(!empty($data) ? $data : 'null', true));
                 }
@@ -201,7 +201,10 @@ class PluginManager
         }
         $dir = new \DirectoryIterator($pluginDir);
         foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDot() || !$fileinfo->isDir()) {
+            if ($fileinfo->isDot()) {
+                continue;
+            }
+            if (!$fileinfo->isDir()) {
                 continue;
             }
             $versionInfo = $this->getPluginVersionDirectories($fileinfo);
@@ -221,7 +224,10 @@ class PluginManager
         $versionList = [];
         $dir = new \DirectoryIterator($parent->getPathName());
         foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDot() || !$fileinfo->isDir()) {
+            if ($fileinfo->isDot()) {
+                continue;
+            }
+            if (!$fileinfo->isDir()) {
                 continue;
             }
             if (!file_exists($fileinfo->getPathname() . '/manifest.php')) {
@@ -319,7 +325,7 @@ class PluginManager
             $pluginList[$uniqueKey][$version] = $detail;
             $versionList[] = $version;
         }
-        usort($versionList, 'version_compare');
+        usort($versionList, version_compare(...));
         $versionList = array_reverse($versionList);
         $pluginList[$uniqueKey]['versions'] = $versionList;
         return $pluginList;
@@ -336,8 +342,7 @@ class PluginManager
             $versions[$result['version']] = $result;
         }
         ksort($versions);
-        $versions = array_reverse($versions);
-        return $versions;
+        return array_reverse($versions);
     }
 
     /**
@@ -353,7 +358,7 @@ class PluginManager
     /**
      * @since ZC v1.5.7
      */
-    public function hasPluginVersionsToClean($uniqueKey, $version): ?int
+    public function hasPluginVersionsToClean(string $uniqueKey, string $version): ?int
     {
         return count($this->getPluginVersionsToClean($uniqueKey, $version));
     }

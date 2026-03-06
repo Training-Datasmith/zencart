@@ -7,14 +7,16 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: torvista 2022 Feb 18 Modified in v1.5.8-alpha $
  */
-  if (!zen_is_logged_in()) {
+if (!zen_is_logged_in()) {
     die(WARNING_SESSION_TIMEOUT);
-  }
+}
 // load all enabled modules
-  if (empty($_SESSION['payment'])) zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
-  require(DIR_WS_CLASSES . 'payment.php');
-  $payment_modules = new payment($_SESSION['payment']);
-  $payment_module = $_SESSION['payment'];
+if (empty($_SESSION['payment'])) {
+    zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
+}
+require(DIR_WS_CLASSES . 'payment.php');
+$payment_modules = new payment($_SESSION['payment']);
+$payment_module = $_SESSION['payment'];
 
 /**
  * Purpose:
@@ -25,7 +27,7 @@
  * Note that the form field names below are CASE SENSITIVE, and all
  * form fields listed below are required.
  */
-header("Cache-Control: max-age=1");  // stores for only 1 second, which prevents page from being re-displayed
+header('Cache-Control: max-age=1');  // stores for only 1 second, which prevents page from being re-displayed
 ?>
 <html>
 <head>

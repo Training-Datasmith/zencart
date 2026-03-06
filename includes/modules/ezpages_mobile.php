@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ezpages links for mobile use - used to display links to EZ-Pages content in a template's mobile menu
  *
@@ -19,12 +21,12 @@ if (!$sniffer->table_exists(TABLE_EZPAGES_CONTENT) || !$sniffer->field_exists(TA
     return; // early exit; db not upgraded
 }
 $pages_query = $db->Execute(
-    "SELECT e.*, ec.pages_title
-      FROM  " . TABLE_EZPAGES . " e
-      INNER JOIN " . TABLE_EZPAGES_CONTENT . " ec ON (e.pages_id = ec.pages_id)
-      WHERE ec.languages_id = " . (int)$_SESSION['languages_id'] . "
+    'SELECT e.*, ec.pages_title
+      FROM  ' . TABLE_EZPAGES . ' e
+      INNER JOIN ' . TABLE_EZPAGES_CONTENT . ' ec ON (e.pages_id = ec.pages_id)
+      WHERE ec.languages_id = ' . (int)$_SESSION['languages_id'] . '
       AND e.status_mobile = 1
-      ORDER BY e.mobile_sort_order, ec.pages_title"
+      ORDER BY e.mobile_sort_order, ec.pages_title'
 );
 if ($pages_query->RecordCount() > 0) {
     $rows = 0;
@@ -41,15 +43,11 @@ if ($pages_query->RecordCount() > 0) {
             case ($page_query['alt_url_external'] != ''):
                 $page_query_list[$rows]['altURL'] = $page_query['alt_url_external'];
                 break;
-            // internal link new window
-            case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '1'):
-                $page_query_list[$rows]['altURL'] = (substr($page_query['alt_url'], 0, 4) == 'http') ?
-                    $page_query['alt_url'] :
-                    ($page_query['alt_url'] == '' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
-                break;
-            // internal link same window
+                // internal link new window
+            case $page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '1':
+                // internal link same window
             case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '0'):
-                $page_query_list[$rows]['altURL'] = (substr($page_query['alt_url'], 0, 4) == 'http') ?
+                $page_query_list[$rows]['altURL'] = (str_starts_with((string) $page_query['alt_url'], 'http')) ?
                     $page_query['alt_url'] :
                     ($page_query['alt_url'] == '' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
                 break;

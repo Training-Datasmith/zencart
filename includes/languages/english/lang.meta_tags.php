@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'TITLE' => 'Zen Cart!',
     'SITE_TAGLINE' => 'The Art of E-commerce',
     'CUSTOM_KEYWORDS' => 'ecommerce, open source, shop, online shopping, store',
@@ -12,5 +14,3 @@ $define = [
     'TERTIARY_SECTION' => ', ',
     'METATAGS_DIVIDER' => ' ',
 ];
-
-return $define;

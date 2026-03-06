@@ -31,15 +31,17 @@ require(DIR_WS_MODULES . zen_get_module_directory('meta_tags.php'));
 
 // ZCAdditions.com, ZCA Responsive Template Default (BOF-addition 1 of 2)
 if (!class_exists('MobileDetect')) {
-  include_once(DIR_WS_CLASSES . 'Mobile_Detect.php');
+    include_once(DIR_WS_CLASSES . 'Mobile_Detect.php');
 }
-  $detect = new Detection\MobileDetect;
-  $isMobile = $detect->isMobile();
-  $isTablet = $detect->isTablet();
-  if (!isset($layoutType)) $layoutType = ($isMobile ? ($isTablet ? 'tablet' : 'mobile') : 'default');
+$detect = new Detection\MobileDetect();
+$isMobile = $detect->isMobile();
+$isTablet = $detect->isTablet();
+if (!isset($layoutType)) {
+    $layoutType = ($isMobile ? ($isTablet ? 'tablet' : 'mobile') : 'default');
+}
 // ZCAdditions.com, ZCA Responsive Template Default (BOF-addition 1 of 2)
 
-  $paginateAsUL = true;
+$paginateAsUL = true;
 
 ?>
 <!DOCTYPE html>
@@ -60,7 +62,7 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
   <meta name="description" content="<?php echo META_TAG_DESCRIPTION; ?>">
   <meta name="author" content="<?php echo STORE_NAME ?>">
   <meta name="generator" content="shopping cart program by Zen Cart&reg;, https://www.zen-cart.com eCommerce">
-<?php if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($current_page_base,explode(",",constant('ROBOTS_PAGES_TO_SKIP'))) || $current_page_base=='down_for_maintenance' || $robotsNoIndex === true) { ?>
+<?php if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($current_page_base, explode(',', constant('ROBOTS_PAGES_TO_SKIP'))) || $current_page_base == 'down_for_maintenance' || $robotsNoIndex === true) { ?>
   <meta name="robots" content="noindex, nofollow">
 <?php } ?>
 
@@ -69,9 +71,9 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
 <?php if (defined('FAVICON')) { ?>
   <link rel="icon" href="<?php echo FAVICON; ?>" type="image/x-icon">
   <link rel="shortcut icon" href="<?php echo FAVICON; ?>" type="image/x-icon">
-<?php } //endif FAVICON ?>
+<?php } //endif FAVICON?>
 
-  <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER . DIR_WS_HTTPS_CATALOG : HTTP_SERVER . DIR_WS_CATALOG ); ?>">
+  <base href="<?php echo(($request_type == 'SSL') ? HTTPS_SERVER . DIR_WS_HTTPS_CATALOG : HTTP_SERVER . DIR_WS_CATALOG); ?>">
 <?php if (isset($canonicalLink) && $canonicalLink != '') { ?>
   <link rel="canonical" href="<?php echo $canonicalLink; ?>">
 <?php } ?>
@@ -93,10 +95,10 @@ require $template->get_template_dir('html_header_css_loader.php', DIR_WS_TEMPLAT
 /** CDN for jQuery core **/
 ?>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<?php if (file_exists(DIR_WS_TEMPLATE . "jscript/jquery.min.js")) { ?>
-<script title="jQuery check - template">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js',DIR_WS_TEMPLATE, $current_page_base,'jscript') ?>/jquery.min.js"><\/script>');</script>
+<?php if (file_exists(DIR_WS_TEMPLATE . 'jscript/jquery.min.js')) { ?>
+<script title="jQuery check - template">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js', DIR_WS_TEMPLATE, $current_page_base, 'jscript') ?>/jquery.min.js"><\/script>');</script>
 <?php } ?>
-<script title="jQuery check - template_default">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js','template_default', $current_page_base,'jscript') ?>/jquery.min.js"><\/script>');</script>
+<script title="jQuery check - template_default">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js', 'template_default', $current_page_base, 'jscript') ?>/jquery.min.js"><\/script>');</script>
 
 <?php
 $zco_notifier->notify('NOTIFY_HTML_HEAD_JS_BEGIN', $current_page_base);
@@ -108,27 +110,27 @@ require $template->get_template_dir('html_header_js_loader.php', DIR_WS_TEMPLATE
 ?>
 
 <?php // ZCAdditions.com, ZCA Responsive Template Default (BOF-addition 2 of 2)
-$responsive_mobile = '<link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'responsive_mobile.css' . '"><link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'jquery.mmenu.all.css' . '">';
-$responsive_tablet = '<link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'responsive_tablet.css' . '"><link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'jquery.mmenu.all.css' . '">';
-$responsive_default = '<link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'responsive_default.css' . '">';
+$responsive_mobile = '<link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'responsive_mobile.css' . '"><link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'jquery.mmenu.all.css' . '">';
+$responsive_tablet = '<link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'responsive_tablet.css' . '"><link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'jquery.mmenu.all.css' . '">';
+$responsive_default = '<link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'responsive_default.css' . '">';
 
 if (!isset($_SESSION['layoutType'])) {
-  $_SESSION['layoutType'] = 'legacy';
+    $_SESSION['layoutType'] = 'legacy';
 }
 
-if (in_array($current_page_base,explode(",",'popup_image,popup_image_additional')) ) {
-  echo '';
-} else {
-  echo '<link rel="stylesheet" href="' . $template->get_template_dir('.css',DIR_WS_TEMPLATE, $current_page_base,'css') . '/' . 'responsive.css' . '">';
-  if ( $detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) {
-    echo $responsive_mobile;
-  } else if ( $detect->isTablet() || $_SESSION['layoutType'] == 'tablet' ){
-    echo $responsive_tablet;
-  } else if ( $_SESSION['layoutType'] == 'full' ) {
+if (in_array($current_page_base, explode(',', 'popup_image,popup_image_additional'))) {
     echo '';
-  } else {
-    echo $responsive_default;
-  }
+} else {
+    echo '<link rel="stylesheet" href="' . $template->get_template_dir('.css', DIR_WS_TEMPLATE, $current_page_base, 'css') . '/' . 'responsive.css' . '">';
+    if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') {
+        echo $responsive_mobile;
+    } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
+        echo $responsive_tablet;
+    } elseif ($_SESSION['layoutType'] == 'full') {
+        echo '';
+    } else {
+        echo $responsive_default;
+    }
 }
 ?>
   <script>document.documentElement.className = 'no-fouc';</script>
@@ -137,10 +139,10 @@ if (in_array($current_page_base,explode(",",'popup_image,popup_image_additional'
   <?php if (empty($disableFontAwesomeV4Compatibility)) { ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/v4-shims.css" integrity="sha256-CB2v9WYYUz97XoXZ4htbPxCe33AezlF5MY8ufd1eyQ8= sha384-JfB3EVqS5xkU+PfLClXRAMlOqJdNIb2TNb98chdDBiv5yD7wkdhdjCi6I2RIZ+mL sha512-tqGH6Vq3kFB19sE6vx9P6Fm/f9jWoajQ05sFTf0hr3gwpfSGRXJe4D7BdzSGCEj7J1IB1MvkUf3V/xWR25+zvw==" crossorigin="anonymous">
   <?php } ?>
-<?php // ZCAdditions.com, ZCA Responsive Template Default (EOF-addition 2 of 2) ?>
+<?php // ZCAdditions.com, ZCA Responsive Template Default (EOF-addition 2 of 2)?>
 <?php
-  $zco_notifier->notify('NOTIFY_HTML_HEAD_END', $current_page_base);
+$zco_notifier->notify('NOTIFY_HTML_HEAD_END', $current_page_base);
 ?>
 </head>
 
-<?php // NOTE: Blank line following is intended: ?>
+<?php // NOTE: Blank line following is intended:?>

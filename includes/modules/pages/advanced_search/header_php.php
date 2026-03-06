@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Redirect stub for the search page
  *

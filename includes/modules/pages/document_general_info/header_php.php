@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * document_general header_php.php
  *

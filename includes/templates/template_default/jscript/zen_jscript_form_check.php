@@ -1,14 +1,14 @@
 <?php
-    /**
-     * consolidated zen_jscript_form_check
-     *
-     * required by various pages' jscript_form_check.php.
-     *
+/**
+ * consolidated zen_jscript_form_check
+ *
+ * required by various pages' jscript_form_check.php.
+ *
  * @copyright Copyright 2003-2022 Zen Cart Development Team
-     * @copyright Portions Copyright 2003 osCommerce
-     * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-     * @version $Id: pRose on charmes 2022 May 19 New in v1.5.8-alpha $
-     */
+ * @copyright Portions Copyright 2003 osCommerce
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id: pRose on charmes 2022 May 19 New in v1.5.8-alpha $
+ */
 
 ?>
 <script>
@@ -130,7 +130,9 @@
         form = form_name;
         error_message = "<?php echo JS_ERROR; ?>";
 
-        <?php if (ACCOUNT_GENDER == 'true') echo '  check_radio("gender", "' . ENTRY_GENDER_ERROR . '");' . "\n"; ?>
+        <?php if (ACCOUNT_GENDER == 'true') {
+            echo '  check_radio("gender", "' . ENTRY_GENDER_ERROR . '");' . "\n";
+        } ?>
 
         <?php if ((int)ENTRY_FIRST_NAME_MIN_LENGTH > 0) { ?>
         check_input("firstname", <?php echo (int)ENTRY_FIRST_NAME_MIN_LENGTH; ?>, "<?php echo ENTRY_FIRST_NAME_ERROR; ?>");
@@ -139,8 +141,12 @@
         check_input("lastname", <?php echo (int)ENTRY_LAST_NAME_MIN_LENGTH; ?>, "<?php echo ENTRY_LAST_NAME_ERROR; ?>");
         <?php } ?>
 
-        <?php if (ACCOUNT_DOB == 'true' && (int)ENTRY_DOB_MIN_LENGTH != 0) echo '  check_input("dob", ' . (int)ENTRY_DOB_MIN_LENGTH . ', "' . ENTRY_DATE_OF_BIRTH_ERROR . '");' . "\n"; ?>
-        <?php if (ACCOUNT_COMPANY == 'true' && (int)ENTRY_COMPANY_MIN_LENGTH != 0) echo '  check_input("company", ' . (int)ENTRY_COMPANY_MIN_LENGTH . ', "' . ENTRY_COMPANY_ERROR . '");' . "\n"; ?>
+        <?php if (ACCOUNT_DOB == 'true' && (int)ENTRY_DOB_MIN_LENGTH != 0) {
+            echo '  check_input("dob", ' . (int)ENTRY_DOB_MIN_LENGTH . ', "' . ENTRY_DATE_OF_BIRTH_ERROR . '");' . "\n";
+        } ?>
+        <?php if (ACCOUNT_COMPANY == 'true' && (int)ENTRY_COMPANY_MIN_LENGTH != 0) {
+            echo '  check_input("company", ' . (int)ENTRY_COMPANY_MIN_LENGTH . ', "' . ENTRY_COMPANY_ERROR . '");' . "\n";
+        } ?>
 
         <?php if ((int)ENTRY_EMAIL_ADDRESS_MIN_LENGTH > 0) { ?>
         check_input("email_address", <?php echo (int)ENTRY_EMAIL_ADDRESS_MIN_LENGTH; ?>, "<?php echo ENTRY_EMAIL_ADDRESS_ERROR; ?>");

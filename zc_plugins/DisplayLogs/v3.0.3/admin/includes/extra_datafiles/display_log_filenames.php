@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 //
 // +----------------------------------------------------------------------+
 // |zen-cart Open Source E-commerce                                       |

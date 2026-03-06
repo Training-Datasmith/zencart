@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Down For Maintenance
  *
@@ -23,9 +25,9 @@ if (DOWN_FOR_MAINTENANCE_HEADER_OFF === 'true') {
     $flag_disable_header = true;
 }
 
-$sql = "SELECT last_modified from " . TABLE_CONFIGURATION . "
+$sql = 'SELECT last_modified from ' . TABLE_CONFIGURATION . "
           WHERE configuration_key = 'DOWN_FOR_MAINTENANCE'";
 $maintenance_on_at_time = $db->Execute($sql);
 define('TEXT_DATE_TIME', $maintenance_on_at_time->fields['last_modified']);
 
-header("HTTP/1.1 503 Service Unavailable");
+header('HTTP/1.1 503 Service Unavailable');

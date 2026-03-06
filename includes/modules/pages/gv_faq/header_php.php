@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * GV FAQ
  *
@@ -17,7 +19,7 @@ $customer_has_gv_balance = false;
 $customer_gv_balance = 0;
 
 if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-    $customer = new Customer;
+    $customer = new Customer();
     $gv_balance = $customer->getData('gv_balance');
     $customer_has_gv_balance = !empty($gv_balance);
     $customer_gv_balance = !is_null($gv_balance) ? $currencies->format($gv_balance) : false;
@@ -27,8 +29,12 @@ $gv_faq_item =  (empty($_GET['faq_item'])) ? 0 : (int)$_GET['faq_item'];
 
 $subHeadingText = 'SUB_HEADING_TEXT_' . $gv_faq_item;
 $subHeadingTitle = 'SUB_HEADING_TITLE_' . $gv_faq_item;
-if (!defined($subHeadingText)) $subHeadingText = 'SUB_HEADING_TEXT_0';
-if (!defined($subHeadingTitle)) $subHeadingTitle = 'SUB_HEADING_TITLE_0';
+if (!defined($subHeadingText)) {
+    $subHeadingText = 'SUB_HEADING_TEXT_0';
+}
+if (!defined($subHeadingTitle)) {
+    $subHeadingTitle = 'SUB_HEADING_TITLE_0';
+}
 $subHeadingText = constant($subHeadingText);
 $subHeadingTitle = constant($subHeadingTitle);
 

@@ -1,16 +1,18 @@
 <?php
-spl_autoload_register(function ($class) {
+
+declare(strict_types=1);
+spl_autoload_register(function ($class): void {
 
     // the package namespace
     $ns = 'Aura\Autoload';
 
     // what prefixes should be recognized?
-    $prefixes = array(
-        "{$ns}\\" => array(
+    $prefixes = [
+        "{$ns}\\" => [
             __DIR__ . '/src',
             __DIR__ . '/tests',
-        ),
-    );
+        ],
+    ];
 
     // go through the prefixes
     foreach ($prefixes as $prefix => $dirs) {

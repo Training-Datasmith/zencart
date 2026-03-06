@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * search sidebox - displays keyword-search field for customer to initiate a search
  *
@@ -8,9 +10,8 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 
-  require($template->get_template_dir('tpl_search.php',DIR_WS_TEMPLATE, $current_page_base,'sideboxes'). '/tpl_search.php');
+require($template->get_template_dir('tpl_search.php', DIR_WS_TEMPLATE, $current_page_base, 'sideboxes'). '/tpl_search.php');
 
-  $title = '<label>' . BOX_HEADING_SEARCH . '</label>';
-  $title_link = false;
-  require($template->get_template_dir($column_box_default, DIR_WS_TEMPLATE, $current_page_base,'common') . '/' . $column_box_default);
-?>
+$title = '<label>' . BOX_HEADING_SEARCH . '</label>';
+$title_link = false;
+require($template->get_template_dir($column_box_default, DIR_WS_TEMPLATE, $current_page_base, 'common') . '/' . $column_box_default);

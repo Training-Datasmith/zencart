@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'Checkout - Step 1',
     'NAVBAR_TITLE_2' => 'Shipping Method',
     'HEADING_TITLE' => 'Step 1 of 3 - Delivery Information',
@@ -15,5 +17,3 @@ $define = [
     'FREE_SHIPPING_TITLE' => 'Free Shipping',
     'ERROR_PLEASE_RESELECT_SHIPPING_METHOD' => 'Your available shipping options have changed. Please re-select your desired shipping method.',
 ];
-
-return $define;

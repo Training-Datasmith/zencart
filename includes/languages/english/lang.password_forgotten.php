@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'Login',
     'NAVBAR_TITLE_2' => 'Password Forgotten',
     'HEADING_TITLE' => 'Forgotten Password',
@@ -10,5 +12,3 @@ $define = [
 
     'SUCCESS_PASSWORD_RESET_SENT' => 'Thank you. If that email address is in our system, we will send password recovery instructions to that email address (remember to check your Spam folder)',
 ];
-
-return $define;

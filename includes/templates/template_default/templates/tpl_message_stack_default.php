@@ -9,7 +9,7 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 ?>
-<?php for ($i=0, $n=sizeof($output); $i<$n; $i++) { ?>
+<?php for ($i = 0, $n = sizeof($output); $i < $n; $i++) { ?>
   <div <?php echo $output[$i]['params']; ?>><?php echo $output[$i]['text']; ?></div>
 
 <?php } ?>

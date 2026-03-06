@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package patches
  * @copyright Copyright 2003-2010 Zen Cart Development Team

@@ -11,12 +11,12 @@
 <div class="centerColumn" id="timeoutDefault">
 <?php
     if (zen_is_logged_in()) {
-?>
+        ?>
 <h1 id="timeoutDefaultHeading"><?php echo HEADING_TITLE_LOGGED_IN; ?></h1>
 <div id="timeoutDefaultContent" class="content"><?php echo TEXT_INFORMATION_LOGGED_IN; ?></div>
 <?php
-  } else {
-?>
+    } else {
+        ?>
 <h1 id="timeoutDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
 
 <div id="timeoutDefaultContent" class="content"><?php echo TEXT_INFORMATION; ?></div>
@@ -39,6 +39,6 @@
 </form>
 <br class="clearBoth">
 <?php
- }
- ?>
+    }
+?>
 </div>

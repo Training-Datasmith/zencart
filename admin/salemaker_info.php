@@ -19,7 +19,7 @@
 // +----------------------------------------------------------------------+
 //  $Id: salemaker_info.php 1969 2005-09-13 06:57:21Z drbyte $
 //
-require("includes/application_top.php");
+require('includes/application_top.php');
 ?>
 <!doctype html>
 <html <?php echo HTML_PARAMS; ?>>

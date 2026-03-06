@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -72,10 +74,6 @@ trait InteractsWithPlugins
     }
 
     /**
-     * @param string $stylesheet_filename
-     * @param string|null $current_page
-     * @return bool
-     *
      * @var \template_func $template
      * @var PageLoader $pageLoader
      * @since ZC v2.1.0

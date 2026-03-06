@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * autoloader array for paypal IPN
  *

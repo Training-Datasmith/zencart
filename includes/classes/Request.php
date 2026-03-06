@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -22,7 +24,7 @@ class Request
      * @return mixed|Request
      * @since ZC v1.5.8
      */
-    static function capture()
+    public static function capture()
     {
         $self = self::getInstance();
         $self->paramBag = $_REQUEST;
@@ -31,21 +33,19 @@ class Request
 
     /**
      * @param $key
-     * @param null $default
      * @return mixed|null
      * @since ZC v1.5.8
      */
     public function input($key, $default = null)
     {
-        return (isset($this->paramBag[$key]) ? $this->paramBag[$key] : $default);
+        return ($this->paramBag[$key] ?? $default);
     }
 
     /**
      * @param $key
-     * @return bool
      * @since ZC v1.5.8
      */
-    public function has($key)
+    public function has($key): bool
     {
         return (isset($this->paramBag[$key]));
     }

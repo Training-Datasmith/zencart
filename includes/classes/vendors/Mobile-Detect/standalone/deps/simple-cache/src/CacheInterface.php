@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Psr\SimpleCache;
 
 interface CacheInterface
@@ -105,7 +107,6 @@ interface CacheInterface
      *
      * @param string $key The cache item key.
      *
-     * @return bool
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.

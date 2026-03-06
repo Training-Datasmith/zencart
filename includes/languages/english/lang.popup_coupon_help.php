@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'TEXT_COUPON_HELP_NAME' => '<br><br>Coupon Name: %s',
     'TEXT_COUPON_HELP_FIXED' => '<br><br>The coupon is worth %s discount against your order',
     'TEXT_COUPON_HELP_FREESHIP' => '<br><br>This coupon gives you free shipping on your order',
@@ -10,5 +12,3 @@ $define = [
     'TEXT_ALLOWED' => ' (Allowed)',
     'TEXT_DENIED' => ' (Denied)',
 ];
-
-return $define;

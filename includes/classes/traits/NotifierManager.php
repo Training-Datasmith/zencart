@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -62,8 +64,7 @@ trait NotifierManager
         mixed &$param7 = null,
         mixed &$param8 = null,
         mixed &$param9 = null
-    ): void
-    {
+    ): void {
         // first log that the notifier was triggered:
         $this->logNotifier($eventID, $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9);
 
@@ -73,7 +74,7 @@ trait NotifierManager
             return;
         }
 
-        foreach ($observers as $key => $obs) {
+        foreach ($observers as $obs) {
             // identify the event
             $actualEventId = $eventID;
             $matchMap = [$eventID, '*'];
@@ -99,12 +100,12 @@ trait NotifierManager
 
             $methodsToCheck = [];
             // Check for a snake_cased method name of the notifier Event, ONLY IF it begins with "NOTIFY_" or "NOTIFIER_"
-            $snake_case_method = strtolower($actualEventId);
+            $snake_case_method = strtolower((string) $actualEventId);
             if (preg_match('/^notif(y|ier)_/', $snake_case_method) && method_exists($obs['obs'], $snake_case_method)) {
                 $methodsToCheck[] = $snake_case_method;
             }
             // alternates are a camelCased version starting with "update" ie: updateNotifierNameCamelCased(), or just "update()"
-            $methodsToCheck[] = 'update' . \base::camelize(strtolower($actualEventId), true);
+            $methodsToCheck[] = 'update' . \base::camelize(strtolower((string) $actualEventId), true);
             $methodsToCheck[] = 'update';
 
             foreach ($methodsToCheck as $method) {
@@ -114,7 +115,7 @@ trait NotifierManager
                 }
             }
             // If no update handler method exists then trigger an error so the problem is logged
-            $className = (is_object($obs['obs'])) ? get_class($obs['obs']) : $obs['obs'];
+            $className = (is_object($obs['obs'])) ? $obs['obs']::class : $obs['obs'];
             trigger_error('WARNING: No update() method (or matching alternative) found in the ' . $className . ' class for event ' . $actualEventId, E_USER_WARNING);
         }
     }
@@ -122,7 +123,7 @@ trait NotifierManager
     /**
      * @since ZC v1.5.8
      */
-    protected function logNotifier($eventID, $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9): void
+    protected function logNotifier(string $eventID, $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9): void
     {
         if (!defined('NOTIFIER_TRACE') || empty(NOTIFIER_TRACE) || NOTIFIER_TRACE === 'false' || NOTIFIER_TRACE === 'Off') {
             return;
@@ -136,13 +137,13 @@ trait NotifierManager
         $paramArray = (is_array($param1) && count($param1) === 0) ? [] : ['param1' => $param1];
         for ($i = 2; $i < 10; $i++) {
             $param_n = "param$i";
-            if ($$param_n !== null) {
-                $paramArray[$param_n] = $$param_n;
+            if (${$param_n} !== null) {
+                $paramArray[$param_n] = ${$param_n};
             }
         }
 
         global $this_is_home_page, $PHP_SELF;
-        $main_page = (IS_ADMIN_FLAG) ? basename($PHP_SELF) : ($_GET['main_page'] ?? '');
+        $main_page = (IS_ADMIN_FLAG) ? basename((string) $PHP_SELF) : ($_GET['main_page'] ?? '');
         if (!empty($this_is_home_page)) {
             $main_page = 'index-home';
         }
@@ -156,7 +157,7 @@ trait NotifierManager
                 $output .= print_r($paramArray, true);
             }
         }
-        error_log($zcDate->output("%Y-%m-%d %H:%M:%S") . ' [main_page=' . $main_page . '] ' . $eventID . $output . "\n", 3, $file);
+        error_log($zcDate->output('%Y-%m-%d %H:%M:%S') . ' [main_page=' . $main_page . '] ' . $eventID . $output . "\n", 3, $file);
     }
 
     /**

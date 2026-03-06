@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * whos_online functions
  *
@@ -8,10 +10,12 @@
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  * @since ZC v1.0.3
  */
-function zen_update_whos_online()
+function zen_update_whos_online(): void
 {
     // exclude ajax pages from whos-online updates
-    if (preg_match('|ajax\.php$|', $_SERVER['SCRIPT_NAME']) && !empty($_GET['act'])) return;
+    if (preg_match('|ajax\.php$|', (string) $_SERVER['SCRIPT_NAME']) && !empty($_GET['act'])) {
+        return;
+    }
 
     global $db;
 
@@ -21,8 +25,8 @@ function zen_update_whos_online()
     if (zen_is_logged_in() && !zen_in_guest_checkout()) {
         $wo_customer_id = $_SESSION['customer_id'];
 
-        $sql = "SELECT customers_firstname, customers_lastname
-                FROM " . TABLE_CUSTOMERS . "
+        $sql = 'SELECT customers_firstname, customers_lastname
+                FROM ' . TABLE_CUSTOMERS . "
                 WHERE customers_id = '" . (int)$_SESSION['customer_id'] . "'";
 
         $customer = $db->Execute($sql);
@@ -31,7 +35,7 @@ function zen_update_whos_online()
     }
 
     $wo_session_id = zen_session_id();
-    $wo_ip_address = substr(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'Unknown', 0, 45);
+    $wo_ip_address = substr($_SERVER['REMOTE_ADDR'] ?? 'Unknown', 0, 45);
     $wo_user_agent = preg_replace('/\W+/u', '~', $_SERVER['HTTP_USER_AGENT'] ?? '');
     $wo_user_agent = mb_substr(zen_db_prepare_input($wo_user_agent), 0, 254);
 
@@ -45,20 +49,22 @@ function zen_update_whos_online()
             $uri = $_SERVER['SCRIPT_NAME'] . '?' . $_SERVER['argv'][0];
         }
     }
-    if (substr($uri, -1) == '?') $uri = substr($uri, 0, strlen($uri) - 1);
-    $wo_last_page_url = (!empty($uri) ? substr($uri, 0, 254) : 'Unknown');
+    if (str_ends_with((string) $uri, '?')) {
+        $uri = substr((string) $uri, 0, strlen((string) $uri) - 1);
+    }
+    $wo_last_page_url = (!empty($uri) ? substr((string) $uri, 0, 254) : 'Unknown');
 
     $current_time = time();
     $xx_mins_ago = ($current_time - 900);
 
     // remove entries that have expired
-    $sql = "DELETE FROM " . TABLE_WHOS_ONLINE . "
+    $sql = 'DELETE FROM ' . TABLE_WHOS_ONLINE . "
             WHERE time_last_click < '" . $xx_mins_ago . "'";
 
     $db->Execute($sql);
 
-    $stored_customer_query = "SELECT count(*) as count
-                              FROM " . TABLE_WHOS_ONLINE . "
+    $stored_customer_query = 'SELECT count(*) as count
+                              FROM ' . TABLE_WHOS_ONLINE . "
                               WHERE session_id = '" . zen_db_input($wo_session_id) . "' AND ip_address='" . zen_db_input($wo_ip_address) . "'";
 
     $stored_customer = $db->Execute($stored_customer_query);
@@ -68,7 +74,7 @@ function zen_update_whos_online()
     }
 
     if ($stored_customer->fields['count'] > 0) {
-        $sql = "UPDATE " . TABLE_WHOS_ONLINE . "
+        $sql = 'UPDATE ' . TABLE_WHOS_ONLINE . "
                 SET customer_id = '" . (int)$wo_customer_id . "',
                   full_name = '" . zen_db_input($wo_full_name) . "',
                   ip_address = '" . zen_db_input($wo_ip_address) . "',
@@ -82,7 +88,7 @@ function zen_update_whos_online()
         $db->Execute($sql);
 
     } else {
-        $sql = "INSERT INTO " . TABLE_WHOS_ONLINE . "
+        $sql = 'INSERT INTO ' . TABLE_WHOS_ONLINE . "
                 (customer_id, full_name, session_id, ip_address, time_entry,
                  time_last_click, last_page_url, host_address, user_agent)
                 VALUES ('" . (int)$wo_customer_id . "', '" . zen_db_input($wo_full_name) . "',
@@ -98,13 +104,13 @@ function zen_update_whos_online()
 /**
  * @since ZC v1.3.0.2
  */
-function whos_online_session_recreate($old_session, $new_session)
+function whos_online_session_recreate($old_session, $new_session): void
 {
     global $db;
 
-    $sql = "UPDATE " . TABLE_WHOS_ONLINE . "
+    $sql = 'UPDATE ' . TABLE_WHOS_ONLINE . '
             SET session_id = :newSessionID
-            WHERE session_id = :oldSessionID";
+            WHERE session_id = :oldSessionID';
     $sql = $db->bindVars($sql, ':newSessionID', $new_session, 'string');
     $sql = $db->bindVars($sql, ':oldSessionID', $old_session, 'string');
     $db->Execute($sql);

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * autoloader activation point for canonical url handling script
  *
@@ -7,10 +9,10 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 if (!defined('IS_ADMIN_FLAG')) {
- die('Illegal Access');
+    die('Illegal Access');
 }
 /**
  * point 161 was selected specifically based on dependancies
  */
-  $autoLoadConfig[161][] = array('autoType'=>'init_script',
-                                 'loadFile'=> 'init_canonical.php');
+$autoLoadConfig[161][] = ['autoType' => 'init_script',
+                               'loadFile' => 'init_canonical.php'];

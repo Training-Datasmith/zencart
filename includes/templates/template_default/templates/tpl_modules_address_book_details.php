@@ -17,15 +17,15 @@
 
 <?php
   if (ACCOUNT_GENDER == 'true') {
-    if (isset($gender)) {
-      $male = ($gender == 'm') ? true : false;
-      $female = ($gender == 'f') ? true : false;
-    } else {
-      $male = ($entry->fields['entry_gender'] == 'm') ? true : false;
-      $female = ($entry->fields['entry_gender'] == 'f') ? true : false;
-    }
-?>
-<?php echo zen_draw_radio_field('gender', 'm', $male, 'id="gender-male"') . '<label class="radioButtonLabel" for="gender-male">' . MALE . '</label>' . zen_draw_radio_field('gender', 'f', $female, 'id="gender-female"') . '<label class="radioButtonLabel" for="gender-female">' . FEMALE . '</label>' . (!empty(ENTRY_GENDER_TEXT) ? '<span class="alert">' . ENTRY_GENDER_TEXT . '</span>': ''); ?>
+      if (isset($gender)) {
+          $male = ($gender == 'm') ? true : false;
+          $female = ($gender == 'f') ? true : false;
+      } else {
+          $male = ($entry->fields['entry_gender'] == 'm') ? true : false;
+          $female = ($entry->fields['entry_gender'] == 'f') ? true : false;
+      }
+      ?>
+<?php echo zen_draw_radio_field('gender', 'm', $male, 'id="gender-male"') . '<label class="radioButtonLabel" for="gender-male">' . MALE . '</label>' . zen_draw_radio_field('gender', 'f', $female, 'id="gender-female"') . '<label class="radioButtonLabel" for="gender-female">' . FEMALE . '</label>' . (!empty(ENTRY_GENDER_TEXT) ? '<span class="alert">' . ENTRY_GENDER_TEXT . '</span>' : ''); ?>
 <br class="clearBoth">
 
 <?php
@@ -41,7 +41,7 @@
 
 <?php
   if (ACCOUNT_COMPANY == 'true') {
-?>
+      ?>
 <label class="inputLabel" for="company"><?php echo ENTRY_COMPANY; ?></label>
 <?php echo zen_draw_input_field('company', $entry->fields['entry_company'], zen_set_field_length(TABLE_ADDRESS_BOOK, 'entry_company', '40') . ' id="company" autocomplete="organization" placeholder="' . ENTRY_COMPANY_TEXT . '"' . (ACCOUNT_COMPANY == 'true' && (int)ENTRY_COMPANY_MIN_LENGTH != 0 ? ' required' : '')); ?>
 <br class="clearBoth">
@@ -54,7 +54,7 @@
 <br class="clearBoth">
 <?php
   if (ACCOUNT_SUBURB == 'true') {
-?>
+      ?>
 <label class="inputLabel" for="suburb"><?php echo ENTRY_SUBURB; ?></label>
 <?php echo zen_draw_input_field('suburb', $entry->fields['entry_suburb'], zen_set_field_length(TABLE_ADDRESS_BOOK, 'entry_suburb', '40') . ' id="suburb" autocomplete="address-line2" placeholder="' . ENTRY_SUBURB_TEXT . '"'); ?>
 <br class="clearBoth">
@@ -68,26 +68,28 @@
 
 <?php
   if (ACCOUNT_STATE == 'true') {
-    if ($flag_show_pulldown_states == true) {
-?>
+      if ($flag_show_pulldown_states == true) {
+          ?>
 <label class="inputLabel" for="stateZone" id="zoneLabel"><?php echo ENTRY_STATE; ?></label>
 <?php
-      echo zen_draw_pull_down_menu('zone_id', zen_prepare_country_zones_pull_down($selected_country), $zone_id, 'id="stateZone"');
-      if (!empty(ENTRY_STATE_TEXT)) echo '&nbsp;<span class="alert">' . ENTRY_STATE_TEXT . '</span>';
-    }
-?>
+                echo zen_draw_pull_down_menu('zone_id', zen_prepare_country_zones_pull_down($selected_country), $zone_id, 'id="stateZone"');
+          if (!empty(ENTRY_STATE_TEXT)) {
+              echo '&nbsp;<span class="alert">' . ENTRY_STATE_TEXT . '</span>';
+          }
+      }
+      ?>
 
 <?php if ($flag_show_pulldown_states == true) { ?>
 <br class="clearBoth" id="stBreak">
 <?php } ?>
 <label class="inputLabel" for="state" id="stateLabel"><?php echo $state_field_label; ?></label>
 <?php
-    echo zen_draw_input_field('state', zen_get_zone_name((int)$entry->fields['entry_country_id'], (int)$entry->fields['entry_zone_id'], $entry->fields['entry_state']), zen_set_field_length(TABLE_ADDRESS_BOOK, 'entry_state', '40') . ' id="state" placeholder="' . ENTRY_STATE_TEXT . '"');
+          echo zen_draw_input_field('state', zen_get_zone_name((int)$entry->fields['entry_country_id'], (int)$entry->fields['entry_zone_id'], $entry->fields['entry_state']), zen_set_field_length(TABLE_ADDRESS_BOOK, 'entry_state', '40') . ' id="state" placeholder="' . ENTRY_STATE_TEXT . '"');
 
-    if ($flag_show_pulldown_states == false) {
-      echo zen_draw_hidden_field('zone_id', $zone_name, ' ');
-    }
-?>
+      if ($flag_show_pulldown_states == false) {
+          echo zen_draw_hidden_field('zone_id', $zone_name, ' ');
+      }
+      ?>
 <br class="clearBoth">
 <?php
   }
@@ -102,8 +104,8 @@
 <br class="clearBoth">
 
 <?php
-  if ((isset($_GET['edit']) && ($_SESSION['customer_default_address_id'] != $_GET['edit'])) || (isset($_GET['edit']) == false) ) {
-?>
+  if ((isset($_GET['edit']) && ($_SESSION['customer_default_address_id'] != $_GET['edit'])) || (isset($_GET['edit']) == false)) {
+      ?>
 <?php echo zen_draw_checkbox_field('primary', 'on', false, 'id="primary"') . ' <label class="checkboxLabel" for="primary">' . SET_AS_PRIMARY . '</label>'; ?>
 <?php
   }

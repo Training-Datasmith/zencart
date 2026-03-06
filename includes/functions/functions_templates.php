@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,10 +13,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 /**
  * Get all template directories found in catalog folder structure
  *
- * @return array
  * @since ZC v1.5.8
  */
-function zen_get_catalog_template_directories($include_template_default = false)
+function zen_get_catalog_template_directories($include_template_default = false): array
 {
     if (!defined('DIR_FS_CATALOG_TEMPLATES')) {
         die('Fatal error: DIR_FS_CATALOG_TEMPLATES not defined.');
@@ -60,14 +61,14 @@ function zen_register_new_template($template_dir, $language_id)
 {
     // @TODO: add duplicate-detection and empty-submission detection
     global $db;
-    $sql = "SELECT *
-            FROM " . TABLE_TEMPLATE_SELECT . "
-            WHERE template_language = :lang:";
+    $sql = 'SELECT *
+            FROM ' . TABLE_TEMPLATE_SELECT . '
+            WHERE template_language = :lang:';
     $sql = $db->bindVars($sql, ':lang:', $language_id, 'integer');
     $check_query = $db->Execute($sql);
     if ($check_query->RecordCount() < 1) {
-        $sql = "INSERT INTO " . TABLE_TEMPLATE_SELECT . " (template_dir, template_language)
-                VALUES (:tpl:, :lang:)";
+        $sql = 'INSERT INTO ' . TABLE_TEMPLATE_SELECT . ' (template_dir, template_language)
+                VALUES (:tpl:, :lang:)';
         $sql = $db->bindVars($sql, ':tpl:', $template_dir, 'string');
         $sql = $db->bindVars($sql, ':lang:', $language_id, 'integer');
         $db->Execute($sql);
@@ -80,13 +81,13 @@ function zen_register_new_template($template_dir, $language_id)
  * @return array of language_name and language_id entries
  * @since ZC v1.5.8
  */
-function zen_get_template_languages_not_registered()
+function zen_get_template_languages_not_registered(): array
 {
     global $db;
     $templates = [];
-    $sql = "SELECT lng.name as language_name, lng.languages_id as language_id
-            FROM " . TABLE_LANGUAGES . " lng
-            WHERE lng.languages_id NOT IN (SELECT template_language FROM " . TABLE_TEMPLATE_SELECT . ")";
+    $sql = 'SELECT lng.name as language_name, lng.languages_id as language_id
+            FROM ' . TABLE_LANGUAGES . ' lng
+            WHERE lng.languages_id NOT IN (SELECT template_language FROM ' . TABLE_TEMPLATE_SELECT . ')';
     $results = $db->Execute($sql);
     foreach ($results as $result) {
         $templates[] = $result;
@@ -99,12 +100,12 @@ function zen_get_template_languages_not_registered()
  * @param string $template_dir
  * @since ZC v1.5.8
  */
-function zen_update_template_name_for_id($id, $template_dir)
+function zen_update_template_name_for_id($id, $template_dir): void
 {
     global $db;
-    $sql = "UPDATE " . TABLE_TEMPLATE_SELECT . "
+    $sql = 'UPDATE ' . TABLE_TEMPLATE_SELECT . '
             SET template_dir = :tpl:
-            WHERE template_id = :id:";
+            WHERE template_id = :id:';
     $sql = $db->bindVars($sql, ':tpl:', $template_dir, 'string');
     $sql = $db->bindVars($sql, ':id:', $id, 'integer');
     $db->Execute($sql);
@@ -115,15 +116,15 @@ function zen_update_template_name_for_id($id, $template_dir)
  * @return bool whether template existed before delete
  * @since ZC v1.5.8
  */
-function zen_deregister_template_id($id)
+function zen_deregister_template_id($id): bool
 {
     global $db;
-    $check_query = $db->Execute("SELECT template_language
-                                 FROM " . TABLE_TEMPLATE_SELECT . "
-                                 WHERE template_id = " . (int)$id);
+    $check_query = $db->Execute('SELECT template_language
+                                 FROM ' . TABLE_TEMPLATE_SELECT . '
+                                 WHERE template_id = ' . (int)$id);
     if ($check_query->RecordCount() && $check_query->fields['template_language'] != '0') {
-        $db->Execute("DELETE FROM " . TABLE_TEMPLATE_SELECT . "
-                      WHERE template_id = " . (int)$id);
+        $db->Execute('DELETE FROM ' . TABLE_TEMPLATE_SELECT . '
+                      WHERE template_id = ' . (int)$id);
         return true;
     }
     return false;

@@ -11,7 +11,9 @@
 <div class="centerColumn" id="passwordForgotten">
 <?php echo zen_draw_form('password_forgotten', zen_href_link(FILENAME_PASSWORD_FORGOTTEN, 'action=process', 'SSL')); ?>
 
-<?php if ($messageStack->size('password_forgotten') > 0) echo $messageStack->output('password_forgotten'); ?>
+<?php if ($messageStack->size('password_forgotten') > 0) {
+    echo $messageStack->output('password_forgotten');
+} ?>
 
 <fieldset>
 <legend><?php echo HEADING_TITLE; ?></legend>

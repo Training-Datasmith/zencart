@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Common;
 
@@ -17,56 +18,45 @@ final class ReedSolomonCodec
     /**
      * Symbol size in bits.
      */
-    private int $symbolSize;
+    private readonly int $symbolSize;
 
     /**
      * Block size in symbols.
      */
-    private int $blockSize;
+    private readonly int $blockSize;
 
     /**
      * First root of RS code generator polynomial, index form.
      */
-    private int $firstRoot;
-
-    /**
-     * Primitive element to generate polynomial roots, index form.
-     */
-    private int $primitive;
+    private readonly int $firstRoot;
 
     /**
      * Prim-th root of 1, index form.
      */
-    private int $iPrimitive;
+    private readonly int $iPrimitive;
 
     /**
      * RS code generator polynomial degree (number of roots).
      */
-    private int $numRoots;
+    private readonly int $numRoots;
 
     /**
      * Padding bytes at front of shortened block.
      */
-    private int $padding;
+    private readonly int $padding;
 
     /**
      * Log lookup table.
-     *
-     * @var SplFixedArray
      */
     private SplFixedArray $alphaTo;
 
     /**
      * Anti-Log lookup table.
-     *
-     * @var SplFixedArray
      */
     private SplFixedArray $indexOf;
 
     /**
      * Generator polynomial.
-     *
-     * @var SplFixedArray
      */
     private SplFixedArray $generatorPoly;
 
@@ -81,7 +71,10 @@ final class ReedSolomonCodec
         int $symbolSize,
         int $gfPoly,
         int $firstRoot,
-        int $primitive,
+        /**
+         * Primitive element to generate polynomial roots, index form.
+         */
+        private readonly int $primitive,
         int $numRoots,
         int $padding
     ) {
@@ -135,18 +128,13 @@ final class ReedSolomonCodec
         // Form RS code generator polynomial from its roots
         $this->generatorPoly = SplFixedArray::fromArray(array_fill(0, $numRoots + 1, 0), false);
         $this->firstRoot = $firstRoot;
-        $this->primitive = $primitive;
         $this->numRoots = $numRoots;
 
-        // Find prim-th root of 1, used in decoding
-        for ($iPrimitive = 1; ($iPrimitive % $primitive) !== 0; $iPrimitive += $this->blockSize) {
-        }
-
-        $this->iPrimitive = intdiv($iPrimitive, $primitive);
+        $this->iPrimitive = intdiv($iPrimitive, $this->primitive);
 
         $this->generatorPoly[0] = 1;
 
-        for ($i = 0, $root = $firstRoot * $primitive; $i < $numRoots; ++$i, $root += $primitive) {
+        for ($i = 0, $root = $firstRoot * $this->primitive; $i < $numRoots; ++$i, $root += $this->primitive) {
             $this->generatorPoly[$i + 1] = 1;
 
             for ($j = $i; $j > 0; $j--) {
@@ -171,7 +159,7 @@ final class ReedSolomonCodec
     /**
      * Encodes data and writes result back into parity array.
      */
-    public function encode(SplFixedArray $data, SplFixedArray $parity) : void
+    public function encode(SplFixedArray $data, SplFixedArray $parity): void
     {
         for ($i = 0; $i < $this->numRoots; ++$i) {
             $parity[$i] = 0;
@@ -208,7 +196,7 @@ final class ReedSolomonCodec
     /**
      * Decodes received data.
      */
-    public function decode(SplFixedArray $data, ?SplFixedArray $erasures = null) : ?int
+    public function decode(SplFixedArray $data, ?SplFixedArray $erasures = null): ?int
     {
         // This speeds up the initialization a bit.
         $numRootsPlusOne = SplFixedArray::fromArray(array_fill(0, $this->numRoots + 1, 0), false);
@@ -442,7 +430,7 @@ final class ReedSolomonCodec
     /**
      * Computes $x % GF_SIZE, where GF_SIZE is 2**GF_BITS - 1, without a slow divide.
      */
-    private function modNn(int $x) : int
+    private function modNn(int $x): int
     {
         while ($x >= $this->blockSize) {
             $x -= $this->blockSize;

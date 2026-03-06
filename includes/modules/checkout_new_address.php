@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * checkout_new_address.php
  *
@@ -52,7 +54,7 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
         }
         $country = zen_db_prepare_input($_POST['zone_country_id']);
         if (ACCOUNT_GENDER === 'true') {
-            if ( ($gender !== 'm') && ($gender !== 'f') ) {
+            if (($gender !== 'm') && ($gender !== 'f')) {
                 $error = true;
                 $messageStack->add('checkout_address', ENTRY_GENDER_ERROR);
             }
@@ -80,21 +82,21 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
 
         if (ACCOUNT_STATE === 'true') {
             $check_query =
-                "SELECT COUNT(*) AS total
-                   FROM " . TABLE_ZONES . "
-                  WHERE zone_country_id = :zoneCountryID";
+                'SELECT COUNT(*) AS total
+                   FROM ' . TABLE_ZONES . '
+                  WHERE zone_country_id = :zoneCountryID';
             $check_query = $db->bindVars($check_query, ':zoneCountryID', $country, 'integer');
             $check = $db->Execute($check_query);
             $entry_state_has_zones = ($check->fields['total'] !== '0');
             if ($entry_state_has_zones === true) {
                 $zone_query =
-                    "SELECT DISTINCT zone_id, zone_name, zone_code
-                       FROM " . TABLE_ZONES . "
+                    'SELECT DISTINCT zone_id, zone_name, zone_code
+                       FROM ' . TABLE_ZONES . '
                       WHERE zone_country_id = :zoneCountryID
-                        AND " .
+                        AND ' .
                             ((trim($state) !== '' && (int)$zone_id === 0) ? "(UPPER(zone_name) LIKE ':zoneState%' OR UPPER(zone_code) LIKE '%:zoneState%') OR " : '') .
-                            "zone_id = :zoneID
-                      ORDER BY zone_code ASC, zone_name";
+                            'zone_id = :zoneID
+                      ORDER BY zone_code ASC, zone_name';
 
                 $zone_query = $db->bindVars($zone_query, ':zoneCountryID', $country, 'integer');
                 $zone_query = $db->bindVars($zone_query, ':zoneState', strtoupper($state), 'noquotestring');
@@ -106,7 +108,7 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
                 if ((int)$zone->RecordCount() > 1) {
                     $state_uppercased = strtoupper($state);
                     foreach ($zone as $next_zone) {
-                        if (strtoupper($next_zone['zone_code']) === $state_uppercased || strtoupper($next_zone['zone_name']) === $state_uppercased) {
+                        if (strtoupper((string) $next_zone['zone_code']) === $state_uppercased || strtoupper((string) $next_zone['zone_name']) === $state_uppercased) {
                             $found_exact_iso_match = true;
                             break;
                         }
@@ -165,14 +167,14 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
                     $sql_data_array[] = ['fieldName' => 'entry_zone_id', 'value' => $zone_id, 'type' => 'integer'];
                     $sql_data_array[] = ['fieldName' => 'entry_state', 'value' => '', 'type' => 'stringIgnoreNull'];
                 } else {
-                    $sql_data_array[] = ['fieldName' => 'entry_zone_id', 'value'=>0, 'type' => 'integer'];
+                    $sql_data_array[] = ['fieldName' => 'entry_zone_id', 'value' => 0, 'type' => 'integer'];
                     $sql_data_array[] = ['fieldName' => 'entry_state', 'value' => $state, 'type' => 'stringIgnoreNull'];
                 }
             }
             $db->perform(TABLE_ADDRESS_BOOK, $sql_data_array);
             $address_book_id = $db->Insert_ID();
             $zco_notifier->notify('NOTIFY_MODULE_CHECKOUT_ADDED_ADDRESS_BOOK_RECORD', array_merge(['address_id' => $address_book_id], $sql_data_array));
-            switch($addressType) {
+            switch ($addressType) {
                 case 'billto':
                     $_SESSION['billto'] = $address_book_id;
                     $_SESSION['payment'] = '';
@@ -199,10 +201,10 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
                 $_SESSION['billto'] = $_POST['address'];
 
                 $check_address_query =
-                    "SELECT COUNT(*) AS total
-                       FROM " . TABLE_ADDRESS_BOOK . "
+                    'SELECT COUNT(*) AS total
+                       FROM ' . TABLE_ADDRESS_BOOK . '
                       WHERE customers_id = :customersID
-                        AND address_book_id = :addressBookID";
+                        AND address_book_id = :addressBookID';
 
                 $check_address_query = $db->bindVars($check_address_query, ':customersID', $_SESSION['customer_id'], 'integer');
                 $check_address_query = $db->bindVars($check_address_query, ':addressBookID', $_SESSION['billto'], 'integer');
@@ -229,10 +231,10 @@ if (isset($_POST['action']) && ($_POST['action'] === 'submit')) {
                 }
                 $_SESSION['sendto'] = $_POST['address'];
                 $check_address_query =
-                    "SELECT COUNT(*) AS total
-                       FROM " . TABLE_ADDRESS_BOOK . "
+                    'SELECT COUNT(*) AS total
+                       FROM ' . TABLE_ADDRESS_BOOK . '
                       WHERE customers_id = :customersID
-                        AND address_book_id = :addressBookID";
+                        AND address_book_id = :addressBookID';
 
                 $check_address_query = $db->bindVars($check_address_query, ':customersID', $_SESSION['customer_id'], 'integer');
                 $check_address_query = $db->bindVars($check_address_query, ':addressBookID', $_SESSION['sendto'], 'integer');

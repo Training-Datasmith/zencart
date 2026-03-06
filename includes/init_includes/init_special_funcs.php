@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * load the system wide functions
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.

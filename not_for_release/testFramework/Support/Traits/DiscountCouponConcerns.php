@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Traits;
 
 use Tests\Support\Database\TestDb;
 
 trait DiscountCouponConcerns
 {
-
     protected array $couponProfiles = [
         'test10percent' => [
             'coupon' => [
@@ -20,12 +21,12 @@ trait DiscountCouponConcerns
                 'coupon_name' => 'Test 10 Percent',
                 'coupon_description' => 'Test 10 Percent',
                 'language_id' => 1,
-            ]
+            ],
 
-        ]
+        ],
     ];
 
-    public function createCoupon($profileName)
+    public function createCoupon($profileName): void
     {
         if (!isset($this->couponProfiles[$profileName])) {
             return;

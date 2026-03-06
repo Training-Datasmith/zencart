@@ -34,19 +34,19 @@ $goodMessage = '<span style="color:green;font-weight:bold">GOOD: </span>';
     <p>
         <?php
         echo 'Checking server against howsmytls.com' . "<br>\n";
-        // Assess the capabilities of this server when connecting as a client. To see ciphers and other data add the ?details=on parameter as described above.
-        $ch = curl_init('https://www.howsmytls.com/a/check');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        $data = curl_exec($ch);
-        $json = json_decode($data, false);
-        echo (stripos($json->rating, 'Okay') !== false ? $goodMessage : $errorMessage) . ' Rating: ' . $json->rating;
-        echo "<br>\n";
-        echo 'Connection uses ' . $json->tls_version . "<br>\n";
-        if ($showDetails) {
-            echo '<pre>' . print_r(json_decode($data, true), true) . "</pre><br>";
-        }
-        ?></p>
+// Assess the capabilities of this server when connecting as a client. To see ciphers and other data add the ?details=on parameter as described above.
+$ch = curl_init('https://www.howsmytls.com/a/check');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+$data = curl_exec($ch);
+$json = json_decode($data, false);
+echo (stripos((string) $json->rating, 'Okay') !== false ? $goodMessage : $errorMessage) . ' Rating: ' . $json->rating;
+echo "<br>\n";
+echo 'Connection uses ' . $json->tls_version . "<br>\n";
+if ($showDetails) {
+    echo '<pre>' . print_r(json_decode($data, true), true) . '</pre><br>';
+}
+?></p>
     <p>This page is a simple diagnostic to determine whether this server can connect to common destinations.<br>
         <em>For advanced "details" mode, add </em><strong>?details=on</strong><em> to the URL.</em></p>
     <p><em>(Another resource you may find useful for testing your server's overall customer-facing SSL configuration:
@@ -58,100 +58,100 @@ $goodMessage = '<span style="color:green;font-weight:bold">GOOD: </span>';
     <?php
 
     echo 'Connecting to USPS ...<br>';
-    doCurlTest('https://secure.shippingapis.com/ShippingAPI.dll');
-    if (isset($_GET['old']) && $_GET['old'] == '1') {
-        echo '2nd test, using old http method on old endpoint: ';
-        doCurlTest('http://production.shippingapis.com/shippingapi.dll');
-    }
+doCurlTest('https://secure.shippingapis.com/ShippingAPI.dll');
+if (isset($_GET['old']) && $_GET['old'] == '1') {
+    echo '2nd test, using old http method on old endpoint: ';
+    doCurlTest('http://production.shippingapis.com/shippingapi.dll');
+}
 
-    echo 'Connecting to USPS Test/Staging/Sandbox Server ...<br>';
-    doCurlTest('https://stg-secure.shippingapis.com/ShippingApi.dll');
+echo 'Connecting to USPS Test/Staging/Sandbox Server ...<br>';
+doCurlTest('https://stg-secure.shippingapis.com/ShippingApi.dll');
 
-    echo 'Connecting to USPS REST API Server ...<br>';
-    doCurlTest('https://apis.usps.com');
+echo 'Connecting to USPS REST API Server ...<br>';
+doCurlTest('https://apis.usps.com');
 
-    echo 'Connecting to UPS (onlinetools.ups.com) ...<br>';
-    doCurlTest('https://onlinetools.ups.com/api/rating/v1/Shop');
-    //doCurlTest('https://onlinetools.ups.com/ups.app/xml/Rate');
+echo 'Connecting to UPS (onlinetools.ups.com) ...<br>';
+doCurlTest('https://onlinetools.ups.com/api/rating/v1/Shop');
+//doCurlTest('https://onlinetools.ups.com/ups.app/xml/Rate');
 
-    echo 'Connecting to UPS (sandbox) ...<br>';
-    doCurlTest('https://wwwcie.ups.com/api/rating/v1/Shop');
-    //doCurlTest('https://wwwcie.ups.com/ups.app/xml/Rate');
+echo 'Connecting to UPS (sandbox) ...<br>';
+doCurlTest('https://wwwcie.ups.com/api/rating/v1/Shop');
+//doCurlTest('https://wwwcie.ups.com/ups.app/xml/Rate');
 
-    echo 'Connecting to FedEx API ...<br>';
-    doCurlTest('https://apis.fedex.com/');
+echo 'Connecting to FedEx API ...<br>';
+doCurlTest('https://apis.fedex.com/');
 
-    echo 'Connecting to FedEx (old port 80)...<br>';
-    dofsockTest('fedex.com', 80);
+echo 'Connecting to FedEx (old port 80)...<br>';
+dofsockTest('fedex.com', 80);
 
-    echo 'Connecting to Canada Post SellOnline HTTP/S ...<br>';
-    doCurlTest('https://sellonline-cybervente.canadapost-postescanada.ca/');
+echo 'Connecting to Canada Post SellOnline HTTP/S ...<br>';
+doCurlTest('https://sellonline-cybervente.canadapost-postescanada.ca/');
 
-    echo 'Connecting to Canada Post REST API (SSL) ...<br>';
-    doCurlTest('https://soa-gw.canadapost.ca/rs/ship/price');
+echo 'Connecting to Canada Post REST API (SSL) ...<br>';
+doCurlTest('https://soa-gw.canadapost.ca/rs/ship/price');
 
-    echo 'Connecting to PayPal IPN (port 443)...<br>';
-    dofsockTest('www.paypal.com', 443);
-    doCurlTest('https://www.paypal.com/cgi-bin/webscr');
+echo 'Connecting to PayPal IPN (port 443)...<br>';
+dofsockTest('www.paypal.com', 443);
+doCurlTest('https://www.paypal.com/cgi-bin/webscr');
 
-    echo 'Connecting to PayPal IPN (port 443) Sandbox ...<br>';
-    dofsockTest('www.sandbox.paypal.com', 443);
-    doCurlTest('https://www.sandbox.paypal.com/cgi-bin/webscr');
+echo 'Connecting to PayPal IPN (port 443) Sandbox ...<br>';
+dofsockTest('www.sandbox.paypal.com', 443);
+doCurlTest('https://www.sandbox.paypal.com/cgi-bin/webscr');
 
-    //echo 'Connecting to PayPal IPN Postback ...<br>';
-    //dofsockTest('ipnpb.paypal.com', 443);
-    //doCurlTest('https://ipnpb.paypal.com');
-    //
-    //echo 'Connecting to PayPal IPN Postback (Sandbox)...<br>';
-    //dofsockTest('ipnpb.sandbox.paypal.com', 443);
-    //doCurlTest('https://ipnpb.sandbox.paypal.com');
+//echo 'Connecting to PayPal IPN Postback ...<br>';
+//dofsockTest('ipnpb.paypal.com', 443);
+//doCurlTest('https://ipnpb.paypal.com');
+//
+//echo 'Connecting to PayPal IPN Postback (Sandbox)...<br>';
+//dofsockTest('ipnpb.sandbox.paypal.com', 443);
+//doCurlTest('https://ipnpb.sandbox.paypal.com');
 
-    echo 'Connecting to PayPal Express/Pro NVP Server ...<br>';
-    doCurlTest('https://api-3t.paypal.com/nvp');
+echo 'Connecting to PayPal Express/Pro NVP Server ...<br>';
+doCurlTest('https://api-3t.paypal.com/nvp');
 
-    echo 'Connecting to PayPal Express/Pro NVP Sandbox ...<br>';
-    doCurlTest('https://api-3t.sandbox.paypal.com/nvp');
+echo 'Connecting to PayPal Express/Pro NVP Sandbox ...<br>';
+doCurlTest('https://api-3t.sandbox.paypal.com/nvp');
 
-    echo 'Connecting to PayPal REST Live Endpoint...<br>';
-    doCurlTest('https://api-m.paypal.com');
+echo 'Connecting to PayPal REST Live Endpoint...<br>';
+doCurlTest('https://api-m.paypal.com');
 
-    echo 'Connecting to PayPal REST Sandbox ...<br>';
-    doCurlTest('https://api-m.sandbox.paypal.com');
+echo 'Connecting to PayPal REST Sandbox ...<br>';
+doCurlTest('https://api-m.sandbox.paypal.com');
 
-    echo 'Connecting to PayPal Payflowpro Server ...<br>';
-    doCurlTest('https://payflowpro.paypal.com/transaction');
+echo 'Connecting to PayPal Payflowpro Server ...<br>';
+doCurlTest('https://payflowpro.paypal.com/transaction');
 
-    echo 'Connecting to PayPal Payflowpro Pilot/Sandbox Server ...<br>';
-    doCurlTest('https://pilot-payflowpro.paypal.com/transaction');
+echo 'Connecting to PayPal Payflowpro Pilot/Sandbox Server ...<br>';
+doCurlTest('https://pilot-payflowpro.paypal.com/transaction');
 
-    echo 'Connecting to Cardinal Commerce 3D-Secure Server ...<br>';
-    doCurlTest('https://paypal.cardinalcommerce.com/maps/processormodule.asp');
+echo 'Connecting to Cardinal Commerce 3D-Secure Server ...<br>';
+doCurlTest('https://paypal.cardinalcommerce.com/maps/processormodule.asp');
 
-    echo 'Connecting to Square Payments Server ...<br>';
-    doCurlTest('https://connect.squareup.com');
+echo 'Connecting to Square Payments Server ...<br>';
+doCurlTest('https://connect.squareup.com');
 
-    echo 'Connecting to AuthorizeNet Production Server ...<br>';
-    doCurlTest('https://secure.authorize.net/gateway/transact.dll');
+echo 'Connecting to AuthorizeNet Production Server ...<br>';
+doCurlTest('https://secure.authorize.net/gateway/transact.dll');
 
-    echo 'Connecting to AuthorizeNet API Production Server ...<br>';
-    doCurlTest('https://api2.authorize.net/xml/v1/request.api');
+echo 'Connecting to AuthorizeNet API Production Server ...<br>';
+doCurlTest('https://api2.authorize.net/xml/v1/request.api');
 
-    echo 'Connecting to AuthorizeNet Developer/Sandbox Server ...<br>';
-    doCurlTest('https://test.authorize.net/gateway/transact.dll');
+echo 'Connecting to AuthorizeNet Developer/Sandbox Server ...<br>';
+doCurlTest('https://test.authorize.net/gateway/transact.dll');
 
-    echo 'Connecting to AuthorizeNet API Developer/Sandbox Server ...<br>';
-    doCurlTest('https://apitest.authorize.net/xml/v1/request.api');
+echo 'Connecting to AuthorizeNet API Developer/Sandbox Server ...<br>';
+doCurlTest('https://apitest.authorize.net/xml/v1/request.api');
 
-    echo 'Connecting to First Data GGe4 server (SSL)...<br>';
-    doCurlTest('https://checkout.globalgatewaye4.firstdata.com/payment');
+echo 'Connecting to First Data GGe4 server (SSL)...<br>';
+doCurlTest('https://checkout.globalgatewaye4.firstdata.com/payment');
 
-    echo 'Connecting to Elavon Server...<br>';
-    doCurlTest('https://www.myvirtualmerchant.com/VirtualMerchant/process.do');
+echo 'Connecting to Elavon Server...<br>';
+doCurlTest('https://www.myvirtualmerchant.com/VirtualMerchant/process.do');
 
-    echo 'Connecting to Elavon Sandbox Server...<br>';
-    doCurlTest('https://demo.myvirtualmerchant.com/VirtualMerchantDemo/process.do');
+echo 'Connecting to Elavon Sandbox Server...<br>';
+doCurlTest('https://demo.myvirtualmerchant.com/VirtualMerchantDemo/process.do');
 
-    ?>
+?>
 
     <em>Testing completed. See results above.</em>
     </body>
@@ -161,15 +161,15 @@ $goodMessage = '<span style="color:green;font-weight:bold">GOOD: </span>';
 die();
 //////// Processing logic ///////
 
-function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', $postdata = "field1=This is a test&statuskey=ready")
+function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', $postdata = 'field1=This is a test&statuskey=ready'): void
 {
     global $goodMessage, $errorMessage, $showDetails;
     $extraMessage = '';
     $showResult = false;
-    if (strpos($url, 'zen-cart.com') && !empty($_GET['z'])) {
+    if (strpos((string) $url, 'zen-cart.com') && !empty($_GET['z'])) {
         $showResult = true;
     }
-    if (!strpos($url, 'zen-cart.com') && !empty($_GET['r'])) {
+    if (!strpos((string) $url, 'zen-cart.com') && !empty($_GET['r'])) {
         $showResult = true;
     }
 
@@ -179,7 +179,7 @@ function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', 
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
     }
-    $val = preg_match('/(.*):([0-9]*)$/', $url, $regs);
+    $val = preg_match('/(.*):([0-9]*)$/', (string) $url, $regs);
     if ($val) {
         curl_setopt($ch, CURLOPT_PORT, $regs[2]);
         curl_setopt($ch, CURLOPT_URL, $regs[1]);
@@ -200,12 +200,11 @@ function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', 
         curl_setopt($ch, CURLOPT_CERTINFO, true);
     }
 
-// not directly implemented here, because it is more future-proof and therefore generally more secure to allow curl to autonegotiate the best mutually-supported protocol, by not specifying CURLOPT_SSLVERSION at all.
-//  curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    // not directly implemented here, because it is more future-proof and therefore generally more secure to allow curl to autonegotiate the best mutually-supported protocol, by not specifying CURLOPT_SSLVERSION at all.
+    //  curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
-// for offline testing, this file can be obtained from https://curl.haxx.se/docs/caextract.html ... should never be used in production!
-//  curl_setopt($ch, CURLOPT_CAINFO, '/local/path/to/cacert.pem');
-
+    // for offline testing, this file can be obtained from https://curl.haxx.se/docs/caextract.html ... should never be used in production!
+    //  curl_setopt($ch, CURLOPT_CAINFO, '/local/path/to/cacert.pem');
 
     $result = curl_exec($ch);
     $errtext = curl_error($ch);
@@ -253,7 +252,7 @@ function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', 
         echo $errorMessage . $errnum . ': ' . $errtext . '<br><br>';
     } else {
         echo $goodMessage . 'CURL Connection successful.' . $extraMessage . '<br><br>';
-        if ($showResult && (int)$commInfo['http_code'] === 200) {
+        if ($showResult && $commInfo['http_code'] === 200) {
             echo '<strong>COMMUNICATIONS TEST OKAY.</strong><br>You may see error information below, but that information simply confirms that the server actually responded, which means communications is open.<br>';
         }
         if ($showResult) {
@@ -262,18 +261,15 @@ function doCurlTest($url = 'http://s3.amazonaws.com/zencart-curltest/endpoint', 
     }
     if ($showDetails) {
         echo '<pre>Connection Details:' . "\n" . print_r($commInfo, true) . '</pre><br><br>';
-    }
-
-    if ($showDetails) {
         echo '<hr>';
     }
 }
 
-function dofsockTest($url = 's3.amazonaws.com/zencart-curltest/endpoint', $port = 80, $timeout = 5)
+function dofsockTest($url = 's3.amazonaws.com/zencart-curltest/endpoint', $port = 80, $timeout = 5): void
 {
     global $goodMessage, $errorMessage, $showDetails;
     /* in case it's not set, set 10-second timeout for fsockopen */
-    ini_set("default_socket_timeout", "10");
+    ini_set('default_socket_timeout', '10');
     $socket = fsockopen($url, $port, $errnum, $errtext, $timeout);
     if ($socket) {
         echo $goodMessage . 'Socket established<br><br>';
@@ -284,7 +280,6 @@ function dofsockTest($url = 's3.amazonaws.com/zencart-curltest/endpoint', $port 
         echo '<hr>';
     }
 }
-
 
 /**
  * FOR DEVELOPERS ONLY:

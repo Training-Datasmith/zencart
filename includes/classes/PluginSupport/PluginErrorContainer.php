@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -12,12 +14,6 @@ namespace Zencart\PluginSupport;
  */
 class PluginErrorContainer
 {
-
-    /**
-     * $logger "null" the logger to use.
-     * @var object
-     */
-    protected $logger;
     /**
      * $logErrors is an array of error messages
      */
@@ -27,9 +23,14 @@ class PluginErrorContainer
      */
     protected array $friendlyErrors = [];
 
-    public function __construct($logger = null)
-    {
-        $this->logger = $logger;
+    /**
+     * @param object $logger
+     */
+    public function __construct(/**
+     * $logger "null" the logger to use.
+     */
+        protected $logger = null
+    ) {
         $this->logErrors = [];
         $this->friendlyErrors = [];
     }
@@ -37,7 +38,7 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function hasLogErrors()
+    public function hasLogErrors(): int
     {
         return (count($this->logErrors));
     }
@@ -45,7 +46,7 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function hasFriendlyErrors()
+    public function hasFriendlyErrors(): int
     {
         return (count($this->friendlyErrors));
     }
@@ -53,14 +54,16 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function addError($logSeverity, $logMessage, $useLogMessageForFriendly = false, $friendlyMessage = '')
+    public function addError($logSeverity, $logMessage, $useLogMessageForFriendly = false, $friendlyMessage = ''): void
     {
         if ($useLogMessageForFriendly) {
             $friendlyMessage = $logMessage;
         }
         $this->logErrors[] = $logMessage;
-        if ($friendlyMessage === '') return;
-        $friendlyHash = hash('md5', $friendlyMessage);
+        if ($friendlyMessage === '') {
+            return;
+        }
+        $friendlyHash = hash('md5', (string) $friendlyMessage);
         $this->friendlyErrors[$friendlyHash] = $friendlyMessage;
         if ($this->logger) {
             // do something here for external logging;
@@ -70,7 +73,7 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function hasErrors()
+    public function hasErrors(): int
     {
         return (count($this->logErrors + $this->friendlyErrors));
     }
@@ -78,7 +81,7 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function getFriendlyErrors()
+    public function getFriendlyErrors(): array
     {
         return $this->friendlyErrors;
     }
@@ -86,7 +89,7 @@ class PluginErrorContainer
     /**
      * @since ZC v1.5.7
      */
-    public function getLogErrors()
+    public function getLogErrors(): array
     {
         return $this->logErrors;
     }

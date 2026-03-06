@@ -44,7 +44,7 @@ if (isset($_GET['action'], $_POST['quantity'], $_POST['update_x']) && $_GET['act
 
         $posm_sql_data = [
             'products_quantity' => $new_quantity,
-            'last_modified' => 'now()'
+            'last_modified' => 'now()',
         ];
         $where_str = "pos_id = $pos_id AND products_quantity != $new_quantity";
         if (isset($model_inputs[$pos_id])) {
@@ -88,9 +88,9 @@ if (isset($_GET['action'], $_POST['quantity'], $_POST['update_x']) && $_GET['act
     //
     if (!empty($pos_id_array)) {
         $product_ids = $db->Execute(
-            "SELECT DISTINCT products_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-               WHERE pos_id IN (" . implode(',', $pos_id_array) . ")"
+            'SELECT DISTINCT products_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+               WHERE pos_id IN (' . implode(',', $pos_id_array) . ')'
         );
         foreach ($product_ids as $product) {
             posm_update_base_product_quantity($product['products_id']);
@@ -117,10 +117,10 @@ if (isset($_GET['action'], $_POST['quantity'], $_POST['update_x']) && $_GET['act
 // -----
 // Check for invalid values in the POSM_STOCK_REORDER_LEVEL setting (it should contain only digits 0-9) and reset it to 0 if found invalid.
 //
-$posm_stock_reorder_level = preg_replace("/[^0-9]/", '', POSM_STOCK_REORDER_LEVEL);
+$posm_stock_reorder_level = preg_replace('/[^0-9]/', '', POSM_STOCK_REORDER_LEVEL);
 if ($posm_stock_reorder_level !== POSM_STOCK_REORDER_LEVEL) {
     $db->Execute(
-        "UPDATE " . TABLE_CONFIGURATION . "
+        'UPDATE ' . TABLE_CONFIGURATION . "
             SET configuration_value = '0'
           WHERE configuration_key = 'POSM_STOCK_REORDER_LEVEL'
           LIMIT 1"
@@ -218,12 +218,12 @@ $css_content = '';
 $js_content = '';
 $zco_notifier->notify('NOTIFY_POSM_VIEW_ALL_INSERT_HEAD', '', $onload, $css_content, $js_content);
 if ($css_content !== '') {
-?>
+    ?>
     <style><?= $css_content ?></style>
 <?php
 }
 if ($js_content !== '') {
-?>
+    ?>
     <script><?= $js_content ?></script>
 <?php
 }
@@ -258,7 +258,7 @@ $sort_dropdown = zen_draw_pull_down_menu('sort_by', $sort_array, $sort_by, 'id="
     <p><?= TEXT_POS_INSTRUCTIONS . $instructions2 ?></p>
     <hr>
 
-    <?= zen_draw_form('all-variants', FILENAME_PRODUCTS_OPTIONS_STOCK_VIEW_ALL, zen_get_all_get_params(['view_all', 'action', 'sort_by']), 'get', 'class="form-inline"') ?>
+    <?= zen_draw_form('all-variants', FILENAME_PRODUCTS_OPTIONS_STOCK_VIEW_ALL, zen_get_all_get_params(['view_all', 'action', 'sort_by']), 'get') ?>
         <div class="form-group">
             <?= zen_draw_label(POSM_TEXT_SORT_BY, 'sort-by', 'class="control-label"') ?>
             <?= $sort_dropdown ?>
@@ -300,12 +300,12 @@ $sort_dropdown = zen_draw_pull_down_menu('sort_by', $sort_array, $sort_by, 'id="
 //
 $additional_content = [];
 $zco_notifier->notify('NOTIFY_POSM_VIEW_ALL_TABLE_HEADING', '', $additional_content);
-if (count($additional_content) !== (int)STATIC_FIELD_COUNT - $base_static_field_count) {
+if (count($additional_content) !== STATIC_FIELD_COUNT - $base_static_field_count) {
     trigger_error('Incorrect table-heading fields supplied by observers, current: ' . count($additional_contrnt) . ', expected: ' . (STATIC_FIELD_COUNT - $base_static_field_count), E_USER_NOTICE);
 }
 foreach ($additional_content as $content) {
     $additional_class = (isset($content['align'])) ? ' text-' . $content['align'] : '';
-?>
+    ?>
                     <th class="dataTableHeadingContent<?= $additional_class ?>"><?= $content['text'] ?></th>
 <?php
 }
@@ -329,19 +329,19 @@ if ($page_num <= 0) {
 }
 $where_clause = ($view_all === true) ? '' : " WHERE pos.products_quantity <= $posm_stock_reorder_level";
 $view_all_sql =
-    "SELECT DISTINCT pos.products_id, pd.products_name, p.master_categories_id
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
-            INNER JOIN " . TABLE_PRODUCTS . " p
+    'SELECT DISTINCT pos.products_id, pd.products_name, p.master_categories_id
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . ' pos
+            INNER JOIN ' . TABLE_PRODUCTS . ' p
                 ON p.products_id = pos.products_id
-            INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+            INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                 ON pd.products_id = pos.products_id
-               AND pd.language_id = " . $_SESSION['languages_id'] . $where_clause . "
-   ORDER BY pd.products_name ASC";
+               AND pd.language_id = ' . $_SESSION['languages_id'] . $where_clause . '
+   ORDER BY pd.products_name ASC';
 
 $view_all_split = new splitPageResults($page_num, POSM_MAX_PRODUCTS_VIEW_ALL, $view_all_sql, $view_all_query_numrows);
 $products_list = $db->Execute($view_all_sql);
 if ($products_list->EOF) {
-?>
+    ?>
                 <tr>
                     <td colspan="<?= STATIC_FIELD_COUNT ?>" class="text-center"><?= POSM_VIEW_ALL_NO_PRODUCTS_TO_LIST ?></td>
                 </tr>
@@ -395,28 +395,28 @@ if ($products_list->EOF) {
         if ($additional_columns_copy !== $products_name_additional_columns && $additional_content_count !== 0) {
             trigger_error('Multiple observers provided additional product-name content: ' . $products_name_additional_columns . ', ' . json_encode($additional_content), E_USER_NOTICE);
             $products_name_additional_columns = '';
-        // -----
-        // Otherwise, if neither notification resulted in additional columns being added, the product's name row will be shown
-        // full-table width.
-        //
+            // -----
+            // Otherwise, if neither notification resulted in additional columns being added, the product's name row will be shown
+            // full-table width.
+            //
         } elseif ($additional_columns_copy === $products_name_additional_columns && $additional_content_count === 0) {
             $products_name_additional_columns = '';
-        // -----
-        // Otherwise, one or the other notification resulted in additional columns being added.  If it was
-        // an observer responding to the legacy notification, reset the parameters to be applied to the
-        // product's name-column.
-        //
+            // -----
+            // Otherwise, one or the other notification resulted in additional columns being added.  If it was
+            // an observer responding to the legacy notification, reset the parameters to be applied to the
+            // product's name-column.
+            //
         } elseif ($additional_columns_copy !== $products_name_additional_columns) {
             $name_column_parameters = '';
-        // -----
-        // Finally (!), an observer responded with additional columns to be added based on the $additional_content
-        // array.
-        //
+            // -----
+            // Finally (!), an observer responded with additional columns to be added based on the $additional_content
+            // array.
+            //
         } else {
             $name_column_parameters = ' colspan="' . ($base_static_field_count - 1) . '"';
             $products_name_additional_columns = '';
         }
-?>
+        ?>
                 <tr class="dataTableHeadingRow">
                     <td class="dataTableHeadingContent"<?= $name_column_parameters ?>>
                         <?= $products_name_extra_info ?>
@@ -437,7 +437,7 @@ if ($products_list->EOF) {
                     $column_align_class = ' text-' . $next_column['align'];
                 }
                 $additional_parameters = (isset($next_column['params'])) ? ' ' . $next_column['params'] : '';
-?>
+                ?>
                     <td class="dataTableHeadingContent<?= $column_align_class ?>"<?= $additional_parameters ?>>
                         <?= $next_column['text'] ?>
                     </td>
@@ -447,14 +447,14 @@ if ($products_list->EOF) {
             // -----
             // Now output a place-holder heading for the quantity column.
             //
-?>
+            ?>
                     <td class="dataTableHeadingContent">&nbsp;</td>
 <?php
         }
-?>
+        ?>
                 </tr>
 <?php
-        $product_options = $posm_view_all->outputProduct($products_id, $view_all);
+                $product_options = $posm_view_all->outputProduct($products_id, $view_all);
         foreach ($product_options as $current_option) {
             $pos_id = $current_option['fields']['pos_id'];
 
@@ -463,31 +463,31 @@ if ($products_list->EOF) {
             if (POSM_VIEW_ALL_MODEL_UPDATE === 'true') {
                 $pos_model = zen_draw_input_field("model[$pos_id]", $pos_model, 'class="model-num' . $extra_model_class . '"' . $model_field_size);
             }
-?>
+            ?>
                 <tr class="hoverRow">
                     <td>&nbsp;</td>
                     <td class="dataTableContent"><?= $current_option['option_name'] ?></td>
                     <td class="dataTableContent text-center model"><?= $pos_model ?></td>
 <?php
-            // -----
-            // This notification provides the observer with access to an array of content which is
-            // rendered via this script.  That array of content, if updated, is expected to contain
-            // an array of associative arrays ... one array element for each added column of data:
-            //
-            // $additional_content = [
-            //   [
-            //      'text' => 'Column Data',            //- The data to be included for the column (required)
-            //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
-            //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
-            //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
-            //   ],
-            //   ...
-            // ];
-            //
-            // NOTE: The observer is expected to include the same number of columns of data as those supplied
-            // for the NOTIFY_POSM_VIEW_ALL_TABLE_HEADING notification, above.
-            //
-            $additional_content = [];
+                        // -----
+                        // This notification provides the observer with access to an array of content which is
+                        // rendered via this script.  That array of content, if updated, is expected to contain
+                        // an array of associative arrays ... one array element for each added column of data:
+                        //
+                        // $additional_content = [
+                        //   [
+                        //      'text' => 'Column Data',            //- The data to be included for the column (required)
+                        //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
+                        //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
+                        //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
+                        //   ],
+                        //   ...
+                        // ];
+                        //
+                        // NOTE: The observer is expected to include the same number of columns of data as those supplied
+                        // for the NOTIFY_POSM_VIEW_ALL_TABLE_HEADING notification, above.
+                        //
+                        $additional_content = [];
             $zco_notifier->notify('NOTIFY_POSM_VIEW_ALL_INSERT_DATA', $current_option['fields'], $additional_content);
             foreach ($additional_content as $content) {
                 $additional_class = (isset($content['align'])) ? ' text-' . $content['align'] : '';
@@ -495,7 +495,7 @@ if ($products_list->EOF) {
                     $additional_class .= ' ' . $content['class'];
                 }
                 $parameters = (isset($content['params'])) ? ' ' . $content['params'] : '';
-?>
+                ?>
                     <td class="dataTableContent<?= $additional_class ?>"<?= $parameters ?>>
                         <?= $content['text'] ?>
                     </td>
@@ -503,7 +503,7 @@ if ($products_list->EOF) {
             }
             $quantity = $_POST['quantity'][$pos_id] ?? $current_option['fields']['products_quantity'];
             $out_of_stock_class = ($quantity <= $posm_stock_reorder_level) ? 'class="out-of-stock"' : '';
-?>
+            ?>
                     <td class="dataTableContent text-center">
                         <?= zen_draw_input_field("quantity[$pos_id]", $quantity, $out_of_stock_class) ?>
                     </td>
@@ -511,7 +511,7 @@ if ($products_list->EOF) {
 <?php
         }
     }  // END loop displaying information for all products
-?>
+    ?>
                 <tr>
                     <td colspan="<?= STATIC_FIELD_COUNT - 1 ?>">&nbsp;</td>
                     <td class="dataTableContent text-center">
@@ -526,10 +526,10 @@ if ($products_list->EOF) {
 
     <div class="row">
         <div class="col-md-6 smallText">
-            <?= $view_all_split->display_count($view_all_query_numrows, POSM_MAX_PRODUCTS_VIEW_ALL, $page_num, POSM_TEXT_DISPLAY_NUMBER_OF_PRODUCTS) ?>
+            <?= $view_all_split->display_count($view_all_query_numrows) ?>
         </div>
         <div class="col-md-6 smallText text-right">
-            <?= $view_all_split->display_links($view_all_query_numrows, POSM_MAX_PRODUCTS_VIEW_ALL, MAX_DISPLAY_PAGE_LINKS, $page_num, zen_get_all_get_params(['page'])) ?>
+            <?= $view_all_split->display_links($view_all_query_numrows, POSM_MAX_PRODUCTS_VIEW_ALL, MAX_DISPLAY_PAGE_LINKS, $page_num) ?>
         </div>
     </div>
 <?php
@@ -543,7 +543,7 @@ if ($products_list->EOF) {
 <!-- footer_eof //-->
 <?php
 if (POSM_DUPLICATE_MODELNUMS !== 'Allow') {
-?>
+    ?>
 <script>
 $(function() {
     $('input[type="text"].model-num').on('change', function() {
@@ -561,13 +561,13 @@ $(function() {
             if (response.isOk === false) {
                 $('input[type="text"][name="'+modelField+'"].model-num').addClass('duplicate');
 <?php
-    if (POSM_DUPLICATE_MODELNUMS === 'Disallow') {
-?>
+        if (POSM_DUPLICATE_MODELNUMS === 'Disallow') {
+            ?>
                 alert(<?= JSCRIPT_ERROR_DUPLICATE_MODEL ?>);
                 document.modify_form['model['+posID+']'].focus();
 <?php
-    }
-?>
+        }
+    ?>
             }
         });
     });

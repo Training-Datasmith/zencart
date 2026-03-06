@@ -15,11 +15,13 @@
 <div class="centerColumn" id="accountDefault">
 
 <h1 id="accountDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
-<?php if ($messageStack->size('account') > 0) echo $messageStack->output('account'); ?>
+<?php if ($messageStack->size('account') > 0) {
+    echo $messageStack->output('account');
+} ?>
 
 <?php
     if (!empty($ordersArray)) {
-  ?>
+        ?>
 <p class="forward"><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL') . '">' . OVERVIEW_SHOW_ALL_ORDERS . '</a>'; ?></p>
 <br class="clearBoth">
 <h2 id="previous-orders"><?php echo OVERVIEW_PREVIOUS_ORDERS; ?></h2>
@@ -33,8 +35,8 @@
     <th scope="col"><?php echo TABLE_HEADING_VIEW; ?></th>
   </tr>
 <?php
-  foreach($ordersArray as $orders) {
-?>
+        foreach ($ordersArray as $orders) {
+            ?>
   <tr>
     <td class="accountOrderDate"><?php echo zen_date_short($orders['date_purchased']); ?></td>
     <td class="accountOrderId"><?php echo TEXT_NUMBER_SYMBOL . $orders['orders_id']; ?></td>
@@ -45,11 +47,11 @@
   </tr>
 
 <?php
-  }
-?>
+        }
+        ?>
 </table>
 <?php
-  }
+    }
 ?>
 <br class="clearBoth">
 <div id="accountLinksWrapper" class="back">
@@ -62,35 +64,35 @@
 
 
 <?php
-  if ((int)ACCOUNT_NEWSLETTER_STATUS > 0 or CUSTOMERS_PRODUCTS_NOTIFICATION_STATUS !='0') {
-?>
+  if ((int)ACCOUNT_NEWSLETTER_STATUS > 0 or CUSTOMERS_PRODUCTS_NOTIFICATION_STATUS != '0') {
+      ?>
 <h2><?php echo EMAIL_NOTIFICATIONS_TITLE; ?></h2>
 <ul id="myAccountNotify" class="list">
 <?php
-  if ((int)ACCOUNT_NEWSLETTER_STATUS > 0) {
-?>
+        if ((int)ACCOUNT_NEWSLETTER_STATUS > 0) {
+            ?>
 <li><?php echo ' <a href="' . zen_href_link(FILENAME_ACCOUNT_NEWSLETTERS, '', 'SSL') . '">' . EMAIL_NOTIFICATIONS_NEWSLETTERS . '</a>'; ?></li>
-<?php } //endif newsletter unsubscribe ?>
+<?php } //endif newsletter unsubscribe?>
 <?php
-  if (CUSTOMERS_PRODUCTS_NOTIFICATION_STATUS == '1') {
-?>
+      if (CUSTOMERS_PRODUCTS_NOTIFICATION_STATUS == '1') {
+          ?>
 <li><?php echo ' <a href="' . zen_href_link(FILENAME_ACCOUNT_NOTIFICATIONS, '', 'SSL') . '">' . EMAIL_NOTIFICATIONS_PRODUCTS . '</a>'; ?></li>
 
-<?php } //endif product notification ?>
+<?php } //endif product notification?>
 </ul>
 
-<?php } // endif don't show unsubscribe or notification ?>
+<?php } // endif don't show unsubscribe or notification?>
 </div>
 
 <?php
-// only show when there is a GV balance
-  if ($customer_has_gv_balance ) {
-?>
+          // only show when there is a GV balance
+            if ($customer_has_gv_balance) {
+                ?>
 <div id="sendSpendWrapper">
-<?php require($template->get_template_dir('tpl_modules_send_or_spend.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_send_or_spend.php'); ?>
+<?php require($template->get_template_dir('tpl_modules_send_or_spend.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_send_or_spend.php'); ?>
 </div>
 <?php
-  }
+            }
 ?>
 <br class="clearBoth">
 </div>

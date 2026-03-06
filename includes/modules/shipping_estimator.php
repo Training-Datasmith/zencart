@@ -20,7 +20,7 @@ if (isset($_POST['zone_country_id'])) {
     $_POST['zone_country_id'] = (int)$_POST['zone_country_id'];
 }
 if (isset($_POST['scid'])) {
-    $_POST['scid'] = preg_replace('/[^a-z_0-9\- ]/i', '', $_POST['scid']);
+    $_POST['scid'] = preg_replace('/[^a-z_0-9\- ]/i', '', (string) $_POST['scid']);
 }
 ?>
 <!-- shipping_estimator //-->
@@ -36,7 +36,7 @@ if (isset($_POST['scid'])) {
 // Only do when something is in the cart
 if ($_SESSION['cart']->count_contents() > 0) {
     $postcode = $_SESSION['cart_postcode'] ?? '';
-    $postcode = (isset($_POST['postcode'])) ? strip_tags(addslashes($_POST['postcode'])) : $postcode;
+    $postcode = (isset($_POST['postcode'])) ? strip_tags(addslashes((string) $_POST['postcode'])) : $postcode;
     $state_zone_id = (isset($_SESSION['cart_zone'])) ? (int)$_SESSION['cart_zone'] : '';
     if (ACCOUNT_STATE_DRAW_INITIAL_DROPDOWN === 'true') {
         $state_zone_id = (isset($_POST['zone_id'])) ? (int)$_POST['zone_id'] : $state_zone_id;
@@ -195,24 +195,24 @@ if ($_SESSION['cart']->count_contents() > 0) {
     // begin shipping cost
     if (!$free_shipping && $_SESSION['cart']->get_content_type() !== 'virtual') {
         if (!empty($_POST['scid'])) {
-            [$module, $method] = explode('_', $_POST['scid']);
+            [$module, $method] = explode('_', (string) $_POST['scid']);
             $_SESSION['cart_sid'] = $_POST['scid'];
         } elseif (!empty($_SESSION['cart_sid'])) {
-            [$module, $method] = explode('_', $_SESSION['cart_sid']);
+            [$module, $method] = explode('_', (string) $_SESSION['cart_sid']);
         } else {
             $module = '';
             $method = '';
         }
 
         if (!empty($module)) {
-            foreach ($quotes as $key => $value) {
+            foreach ($quotes as $value) {
                 if (!isset($value['id'])) {
                     continue;
                 }
                 if ($value['id'] == $module) {
                     $selected_quote[0] = $value;
                     if (!empty($method)) {
-                        foreach ($selected_quote[0]['methods'] as $qkey => $qval) {
+                        foreach ($selected_quote[0]['methods'] as $qval) {
                             if (($qval['id'] ?? '') == $method) {
                                 $selected_quote[0]['methods'] = [$qval];
                                 continue 2;
@@ -268,17 +268,17 @@ if ($_SESSION['cart']->count_contents() > 0) {
             }
         }
     } elseif ($_SESSION['cart']->get_content_type() !== 'virtual') {
-            $state_array = [];
-            $state_array[] = ['id' => '', 'text' => PULL_DOWN_SHIPPING_ESTIMATOR_SELECT];
-            $state_values = $db->Execute('SELECT zone_name, zone_id FROM ' . TABLE_ZONES . ' WHERE zone_country_id = ' . (int)$selected_country . ' ORDER BY zone_country_id DESC, zone_name');
-            while (!$state_values->EOF) {
-                $state_array[] = [
-                    'id' => $state_values->fields['zone_id'],
-                    'text' => $state_values->fields['zone_name']
-                ];
-                $state_values->MoveNext();
-            }
+        $state_array = [];
+        $state_array[] = ['id' => '', 'text' => PULL_DOWN_SHIPPING_ESTIMATOR_SELECT];
+        $state_values = $db->Execute('SELECT zone_name, zone_id FROM ' . TABLE_ZONES . ' WHERE zone_country_id = ' . (int)$selected_country . ' ORDER BY zone_country_id DESC, zone_name');
+        while (!$state_values->EOF) {
+            $state_array[] = [
+                'id' => $state_values->fields['zone_id'],
+                'text' => $state_values->fields['zone_name'],
+            ];
+            $state_values->MoveNext();
         }
+    }
 
     // This is done after quote-calcs in order to include Tare info accurately.
     // NOTE: tare values are *not* included in weights shown on-screen.

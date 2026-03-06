@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -22,15 +24,15 @@ class HtmlEntityRecurseTest extends zcUnitTestCase
     /**
      *
      */
-    public function testRecurse()
+    public function testRecurse(): void
     {
-        $test = "<script>";
+        $test = '<script>';
         $result = htmlentities_recurse($test);
         $this->assertEquals($result, '&lt;script&gt;');
-        $test = array('value' => "<script>");
+        $test = ['value' => '<script>'];
         $result = htmlentities_recurse($test);
         $this->assertEquals($result['value'], '&lt;script&gt;');
-        $test = array(array('value' => "<script>", 'value1' => "<script>"), 'value' => "<script>");
+        $test = [['value' => '<script>', 'value1' => '<script>'], 'value' => '<script>'];
         $result = htmlentities_recurse($test);
         $this->assertEquals($result[0]['value'], '&lt;script&gt;');
         $this->assertEquals($result[0]['value1'], '&lt;script&gt;');

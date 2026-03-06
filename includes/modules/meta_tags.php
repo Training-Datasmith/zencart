@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * meta_tags module
  *
@@ -29,12 +31,12 @@ zen_define_default('METATAGS_DIVIDER', ', ');
 
 // Get all top category names for use with web site keywords
 $sql =
-    "SELECT cd.categories_name
-       FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+    'SELECT cd.categories_name
+       FROM ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . ' cd
       WHERE c.parent_id = 0
         AND c.categories_id = cd.categories_id
-        AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
-        AND c.categories_status = 1";
+        AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
+        AND c.categories_status = 1';
 $keywords_metatags = $db->Execute($sql);
 foreach ($keywords_metatags as $next_keyword) {
     $keywords_string_metatags .= zen_clean_html($next_keyword['categories_name']) . METATAGS_DIVIDER;
@@ -45,14 +47,14 @@ zen_define_default('KEYWORDS', str_replace('"', '', zen_clean_html($keywords_str
 
 // if per-page metatags overrides have been defined, use those, otherwise use usual defaults:
 if ($metatag_page_name !== 'index') {
-    if (defined('META_TAG_TITLE_' . strtoupper($metatag_page_name))) {
-        zen_define_default('META_TAG_TITLE', constant('META_TAG_TITLE_' . strtoupper($metatag_page_name)));
+    if (defined('META_TAG_TITLE_' . strtoupper((string) $metatag_page_name))) {
+        zen_define_default('META_TAG_TITLE', constant('META_TAG_TITLE_' . strtoupper((string) $metatag_page_name)));
     }
-    if (defined('META_TAG_DESCRIPTION_' . strtoupper($metatag_page_name))) {
-        zen_define_default('META_TAG_DESCRIPTION', constant('META_TAG_DESCRIPTION_' . strtoupper($metatag_page_name)));
+    if (defined('META_TAG_DESCRIPTION_' . strtoupper((string) $metatag_page_name))) {
+        zen_define_default('META_TAG_DESCRIPTION', constant('META_TAG_DESCRIPTION_' . strtoupper((string) $metatag_page_name)));
     }
-    if (defined('META_TAG_KEYWORDS_' . strtoupper($metatag_page_name))) {
-        zen_define_default('META_TAG_KEYWORDS', constant('META_TAG_KEYWORDS_' . strtoupper($metatag_page_name)));
+    if (defined('META_TAG_KEYWORDS_' . strtoupper((string) $metatag_page_name))) {
+        zen_define_default('META_TAG_KEYWORDS', constant('META_TAG_KEYWORDS_' . strtoupper((string) $metatag_page_name)));
     }
 }
 
@@ -110,18 +112,18 @@ switch ($metatag_page_name) {
 
     case ($this_is_home_page):
         zen_define_default('META_TAG_TITLE', (defined('HOME_PAGE_TITLE') && HOME_PAGE_TITLE !== '' ? HOME_PAGE_TITLE : (defined('NAVBAR_TITLE') ? NAVBAR_TITLE . PRIMARY_SECTION : '') . TITLE . TAGLINE));
-        zen_define_default('META_TAG_DESCRIPTION', (defined('HOME_PAGE_META_DESCRIPTION') && HOME_PAGE_META_DESCRIPTION !== '') ? HOME_PAGE_META_DESCRIPTION : TITLE . PRIMARY_SECTION . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '' ) . SECONDARY_SECTION . KEYWORDS);
-        zen_define_default('META_TAG_KEYWORDS', (defined('HOME_PAGE_META_KEYWORDS') && HOME_PAGE_META_KEYWORDS !== '') ? HOME_PAGE_META_KEYWORDS : KEYWORDS . METATAGS_DIVIDER . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '' ) );
+        zen_define_default('META_TAG_DESCRIPTION', (defined('HOME_PAGE_META_DESCRIPTION') && HOME_PAGE_META_DESCRIPTION !== '') ? HOME_PAGE_META_DESCRIPTION : TITLE . PRIMARY_SECTION . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '') . SECONDARY_SECTION . KEYWORDS);
+        zen_define_default('META_TAG_KEYWORDS', (defined('HOME_PAGE_META_KEYWORDS') && HOME_PAGE_META_KEYWORDS !== '') ? HOME_PAGE_META_KEYWORDS : KEYWORDS . METATAGS_DIVIDER . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : ''));
         break;
 
     case 'index':
         // bof: categories meta tags
         // run custom categories meta tags
         $sql =
-            "SELECT *
-               FROM " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " mcd
-              WHERE mcd.categories_id = " . (int)$current_category_id . "
-                AND mcd.language_id = " . (int)$_SESSION['languages_id'];
+            'SELECT *
+               FROM ' . TABLE_METATAGS_CATEGORIES_DESCRIPTION . ' mcd
+              WHERE mcd.categories_id = ' . (int)$current_category_id . '
+                AND mcd.language_id = ' . (int)$_SESSION['languages_id'];
         $category_metatags = $db->Execute($sql, 1);
         if (!$category_metatags->EOF) {
             zen_define_default('META_TAG_TITLE', str_replace('"', '', $category_metatags->fields['metatags_title']));
@@ -134,12 +136,12 @@ switch ($metatag_page_name) {
         // eof: categories meta tags
         if ($category_depth === 'nested') {
             $sql =
-                "SELECT cd.categories_name
-                   FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+                'SELECT cd.categories_name
+                   FROM ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . ' cd
                   WHERE c.categories_id = cd.categories_id
-                    AND cd.categories_id = " . (int)$current_category_id . "
-                    AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
-                    AND c.categories_status = 1";
+                    AND cd.categories_id = ' . (int)$current_category_id . '
+                    AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                    AND c.categories_status = 1';
             $category_metatags = $db->Execute($sql, 1);
             if ($category_metatags->EOF) {
                 $meta_tags_over_ride = true;
@@ -159,7 +161,7 @@ switch ($metatag_page_name) {
                 } else {
                     $include_manufacturers_id = $_GET['manufacturers_id'];
                 }
-                $sql = "SELECT manufacturers_name FROM " . TABLE_MANUFACTURERS . " WHERE manufacturers_id = " . (int)$include_manufacturers_id;
+                $sql = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = ' . (int)$include_manufacturers_id;
                 $manufacturer_metatags = $db->Execute($sql, 1);
                 if ($manufacturer_metatags->EOF) {
                     $meta_tags_over_ride = true;
@@ -173,12 +175,12 @@ switch ($metatag_page_name) {
             }
 
             $sql =
-                "SELECT cd.categories_name
-                   FROM " . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . " cd
+                'SELECT cd.categories_name
+                   FROM ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . ' cd
                   WHERE c.categories_id = cd.categories_id
-                    AND cd.categories_id = " . (int)$current_category_id . "
-                    AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
-                    AND c.categories_status = 1";
+                    AND cd.categories_id = ' . (int)$current_category_id . '
+                    AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                    AND c.categories_status = 1';
             $category_metatags = $db->Execute($sql, 1);
             if ($category_metatags->EOF) {
                 $meta_tags_over_ride = true;
@@ -192,12 +194,12 @@ switch ($metatag_page_name) {
         }
 
         if (isset($_GET['manufacturers_id'])) {
-            $sql = "SELECT manufacturers_name FROM " . TABLE_MANUFACTURERS . " WHERE manufacturers_id = " . (int)$_GET['manufacturers_id'];
+            $sql = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = ' . (int)$_GET['manufacturers_id'];
             $manufacturer_metatags = $db->Execute($sql, 1);
             if ($manufacturer_metatags->EOF) {
                 zen_define_default('META_TAG_TITLE', TITLE . TAGLINE);
-                zen_define_default('META_TAG_DESCRIPTION', TITLE . PRIMARY_SECTION . str_replace(["'", '"'], '', strip_tags(HEADING_TITLE)) . SECONDARY_SECTION . KEYWORDS);
-                zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . str_replace(["'", '"'], '', strip_tags(HEADING_TITLE)));
+                zen_define_default('META_TAG_DESCRIPTION', TITLE . PRIMARY_SECTION . str_replace(["'", '"'], '', strip_tags((string) HEADING_TITLE)) . SECONDARY_SECTION . KEYWORDS);
+                zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . str_replace(["'", '"'], '', strip_tags((string) HEADING_TITLE)));
             } else {
                 $metatag_name = $manufacturer_metatags->fields['manufacturers_name'];
                 zen_define_default('META_TAG_TITLE', str_replace('"', '', $metatag_name . PRIMARY_SECTION . TITLE . TAGLINE));
@@ -212,14 +214,6 @@ switch ($metatag_page_name) {
         // eof: categories meta tags
 
     case 'popup_image':
-        $meta_products_name = '';
-        if (isset($products_values->fields['products_name'])) {
-            $meta_products_name = str_replace('"', '', zen_clean_html($products_values->fields['products_name']));
-        }
-        zen_define_default('META_TAG_TITLE', $meta_products_name . PRIMARY_SECTION . TITLE . TAGLINE);
-        zen_define_default('META_TAG_DESCRIPTION', TITLE . PRIMARY_SECTION . $meta_products_name . SECONDARY_SECTION . KEYWORDS);
-        zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . $meta_products_name);
-        break;
 
     case 'popup_image_additional':
         $meta_products_name = '';
@@ -237,30 +231,31 @@ switch ($metatag_page_name) {
         zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . HEADING_SEARCH_HELP);
         break;
 
-    // unless otherwise required product_reviews uses the same settings as product_reviews_info and other _info pages
+        // unless otherwise required product_reviews uses the same settings as product_reviews_info and other _info pages
     case 'product_reviews':
-    // unless otherwise required product_reviews_info uses the same settings as reviews and other _info pages
+        // unless otherwise required product_reviews_info uses the same settings as reviews and other _info pages
     case 'product_reviews_info':
         $review_on = META_TAGS_REVIEW;
-    //  case 'product_info':
-    case (strstr($_GET['main_page'], 'product_') || strstr($_GET['main_page'], 'document_')):
+        //  case 'product_info':
+        // no break
+    case (strstr((string) $_GET['main_page'], 'product_') || strstr((string) $_GET['main_page'], 'document_')):
         if (empty($_GET['products_id'])) {
             $_GET['products_id'] = 0;
         }
 
         $sql =
-            "SELECT pd.products_name, p.products_model, p.products_price_sorter, p.products_tax_class_id,
+            'SELECT pd.products_name, p.products_model, p.products_price_sorter, p.products_tax_class_id,
                     p.metatags_title_status, p.metatags_products_name_status, p.metatags_model_status,
                     p.products_id, p.metatags_price_status, p.metatags_title_tagline_status,
                     pd.products_description, p.product_is_free, p.product_is_call,
                     mtpd.metatags_title, mtpd.metatags_keywords, mtpd.metatags_description
-               FROM (" . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd)
-                    LEFT JOIN " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " mtpd
+               FROM (' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd)
+                    LEFT JOIN ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' mtpd
                         ON mtpd.products_id = p.products_id
-                       AND mtpd.language_id = " . (int)$_SESSION['languages_id'] . "
-              WHERE p.products_id = " . (int)$_GET['products_id'] . "
+                       AND mtpd.language_id = ' . (int)$_SESSION['languages_id'] . '
+              WHERE p.products_id = ' . (int)$_GET['products_id'] . '
                 AND p.products_id = pd.products_id
-                AND pd.language_id = " . (int)$_SESSION['languages_id'];
+                AND pd.language_id = ' . (int)$_SESSION['languages_id'];
 
         $product_info_metatags = $db->Execute($sql);
         if ($product_info_metatags->EOF) {
@@ -289,7 +284,7 @@ switch ($metatag_page_name) {
                 $metatags_description = $product_info_metatags->fields['metatags_description'];
             } else {
                 // no custom description defined use product_description
-                $metatags_description = zen_truncate_paragraph(strip_tags(stripslashes($product_info_metatags->fields['products_description'])), MAX_META_TAG_DESCRIPTION_LENGTH);
+                $metatags_description = zen_truncate_paragraph(strip_tags(stripslashes((string) $product_info_metatags->fields['products_description'])), MAX_META_TAG_DESCRIPTION_LENGTH);
             }
 
             $metatags_description = zen_clean_html($metatags_description);
@@ -302,16 +297,16 @@ switch ($metatag_page_name) {
                 $metatags_keywords = KEYWORDS . METATAGS_DIVIDER . $meta_products_name . METATAGS_DIVIDER;
             }
 
-            zen_define_default('META_TAG_TITLE', str_replace('"','',zen_clean_html($review_on . $meta_products_name)));
-            zen_define_default('META_TAG_DESCRIPTION', str_replace('"','',zen_clean_html($metatags_description . ' ')));
-            zen_define_default('META_TAG_KEYWORDS', str_replace('"','',zen_clean_html($metatags_keywords)));  // KEYWORDS and CUSTOM_KEYWORDS are added above
+            zen_define_default('META_TAG_TITLE', str_replace('"', '', zen_clean_html($review_on . $meta_products_name)));
+            zen_define_default('META_TAG_DESCRIPTION', str_replace('"', '', zen_clean_html($metatags_description . ' ')));
+            zen_define_default('META_TAG_KEYWORDS', str_replace('"', '', zen_clean_html($metatags_keywords)));  // KEYWORDS and CUSTOM_KEYWORDS are added above
             break;
         }
 
         $meta_products_price = '';
 
         // build un-customized meta tag
-        if (META_TAG_INCLUDE_PRICE === '1' && !strstr($_GET['main_page'], 'document_general')) {
+        if (META_TAG_INCLUDE_PRICE === '1' && !strstr((string) $_GET['main_page'], 'document_general')) {
             if ($product_info_metatags->fields['product_is_free'] !== '1') {
                 if (zen_check_show_prices() == true) {
                     $meta_products_price = zen_get_products_actual_price($product_info_metatags->fields['products_id']);
@@ -330,7 +325,7 @@ switch ($metatag_page_name) {
         }
         $meta_products_name = zen_clean_html($meta_products_name);
 
-        $meta_products_description = zen_truncate_paragraph(strip_tags(stripslashes($product_info_metatags->fields['products_description'])), MAX_META_TAG_DESCRIPTION_LENGTH);
+        $meta_products_description = zen_truncate_paragraph(strip_tags(stripslashes((string) $product_info_metatags->fields['products_description'])), MAX_META_TAG_DESCRIPTION_LENGTH);
 
         $meta_products_description = zen_clean_html($meta_products_description);
 
@@ -340,16 +335,16 @@ switch ($metatag_page_name) {
         break;
 
     case 'product_reviews_info_OFF':
-        $sql = 
-            "SELECT rd.reviews_text, r.reviews_rating, r.reviews_id, r.customers_name, p.products_id, p.products_price, p.products_tax_class_id, p.products_model, pd.products_name, p.product_is_free
-               FROM " . TABLE_REVIEWS . " r, " . TABLE_REVIEWS_DESCRIPTION . " rd, " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
-              WHERE r.reviews_id = " . (int)$_GET['reviews_id'] . "
+        $sql =
+            'SELECT rd.reviews_text, r.reviews_rating, r.reviews_id, r.customers_name, p.products_id, p.products_price, p.products_tax_class_id, p.products_model, pd.products_name, p.product_is_free
+               FROM ' . TABLE_REVIEWS . ' r, ' . TABLE_REVIEWS_DESCRIPTION . ' rd, ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
+              WHERE r.reviews_id = ' . (int)$_GET['reviews_id'] . '
                 AND r.reviews_id = rd.reviews_id
-                AND rd.languages_id = " . (int)$_SESSION['languages_id'] . "
+                AND rd.languages_id = ' . (int)$_SESSION['languages_id'] . '
                 AND r.products_id = p.products_id
                 AND p.products_status = 1
                 AND p.products_id = pd.products_id
-                AND pd.language_id = ". (int)$_SESSION['languages_id'];
+                AND pd.language_id = '. (int)$_SESSION['languages_id'];
         $review_metatags = $db->Execute($sql, 1);
         if ($review_metatags->EOF) {
             $meta_tags_over_ride = true;
@@ -361,7 +356,7 @@ switch ($metatag_page_name) {
                 $meta_products_price = zen_get_products_actual_price($review_metatags->fields['products_id']);
                 $meta_products_price = SECONDARY_SECTION . $currencies->display_price($meta_products_price, zen_get_tax_rate($review_metatags->fields['products_tax_class_id']));
             } else {
-                    $meta_products_price = SECONDARY_SECTION . META_TAG_PRODUCTS_PRICE_IS_FREE_TEXT;
+                $meta_products_price = SECONDARY_SECTION . META_TAG_PRODUCTS_PRICE_IS_FREE_TEXT;
             }
         } else {
             $meta_products_price = '';
@@ -375,7 +370,7 @@ switch ($metatag_page_name) {
 
         $meta_products_name = zen_clean_html($meta_products_name);
 
-        $review_text_metatags = substr(strip_tags(stripslashes($review_metatags->fields['reviews_text'])), 0, 60);
+        $review_text_metatags = substr(strip_tags(stripslashes((string) $review_metatags->fields['reviews_text'])), 0, 60);
         $reviews_rating_metatags = SUB_TITLE_RATING . ' ' . sprintf(TEXT_OF_5_STARS, $review_metatags->fields['reviews_rating']);
 
         zen_define_default('META_TAG_TITLE', str_replace('"', '', $meta_products_name . $meta_products_price . PRIMARY_SECTION . TITLE . TERTIARY_SECTION . NAVBAR_TITLE));
@@ -383,7 +378,7 @@ switch ($metatag_page_name) {
         zen_define_default('META_TAG_KEYWORDS', str_replace('"', '', KEYWORDS . METATAGS_DIVIDER . $meta_products_name . METATAGS_DIVIDER . $review_metatags->fields['customers_name'] . METATAGS_DIVIDER . $reviews_rating_metatags));
         break;
 
-    // EZ-Pages:
+        // EZ-Pages:
     case 'page':
         $ezpage_id = (int)$_GET['id'];
         $chapter_id = (int)($_GET['chapter'] ?? 0);
@@ -398,16 +393,15 @@ switch ($metatag_page_name) {
         }
 
         // NO "break" here. Allow defaults if not overridden at the per-page level
+        // no break
     default:
         $metatags_title = (defined('NAVBAR_TITLE') ? NAVBAR_TITLE . PRIMARY_SECTION : '') . TITLE . TAGLINE;
         $metatags_description = TITLE . (defined('NAVBAR_TITLE') ? PRIMARY_SECTION . NAVBAR_TITLE : '') . SECONDARY_SECTION . KEYWORDS;
         $metatags_keywords = KEYWORDS . METATAGS_DIVIDER . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '');
         $zco_notifier->notify('NOTIFY_MODULE_META_TAGS_UNSPECIFIEDPAGE', $current_page_base, $metatag_page_name, $meta_tags_over_ride, $metatags_title, $metatags_description, $metatags_keywords);
-        if (false === $meta_tags_over_ride) {
-            zen_define_default('META_TAG_TITLE', (defined('NAVBAR_TITLE') ? NAVBAR_TITLE . PRIMARY_SECTION : '') . TITLE . TAGLINE);
-            zen_define_default('META_TAG_DESCRIPTION', TITLE . PRIMARY_SECTION . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '' ) . SECONDARY_SECTION . KEYWORDS);
-            zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '' ) );
-        }
+        zen_define_default('META_TAG_TITLE', (defined('NAVBAR_TITLE') ? NAVBAR_TITLE . PRIMARY_SECTION : '') . TITLE . TAGLINE);
+        zen_define_default('META_TAG_DESCRIPTION', TITLE . PRIMARY_SECTION . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : '') . SECONDARY_SECTION . KEYWORDS);
+        zen_define_default('META_TAG_KEYWORDS', KEYWORDS . METATAGS_DIVIDER . (defined('NAVBAR_TITLE') ? NAVBAR_TITLE : ''));
         break;
 }
 

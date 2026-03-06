@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -28,7 +30,6 @@ class WhosOnline extends base
 
     protected $statsCacheLastCalculatedAt = 0;
 
-
     public function __construct($forceRebuild = false, $skip_gc = false)
     {
         if (defined('WHOIS_TIMER_REMOVE')) {
@@ -55,7 +56,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getTimerInactive()
+    public function getTimerInactive(): int
     {
         return (int)$this->timer_inactive_threshold;
     }
@@ -63,7 +64,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getTimerDead()
+    public function getTimerDead(): int
     {
         return (int)$this->timer_dead_threshold;
     }
@@ -71,7 +72,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getUniques()
+    public function getUniques(): int
     {
         return (int)$this->unique_sessions;
     }
@@ -79,7 +80,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getDuplicates()
+    public function getDuplicates(): int
     {
         return (int)$this->duplicates;
     }
@@ -87,7 +88,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getTotalSessions()
+    public function getTotalSessions(): int
     {
         return (int)$this->total_sessions;
     }
@@ -97,59 +98,34 @@ class WhosOnline extends base
      */
     public function retrieve($selectedView = '', $sessionToInspect = '', $exclude_spiders = false, $exclude_admins = true)
     {
-        switch ($selectedView) {
-            case "full_name-desc":
-                $order = "full_name DESC, LPAD(ip_address,11,'0')";
-                break;
-            case "full_name":
-                $order = "full_name, LPAD(ip_address,11,'0')";
-                break;
-            case "ip_address":
-                $order = "ip_address, session_id";
-                break;
-            case "ip_address-desc":
-                $order = "ip_address DESC, session_id";
-                break;
-            case "time_last_click-desc":
-                $order = "time_last_click DESC, LPAD(ip_address,11,'0')";
-                break;
-            case "time_last_click":
-                $order = "time_last_click, LPAD(ip_address,11,'0')";
-                break;
-            case "time_entry-desc":
-                $order = "time_entry DESC, LPAD(ip_address,11,'0')";
-                break;
-            case "time_entry":
-                $order = "time_entry, LPAD(ip_address,11,'0')";
-                break;
-            case "last_page_url-desc":
-                $order = "last_page_url DESC, LPAD(ip_address,11,'0')";
-                break;
-            case "last_page_url":
-                $order = "last_page_url, LPAD(ip_address,11,'0')";
-                break;
-            case "session_id":
-                $order = "session_id, ip_address";
-                break;
-            case "session_id-desc":
-                $order = "session_id DESC, ip_address";
-                break;
-            default:
-                $order = "time_entry, LPAD(ip_address,11,'0')";
-        }
+        $order = match ($selectedView) {
+            'full_name-desc' => "full_name DESC, LPAD(ip_address,11,'0')",
+            'full_name' => "full_name, LPAD(ip_address,11,'0')",
+            'ip_address' => 'ip_address, session_id',
+            'ip_address-desc' => 'ip_address DESC, session_id',
+            'time_last_click-desc' => "time_last_click DESC, LPAD(ip_address,11,'0')",
+            'time_last_click' => "time_last_click, LPAD(ip_address,11,'0')",
+            'time_entry-desc' => "time_entry DESC, LPAD(ip_address,11,'0')",
+            'time_entry' => "time_entry, LPAD(ip_address,11,'0')",
+            'last_page_url-desc' => "last_page_url DESC, LPAD(ip_address,11,'0')",
+            'last_page_url' => "last_page_url, LPAD(ip_address,11,'0')",
+            'session_id' => 'session_id, ip_address',
+            'session_id-desc' => 'session_id DESC, ip_address',
+            default => "time_entry, LPAD(ip_address,11,'0')",
+        };
         $where = '';
         if ($exclude_spiders) {
             $where = "WHERE session_id != '' ";
         }
         if ($exclude_admins) {
-            $where .= ($where == '') ? " WHERE " : " AND ";
+            $where .= ($where == '') ? ' WHERE ' : ' AND ';
             $where .= "ip_address != '' AND ip_address NOT IN ('" . implode("','", preg_split('/[\s,]/', zen_db_input(EXCLUDE_ADMIN_IP_FOR_MAINTENANCE) . ',' . zen_db_input($_SERVER['REMOTE_ADDR']))) . "') ";
         }
-        $sql = "SELECT customer_id, full_name, ip_address, time_entry, time_last_click, last_page_url, session_id, host_address, user_agent, s.value as session_data
-                FROM " . TABLE_WHOS_ONLINE . " w
-                LEFT OUTER JOIN " . TABLE_SESSIONS . " s ON (s.sesskey = w.session_id)
+        $sql = 'SELECT customer_id, full_name, ip_address, time_entry, time_last_click, last_page_url, session_id, host_address, user_agent, s.value as session_data
+                FROM ' . TABLE_WHOS_ONLINE . ' w
+                LEFT OUTER JOIN ' . TABLE_SESSIONS . ' s ON (s.sesskey = w.session_id)
                 :where:
-                ORDER BY :orderby:";
+                ORDER BY :orderby:';
 
         global $db;
         $sql = $db->bindVars($sql, ':where:', $where, 'passthru');
@@ -246,7 +222,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    public function getStats()
+    public function getStats(): array
     {
         if ($this->statsCacheLastCalculatedAt < (time() - 15)) {
             $this->retrieve();
@@ -258,7 +234,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    protected function getHumanFriendlyTimeSince($timestamp_of_last_click)
+    protected function getHumanFriendlyTimeSince($timestamp_of_last_click): string
     {
         $diff_in_seconds = (time() - $timestamp_of_last_click);
         return gmdate('H:i:s', $diff_in_seconds);
@@ -267,7 +243,7 @@ class WhosOnline extends base
     /**
      * @since ZC v1.5.7
      */
-    protected function getStatusCode($data)
+    protected function getStatusCode(array $data): int
     {
         $xx_mins_ago_long = (time() - (int)$this->timer_inactive_threshold);
         $inactive = ($data['time_last_click'] ?? 0) < $xx_mins_ago_long;
@@ -309,7 +285,7 @@ class WhosOnline extends base
                 $this->spider_array[$session['status_code']]++;
                 continue;
             }
-            if ($session['full_name'] === "&yen;Guest") {
+            if ($session['full_name'] === '&yen;Guest') {
                 $this->guest_array[$session['status_code']]++;
                 continue;
             }
@@ -321,46 +297,44 @@ class WhosOnline extends base
      * Remove expired entries
      * @since ZC v1.5.7
      */
-    public function doGarbageCollection()
+    public function doGarbageCollection(): void
     {
         global $db;
         $xx_mins_ago_dead = (time() - (int)$this->timer_dead_threshold);
         $xx_mins_ago = (time() - (int)$this->timer_remove_threshold);
 
-        $db->Execute("DELETE FROM " . TABLE_WHOS_ONLINE . "
+        $db->Execute('DELETE FROM ' . TABLE_WHOS_ONLINE . "
               WHERE time_last_click < '" . $xx_mins_ago . "'
               OR (time_entry=time_last_click
                 AND time_last_click < '" . $xx_mins_ago_dead . "')");
 
     }
 
-
     /**
      * @param string $session_id
      * @param string $session_data
-     * @return array|null
      * @since ZC v1.5.7
      */
-    protected function inspectSessionCart($session_id = '', $session_data = '')
+    protected function inspectSessionCart($session_id = '', $session_data = ''): ?array
     {
         // we need at least one of these parameters
         if (empty($session_id) && empty($session_data)) {
-          return null;
+            return null;
         }
 
         // or we can pass in the already-queried session data
         if (empty($session_data)) {
-            $result = $GLOBALS['db']->Execute("
+            $result = $GLOBALS['db']->Execute('
                 SELECT value as session_data
-                FROM " . TABLE_SESSIONS . "
+                FROM ' . TABLE_SESSIONS . "
                 WHERE sesskey = '" . zen_db_input($session_id) . "'");
-            $session_data = $result->EOF === false ? trim($result->fields['session_data']) : '';
+            $session_data = $result->EOF === false ? trim((string) $result->fields['session_data']) : '';
         }
 
-        if (strpos($session_data, 'cart|O') == 0) {
+        if (str_starts_with($session_data, 'cart|O')) {
             $session_data = base64_decode($session_data);
         }
-        if (strpos($session_data, 'cart|O') == 0) {
+        if (str_starts_with($session_data, 'cart|O')) {
             $session_data = '';
         }
 
@@ -404,7 +378,7 @@ class WhosOnline extends base
                 $extracted_data['cartID'] = $_SESSION['cartID'];
             }
 
-            foreach($fields_to_extract as $field => $as) {
+            foreach ($fields_to_extract as $field => $as) {
                 if (isset($_SESSION[$field])) {
                     $extracted_data[$as] = $_SESSION[$field];
                 }
@@ -413,7 +387,7 @@ class WhosOnline extends base
 
         // protect against tampering
         $_SESSION = $backupSessionArray;
-        foreach($_SESSION as $key => $value) {
+        foreach ($_SESSION as $key => $value) {
             if (!isset($backupSessionArray[$key])) {
                 unset($_SESSION[$key]);
             }

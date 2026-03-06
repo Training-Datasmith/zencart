@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Pop up Image Header
  *
@@ -15,60 +17,60 @@
 $pid = $_GET['pID'] ?? $_GET['pid'] ?? $_GET['products_id'] ?? $_GET['product_id'] ?? 0;
 
 // This should be first line of the script:
-  $zco_notifier->notify('NOTIFY_HEADER_START_POPUP_IMAGES');
+$zco_notifier->notify('NOTIFY_HEADER_START_POPUP_IMAGES');
 
-  $_SESSION['navigation']->remove_current_page();
+$_SESSION['navigation']->remove_current_page();
 
-  $products_values_query = "SELECT pd.products_name, p.products_image
-                            FROM " . TABLE_PRODUCTS . " p
-                            left join " . TABLE_PRODUCTS_DESCRIPTION . " pd
+$products_values_query = 'SELECT pd.products_name, p.products_image
+                            FROM ' . TABLE_PRODUCTS . ' p
+                            left join ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                             on p.products_id = pd.products_id
                             WHERE p.products_status = 1
                             and p.products_id = :productsID
-                            and pd.language_id = :languagesID ";
+                            and pd.language_id = :languagesID ';
 
-  $products_values_query = $db->bindVars($products_values_query, ':productsID', $pid, 'integer');
-  $products_values_query = $db->bindVars($products_values_query, ':languagesID', $_SESSION['languages_id'], 'integer');
+$products_values_query = $db->bindVars($products_values_query, ':productsID', $pid, 'integer');
+$products_values_query = $db->bindVars($products_values_query, ':languagesID', $_SESSION['languages_id'], 'integer');
 
-  $products_values = $db->Execute($products_values_query);
+$products_values = $db->Execute($products_values_query);
 
-  // Ensure data/variable is available for use downstream.
-  if ($products_values->EOF) {
+// Ensure data/variable is available for use downstream.
+if ($products_values->EOF) {
     $products_values->fields['products_image'] = '';
     $products_values->fields['products_name'] = '';
-  }
+}
 
-  $products_image = $products_values->fields['products_image'];
+$products_image = $products_values->fields['products_image'];
 
-  //auto replace with defined missing image
-  if ($products_image === '' && PRODUCTS_IMAGE_NO_IMAGE_STATUS === '1') {
+//auto replace with defined missing image
+if ($products_image === '' && PRODUCTS_IMAGE_NO_IMAGE_STATUS === '1') {
     $products_image = PRODUCTS_IMAGE_NO_IMAGE;
-  }
+}
 
-  if ($products_image === '') {
-      $products_image_extension = '';
-      $products_image_base = '';
-      $products_image_medium = '';
-      $products_image_large = '';
-  } else {
-      $products_image_extension = '.' . pathinfo($products_image, PATHINFO_EXTENSION);
-      $products_image_base = substr($products_image, 0, -strlen($products_image_extension));
-      $products_image_medium = $products_image_base . IMAGE_SUFFIX_MEDIUM . $products_image_extension;
-      $products_image_large = $products_image_base . IMAGE_SUFFIX_LARGE . $products_image_extension;
-  }
+if ($products_image === '') {
+    $products_image_extension = '';
+    $products_image_base = '';
+    $products_image_medium = '';
+    $products_image_large = '';
+} else {
+    $products_image_extension = '.' . pathinfo((string) $products_image, PATHINFO_EXTENSION);
+    $products_image_base = substr((string) $products_image, 0, -strlen($products_image_extension));
+    $products_image_medium = $products_image_base . IMAGE_SUFFIX_MEDIUM . $products_image_extension;
+    $products_image_large = $products_image_base . IMAGE_SUFFIX_LARGE . $products_image_extension;
+}
 
-  // check for a medium image else use small
-  if (!file_exists(DIR_WS_IMAGES . 'medium/' . $products_image_medium)) {
+// check for a medium image else use small
+if (!file_exists(DIR_WS_IMAGES . 'medium/' . $products_image_medium)) {
     $products_image_medium = DIR_WS_IMAGES . $products_image;
-  } else {
+} else {
     $products_image_medium = DIR_WS_IMAGES . 'medium/' . $products_image_medium;
-  }
-  // check for a large image else use medium else use small
-  if (!file_exists(DIR_WS_IMAGES . 'large/' . $products_image_large)) {
+}
+// check for a large image else use medium else use small
+if (!file_exists(DIR_WS_IMAGES . 'large/' . $products_image_large)) {
     $products_image_large = $products_image_medium;
-  } else {
+} else {
     $products_image_large = DIR_WS_IMAGES . 'large/' . $products_image_large;
-  }
+}
 
-  // This should be last line of the script:
-  $zco_notifier->notify('NOTIFY_HEADER_END_POPUP_IMAGES');
+// This should be last line of the script:
+$zco_notifier->notify('NOTIFY_HEADER_END_POPUP_IMAGES');

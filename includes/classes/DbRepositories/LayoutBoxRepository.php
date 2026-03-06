@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -13,7 +15,7 @@ use queryFactory;
  */
 class LayoutBoxRepository
 {
-    public function __construct(private queryFactory $db)
+    public function __construct(private readonly queryFactory $db)
     {
     }
 
@@ -23,11 +25,11 @@ class LayoutBoxRepository
     public function getActiveForLocation(int $location, string $template, int $limit = 100): array
     {
         return $this->fetchAll(
-            "SELECT * FROM " . TABLE_LAYOUT_BOXES .
-            " WHERE layout_box_location = " . (int)$location .
-            " AND layout_box_status = 1" .
+            'SELECT * FROM ' . TABLE_LAYOUT_BOXES .
+            ' WHERE layout_box_location = ' . $location .
+            ' AND layout_box_status = 1' .
             " AND layout_template = '" . $this->db->prepare_input($template) . "'" .
-            " ORDER BY layout_box_sort_order LIMIT " . (int)$limit
+            ' ORDER BY layout_box_sort_order LIMIT ' . $limit
         );
     }
 
@@ -37,10 +39,10 @@ class LayoutBoxRepository
     public function findFirstByTemplateAndBoxName(string $template, string $boxName): ?array
     {
         $result = $this->db->Execute(
-            "SELECT * FROM " . TABLE_LAYOUT_BOXES .
+            'SELECT * FROM ' . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name = '" . $this->db->prepare_input($boxName) . "'" .
-            " LIMIT 1"
+            ' LIMIT 1'
         );
 
         if ($result->EOF) {
@@ -68,7 +70,7 @@ class LayoutBoxRepository
             TABLE_LAYOUT_BOXES,
             $this->buildSqlDataArray($values),
             'UPDATE',
-            "layout_id = " . (int)$layoutId
+            'layout_id = ' . $layoutId
         );
     }
 
@@ -78,8 +80,8 @@ class LayoutBoxRepository
     public function deleteByLayoutIdAndName(int $layoutId, string $boxName): void
     {
         $this->db->Execute(
-            "DELETE FROM " . TABLE_LAYOUT_BOXES .
-            " WHERE layout_id = " . (int)$layoutId .
+            'DELETE FROM ' . TABLE_LAYOUT_BOXES .
+            ' WHERE layout_id = ' . $layoutId .
             " AND layout_box_name = '" . $this->db->prepare_input($boxName) . "'"
         );
     }
@@ -90,7 +92,7 @@ class LayoutBoxRepository
     public function getByTemplate(string $template): array
     {
         return $this->fetchAll(
-            "SELECT * FROM " . TABLE_LAYOUT_BOXES .
+            'SELECT * FROM ' . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'"
         );
     }
@@ -115,12 +117,12 @@ class LayoutBoxRepository
     public function getNonHeaderFooterByTemplate(string $template): array
     {
         return $this->fetchAll(
-            "SELECT * FROM " . TABLE_LAYOUT_BOXES .
+            'SELECT * FROM ' . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name NOT LIKE '%ezpages_bar'" .
             " AND layout_box_name NOT LIKE '%\\_header.php'" .
             " AND layout_box_name NOT LIKE '%\\_footer.php'" .
-            " ORDER BY layout_box_sort_order, layout_box_sort_order_single, layout_box_name"
+            ' ORDER BY layout_box_sort_order, layout_box_sort_order_single, layout_box_name'
         );
     }
 
@@ -130,10 +132,10 @@ class LayoutBoxRepository
     public function getByTemplateAndNameLike(string $template, string $pattern): array
     {
         return $this->fetchAll(
-            "SELECT * FROM " . TABLE_LAYOUT_BOXES .
+            'SELECT * FROM ' . TABLE_LAYOUT_BOXES .
             " WHERE layout_template = '" . $this->db->prepare_input($template) . "'" .
             " AND layout_box_name LIKE '" . $this->db->prepare_input($pattern) . "'" .
-            " ORDER BY layout_box_sort_order_single, layout_box_name"
+            ' ORDER BY layout_box_sort_order_single, layout_box_name'
         );
     }
 
@@ -143,7 +145,7 @@ class LayoutBoxRepository
     public function updatePluginDetailsByPrefix(string $pluginKey, string $version): void
     {
         $this->db->Execute(
-            "UPDATE " . TABLE_LAYOUT_BOXES .
+            'UPDATE ' . TABLE_LAYOUT_BOXES .
             " SET plugin_details = '" . $this->db->prepare_input($pluginKey . '/' . $version) . "'" .
             " WHERE plugin_details LIKE '" . $this->db->prepare_input($pluginKey . '/%') . "'"
         );
@@ -155,7 +157,7 @@ class LayoutBoxRepository
     public function deleteByPluginDetailsPrefix(string $pluginKey): void
     {
         $this->db->Execute(
-            "DELETE FROM " . TABLE_LAYOUT_BOXES .
+            'DELETE FROM ' . TABLE_LAYOUT_BOXES .
             " WHERE plugin_details LIKE '" . $this->db->prepare_input($pluginKey . '/%') . "'"
         );
     }

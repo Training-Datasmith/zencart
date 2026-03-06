@@ -46,7 +46,7 @@ require 'includes/application_top.php';
 <?php
 $include_disabled = (isset($_GET['include_disabled']));
 ?>
-        <?= zen_draw_form('options', FILENAME_POSM_FIND_DUPLICATE_MODELNUMS, '', 'get', 'class="form-inline"') ?>
+        <?= zen_draw_form('options', FILENAME_POSM_FIND_DUPLICATE_MODELNUMS, '', 'get') ?>
             <div class="checkbox">
                 <label class="control-label">
                     <?= zen_draw_checkbox_field('include_disabled', '', $include_disabled) . ' ' . INCLUDE_DISABLED ?>
@@ -73,9 +73,9 @@ $include_disabled = (isset($_GET['include_disabled']));
 // times to produce the 3-stage report.
 //
 $managed = $db->Execute(
-    "SELECT DISTINCT products_id
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-      ORDER BY products_id ASC"
+    'SELECT DISTINCT products_id
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+      ORDER BY products_id ASC'
 );
 $managed_products = [];
 foreach ($managed as $next_product) {
@@ -110,11 +110,11 @@ if ($managed_products_exist === true) {
 }
 
 $dup_model_query1 =
-    "SELECT DISTINCT p.products_id, p.products_model, pd.products_name, p.products_type, p.products_status
-       FROM " . TABLE_PRODUCTS . " p
-            INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+    'SELECT DISTINCT p.products_id, p.products_model, pd.products_name, p.products_type, p.products_status
+       FROM ' . TABLE_PRODUCTS . ' p
+            INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                 ON pd.products_id = p.products_id
-               AND pd.language_id = " . $_SESSION['languages_id'] . "
+               AND pd.language_id = ' . $_SESSION['languages_id'] . "
             INNER JOIN (
                 SELECT DISTINCT products_id, COALESCE(products_model, '') AS dup_model
                   FROM " . TABLE_PRODUCTS . "
@@ -131,7 +131,7 @@ $dup_models = $db->Execute($dup_model_query1);
             </tr>
 <?php
 if ($dup_models->EOF) {
-?>
+    ?>
             <tr>
                 <td colspan="6" class="text-center"><b><?= NO_DUPS_FOUND ?></b></td>
             </tr>
@@ -142,7 +142,7 @@ if ($dup_models->EOF) {
     $posm_link = '---';
     foreach ($dup_models as $next_dup) {
         $products_id = $next_dup['products_id'];
-        $products_model = strtoupper($next_dup['products_model']);
+        $products_model = strtoupper((string) $next_dup['products_model']);
 
         if ($current_model === false || $current_model !== $products_model) {
             $current_model = $products_model;
@@ -158,7 +158,7 @@ if ($dup_models->EOF) {
             $products_status = '<span class="enabled">&check;</span>';
         }
         $products_link = zen_href_link(FILENAME_PRODUCT, 'product_type=' . $next_dup['products_type'] . "&action=new_product&pID=$products_id");
-?>
+        ?>
             <tr<?= $row_class;?>>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($products_model) ?></td>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($posm_model) ?></td>
@@ -183,11 +183,11 @@ if ($managed_products_exist === true) {
     }
 
     $dup_model_query2 =
-        "SELECT p.products_id, p.products_model, pd.products_name, p.products_type, p.master_categories_id, p.products_status, dups.dup_model AS posm_model
-           FROM " . TABLE_PRODUCTS . " p
-                INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        'SELECT p.products_id, p.products_model, pd.products_name, p.products_type, p.master_categories_id, p.products_status, dups.dup_model AS posm_model
+           FROM ' . TABLE_PRODUCTS . ' p
+                INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                     ON pd.products_id = p.products_id
-                   AND pd.language_id = " . $_SESSION['languages_id'] . "
+                   AND pd.language_id = ' . $_SESSION['languages_id'] . "
                 INNER JOIN (
                     SELECT DISTINCT pos1.products_id, COALESCE(pos1.pos_model, '') AS dup_model
                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos1
@@ -205,7 +205,7 @@ if ($managed_products_exist === true) {
             </tr>
 <?php
 if ($managed_products_exist === false || $dup_models->EOF) {
-?>
+    ?>
             <tr class="new-model">
                 <td colspan="6" class="text-center"><b><?= NO_DUPS_FOUND ?></b></td>
             </tr>
@@ -214,7 +214,7 @@ if ($managed_products_exist === false || $dup_models->EOF) {
     $current_model = false;
     foreach ($dup_models as $next_dup) {
         $products_id = $next_dup['products_id'];
-        $products_model = strtoupper($next_dup['products_model']);
+        $products_model = strtoupper((string) $next_dup['products_model']);
         $posm_model = $next_dup['posm_model'];
 
         if ($current_model === false || $current_model !== $products_model) {
@@ -232,7 +232,7 @@ if ($managed_products_exist === false || $dup_models->EOF) {
         }
         $products_link = zen_href_link(FILENAME_PRODUCT, 'product_type=' . $next_dup['products_type'] . "&action=new_product&pID=$products_id");
         $posm_link = zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK, "pID=$products_id&category_id=" . $next_dup['master_categories_id']);
-?>
+        ?>
             <tr<?= $row_class;?>>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($products_model) ?></td>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($posm_model) ?></td>
@@ -257,12 +257,12 @@ if ($managed_products_exist === true) {
     }
 
     $dup_model_query3 =
-        "SELECT DISTINCT p.products_id, pd.products_name, p.products_type, p.master_categories_id, p.products_status, dups.dup_model
-           FROM " . TABLE_PRODUCTS . " p
-                INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        'SELECT DISTINCT p.products_id, pd.products_name, p.products_type, p.master_categories_id, p.products_status, dups.dup_model
+           FROM ' . TABLE_PRODUCTS . ' p
+                INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                     ON pd.products_id = p.products_id
-                   AND pd.language_id = " . $_SESSION['languages_id'] . "
-                INNER JOIN " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
+                   AND pd.language_id = ' . $_SESSION['languages_id'] . '
+                INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
                     ON pos.products_id = p.products_id
                 INNER JOIN (
                     SELECT DISTINCT pos1.products_id, COALESCE(pos1.pos_model, '') AS dup_model
@@ -281,7 +281,7 @@ if ($managed_products_exist === true) {
             </tr>
 <?php
 if ($managed_products_exist === false || $dup_models->EOF) {
-?>
+    ?>
             <tr class="new-model">
                 <td colspan="6" class="text-center"><b><?= NO_DUPS_FOUND ?></b></td>
             </tr>
@@ -291,7 +291,7 @@ if ($managed_products_exist === false || $dup_models->EOF) {
     $products_model = '---';
     foreach ($dup_models as $next_dup) {
         $products_id = $next_dup['products_id'];
-        $posm_model = strtoupper($next_dup['dup_model']);
+        $posm_model = strtoupper((string) $next_dup['dup_model']);
 
         if ($current_model === false || $current_model !== $posm_model) {
             $current_model = $posm_model;
@@ -308,7 +308,7 @@ if ($managed_products_exist === false || $dup_models->EOF) {
         }
         $products_link = zen_href_link(FILENAME_PRODUCT, 'product_type=' . $next_dup['products_type'] . "&action=new_product&pID=$products_id");
         $posm_link = zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK, "pID=$products_id&category_id=" . $next_dup['master_categories_id']);
-?>
+        ?>
             <tr<?= $row_class;?>>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($products_model) ?></td>
                 <td class="dataTableContent model-number"><?= zen_output_string_protected($posm_model) ?></td>

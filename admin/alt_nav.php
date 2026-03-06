@@ -20,14 +20,12 @@ require('includes/application_top.php');
 <h1><?php echo HEADING_TITLE ?></h1>
 
 <?php
- foreach (zen_get_admin_menu_for_user() as $menuKey => $pages)
- {
-   $pageList = array();
-   foreach ($pages as $page)
-   {
-      $pageList[] = '<a href="' . zen_href_link($page['file'], $page['params']) . '">' . $page['name'] . '</a>';
-   }
-?>
+ foreach (zen_get_admin_menu_for_user() as $menuKey => $pages) {
+     $pageList = [];
+     foreach ($pages as $page) {
+         $pageList[] = '<a href="' . zen_href_link($page['file'], $page['params']) . '">' . $page['name'] . '</a>';
+     }
+     ?>
   <div>
     <h2><?php echo $menuTitles[$menuKey] ?></h2>
     <p><?php echo implode(', ', $pageList) ?>.</p>

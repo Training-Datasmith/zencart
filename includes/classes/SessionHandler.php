@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Zen Cart Database Session Handler
  *
@@ -14,7 +16,6 @@ namespace Zencart;
  */
 class SessionHandler implements \SessionHandlerInterface
 {
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -31,7 +32,7 @@ class SessionHandler implements \SessionHandlerInterface
     public function destroy(string $id): bool
     {
         global $db;
-        $sql = "DELETE FROM " . TABLE_SESSIONS . " WHERE sesskey = '" . zen_db_input($id) . "'";
+        $sql = 'DELETE FROM ' . TABLE_SESSIONS . " WHERE sesskey = '" . zen_db_input($id) . "'";
         $db->Execute($sql);
 
         return true;
@@ -44,7 +45,7 @@ class SessionHandler implements \SessionHandlerInterface
     public function gc(int $max_lifetime): int|false
     {
         global $db;
-        $sql = "DELETE FROM " . TABLE_SESSIONS . " WHERE expiry < " . time();
+        $sql = 'DELETE FROM ' . TABLE_SESSIONS . ' WHERE expiry < ' . time();
         $db->Execute($sql);
 
         return $db->affectedRows() ?? false;
@@ -66,15 +67,15 @@ class SessionHandler implements \SessionHandlerInterface
     public function read(string $id): string|false
     {
         global $db;
-        $qid = "SELECT value
-                FROM " . TABLE_SESSIONS . "
+        $qid = 'SELECT value
+                FROM ' . TABLE_SESSIONS . "
                 WHERE sesskey = '" . zen_db_input($id) . "'
                 AND expiry > '" . time() . "'";
 
         $value = $db->Execute($qid);
 
         if (!empty($value->fields['value'])) {
-            $value->fields['value'] = base64_decode($value->fields['value']);
+            $value->fields['value'] = base64_decode((string) $value->fields['value']);
             return $value->fields['value'];
         }
 
@@ -96,9 +97,9 @@ class SessionHandler implements \SessionHandlerInterface
         global $SESS_LIFE;
         $expiry = time() + $SESS_LIFE;
 
-        $sql = "INSERT INTO " . TABLE_SESSIONS . " (sesskey, expiry, `value`)
+        $sql = 'INSERT INTO ' . TABLE_SESSIONS . ' (sesskey, expiry, `value`)
                 VALUES (:zkey, :zexpiry, :zvalue)
-                ON DUPLICATE KEY UPDATE `value`=:zvalue, expiry=:zexpiry";
+                ON DUPLICATE KEY UPDATE `value`=:zvalue, expiry=:zexpiry';
 
         $sql = $db->bindVars($sql, ':zkey', $id, 'string');
         $sql = $db->bindVars($sql, ':zexpiry', $expiry, 'integer');

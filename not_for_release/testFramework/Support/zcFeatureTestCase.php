@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -6,28 +8,32 @@
 
 namespace Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestResult;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Tests\Support\Traits\ConfigurationSettingsConcerns;
-use Tests\Support\Traits\DiscountCouponConcerns;
-use Tests\Support\Traits\LowOrderFeeConcerns;
 use Tests\Support\Traits\CustomerAccountConcerns;
 use Tests\Support\Traits\DatabaseConcerns;
+use Tests\Support\Traits\DiscountCouponConcerns;
 use Tests\Support\Traits\GeneralConcerns;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Tests\Support\Traits\LogFileConcerns;
+use Tests\Support\Traits\LowOrderFeeConcerns;
 
 /**
  *
  */
 abstract class zcFeatureTestCase extends WebTestCase
 {
-    use DatabaseConcerns, GeneralConcerns, CustomerAccountConcerns, ConfigurationSettingsConcerns, LogFileConcerns, LowOrderFeeConcerns, DiscountCouponConcerns;
+    use DatabaseConcerns;
+    use GeneralConcerns;
+    use CustomerAccountConcerns;
+    use ConfigurationSettingsConcerns;
+    use LogFileConcerns;
+    use LowOrderFeeConcerns;
+    use DiscountCouponConcerns;
 
-    static $firstrun = false;
+    public static $firstrun = false;
 
     /**
-     * @param TestResult|null $result
      * @return TestResult
      *
      * This allows us to run in full isolation mode including
@@ -91,15 +97,13 @@ abstract class zcFeatureTestCase extends WebTestCase
     protected static function moveLogFileForArtifacts($file)
     {
         $context = 'store';
-        if (str_starts_with(basename($file), 'myDEBUG-adm')) {
+        if (str_starts_with(basename((string) $file), 'myDEBUG-adm')) {
             $context = 'admin';
         }
         if (!is_dir(ROOTCWD . 'not_for_release/testFramework/logs/console/' . $context . '/')) {
             mkdir(ROOTCWD . 'not_for_release/testFramework/logs/console/' . $context . '/');
         }
-        copy($file,  ROOTCWD . 'not_for_release/testFramework/logs/console/' . $context . '/' . basename($file));
+        copy($file, ROOTCWD . 'not_for_release/testFramework/logs/console/' . $context . '/' . basename((string) $file));
     }
 
 }
-
-

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Load the system-wide functions
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -8,7 +10,7 @@
  * @version $Id: DrByte 2025 Oct 10 Modified in v2.2.0 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 require DIR_WS_FUNCTIONS . 'database.php';
 require DIR_WS_FUNCTIONS . 'functions_general.php';

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -43,7 +45,7 @@ function zen_debug_error_handler($errno, $errstr, $errfile, $errline)
             $error_type = 'Warning';
             $this_log_suffix = '-warning.log';
             // upgrade E_USER_WARNING to ERROR if message starts with 'FATAL'
-            if (str_starts_with($errstr, 'FATAL ')) {
+            if (str_starts_with((string) $errstr, 'FATAL ')) {
                 $error_type = 'Fatal error';
                 $this_log_suffix = '-error.log';
             }
@@ -54,8 +56,7 @@ function zen_debug_error_handler($errno, $errstr, $errfile, $errline)
             $this_log_suffix = '-error.log';
             break;
         default:
-            return false;      //-Unknown error type, let PHP's built-in handler do its thing.
-            break;
+            return false;
     }
 
     if ($last_log_suffix != $this_log_suffix) {
@@ -69,7 +70,7 @@ function zen_debug_error_handler($errno, $errstr, $errfile, $errline)
     $backtrace = ob_get_contents();
     ob_end_clean();
     // The following line removes the call to this zen_debug_error_handler function (as it's not relevant)
-    $backtrace = preg_replace ('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $backtrace, 1);
+    $backtrace = preg_replace('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $backtrace, 1);
     if (!empty($backtrace)) {
         $backtrace = PHP_EOL . rtrim($backtrace);
     }
@@ -86,7 +87,7 @@ function zen_debug_error_handler($errno, $errstr, $errfile, $errline)
 /**
  * @since ZC v1.5.6a
  */
-function zen_fatal_error_handler()
+function zen_fatal_error_handler(): void
 {
     $last_error = error_get_last();
 
@@ -153,9 +154,9 @@ function zen_enable_error_logging(array $pages_to_debug = ['*'], $logging_level 
         @ini_set('log_errors', 1);          // store to file
         @ini_set('display_errors', 0);      // do not output errors to screen/browser/client
         @ini_set('error_log', $debug_logfile_path);  // the filename to log errors into
-        @ini_set('error_reporting', $logging_level ); // log only errors according to defined rules
-        set_error_handler('zen_debug_error_handler', $logging_level);
-        register_shutdown_function('zen_fatal_error_handler');
+        @ini_set('error_reporting', $logging_level); // log only errors according to defined rules
+        set_error_handler(zen_debug_error_handler(...), $logging_level);
+        register_shutdown_function(zen_fatal_error_handler(...));
     }
 
     if (defined('IS_CLI') && IS_CLI == 'VERBOSE') {

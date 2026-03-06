@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -17,59 +19,54 @@ if (!function_exists('zen_date_raw')) {
      *
      * @param string $date
      * @param bool $reverse
-     * @return string
      * @since ZC v1.0.3
      */
-    function zen_date_raw($date, $reverse = false) {
+    function zen_date_raw($date, $reverse = false): string
+    {
         // sometimes zen_date_short is called with a zero-date value which returns false, which is then passed to $date here, so this just reformats to avoid confusion.
         if (empty($date) || strpos($date, '0001') || strpos($date, '0000')) {
             $date = DateTime::createFromFormat('!m/d/Y', '01/01/0001')->format(DATE_FORMAT);
         }
 
-		$date = preg_replace('/\D+/', '', $date);
-		$date_format = str_replace(['/', '-'], '', DATE_FORMAT);
-
+        $date = preg_replace('/\D+/', '', $date);
+        $date_format = str_replace(['/', '-'], '', DATE_FORMAT);
         if ($date_format === 'dmY') {
             if ($reverse) {
-                return substr($date, 0, 2) . substr($date, 2, 2) . substr($date, 4, 4);
-            } else {
-                return substr($date, 4, 4) . substr($date, 2, 2) . substr($date, 0, 2);
+                return substr((string) $date, 0, 2) . substr((string) $date, 2, 2) . substr((string) $date, 4, 4);
             }
-        } elseif ($date_format === 'Ymd') {
-            if ($reverse) {
-                return substr($date, 6, 2) . substr($date, 4, 2) . substr($date, 0, 4);
-            } else {
-                return substr($date, 0, 4) . substr($date, 4, 2) . substr($date, 6, 2);
-            }
-        } elseif ($reverse) {
-            return substr($date, 2, 2) . substr($date, 0, 2) . substr($date, 4, 4);
-        } else {
-            return substr($date, 4, 4) . substr($date, 0, 2) . substr($date, 2, 2);
+            return substr((string) $date, 4, 4) . substr((string) $date, 2, 2) . substr((string) $date, 0, 2);
         }
+        if ($date_format === 'Ymd') {
+            if ($reverse) {
+                return substr((string) $date, 6, 2) . substr((string) $date, 4, 2) . substr((string) $date, 0, 4);
+            }
+            return substr((string) $date, 0, 4) . substr((string) $date, 4, 2) . substr((string) $date, 6, 2);
+        }
+
+        if ($reverse) {
+            return substr((string) $date, 2, 2) . substr((string) $date, 0, 2) . substr((string) $date, 4, 4);
+        }
+        return substr((string) $date, 4, 4) . substr((string) $date, 0, 2) . substr((string) $date, 2, 2);
     }
 }
-
 
 /**
  * Validate a date in the selected locale date format
  *
- * @param string $date
  * @param string $format (optional) needs to be a valid short date format for DateTimeImmutableObject using / or - or nothing as separators
- * @return bool
  * @since ZC v2.0.0
  */
 function zen_valid_date(string $date, string $format = DATE_FORMAT): bool
 {
-	// Build 3 formats from 1 with 3 possible separators
-	$format0 = str_replace('-', '/', $format);
-	$format1 = str_replace('/', '-', $format);
+    // Build 3 formats from 1 with 3 possible separators
+    $format0 = str_replace('-', '/', $format);
+    $format1 = str_replace('/', '-', $format);
     $format2 = str_replace(['/','-'], '', $format);
     $d0 = DateTime::createFromFormat('!' . $format0, $date);
     $d1 = DateTime::createFromFormat('!' . $format1, $date);
     $d2 = DateTime::createFromFormat('!' . $format2, $date);
     return ($d0 && $d0->format($format0) == $date) || ($d1 && $d1->format($format1) == $date) || ($d2 && $d2->format($format2) == $date);
 }
-
 
 /**
  * Output a raw date string in the selected locale date format
@@ -80,7 +77,9 @@ function zen_valid_date(string $date, string $format = DATE_FORMAT): bool
  */
 function zen_date_long($raw_date)
 {
-    if (empty($raw_date) || $raw_date <= '0001-01-01 00:00:00') return false;
+    if (empty($raw_date) || $raw_date <= '0001-01-01 00:00:00') {
+        return false;
+    }
 
     $year = (int)substr($raw_date, 0, 4);
     $month = (int)substr($raw_date, 5, 2);
@@ -93,7 +92,6 @@ function zen_date_long($raw_date)
     return $zcDate->output(DATE_FORMAT_LONG, mktime($hour, $minute, $second, $month, $day, $year));
 }
 
-
 /**
  * Output a raw date string in the selected locale date format
  *
@@ -101,9 +99,11 @@ function zen_date_long($raw_date)
  * @return bool|false|string|string[]|null
  * @since ZC v1.0.3
  */
-function zen_date_short($raw_date)
+function zen_date_short($raw_date): false|string
 {
-    if (empty($raw_date) || $raw_date <= '0001-01-01 00:00:00') return false;
+    if (empty($raw_date) || $raw_date <= '0001-01-01 00:00:00') {
+        return false;
+    }
 
     $year = (int)substr($raw_date, 0, 4);
     $month = (int)substr($raw_date, 5, 2);
@@ -115,20 +115,21 @@ function zen_date_short($raw_date)
     return date(DATE_FORMAT, mktime($hour, $minute, $second, $month, $day, $year));
 }
 
-
 /**
  * @since ZC v1.0.3
  */
 function zen_datetime_short($raw_datetime)
 {
-    if (empty($raw_datetime) || $raw_datetime <= '0001-01-01 00:00:00') return false;
+    if (empty($raw_datetime) || $raw_datetime <= '0001-01-01 00:00:00') {
+        return false;
+    }
 
-    $year = (int)substr($raw_datetime, 0, 4);
-    $month = (int)substr($raw_datetime, 5, 2);
-    $day = (int)substr($raw_datetime, 8, 2);
-    $hour = (int)substr($raw_datetime, 11, 2);
-    $minute = (int)substr($raw_datetime, 14, 2);
-    $second = (int)substr($raw_datetime, 17, 2);
+    $year = (int)substr((string) $raw_datetime, 0, 4);
+    $month = (int)substr((string) $raw_datetime, 5, 2);
+    $day = (int)substr((string) $raw_datetime, 8, 2);
+    $hour = (int)substr((string) $raw_datetime, 11, 2);
+    $minute = (int)substr((string) $raw_datetime, 14, 2);
+    $second = (int)substr((string) $raw_datetime, 17, 2);
 
     global $zcDate;
     return $zcDate->output(DATE_TIME_FORMAT, mktime($hour, $minute, $second, $month, $day, $year));
@@ -138,9 +139,11 @@ function zen_datetime_short($raw_datetime)
  * Return locale-formatted date and time without seconds (ie. 2024/10/01 9:54)
  * @since ZC v2.1.0
  */
-function zen_datetime_without_seconds (string $raw_datetime): string
+function zen_datetime_without_seconds(string $raw_datetime): string
 {
-    if (empty($raw_datetime) || $raw_datetime <= '0001-01-01 00:00:00') return false;
+    if (empty($raw_datetime) || $raw_datetime <= '0001-01-01 00:00:00') {
+        return false;
+    }
 
     $year = (int)substr($raw_datetime, 0, 4);
     $month = (int)substr($raw_datetime, 5, 2);
@@ -163,14 +166,18 @@ function zen_datetime_without_seconds (string $raw_datetime): string
  */
 function zen_format_date_raw($date, $formatOut = 'mysql', $formatIn = null)
 {
-    if ($formatIn === null && defined('DATE_FORMAT_DATE_PICKER')) $formatIn = DATE_FORMAT_DATE_PICKER;
-    if ($date == 'null' || $date == '') return $date;
-    $mpos = strpos($formatIn, 'm');
-    $dpos = strpos($formatIn, 'd');
-    $ypos = strpos($formatIn, 'y');
-    $d = substr($date, $dpos, 2);
-    $m = substr($date, $mpos, 2);
-    $y = substr($date, $ypos, 4);
+    if ($formatIn === null && defined('DATE_FORMAT_DATE_PICKER')) {
+        $formatIn = DATE_FORMAT_DATE_PICKER;
+    }
+    if ($date == 'null' || $date == '') {
+        return $date;
+    }
+    $mpos = strpos((string) $formatIn, 'm');
+    $dpos = strpos((string) $formatIn, 'd');
+    $ypos = strpos((string) $formatIn, 'y');
+    $d = substr((string) $date, $dpos, 2);
+    $m = substr((string) $date, $mpos, 2);
+    $y = substr((string) $date, $ypos, 4);
     switch ($formatOut) {
         case 'raw':
             $mdate = $y . $m . $d;
@@ -193,13 +200,11 @@ function zen_format_date_raw($date, $formatOut = 'mysql', $formatIn = null)
  * @return bool and also updates $date_array by reference
  * @since ZC v1.0.3
  */
-function zen_checkdate($date_to_check, $format_string, &$date_array)
+function zen_checkdate($date_to_check, $format_string, &$date_array): bool
 {
-    $separator_idx = -1;
-
-    $separators = array('-', ' ', '/', '.');
-    $month_abbr = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
-    $no_of_days = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+    $separators = ['-', ' ', '/', '.'];
+    $month_abbr = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    $no_of_days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     $format_string = strtolower($format_string);
 
@@ -241,9 +246,15 @@ function zen_checkdate($date_to_check, $format_string, &$date_array)
 
         $size = count($format_string_array);
         for ($i = 0; $i < $size; $i++) {
-            if ($format_string_array[$i] == 'mm' || $format_string_array[$i] == 'mmm') $month = $date_to_check_array[$i];
-            if ($format_string_array[$i] == 'dd') $day = $date_to_check_array[$i];
-            if (($format_string_array[$i] == 'yyyy') || ($format_string_array[$i] == 'aaaa')) $year = $date_to_check_array[$i];
+            if ($format_string_array[$i] == 'mm' || $format_string_array[$i] == 'mmm') {
+                $month = $date_to_check_array[$i];
+            }
+            if ($format_string_array[$i] == 'dd') {
+                $day = $date_to_check_array[$i];
+            }
+            if (($format_string_array[$i] == 'yyyy') || ($format_string_array[$i] == 'aaaa')) {
+                $year = $date_to_check_array[$i];
+            }
         }
     } else {
         if (strlen($format_string) == 8 || strlen($format_string) == 9) {
@@ -292,7 +303,7 @@ function zen_checkdate($date_to_check, $format_string, &$date_array)
         return false;
     }
 
-    $date_array = array($year, $month, $day);
+    $date_array = [$year, $month, $day];
 
     return true;
 }
@@ -300,39 +311,40 @@ function zen_checkdate($date_to_check, $format_string, &$date_array)
 /**
  * Check if year is a leap year
  * @param int $year
- * @return bool
  * @since ZC v1.0.3
  */
-function zen_is_leap_year($year)
+function zen_is_leap_year($year): bool
 {
     if ($year % 100 == 0) {
-        if ($year % 400 == 0) return true;
+        if ($year % 400 == 0) {
+            return true;
+        }
     } else {
-        if (($year % 4) == 0) return true;
+        if (($year % 4) == 0) {
+            return true;
+        }
     }
 
     return false;
 }
 
-
 /**
  * compute the days between two dates
  * @param string $date1
  * @param string $date2
- * @return int
  * @since ZC v1.3.9a
  */
-function zen_date_diff($date1, $date2)
+function zen_date_diff($date1, $date2): int
 {
     //$date1  today, or any other day
     //$date2  date to check against
 
-    $d1 = explode("-", substr($date1, 0, 10));
+    $d1 = explode('-', substr($date1, 0, 10));
     $y1 = $d1[0];
     $m1 = $d1[1];
     $d1 = $d1[2];
 
-    $d2 = explode("-", substr($date2, 0, 10));
+    $d2 = explode('-', substr($date2, 0, 10));
     $y2 = $d2[0];
     $m2 = $d2[1];
     $d2 = $d2[2];
@@ -342,7 +354,6 @@ function zen_date_diff($date1, $date2)
 
     return (int)round(($date2_set - $date1_set) / (60 * 60 * 24));
 }
-
 
 /**
  * function to evaluate two date spans and identify if they overlap or not.
@@ -383,7 +394,7 @@ function zen_date_diff($date1, $date2)
  */
 function zen_datetime_overlap($start1, $start2, $end1 = null, $end2 = null, $future_only = true)
 {
-    $cur_datetime = date("Y-m-d h:i:s", time());
+    $cur_datetime = date('Y-m-d h:i:s', time());
 
     // BOF if variable is provided as an array, validate properly setup and if so, assign and replace the other applicable values.
     if (is_array($start1)) {
@@ -391,20 +402,18 @@ function zen_datetime_overlap($start1, $start2, $end1 = null, $end2 = null, $fut
             trigger_error('Missing date/time array key(s) start and/or end.', E_USER_WARNING);
             // array is not properly defined to support further operation, therefore to prevent potential downstream issues fail safe and identify that an overlap has occurred.
             return true;
-        } else {
-            $end1 = $start1['start'];
-            $start1 = $start1['end'];
         }
+        $end1 = $start1['start'];
+        $start1 = $start1['end'];
     }
     if (is_array($start2)) {
         if (!array_key_exists('start', $start2) || !array_key_exists('end', $start2)) {
             trigger_error('Missing date/time array key(s) start and/or end.', E_USER_WARNING);
             // array is not properly defined to support further operation, therefore to prevent potential downstream issues fail safe and identify that an overlap has occurred.
             return true;
-        } else {
-            $end2 = $start2['start'];
-            $start2 = $start2['end'];
         }
+        $end2 = $start2['start'];
+        $start2 = $start2['end'];
     }
     // EOF if variable is provided as an array, validate properly setup and if so, assign and replace the other applicable values.
 
@@ -472,19 +481,18 @@ function zen_datetime_overlap($start1, $start2, $end1 = null, $end2 = null, $fut
     return $overlap;
 }
 
-
 /**
  * @since ZC v1.3.0
  */
-function zen_count_days($start_date, $end_date, $lookup = 'm')
+function zen_count_days(string $start_date, $end_date, $lookup = 'm'): float|int
 {
     if ($lookup == 'd') {
         // Returns number of days
         $start_datetime = gmmktime(0, 0, 0, substr($start_date, 5, 2), substr($start_date, 8, 2), substr($start_date, 0, 4));
-        $end_datetime = gmmktime(0, 0, 0, substr($end_date, 5, 2), substr($end_date, 8, 2), substr($end_date, 0, 4));
+        $end_datetime = gmmktime(0, 0, 0, substr((string) $end_date, 5, 2), substr((string) $end_date, 8, 2), substr((string) $end_date, 0, 4));
         $days = (($end_datetime - $start_datetime) / 86400) + 1;
         $d = $days % 7;
-        $w = date("w", $start_datetime);
+        $w = date('w', $start_datetime);
         $result = floor($days / 7) * 5;
         $counter = $result + $d - (($d + $w) >= 7) - (($d + $w) >= 8) - ($w == 0);
     }
@@ -492,16 +500,18 @@ function zen_count_days($start_date, $end_date, $lookup = 'm')
         // Returns whole-month-count between two dates
         // courtesy of websafe<at>partybitchez<dot>org
         $start_date_unixtimestamp = strtotime($start_date);
-        $start_date_month = date("m", $start_date_unixtimestamp);
-        $end_date_unixtimestamp = strtotime($end_date);
-        $end_date_month = date("m", $end_date_unixtimestamp);
+        $start_date_month = date('m', $start_date_unixtimestamp);
+        $end_date_unixtimestamp = strtotime((string) $end_date);
+        $end_date_month = date('m', $end_date_unixtimestamp);
         $calculated_date_unixtimestamp = $start_date_unixtimestamp;
         $counter = 0;
         while ($calculated_date_unixtimestamp < $end_date_unixtimestamp) {
             $counter++;
             $calculated_date_unixtimestamp = strtotime($start_date . " +{$counter} months");
         }
-        if (($counter == 1) && ($end_date_month == $start_date_month)) $counter = ($counter - 1);
+        if (($counter == 1) && ($end_date_month == $start_date_month)) {
+            $counter = ($counter - 1);
+        }
     }
     return $counter;
 }
@@ -513,7 +523,7 @@ if (!function_exists('datetime_to_sql_format')) {
     function datetime_to_sql_format(string $dateString, string $format = 'H:i:s M d, Y e'): string
     {
         $dateTime = DateTime::createFromFormat($format, $dateString);
-        $dateTime->setTimezone((new DateTime)->getTimezone());
+        $dateTime->setTimezone((new DateTime())->getTimezone());
         return $dateTime->format('Y-m-d H:i:s');
     }
 }
@@ -526,7 +536,7 @@ if (!function_exists('convertToLocalTimeZone')) {
     function convertToLocalTimeZone(string $dateTime, string $fromTz = 'UTC', string $outputFormat = 'Y-m-d H:i:s'): string
     {
         $localDateTime = new DateTime($dateTime, new DateTimeZone($fromTz));
-        $localDateTime->setTimezone((new DateTime)->getTimezone());
+        $localDateTime->setTimezone((new DateTime())->getTimezone());
         return $localDateTime->format($outputFormat);
     }
 }

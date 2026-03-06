@@ -21,26 +21,26 @@ foreach ($list_box_contents as $row => $cols) {
     if (isset($list_box_contents[$row]['params'])) {
         $r_params .= ' ' . $list_box_contents[$row]['params'];
     }
-?>
+    ?>
     <div<?php echo $r_params; ?>>
 <?php
-    foreach ($cols as $num => $col) {
-        $c_params = '';
-        $cell_type = ($row == 0) ? 'li' : 'div';
-        if (isset($col['params'])) {
-            $c_params .= ' ' . $col['params'];
+        foreach ($cols as $col) {
+            $c_params = '';
+            $cell_type = ($row == 0) ? 'li' : 'div';
+            if (isset($col['params'])) {
+                $c_params .= ' ' . $col['params'];
+            }
+            if (!empty($col['align'])) {
+                $c_params .= ' align="' . $col['align'] . '"';
+            }
+            //        if ($cell_type == 'th') {
+            //            $c_params .= ' scope="' . $cell_scope . '" id="' . $cell_title . 'Cell' . $row . '-' . $num.'"';
+            //        }
+            if (isset($col['text'])) {
+                echo $col['text'] . "\n";
+            }
         }
-        if (!empty($col['align'])) {
-            $c_params .= ' align="' . $col['align'] . '"';
-        }
-//        if ($cell_type == 'th') {
-//            $c_params .= ' scope="' . $cell_scope . '" id="' . $cell_title . 'Cell' . $row . '-' . $num.'"';
-//        }
-        if (isset($col['text'])) {
-            echo $col['text'] . "\n";
-        }
-    }
-?>
+    ?>
     </div>
 <?php
 }
@@ -48,4 +48,3 @@ foreach ($list_box_contents as $row => $cols) {
 </div>
 <?php
 $zco_notifier->notify('NOTIFY_TPL_TABULAR_DISPLAY_END', $current_page_base, $list_box_contents);
-

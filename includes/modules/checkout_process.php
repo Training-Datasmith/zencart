@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * module to process a completed checkout
  *
@@ -50,7 +52,7 @@ require DIR_WS_CLASSES . 'payment.php';
 $payment_modules = new payment($_SESSION['payment']);
 
 require DIR_WS_CLASSES . 'order.php';
-$order = new order;
+$order = new order();
 
 // -----
 // If no billing-address is present, this is a spoofed order.  Redirect
@@ -70,7 +72,7 @@ if (count($order->products) === 0) {
 }
 
 require DIR_WS_CLASSES . 'order_total.php';
-$order_total_modules = new order_total;
+$order_total_modules = new order_total();
 
 // avoid hack attempts during the checkout procedure by checking the internal cartID
 if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
@@ -84,7 +86,7 @@ if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
 }
 
 $zco_notifier->notify('NOTIFY_CHECKOUT_PROCESS_BEFORE_ORDER_TOTALS_PRE_CONFIRMATION_CHECK');
-if (empty($_SESSION['payment']) || strpos($GLOBALS[$_SESSION['payment']]->code, 'paypal') !== 0) {
+if (empty($_SESSION['payment']) || !str_starts_with((string) $GLOBALS[$_SESSION['payment']]->code, 'paypal')) {
     $order_totals = $order_total_modules->pre_confirmation_check();
 }
 
@@ -167,7 +169,7 @@ $_SESSION['order_summary']['credits_applied'] = $credits_applied;
 $_SESSION['order_summary']['order_total'] = $ototal;
 $_SESSION['order_summary']['commissionable_order'] = $commissionable_order;
 $_SESSION['order_summary']['commissionable_order_formatted'] = $commissionable_order_formatted;
-$_SESSION['order_summary']['coupon_code'] = urlencode($order->info['coupon_code']);
+$_SESSION['order_summary']['coupon_code'] = urlencode((string) $order->info['coupon_code']);
 $_SESSION['order_summary']['currency_code'] = $order->info['currency'];
 $_SESSION['order_summary']['currency_value'] = $order->info['currency_value'];
 $_SESSION['order_summary']['payment_module_code'] = $order->info['payment_module_code'];
@@ -177,8 +179,8 @@ $_SESSION['order_summary']['orders_status'] = $order->info['order_status']; // a
 $_SESSION['order_summary']['tax'] = $otax;
 $_SESSION['order_summary']['shipping'] = $oshipping;
 $products_array = [];
-foreach ($order->products as $key => $val) {
-    $products_array[urlencode((string)$val['id'])] = urlencode($val['model']);
+foreach ($order->products as $val) {
+    $products_array[urlencode((string)$val['id'])] = urlencode((string) $val['model']);
 }
 $_SESSION['order_summary']['products_ordered_ids'] = implode('|', array_keys($products_array));
 $_SESSION['order_summary']['products_ordered_models'] = implode('|', array_values($products_array));

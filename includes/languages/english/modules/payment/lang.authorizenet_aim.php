@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $define = [
     'MODULE_PAYMENT_AUTHORIZENET_AIM_TEXT_ADMIN_TITLE' => 'Authorize.net (AIM)',
     'MODULE_PAYMENT_AUTHORIZENET_AIM_TEXT_ERROR_CURL_NOT_FOUND' => 'CURL functions not found - required for Authorize.net AIM payment module',

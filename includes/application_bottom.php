@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * application_bottom.php
  * Common actions carried out at the end of each page invocation.
@@ -22,14 +24,20 @@ if (defined('DEV_SHOW_APPLICATION_BOTTOM_DEBUG') && DEV_SHOW_APPLICATION_BOTTOM_
     $langFiles = [];
     $pattern = DIR_WS_LANGUAGES;
     foreach ($files as $file) {
-        $shortFile = str_replace(["\\", DIR_FS_CATALOG], ['/', ''], $file);
-        if (in_array($shortFile, $langLoaded['legacy']) || in_array($file, $langLoaded['legacy'])) {
+        $shortFile = str_replace(['\\', DIR_FS_CATALOG], ['/', ''], $file);
+        if (in_array($shortFile, $langLoaded['legacy'])) {
             continue;
         }
-        if (in_array($shortFile, $langLoaded['arrays']) || in_array($file, $langLoaded['arrays'])) {
+        if (in_array($file, $langLoaded['legacy'])) {
             continue;
         }
-        if (strpos($shortFile, $pattern) === 0) {
+        if (in_array($shortFile, $langLoaded['arrays'])) {
+            continue;
+        }
+        if (in_array($file, $langLoaded['arrays'])) {
+            continue;
+        }
+        if (str_starts_with($shortFile, $pattern)) {
             $langFiles[] = $file;
         }
     }

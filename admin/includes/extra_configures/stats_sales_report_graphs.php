@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @author inspired from sales_report_graphs.php,v 0.01 2002/11/27 19:02:22 cwi Exp  Released under the GNU General Public License $
@@ -8,4 +10,3 @@
 
 // adjust and uncomment if a different value is desired
 //define('SALES_REPORT_GRAPHS_FILTER_DEFAULT', '00000000110000000000');
-

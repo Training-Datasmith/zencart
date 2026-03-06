@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * zc_install password_funcs functions
  *
@@ -46,11 +48,9 @@ function zen_validate_password(string $plain, string $encrypted): bool
 function zen_encrypt_password(string $plain): string
 {
     if (function_exists('password_hash')) {
-        $password = password_hash($plain, PASSWORD_DEFAULT);
-    } else {
-        $password = zen_encrypt_password_sha256($plain);
+        return password_hash($plain, PASSWORD_DEFAULT);
     }
-    return $password;
+    return zen_encrypt_password_sha256($plain);
 }
 
 /**
@@ -80,11 +80,11 @@ function zen_create_random_value(int $length, string $type = 'mixed'): false|str
             $char = chr(zen_rand(0, 255));
         }
         if ($type === 'mixed') {
-            if (preg_match('/^[a-z0-9]$/i', $char)) {
+            if (preg_match('/^[a-z0-9]$/i', (string) $char)) {
                 $rand_value .= $char;
             }
         } elseif ($type === 'chars') {
-            if (preg_match('/^[a-z]$/i', $char)) {
+            if (preg_match('/^[a-z]$/i', (string) $char)) {
                 $rand_value .= $char;
             }
         } elseif ($type === 'digits') {
@@ -178,7 +178,7 @@ function zen_get_entropy(string $hash = 'sha1', int $size = 32): string
                     $stat['CAPICOM_Utilities_random'] = hash('md5', $entropy, true);
                 }
                 unset($CAPI_Util, $entropy);
-            } catch (Exception $ex) {
+            } catch (Exception) {
             }
         }
 
@@ -198,7 +198,7 @@ function zen_create_PADSS_password(int $length = 8): string
     $charsAlpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charsNum = '0123456789';
     $charsMixed = $charsAlpha . $charsNum;
-    $password = "";
+    $password = '';
     for ($i = 0; $i < $length; $i++) {
         $addChar = substr($charsMixed, zen_pwd_rand(0, strlen($charsMixed) - 1), 1);
         while (strpos($password, $addChar)) {
@@ -226,6 +226,5 @@ function zen_pwd_rand(int $min = 0, int $max = 10): int
     $random = substr($random, 0, 8);
     $value = abs(hexdec($random));
     $value = $min + (($max - $min + 1) * ($value / (4294967295 + 1)));
-    $value = abs((int)$value);
-    return $value;
+    return abs((int)$value);
 }

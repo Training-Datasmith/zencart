@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -35,7 +37,7 @@ class zcObserverLogWriterDatabase
         /**
          * gzip the passed postdata so that it takes less storage space in the database
          */
-        $gzpostdata = gzdeflate($log_data['postdata'], 7);
+        $gzpostdata = gzdeflate((string) $log_data['postdata'], 7);
 
         /**
          * map incoming log data to db schema
@@ -65,7 +67,7 @@ class zcObserverLogWriterDatabase
     {
         global $db;
 
-        $sql = "SELECT ip_address from " . TABLE_ADMIN_ACTIVITY_LOG . " LIMIT 1";
+        $sql = 'SELECT ip_address from ' . TABLE_ADMIN_ACTIVITY_LOG . ' LIMIT 1';
         $result = $db->Execute($sql);
         if ($result->EOF) {
             $admin_id = $_SESSION['admin_id'] ?? 0;
@@ -74,7 +76,7 @@ class zcObserverLogWriterDatabase
                 'admin_id' => (int)$admin_id,
                 'page_accessed' =>  'Log found to be empty. Logging started.',
                 'page_parameters' => '',
-                'ip_address' => $db->prepare_input(substr($_SERVER['REMOTE_ADDR'],0,45)),
+                'ip_address' => $db->prepare_input(substr((string) $_SERVER['REMOTE_ADDR'], 0, 45)),
                 'gzpost' => '',
                 'flagged' => 0,
                 'attention' => '',
@@ -94,19 +96,19 @@ class zcObserverLogWriterDatabase
         global $db, $sniffer;
 
         if ($sniffer->field_exists(TABLE_ADMIN_ACTIVITY_LOG, 'logmessage') === false) {
-            $sql = "ALTER TABLE " . TABLE_ADMIN_ACTIVITY_LOG . " ADD COLUMN logmessage mediumtext NOT NULL";
+            $sql = 'ALTER TABLE ' . TABLE_ADMIN_ACTIVITY_LOG . ' ADD COLUMN logmessage mediumtext NOT NULL';
             $db->Execute($sql);
         }
- 
+
         // add 'severity' field of type varchar(9), if not already present
         if ($sniffer->field_exists(TABLE_ADMIN_ACTIVITY_LOG, 'severity') === true) {
             return;
         }
 
-        $sql = "ALTER TABLE " . TABLE_ADMIN_ACTIVITY_LOG . " ADD COLUMN severity varchar(9) NOT NULL default 'info', ADD INDEX idx_severity_zen (severity)";
+        $sql = 'ALTER TABLE ' . TABLE_ADMIN_ACTIVITY_LOG . " ADD COLUMN severity varchar(9) NOT NULL default 'info', ADD INDEX idx_severity_zen (severity)";
         $db->Execute($sql);
 
-        $sql = "UPDATE " . TABLE_ADMIN_ACTIVITY_LOG . " SET severity = 'notice' WHERE flagged = 1";
+        $sql = 'UPDATE ' . TABLE_ADMIN_ACTIVITY_LOG . " SET severity = 'notice' WHERE flagged = 1";
         $db->Execute($sql);
 
         // Init the logs if necessary
@@ -117,7 +119,7 @@ class zcObserverLogWriterDatabase
         $sql_data_array = [
             'access_date' => 'now()',
             'admin_id' => (int)$admin_id,
-            'ip_address' => $db->prepare_input(substr($_SERVER['REMOTE_ADDR'], 0, 45)),
+            'ip_address' => $db->prepare_input(substr((string) $_SERVER['REMOTE_ADDR'], 0, 45)),
             'gzpost' => '',
             'flagged' => 1,
             'attention' => '',
@@ -142,8 +144,8 @@ class zcObserverLogWriterDatabase
     {
         global $db;
 
-        $db->Execute("TRUNCATE TABLE " . TABLE_ADMIN_ACTIVITY_LOG);
-        
+        $db->Execute('TRUNCATE TABLE ' . TABLE_ADMIN_ACTIVITY_LOG);
+
         $admin_id = $_SESSION['admin_id'] ?? 0;
         $admname = '{' . preg_replace('/[^\w]/', '*', zen_get_admin_name() ?? '[Unknown/NotLoggedIn]') . '[' . $admin_id . ']}';
 
@@ -152,7 +154,7 @@ class zcObserverLogWriterDatabase
             'admin_id' => (int)$admin_id,
             'page_accessed' =>  'Log reset by ' . $admname . '.',
             'page_parameters' => '',
-            'ip_address' => $db->prepare_input(substr($_SERVER['REMOTE_ADDR'], 0, 45)),
+            'ip_address' => $db->prepare_input(substr((string) $_SERVER['REMOTE_ADDR'], 0, 45)),
             'gzpost' => '',
             'flagged' => 0,
             'attention' => '',

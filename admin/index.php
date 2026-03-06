@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -9,7 +11,7 @@ use Zencart\FileSystem\FileSystem;
 
 require_once('includes/application_bootstrap.php');
 
-$cmd = isset($_GET['cmd']) ? $_GET['cmd'] : 'home';
+$cmd = $_GET['cmd'] ?? 'home';
 $cmd = ($cmd == 'index') ? 'home' : $cmd;
 
 if (file_exists(basename($cmd . '.php'))) {
@@ -17,7 +19,7 @@ if (file_exists(basename($cmd . '.php'))) {
     exit();
 }
 
-$adminPage = (new FileSystem)->findPluginAdminPage($installedPlugins, $cmd);
+$adminPage = (new FileSystem())->findPluginAdminPage($installedPlugins, $cmd);
 
 if (!isset($adminPage)) {
     require 'includes/application_top.php';

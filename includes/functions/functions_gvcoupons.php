@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * functions_gvcoupons.php
  * Functions related to processing Gift Vouchers/Certificates
@@ -8,40 +10,39 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * Update the Customer's GV account balance using the amount of the GV specified
  *
- * @param int $customer_id
- * @param int $gv_id
  * @since ZC v1.0.3
  */
-function zen_gv_account_update(int $customer_id, int $gv_id)
+function zen_gv_account_update(int $customer_id, int $gv_id): void
 {
     global $db;
-    $sql = "SELECT amount
-            FROM " . TABLE_COUPON_GV_CUSTOMER . "
-            WHERE customer_id = " . (int)$customer_id;
+    $sql = 'SELECT amount
+            FROM ' . TABLE_COUPON_GV_CUSTOMER . '
+            WHERE customer_id = ' . $customer_id;
 
     $customer_gv = $db->Execute($sql);
 
-    $sql = "SELECT coupon_amount
-            FROM " . TABLE_COUPONS . "
-            WHERE coupon_id = " . (int)$gv_id;
+    $sql = 'SELECT coupon_amount
+            FROM ' . TABLE_COUPONS . '
+            WHERE coupon_id = ' . $gv_id;
 
     $coupon_gv = $db->Execute($sql);
 
-    if ($coupon_gv->EOF) return;
+    if ($coupon_gv->EOF) {
+        return;
+    }
 
     if ($customer_gv->RecordCount() > 0) {
         $new_gv_amount = $customer_gv->fields['amount'] + $coupon_gv->fields['coupon_amount'];
-        $sql = "UPDATE " . TABLE_COUPON_GV_CUSTOMER . "
-              SET amount = '" . $db->prepare_input($new_gv_amount) . "' WHERE customer_id = " . (int)$customer_id;
+        $sql = 'UPDATE ' . TABLE_COUPON_GV_CUSTOMER . "
+              SET amount = '" . $db->prepare_input($new_gv_amount) . "' WHERE customer_id = " . $customer_id;
         $db->Execute($sql);
 
     } else {
-        $sql = "INSERT INTO " . TABLE_COUPON_GV_CUSTOMER . " (customer_id, amount)
-                VALUES (" . (int)$customer_id . ", '" . $db->prepare_input($coupon_gv->fields['coupon_amount']) . "')";
+        $sql = 'INSERT INTO ' . TABLE_COUPON_GV_CUSTOMER . ' (customer_id, amount)
+                VALUES (' . $customer_id . ", '" . $db->prepare_input($coupon_gv->fields['coupon_amount']) . "')";
         $db->Execute($sql);
     }
 }
@@ -49,7 +50,6 @@ function zen_gv_account_update(int $customer_id, int $gv_id)
 /**
  * Return GV balance for customer
  *
- * @param int $customer_id
  * @return mixed|string
  * @since ZC v1.1.0
  */
@@ -72,7 +72,7 @@ function zen_user_has_gv_account(int $customer_id)
  * @deprecated v2.0.0; use Coupon::generateRandomCouponCode() instead.
  * @since ZC v1.0.3
  */
-function zen_create_coupon_code(string $salt = "secret", $length = SECURITY_CODE_LENGTH, string $prefix = '')
+function zen_create_coupon_code(string $salt = 'secret', $length = SECURITY_CODE_LENGTH, string $prefix = ''): string
 {
     return Coupon::generateRandomCouponCode($salt, $length, $prefix);
 }
@@ -81,7 +81,7 @@ function zen_create_coupon_code(string $salt = "secret", $length = SECURITY_CODE
  * @deprecated v2.0.0 use CouponValidation::is_coupon_valid_for_sales
  * @since ZC v1.5.6
  */
-function is_coupon_valid_for_sales($product_id, $coupon_id): bool
+function is_coupon_valid_for_sales(int $product_id, int $coupon_id): bool
 {
     return CouponValidation::is_coupon_valid_for_sales($product_id, $coupon_id);
 }
@@ -90,7 +90,7 @@ function is_coupon_valid_for_sales($product_id, $coupon_id): bool
  * @deprecated v2.0.0 use CouponValidation::is_product_valid
  * @since ZC v1.0.3
  */
-function is_product_valid($product_id, $coupon_id): bool
+function is_product_valid(int $product_id, int $coupon_id): bool
 {
     return CouponValidation::is_product_valid($product_id, $coupon_id);
 }
@@ -99,7 +99,7 @@ function is_product_valid($product_id, $coupon_id): bool
  * @deprecated v2.0.0 use CouponValidation::validate_for_category
  * @since ZC v1.3.0
  */
-function validate_for_category(int $product_id, int $coupon_id)
+function validate_for_category(int $product_id, int $coupon_id): bool|string
 {
     return CouponValidation::validate_for_category($product_id, $coupon_id);
 }
@@ -108,7 +108,7 @@ function validate_for_category(int $product_id, int $coupon_id)
  * @deprecated v2.0.0 use CouponValidation::validate_for_product
  * @since ZC v1.3.0
  */
-function validate_for_product(int $product_id, int $coupon_id)
+function validate_for_product(int $product_id, int $coupon_id): bool|string
 {
     return CouponValidation::validate_for_product($product_id, $coupon_id);
 }

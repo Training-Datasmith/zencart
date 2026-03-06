@@ -28,12 +28,12 @@ require('includes/application_top.php');
 $restrict_array = [
     [
         'id' => 'Deny',
-        'text' => TEXT_PULLDOWN_DENY
+        'text' => TEXT_PULLDOWN_DENY,
     ],
     [
         'id' => 'Allow',
-        'text' => TEXT_PULLDOWN_ALLOW
-    ]
+        'text' => TEXT_PULLDOWN_ALLOW,
+    ],
 ];
 
 if (isset($_GET['cPath_prod']) && isset($_GET['manufacturers_id']) && ((int)$_GET['cPath_prod']) > 0 && ((int)$_GET['manufacturers_id']) > 0) {
@@ -53,20 +53,20 @@ $cPath_prod = (isset($_GET['cPath_prod'])) ? (int)$_GET['cPath_prod'] : 0;
 // an admin 'fussing' with the $_GET variables) and redirect back to the coupon_admin.
 //
 $check = $db->Execute(
-    "SELECT coupon_name
-       FROM " . TABLE_COUPONS_DESCRIPTION . "
+    'SELECT coupon_name
+       FROM ' . TABLE_COUPONS_DESCRIPTION . "
       WHERE coupon_id = $cid
-        AND language_id = " . (int)$_SESSION['languages_id'] . "
-      LIMIT 1"
+        AND language_id = " . (int)$_SESSION['languages_id'] . '
+      LIMIT 1'
 );
 if ($check->EOF) {
     trigger_error("Undefined coupon_id ($cid) requested by admin_id ({$_SESSION['admin_id']}).", E_USER_NOTICE);
     zen_redirect(zen_href_link(FILENAME_COUPON_ADMIN));
 }
-$coupon_name = htmlspecialchars($check->fields['coupon_name'], ENT_COMPAT, CHARSET);
+$coupon_name = htmlspecialchars((string) $check->fields['coupon_name'], ENT_COMPAT, CHARSET);
 unset($check);
 
-$action = (isset($_GET['action'])) ? $_GET['action'] : '';
+$action = $_GET['action'] ?? '';
 switch ($action) {
     case 'switch_status':
         $rid = (isset($_POST['rid'])) ? (int)$_POST['rid'] : 0;
@@ -76,8 +76,8 @@ switch ($action) {
             // then there's nothing else to do.
             //
             $status = $db->Execute(
-                "SELECT coupon_restrict
-                   FROM " . TABLE_COUPON_RESTRICT . "
+                'SELECT coupon_restrict
+                   FROM ' . TABLE_COUPON_RESTRICT . "
                   WHERE restrict_id = $rid
                   LIMIT 1"
             );
@@ -90,7 +90,7 @@ switch ($action) {
             //
             $new_status = ($status->fields['coupon_restrict'] == 'N') ? 'Y' : 'N';
             $db->Execute(
-                "UPDATE " . TABLE_COUPON_RESTRICT . "
+                'UPDATE ' . TABLE_COUPON_RESTRICT . "
                    SET coupon_restrict = '" . $new_status . "'
                  WHERE restrict_id = $rid
                  LIMIT 1"
@@ -106,8 +106,8 @@ switch ($action) {
             $cPath = -1;
         }
         $test_query = $db->Execute(
-            "SELECT *
-               FROM " . TABLE_COUPON_RESTRICT . "
+            'SELECT *
+               FROM ' . TABLE_COUPON_RESTRICT . "
               WHERE coupon_id = $cid
                 AND category_id = $cPath"
         );
@@ -117,16 +117,16 @@ switch ($action) {
         //
         if (!$test_query->EOF) {
             $messageStack->add_session(ERROR_DISCOUNT_COUPON_DEFINED_CATEGORY . " $cPath", 'caution');
-        // -----
-        // Otherwise, toggle the category's restriction status (Allow vs. Deny).
-        //
+            // -----
+            // Otherwise, toggle the category's restriction status (Allow vs. Deny).
+            //
         } else {
             $status = 'N';
             if (isset($_POST['restrict_status']) && $_POST['restrict_status'] == 'Deny') {
                 $status = 'Y';
             }
             $db->Execute(
-                "INSERT INTO " . TABLE_COUPON_RESTRICT . "
+                'INSERT INTO ' . TABLE_COUPON_RESTRICT . "
                     (coupon_id, category_id, coupon_restrict)
                  VALUES
                     ($cid, $cPath, '$status')"
@@ -140,8 +140,8 @@ switch ($action) {
         }
         $pid = (int)$_POST['pid'];
         $test_query = $db->Execute(
-            "SELECT *
-               FROM " . TABLE_COUPON_RESTRICT . "
+            'SELECT *
+               FROM ' . TABLE_COUPON_RESTRICT . "
               WHERE coupon_id = $cid
                 AND product_id = $pid"
         );
@@ -158,22 +158,22 @@ switch ($action) {
             //
             if ($pid > 0) {
                 $db->Execute(
-                    "INSERT INTO " . TABLE_COUPON_RESTRICT . "
+                    'INSERT INTO ' . TABLE_COUPON_RESTRICT . "
                         (coupon_id, product_id, coupon_restrict)
                      VALUES ($cid, $pid, '" . $status . "')"
                 );
-            // -----
-            // Otherwise, adding or dropping all products in a given category or manufacturer.  Note that processing
-            // at the top of this script has restricted either a category _or_ a manufacturer!
-            //
+                // -----
+                // Otherwise, adding or dropping all products in a given category or manufacturer.  Note that processing
+                // at the top of this script has restricted either a category _or_ a manufacturer!
+                //
             } elseif ($pid == -1 || $pid == -2) {
                 // adding new records
                 if ($prod_cat > 0 && $pid == -1) {
                     // to insert new products from a given categories_id for a coupon_code that are not already in the table
                     // products in the table from the categories_id are skipped
                     $new_products_query =
-                        "SELECT products_id
-                           FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
+                        'SELECT products_id
+                           FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . "
                           WHERE categories_id = $prod_cat
                             AND products_id NOT IN (
                                     SELECT product_id
@@ -187,8 +187,8 @@ switch ($action) {
                     // to delete existing products from a given categories_id for a coupon_code that are already in the table,
                     // products in the table from the categories_id are skipped
                     $new_products_query =
-                        "SELECT products_id
-                           FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
+                        'SELECT products_id
+                           FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . "
                           WHERE categories_id = $prod_cat
                             AND products_id IN (
                                     SELECT product_id
@@ -203,8 +203,8 @@ switch ($action) {
                     // to insert new products from a given manufacturers_id for a coupon_code that are not already in the table,
                     // products in the table from the manufacturers_id are skipped
                     $new_products_query =
-                        "SELECT products_id
-                           FROM " . TABLE_PRODUCTS . "
+                        'SELECT products_id
+                           FROM ' . TABLE_PRODUCTS . "
                           WHERE manufacturers_id = $prod_man
                             AND products_id NOT IN (
                                     SELECT product_id
@@ -218,8 +218,8 @@ switch ($action) {
                     // to delete existing products from a given manufacturers_id for a coupon_code that are already in the table
                     // products in the table from the manufacturers_id are skipped
                     $new_products_query =
-                        "SELECT products_id
-                           FROM " . TABLE_PRODUCTS . "
+                        'SELECT products_id
+                           FROM ' . TABLE_PRODUCTS . "
                           WHERE manufacturers_id = $prod_man
                             AND products_id IN (
                                     SELECT product_id
@@ -239,7 +239,7 @@ switch ($action) {
                     // add all products from select category for each product not already defined in coupons_restrict
                     if ($pid == -1) {
                         $db->Execute(
-                            "INSERT INTO " . TABLE_COUPON_RESTRICT . "
+                            'INSERT INTO ' . TABLE_COUPON_RESTRICT . "
                                 (coupon_id, product_id, coupon_restrict)
                              VALUES
                                 ($cid, {$new_products->fields['products_id']}, '" . $status . "')"
@@ -247,7 +247,7 @@ switch ($action) {
                     } else {
                         // removed as defined in coupons_restrict for either DENY or ALLOW
                         $db->Execute(
-                            "DELETE FROM " . TABLE_COUPON_RESTRICT . "
+                            'DELETE FROM ' . TABLE_COUPON_RESTRICT . "
                               WHERE coupon_id = $cid
                                 AND product_id = {$new_products->fields['products_id']}
                                 AND coupon_restrict = '" . $status . "'"
@@ -262,7 +262,7 @@ switch ($action) {
     case 'remove':
         $rid = (isset($_POST['rid'])) ? (int)$_POST['rid'] : 0;
         $db->Execute(
-            "DELETE FROM " . TABLE_COUPON_RESTRICT . "
+            'DELETE FROM ' . TABLE_COUPON_RESTRICT . "
               WHERE restrict_id = $rid
               LIMIT 1"
         );
@@ -300,7 +300,7 @@ $toggle_button = '&nbsp;&nbsp;<button type="button" class="cr-toggle" title="' .
 
 $cpage = (isset($_GET['cpage'])) ? (int)$_GET['cpage'] : 1;
 
-$cr_query_raw = "SELECT * FROM " . TABLE_COUPON_RESTRICT . " WHERE coupon_id = $cid AND category_id != 0";
+$cr_query_raw = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . " WHERE coupon_id = $cid AND category_id != 0";
 $cr_split = new splitPageResults($cpage, MAX_DISPLAY_RESTRICT_ENTRIES, $cr_query_raw, $cr_query_numrows);
 $cr_list = $db->Execute($cr_query_raw);
 ?>
@@ -315,7 +315,7 @@ $cr_list = $db->Execute($cr_query_raw);
             </tr>
 <?php
 if ($cr_list->EOF) {
-?>
+    ?>
             <tr class="dataTableRow">
                 <td colspan="4" class="dataTableContent text-center"><strong><?php echo TEXT_NO_CATEGORY_RESTRICTIONS; ?></strong></td>
             </tr>
@@ -327,7 +327,7 @@ if ($cr_list->EOF) {
         } else {
             $category_name = zen_get_category_name($cr_list->fields['category_id'], $_SESSION['languages_id']);
         }
-?>
+        ?>
             <tr class="dataTableRow" data-rid="<?php echo $cr_list->fields['restrict_id']; ?>">
                 <td class="dataTableContent text-center"><?php echo $cr_list->fields['category_id']; ?></td>
                 <td class="dataTableContent text-center"><?php echo $category_name; ?></td>
@@ -335,12 +335,12 @@ if ($cr_list->EOF) {
                 <td class="dataTableContent text-center cr-remove"><?php echo $remove_image; ?></td>
             </tr>
 <?php
-        $cr_list->MoveNext();
+                $cr_list->MoveNext();
     }
-?>
+    ?>
             <tr class="smallText">
-                <td colspan="2"><?php echo $cr_split->display_count($cr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, $cpage, TEXT_DISPLAY_NUMBER_OF_CATEGORIES); ?></td>
-                <td colspan="2" class="text-right"><?php echo $cr_split->display_links($cr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, MAX_DISPLAY_PAGE_LINKS, $cpage, zen_get_all_get_params(['cpage','action', 'x', 'y']), 'cpage'); ?></td>
+                <td colspan="2"><?php echo $cr_split->display_count($cr_query_numrows); ?></td>
+                <td colspan="2" class="text-right"><?php echo $cr_split->display_links($cr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, MAX_DISPLAY_PAGE_LINKS, $cpage); ?></td>
             </tr>
 <?php
 }
@@ -349,7 +349,7 @@ if ($cr_list->EOF) {
                 <td class="font-weight-bold"><?php echo TABLE_HEADING_CATEGORY_NAME; ?></td>
                 <td>
                     <?php echo
-                    zen_draw_form('cat_cpath', FILENAME_COUPON_RESTRICT, zen_get_all_get_params(['action']), 'get', 'id="cat-path-form"') .
+                    zen_draw_form('cat_cpath', FILENAME_COUPON_RESTRICT, zen_get_all_get_params(['action']), 'get') .
                     zen_draw_pull_down_menu('cPath', zen_get_category_tree(), $cPath, 'id="cat-path"') .
                     zen_draw_hidden_field('cid', $cid) .
                     '</form>'; ?>
@@ -362,7 +362,7 @@ if ($cr_list->EOF) {
 <?php
 $ppage = (isset($_GET['ppage'])) ? (int)$_GET['ppage'] : 1;
 
-$pr_query_raw = "SELECT * FROM " . TABLE_COUPON_RESTRICT . " WHERE coupon_id = $cid AND product_id != '0'";
+$pr_query_raw = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . " WHERE coupon_id = $cid AND product_id != '0'";
 $pr_split = new splitPageResults($ppage, MAX_DISPLAY_RESTRICT_ENTRIES, $pr_query_raw, $pr_query_numrows);
 $pr_list = $db->Execute($pr_query_raw);
 $prArrayList = [];
@@ -380,7 +380,7 @@ $prArrayList = [];
             </tr>
             <?php
 if ($pr_list->EOF) {
-?>
+    ?>
             <tr class="dataTableRow">
                 <td colspan="6" class="dataTableContent text-center"><strong><?php echo TEXT_NO_PRODUCT_RESTRICTIONS; ?></strong></td>
             </tr>
@@ -394,7 +394,7 @@ if ($pr_list->EOF) {
         $products_name = zen_get_products_name($products_id, $_SESSION['languages_id']);
         $products_model = htmlspecialchars(zen_get_products_model($products_id), ENT_COMPAT, CHARSET);
         $products_status = zen_get_products_status($products_id);
-?>
+        ?>
             <tr class="dataTableRow" data-rid="<?php echo $pr_list->fields['restrict_id']; ?>">
                 <td class="dataTableContent text-center"><?php echo $products_id; ?></td>
                 <td class="dataTableContent text-center"><?php echo (empty($products_status)) ? $products_status_disabled : $products_status_enabled; ?></td>
@@ -404,12 +404,12 @@ if ($pr_list->EOF) {
                 <td class="dataTableContent text-center cr-remove"><?php echo $remove_image; ?></td>
             </tr>
 <?php
-        $pr_list->MoveNext();
+                $pr_list->MoveNext();
     }
-?>
+    ?>
             <tr class="smallText">
-                <td colspan="3"><?php echo $pr_split->display_count($pr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, $ppage, TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?></td>
-                <td colspan="3" class="text-right"><?php echo $pr_split->display_links($pr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, MAX_DISPLAY_PAGE_LINKS, $ppage, zen_get_all_get_params(['ppage','action', 'x', 'y']), 'ppage'); ?></td>
+                <td colspan="3"><?php echo $pr_split->display_count($pr_query_numrows); ?></td>
+                <td colspan="3" class="text-right"><?php echo $pr_split->display_links($pr_query_numrows, MAX_DISPLAY_RESTRICT_ENTRIES, MAX_DISPLAY_PAGE_LINKS, $ppage); ?></td>
             </tr>
 <?php
 }
@@ -420,25 +420,25 @@ $current_manufacturers_id = (isset($_GET['manufacturers_id'])) ? (int)$_GET['man
 $manufacturers_array = [
     [
         'id' => '0',
-        'text' => TEXT_NONE
-    ]
+        'text' => TEXT_NONE,
+    ],
 ];
 
 $manufacturers = $db->Execute(
-    "SELECT distinct m.manufacturers_id, m.manufacturers_name
-       FROM " . TABLE_MANUFACTURERS . " m
-            LEFT JOIN " . TABLE_PRODUCTS . " p
+    'SELECT distinct m.manufacturers_id, m.manufacturers_name
+       FROM ' . TABLE_MANUFACTURERS . ' m
+            LEFT JOIN ' . TABLE_PRODUCTS . ' p
                 ON m.manufacturers_id = p.manufacturers_id
       WHERE p.manufacturers_id = m.manufacturers_id
         AND p.products_status = 1
         AND p.products_quantity > 0
-      ORDER BY m.manufacturers_name"
+      ORDER BY m.manufacturers_name'
 );
 
 while (!$manufacturers->EOF) {
     $manufacturers_array[] = [
         'id' => $manufacturers->fields['manufacturers_id'],
-        'text' => $manufacturers->fields['manufacturers_name'] . ' [ #' . $manufacturers->fields['manufacturers_id'] . ' ]'
+        'text' => $manufacturers->fields['manufacturers_name'] . ' [ #' . $manufacturers->fields['manufacturers_id'] . ' ]',
     ];
     $manufacturers->MoveNext();
 }
@@ -446,20 +446,20 @@ unset($manufacturers);
 
 if ($current_manufacturers_id > 0) {
     $products = $db->Execute(
-        "SELECT p.products_id, pd.products_name
-           FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd, " . TABLE_MANUFACTURERS . " m
+        'SELECT p.products_id, pd.products_name
+           FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd, ' . TABLE_MANUFACTURERS . ' m
           WHERE p.products_id = pd.products_id
-            AND pd.language_id = " . $_SESSION['languages_id'] . "
+            AND pd.language_id = ' . $_SESSION['languages_id'] . "
             AND p.manufacturers_id = m.manufacturers_id
             AND m.manufacturers_id = $current_manufacturers_id
           ORDER BY pd.products_name, p.products_id"
     );
 } else {
     $products = $db->Execute(
-        "SELECT p.products_id, pd.products_name
-           FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd, " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c
+        'SELECT p.products_id, pd.products_name
+           FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd, ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c
           WHERE p.products_id = pd.products_id
-            AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+            AND pd.language_id = ' . (int)$_SESSION['languages_id'] . "
             AND p.products_id = p2c.products_id
             AND p2c.categories_id = $cPath_prod
           ORDER BY pd.products_name, p.products_id"
@@ -471,20 +471,20 @@ if (!$products->EOF) {
     if ($cPath_prod > 0) {
         $products_array[] = [
             'id' => '-1',
-            'text' => TEXT_ALL_PRODUCTS_ADD
+            'text' => TEXT_ALL_PRODUCTS_ADD,
         ];
         $products_array[] = [
             'id' => '-2',
-            'text' => TEXT_ALL_PRODUCTS_REMOVE
+            'text' => TEXT_ALL_PRODUCTS_REMOVE,
         ];
     } elseif ($current_manufacturers_id > 0) {
         $products_array[] = [
             'id' => '-1',
-            'text' => TEXT_ALL_MANUFACTURERS_ADD
+            'text' => TEXT_ALL_MANUFACTURERS_ADD,
         ];
         $products_array[] = [
             'id' => '-2',
-            'text' => TEXT_ALL_MANUFACTURERS_REMOVE
+            'text' => TEXT_ALL_MANUFACTURERS_REMOVE,
         ];
     }
 }
@@ -504,7 +504,7 @@ unset($products);
                 <td><?php echo TABLE_HEADING_CATEGORY_NAME . HEADER_MANUFACTURER_NAME; ?></td>
                 <td colspan="2">
                     <?php echo
-                    zen_draw_form('prod-sel', FILENAME_COUPON_RESTRICT, zen_get_all_get_params(['action']), 'get', 'id="prod-cat-man"') .
+                    zen_draw_form('prod-sel', FILENAME_COUPON_RESTRICT, zen_get_all_get_params(['action']), 'get') .
                     zen_draw_pull_down_menu('cPath_prod', zen_get_category_tree(), $cPath_prod, 'id="prod-path"') .
                     '<br><br>' .
                     zen_draw_pull_down_menu('manufacturers_id', $manufacturers_array, $current_manufacturers_id, 'id="prod-man"') .
@@ -513,11 +513,11 @@ unset($products);
                 </td>
 <?php
 if (empty($products_array)) {
-?>
+    ?>
                 <td colspan="3">&nbsp;</td>
 <?php
 } else {
-?>
+    ?>
                 <td><?php echo zen_draw_pull_down_menu('pid', $products_array, 0, 'id="prod-pid"'); ?></td>
                 <td class="text-center"><?php echo zen_draw_pull_down_menu('restrict_status', $restrict_array, 'Deny', 'id="prod-status"'); ?></td>
                 <td class="text-center"><button type="button" id="prod-add-submit"><?php echo TEXT_SUBMIT_PRODUCT_UPDATE; ?></button></td>

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * new_products.php module
  *
@@ -20,11 +22,11 @@ $display_limit = zen_get_new_date_range();
 
 if ((($manufacturers_id > 0 && empty($_GET['filter_id'])) || !empty($_GET['music_genre_id']) || !empty($_GET['record_company_id'])) || empty($new_products_category_id)) {
     $new_products_query =
-        "SELECT DISTINCT p.products_id, p.products_image, pd.products_name, p.products_price, p.master_categories_id
-           FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        'SELECT DISTINCT p.products_id, p.products_image, pd.products_name, p.products_price, p.master_categories_id
+           FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
           WHERE p.products_id = pd.products_id
-            AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
-            AND p.products_status = 1 " . $display_limit;
+            AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+            AND p.products_status = 1 ' . $display_limit;
 } else {
     // get all products and cPaths in this subcat tree
     $productsInCategory = zen_get_categories_products_list((($manufacturers_id > 0 && !empty($_GET['filter_id'])) ? zen_get_generated_category_path_rev($_GET['filter_id']) : $cPath), false, true, 0, $display_limit);
@@ -33,12 +35,12 @@ if ((($manufacturers_id > 0 && empty($_GET['filter_id'])) || !empty($_GET['music
         // build products-list string to insert into SQL query
         $list_of_products = implode(',', array_keys($productsInCategory));
         $new_products_query =
-            "SELECT DISTINCT p.products_id, p.products_image, pd.products_name, p.products_price, p.master_categories_id
-               FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+            'SELECT DISTINCT p.products_id, p.products_image, pd.products_name, p.products_price, p.master_categories_id
+               FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
               WHERE p.products_id = pd.products_id
-                AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+                AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
                 AND p.products_status = 1
-                AND p.products_id IN (" . $list_of_products . ")";
+                AND p.products_id IN (' . $list_of_products . ')';
     }
 }
 
@@ -57,9 +59,9 @@ $title = '';
 // show only when 1 or more
 if ($num_products_count > 0) {
     if ($num_products_count < SHOW_PRODUCT_INFO_COLUMNS_NEW_PRODUCTS || SHOW_PRODUCT_INFO_COLUMNS_NEW_PRODUCTS === '0') {
-        $col_width = floor(100/$num_products_count);
+        $col_width = floor(100 / $num_products_count);
     } else {
-        $col_width = floor(100/SHOW_PRODUCT_INFO_COLUMNS_NEW_PRODUCTS);
+        $col_width = floor(100 / SHOW_PRODUCT_INFO_COLUMNS_NEW_PRODUCTS);
     }
 
     while (!$new_products->EOF) {
@@ -85,7 +87,7 @@ if ($num_products_count > 0) {
 
         $list_box_contents[$row][$col] = [
             'params' => 'class="centerBoxContentsNew centeredContent back"' . ' ' . 'style="width:' . $col_width . '%;"',
-            'text' => $new_products_image . '<a href="' . $new_products_link . '">' . $new_products_name . '</a><br>' . $products_price
+            'text' => $new_products_image . '<a href="' . $new_products_link . '">' . $new_products_name . '</a><br>' . $products_price,
         ];
 
         $col++;
@@ -98,7 +100,7 @@ if ($num_products_count > 0) {
 
     if (!empty($current_category_id)) {
         $category_title = zen_get_category_name((int)$current_category_id);
-        $title = '<h2 class="centerBoxHeading">' . sprintf(TABLE_HEADING_NEW_PRODUCTS, $zcDate->output('%B')) . ($category_title !== '' ? ' - ' . $category_title : '' ) . '</h2>';
+        $title = '<h2 class="centerBoxHeading">' . sprintf(TABLE_HEADING_NEW_PRODUCTS, $zcDate->output('%B')) . ($category_title !== '' ? ' - ' . $category_title : '') . '</h2>';
     } else {
         $title = '<h2 class="centerBoxHeading">' . sprintf(TABLE_HEADING_NEW_PRODUCTS, $zcDate->output('%B')) . '</h2>';
     }

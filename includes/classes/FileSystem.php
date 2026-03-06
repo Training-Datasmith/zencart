@@ -1,10 +1,13 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
+
 namespace Zencart\FileSystem;
 
 /**
@@ -81,7 +84,7 @@ class FileSystem
     /**
      * @since ZC v1.5.7
      */
-    public function findPluginAdminPage(array $installedPlugins, string $page)
+    public function findPluginAdminPage(array $installedPlugins, string $page): ?string
     {
         $found = null;
         foreach ($installedPlugins as $plugin) {
@@ -89,7 +92,7 @@ class FileSystem
             $adminFile = $pluginDir . '/admin/' . $page . '.php';
             $adminFile = $this->realpath($adminFile);
             $realPath = $this->realpath($adminFile);
-            if ($realPath === false || strpos($realPath, $pluginDir) !== 0) {
+            if (!str_starts_with($realPath, $pluginDir)) {
                 continue; // Skip this file if it's not under the intended directory
             }
             if (!file_exists($realPath)) {
@@ -157,13 +160,13 @@ class FileSystem
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path)) as $file) {
             $bytes += $file->getSize();
         }
-        $size = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
         $suffix = 'bloody huge!';
         if (isset($size[$factor])) {
             $suffix = $size[$factor];
         }
-        return sprintf("%.{$decimals}f ", $bytes / pow(1024, $factor)) . $suffix;
+        return sprintf("%.{$decimals}f ", $bytes / 1024 ** $factor) . $suffix;
     }
 
     /**
@@ -172,7 +175,7 @@ class FileSystem
     public function fileExistsInDirectory(string $fileDir, string $filePattern): bool
     {
         $found = false;
-        $filePattern = '/' . str_replace("/", "\/", $filePattern) . '$/';
+        $filePattern = '/' . str_replace('/', "\/", $filePattern) . '$/';
         if (!is_dir($fileDir)) {
             return false;
         }
@@ -220,8 +223,7 @@ class FileSystem
         if (!$this->hasTemplateLanguageOverride($templateDir, $rootPath, $language, $file, $extraPath)) {
             return $extraPath;
         }
-        $extraPath = $extraPath . '/' . $templateDir;
-        return $extraPath;
+        return $extraPath . '/' . $templateDir;
     }
 
     /**
@@ -250,10 +252,12 @@ class FileSystem
         }
 
         foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
+            if ($item === '.') {
                 continue;
             }
-
+            if ($item === '..') {
+                continue;
+            }
             $path = $directory . DIRECTORY_SEPARATOR . $item;
             if (is_dir($path)) {
                 $this->deleteDirectory($path);

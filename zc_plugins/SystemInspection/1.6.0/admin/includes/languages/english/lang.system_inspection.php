@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * System Inspection (formerly Mod List by That Software Guy)
  *
@@ -25,7 +27,7 @@ return [
     'NO_LINK' => '[Unable to create a Link to this]',
     'NO_PAGES_TABLE_FOUND' => 'Problem: No Admin Pages found!',
     'NO_INFORMATION_SCHEMA_TABLE_FOUND' => 'INFORMATION_SCHEMA.TABLES table not found ',
-    'MISSING_ADMIN_PAGES_WHY' => "These are entries in Admin->Configuration (configuration_groups) without corresponding admin_pages entries.",
+    'MISSING_ADMIN_PAGES_WHY' => 'These are entries in Admin->Configuration (configuration_groups) without corresponding admin_pages entries.',
     'NO_NEW_PAGES' => 'No new admin pages.',
     'NO_NEW_TABLES' => 'No new tables.',
     'NO_PLUGINS_ENABLED' => 'No enabled plugins found.',

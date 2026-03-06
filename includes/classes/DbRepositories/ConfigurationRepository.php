@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -18,7 +20,7 @@ class ConfigurationRepository
     protected array $configAsIntArray = ['SECURITY_CODE_LENGTH'];
     protected array $keepAsStringArray = ['PRODUCTS_MANUFACTURERS_STATUS'];
 
-    public function __construct(private queryFactory $db)
+    public function __construct(private readonly queryFactory $db)
     {
     }
 
@@ -60,7 +62,7 @@ class ConfigurationRepository
     {
         $configurationKey = $this->db->prepare_input($configurationKey);
         $result = $this->db->Execute(
-            "SELECT configuration_id, configuration_key, configuration_value FROM " . TABLE_CONFIGURATION .
+            'SELECT configuration_id, configuration_key, configuration_value FROM ' . TABLE_CONFIGURATION .
             " WHERE configuration_key = '" . $configurationKey . "' LIMIT 1"
         );
 
@@ -80,7 +82,7 @@ class ConfigurationRepository
         $configurationValue = $this->db->prepare_input($configurationValue);
 
         $this->db->Execute(
-            "UPDATE " . TABLE_CONFIGURATION .
+            'UPDATE ' . TABLE_CONFIGURATION .
             " SET configuration_value = '" . $configurationValue . "'" .
             " WHERE configuration_key = '" . $configurationKey . "'"
         );

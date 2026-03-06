@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * zcAjaxAdminNotifications
  *
@@ -9,30 +11,29 @@
  */
 class zcAjaxAdminNotifications extends base
 {
-
     /**
      * @since ZC v1.5.6
      */
-    public function forget()
+    public function forget(): array
     {
         global $db;
 
         if (!isset($_POST['key'])) {
-            return (array(
-                'data' => false
-            ));
+            return ([
+                'data' => false,
+            ]);
         }
 
-        $sql = "INSERT INTO " . TABLE_ADMIN_NOTIFICATIONS . "(notification_key, admin_id, dismissed) VALUE (:nKey:,:adminId:, 1) 
-               ON DUPLICATE KEY UPDATE notification_key = :nKey:, admin_id = :adminId:, dismissed = 1";
+        $sql = 'INSERT INTO ' . TABLE_ADMIN_NOTIFICATIONS . '(notification_key, admin_id, dismissed) VALUE (:nKey:,:adminId:, 1) 
+               ON DUPLICATE KEY UPDATE notification_key = :nKey:, admin_id = :adminId:, dismissed = 1';
 
         $sql = $db->bindVars($sql, ':adminId:', $_POST['admin_id'], 'integer');
         $sql = $db->bindVars($sql, ':nKey:', $_POST['key'], 'string');
         $result = $db->execute($sql);
 
-        return (array(
-            'data' => $result
-        ));
+        return ([
+            'data' => $result,
+        ]);
     }
 
 }

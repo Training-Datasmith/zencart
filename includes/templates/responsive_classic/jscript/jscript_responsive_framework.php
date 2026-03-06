@@ -25,7 +25,7 @@ $('#contentMainWrapper').addClass('onerow-fluid');
      'margin': 'auto'
  });
 
-<?php if ( $detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) { ?>
+<?php if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') { ?>
 
 $('.leftBoxContainer').css('width', '');
 $('.rightBoxContainer').css('width', '');
@@ -70,7 +70,7 @@ $('input#telephone').clone().attr('type','tel').insertAfter('input#telephone').p
 $('input#dob').clone().attr('type','date').insertAfter('input#dob').prev().remove();
 $('input#fax').clone().attr('type','tel').insertAfter('input#fax').prev().remove();
 
-<?php } else if ( $detect->isTablet() || $_SESSION['layoutType'] == 'tablet' ){ ?>
+<?php } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') { ?>
 $('#mainWrapper').css({
      'max-width': '100%',
      'margin': 'auto'
@@ -109,7 +109,7 @@ $('#whatsnew').css({  });
 $('#whosonline').css({  });
 
 
-<?php } else if ( $_SESSION['layoutType'] == 'full' ){ ?>
+<?php } elseif ($_SESSION['layoutType'] == 'full') { ?>
 
  $('#mainWrapper').css({
      'width': '100%',

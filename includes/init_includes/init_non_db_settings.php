@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Initializes non-database constants that were previously set in language or template files,
  * overridable via site-specific /init_includes processing.  See
@@ -30,7 +32,7 @@ $non_db_settings = [
     'ORDER_STATUS_DISPLAY_PRODUCTS' => 'true',      //- "
     'ORDER_STATUS_SLAM_COUNT' => '3',               //- A numeric string (defaults to '3'). Used by order_status/header_php.php
 
-    // Shared - Storefront and Admin 
+    // Shared - Storefront and Admin
     'TOPMOST_CATEGORY_PARENT_ID' => '0',
 
     // -----

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * index header_php.php
  *
@@ -25,10 +27,10 @@ $current_category_has_subcats = false;
 if (isset($cPath) && zen_not_null($cPath)) {
     if ($cPath > 0) {
         $category_status_query =
-            "SELECT categories_status
-             FROM " . TABLE_CATEGORIES . "
+            'SELECT categories_status
+             FROM ' . TABLE_CATEGORIES . '
              WHERE categories_id = :currentCategoryId
-             LIMIT 1";
+             LIMIT 1';
         $category_status_query = $db->bindVars($category_status_query, ':currentCategoryId', $current_category_id, 'integer');
         $category_status = $db->Execute($category_status_query);
         if ($category_status->EOF) {
@@ -38,20 +40,20 @@ if (isset($cPath) && zen_not_null($cPath)) {
         }
     }
     $category_products_query =
-        "SELECT products_id
-         FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
+        'SELECT products_id
+         FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . '
          WHERE categories_id = :currentCategoryId
-         LIMIT 1";
+         LIMIT 1';
     $category_products_query = $db->bindVars($category_products_query, ':currentCategoryId', $current_category_id, 'integer');
     $category_products = $db->Execute($category_products_query);
     if (!$category_products->EOF) {
         $current_category_has_products = true;
     } else {
         $category_parent_query =
-            "SELECT parent_id
-             FROM " . TABLE_CATEGORIES . "
+            'SELECT parent_id
+             FROM ' . TABLE_CATEGORIES . '
              WHERE parent_id = :currentCategoryId
-             LIMIT 1";
+             LIMIT 1';
         $category_parent_query = $db->bindVars($category_parent_query, ':currentCategoryId', $current_category_id, 'integer');
         $category_parent = $db->Execute($category_parent_query);
         $current_category_has_subcats = !$category_parent->EOF;
@@ -98,23 +100,21 @@ if (isset($cPath) && zen_not_null($cPath)) {
     //      of display for stores that have an 'invalid' mix of products and categories within a
     //      category.
     //
-    if (!$category_redirect_handled) {
-        if ($current_category_not_found) {
-            unset($_GET['cPath']);
-            $breadcrumb->reset();
-            $robotsNoIndex = true;
-            header('HTTP/1.1 404 Not Found');
-//-bof-Comment the following four (4) lines out to display disabled categories
-        } elseif ($current_category_is_disabled) {
-            $category_depth = 'products';
-            $robotsNoIndex = true;
-            header('HTTP/1.1 410 Gone');
-//-eof-Comment the above four (4) lines out to display disabled categories
-        } elseif ($current_category_has_products) {
-            $category_depth = 'products';
-        } else {
-            $category_depth = ($current_category_has_subcats) ? 'nested' : 'products';
-        }
+    if ($current_category_not_found) {
+        unset($_GET['cPath']);
+        $breadcrumb->reset();
+        $robotsNoIndex = true;
+        header('HTTP/1.1 404 Not Found');
+        //-bof-Comment the following four (4) lines out to display disabled categories
+    } elseif ($current_category_is_disabled) {
+        $category_depth = 'products';
+        $robotsNoIndex = true;
+        header('HTTP/1.1 410 Gone');
+        //-eof-Comment the above four (4) lines out to display disabled categories
+    } elseif ($current_category_has_products) {
+        $category_depth = 'products';
+    } else {
+        $category_depth = ($current_category_has_subcats) ? 'nested' : 'products';
     }
 }
 

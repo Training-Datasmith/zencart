@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Handle Multi-Factor authentication via TOTP
  * Compatible with most Authenticator apps and in-browser support.
@@ -36,12 +38,12 @@ class MultiFactorAuth
 
     public function __construct(
         private int     $codeLength = 6,
-        private int     $period = 30,
-        private string  $algorithm = 'sha1', // 'sha256', 'sha512'
+        private readonly int     $period = 30,
+        private readonly string  $algorithm = 'sha1', // 'sha256', 'sha512'
         private ?string $issuer = null,
-        private array   $qrProviderOrder = ['local', 'BaconQrCode', 'QrServerUrl', 'QRickitUrl'], // 'TCBarcode'
-        private bool    $prependIssuer = true,
-        private string  $encoding = 'utf-8',
+        private readonly array   $qrProviderOrder = ['local', 'BaconQrCode', 'QrServerUrl', 'QRickitUrl'], // 'TCBarcode'
+        private readonly bool    $prependIssuer = true,
+        private readonly string  $encoding = 'utf-8',
     ) {
         if ($this->codeLength <= 0) {
             throw new ValueError('codeLength must be int > 0, usually 6, 7, or 8');
@@ -138,7 +140,7 @@ class MultiFactorAuth
      */
     private function getTimeSlice(?int $time = null, int $offset = 0): int
     {
-        $time = $time ?? time();
+        $time ??= time();
         return (int)floor($time / $this->period) + ($offset * $this->period);
     }
 
@@ -271,7 +273,7 @@ class MultiFactorAuth
         )->setBackgroundColor('white'); // background color
 
         if (function_exists('imagecreate')) {
-            return 'data:image/png;base64,' . base64_encode($qrCode->getPngData(true));
+            return 'data:image/png;base64,' . base64_encode((string) $qrCode->getPngData(true));
         }
 
         return $qrCode->getSvgCode(); // returns SVG as SVG markup, safe to render directly as HTML
@@ -289,7 +291,7 @@ class MultiFactorAuth
         $qr = '';
         foreach ($this->qrProviderOrder as $provider) {
             if ($provider === 'local' || $provider === 'BaconQrCode') {
-                if (class_exists('\BaconQrCode\Encoder\QrCode')) {
+                if (class_exists(\BaconQrCode\Encoder\QrCode::class)) {
                     $qr = $this->getQrCodeBaconQrCode($data, $size);
                 }
                 if (!empty($qr)) {

@@ -13,67 +13,67 @@ require DIR_WS_CLASSES . 'stats_sales_report_graph.php';
 $currencies = new currencies();
 
 if (!empty($_GET['report'])) {
-  $sales_report_view = (int)$_GET['report'];
+    $sales_report_view = (int)$_GET['report'];
 }
 // default is 4
 if (!isset($sales_report_view) || $sales_report_view < statsSalesReportGraph::HOURLY_VIEW || $sales_report_view > statsSalesReportGraph::YEARLY_VIEW) {
-  $sales_report_view = statsSalesReportGraph::MONTHLY_VIEW;
+    $sales_report_view = statsSalesReportGraph::MONTHLY_VIEW;
 }
 
 switch ($sales_report_view) {
-  case(statsSalesReportGraph::HOURLY_VIEW):
-    $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_HOURLY;
-    $summary2 = TODAY_TO_DATE;
-    $report_desc = REPORT_TEXT_HOURLY;
-    break;
-  case(statsSalesReportGraph::DAILY_VIEW):
-    $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_DAILY;
-    $summary2 = WEEK_TO_DATE;
-    $report_desc = REPORT_TEXT_DAILY;
-    break;
-  case(statsSalesReportGraph::WEEKLY_VIEW):
-    $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_WEEKLY;
-    $summary2 = WEEK_TO_DATE;
-    $report_desc = REPORT_TEXT_WEEKLY;
-    break;
+    case (statsSalesReportGraph::HOURLY_VIEW):
+        $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_HOURLY;
+        $summary2 = TODAY_TO_DATE;
+        $report_desc = REPORT_TEXT_HOURLY;
+        break;
+    case (statsSalesReportGraph::DAILY_VIEW):
+        $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_DAILY;
+        $summary2 = WEEK_TO_DATE;
+        $report_desc = REPORT_TEXT_DAILY;
+        break;
+    case (statsSalesReportGraph::WEEKLY_VIEW):
+        $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_WEEKLY;
+        $summary2 = WEEK_TO_DATE;
+        $report_desc = REPORT_TEXT_WEEKLY;
+        break;
 
-  case(statsSalesReportGraph::MONTHLY_VIEW):
-    $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_MONTHLY;
-    $summary2 = MONTH_TO_DATE;
-    $report_desc = REPORT_TEXT_MONTHLY;
-    break;
+    case (statsSalesReportGraph::MONTHLY_VIEW):
+        $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_MONTHLY;
+        $summary2 = MONTH_TO_DATE;
+        $report_desc = REPORT_TEXT_MONTHLY;
+        break;
 
-  case(statsSalesReportGraph::YEARLY_VIEW):
-    $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_YEARLY;
-    $summary2 = YEARLY_TOTAL;
-    $report_desc = REPORT_TEXT_YEARLY;
-    break;
+    case (statsSalesReportGraph::YEARLY_VIEW):
+        $summary1 = CHART_TEXT_AVERAGE . ' ' . REPORT_TEXT_YEARLY;
+        $summary2 = YEARLY_TOTAL;
+        $report_desc = REPORT_TEXT_YEARLY;
+        break;
 }
 
 // check start and end Date
-$startDate = "";
+$startDate = '';
 if (!empty($_GET['startDate']) && $_GET['startDate'] >= '0001-01-01') {
-  $startDate = $_GET['startDate'];
+    $startDate = $_GET['startDate'];
 }
-$endDate = "";
+$endDate = '';
 if (!empty($_GET['endDate']) && $_GET['endDate'] >= '0001-01-01') {
-  $endDate = $_GET['endDate'];
+    $endDate = $_GET['endDate'];
 }
 // check filters
 $sales_report_filter = '';
 if (isset($_GET['filter']) && $_GET['filter'] && zen_not_null($_GET['filter'])) {
-  $sales_report_filter = $_GET['filter'];
-  $sales_report_filter_link = "&filter=$sales_report_filter";
+    $sales_report_filter = $_GET['filter'];
+    $sales_report_filter_link = "&filter=$sales_report_filter";
 } elseif (defined('SALES_REPORT_GRAPHS_FILTER_DEFAULT')) {
-  $sales_report_filter = SALES_REPORT_GRAPHS_FILTER_DEFAULT;
-  $sales_report_filter_link = "&filter=$sales_report_filter";
+    $sales_report_filter = SALES_REPORT_GRAPHS_FILTER_DEFAULT;
+    $sales_report_filter_link = "&filter=$sales_report_filter";
 }
 
 $report = new statsSalesReportGraph($sales_report_view, $startDate, $endDate, $sales_report_filter);
 
-if (strlen($sales_report_filter) == 0) {
-  $sales_report_filter = $report->filter;
-  $sales_report_filter_link = "";
+if (strlen((string) $sales_report_filter) == 0) {
+    $sales_report_filter = $report->filter;
+    $sales_report_filter_link = '';
 }
 ?>
 <!doctype html>
@@ -99,54 +99,54 @@ if (strlen($sales_report_filter) == 0) {
 <?php    if ($sales_report_view < statsSalesReportGraph::YEARLY_VIEW) { ?>
             data.addColumn('number', '<?php echo CHART_AVERAGE_SALE_AMOUNT; ?>');
 <?php    } else { ?>
-   <?php    if ($j == 1) break; // don't show avg sale ?>
+   <?php    break; // don't show avg sale?>
 <?php    } ?>
 <?php } ?>
           data.addRows([
 <?php
 $chartHeader = '';
-for ($i = 0; $i < $report->size; $i++) {
+    for ($i = 0; $i < $report->size; $i++) {
 
-  // column name
-  echo "           ['";
+        // column name
+        echo "           ['";
 
-  switch ($sales_report_view) {
-      case statsSalesReportGraph::YEARLY_VIEW:
-          echo $zcDate->output('%Y', $report->info[$i]['startDates']);
-          break;
-      case statsSalesReportGraph::MONTHLY_VIEW:
-          echo $zcDate->output('%b', $report->info[$i]['startDates']);
-          $chartHeader = ($chartHeader === '' && $i === 0) ? ' ' . $zcDate->output('%Y', $report->info[$i]['startDates']) : $chartHeader;
-          break;
-      case statsSalesReportGraph::WEEKLY_VIEW:
-          echo $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['startDates']) . '\n' . $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['endDates'] - 1);
-          break;
-      case statsSalesReportGraph::DAILY_VIEW:
-          echo $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['startDates']);
-          break;
-      case statsSalesReportGraph::HOURLY_VIEW:
-          echo $zcDate->output('%k', $report->info[$i]['startDates']);
-          $chartHeader = ($chartHeader === '' && $i === 0) ? ' ' . $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) : $chartHeader;
-          break;
-  }
+        switch ($sales_report_view) {
+            case statsSalesReportGraph::YEARLY_VIEW:
+                echo $zcDate->output('%Y', $report->info[$i]['startDates']);
+                break;
+            case statsSalesReportGraph::MONTHLY_VIEW:
+                echo $zcDate->output('%b', $report->info[$i]['startDates']);
+                $chartHeader = ($chartHeader === '' && $i === 0) ? ' ' . $zcDate->output('%Y', $report->info[$i]['startDates']) : $chartHeader;
+                break;
+            case statsSalesReportGraph::WEEKLY_VIEW:
+                echo $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['startDates']) . '\n' . $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['endDates'] - 1);
+                break;
+            case statsSalesReportGraph::DAILY_VIEW:
+                echo $zcDate->output(DATE_FORMAT_SHORT_NO_YEAR, $report->info[$i]['startDates']);
+                break;
+            case statsSalesReportGraph::HOURLY_VIEW:
+                echo $zcDate->output('%k', $report->info[$i]['startDates']);
+                $chartHeader = ($chartHeader === '' && $i === 0) ? ' ' . $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) : $chartHeader;
+                break;
+        }
 
-  echo "', ";
+        echo "', ";
 
-  if ($j == 0) {
-  // first value
-  echo round($report->info[$i]['sum'], $currencies->get_decimal_places(DEFAULT_CURRENCY));
-  } else {
-    // second value
-    if ($sales_report_view < statsSalesReportGraph::YEARLY_VIEW) {
-      echo round($report->info[$i]['avg'], $currencies->get_decimal_places(DEFAULT_CURRENCY));
+        if ($j == 0) {
+            // first value
+            echo round($report->info[$i]['sum'], $currencies->get_decimal_places(DEFAULT_CURRENCY));
+        } else {
+            // second value
+            if ($sales_report_view < statsSalesReportGraph::YEARLY_VIEW) {
+                echo round($report->info[$i]['avg'], $currencies->get_decimal_places(DEFAULT_CURRENCY));
+            }
+        }
+        echo ']';
+        if (($i + 1) < $report->size) {
+            echo ',' . "\n";
+        }
     }
-  }
-  echo ']';
-  if (($i + 1) < $report->size) {
-    echo ',' . "\n";
-  }
-}
-?>
+    ?>
 
           ]);
 
@@ -157,7 +157,11 @@ for ($i = 0; $i < $report->size; $i++) {
               'is3D': false,
               'width': 600,
               'height': 450,
-              'colors': ['<?php if ($j == 0) echo "#0000FF"; else echo "#FF0000"; ?>'],
+              'colors': ['<?php if ($j == 0) {
+                  echo '#0000FF';
+              } else {
+                  echo '#FF0000';
+              } ?>'],
               vAxis: {minValue: 0}
           };
 
@@ -200,24 +204,24 @@ for ($i = 0; $i < $report->size; $i++) {
               <tr class="dataTableHeadingRow">
                 <?php
                 $reportTextTitle = '';
-                Switch ($sales_report_view) {
-                    case statsSalesReportGraph::YEARLY_VIEW:
-                        $reportTextTitle = REPORT_TEXT_YEARLY_TITLE;
-                        break;
-                    case statsSalesReportGraph::MONTHLY_VIEW:
-                        $reportTextTitle = REPORT_TEXT_MONTHLY_TITLE;
-                        break;
-                    case statsSalesReportGraph::WEEKLY_VIEW:
-                        $reportTextTitle = REPORT_TEXT_WEEKLY_TITLE;
-                        break;
-                    case statsSalesReportGraph::DAILY_VIEW:
-                        $reportTextTitle = REPORT_TEXT_DAILY_TITLE;
-                        break;
-                    case statsSalesReportGraph::HOURLY_VIEW:
-                        $reportTextTitle = REPORT_TEXT_HOURLY_TITLE;
-                        break;
-                }
-                ?>
+switch ($sales_report_view) {
+    case statsSalesReportGraph::YEARLY_VIEW:
+        $reportTextTitle = REPORT_TEXT_YEARLY_TITLE;
+        break;
+    case statsSalesReportGraph::MONTHLY_VIEW:
+        $reportTextTitle = REPORT_TEXT_MONTHLY_TITLE;
+        break;
+    case statsSalesReportGraph::WEEKLY_VIEW:
+        $reportTextTitle = REPORT_TEXT_WEEKLY_TITLE;
+        break;
+    case statsSalesReportGraph::DAILY_VIEW:
+        $reportTextTitle = REPORT_TEXT_DAILY_TITLE;
+        break;
+    case statsSalesReportGraph::HOURLY_VIEW:
+        $reportTextTitle = REPORT_TEXT_HOURLY_TITLE;
+        break;
+}
+?>
                 <th class="dataTableHeadingContent"><?php echo $reportTextTitle ?></th>
                 <th class="dataTableHeadingContent text-center"><?php echo REPORT_TEXT_ORDERS; ?></th>
                 <th class="dataTableHeadingContent text-right"><?php echo REPORT_TEXT_CONVERSION_PER_ORDER; ?></th>
@@ -227,67 +231,67 @@ for ($i = 0; $i < $report->size; $i++) {
             </thead>
             <tbody>
                 <?php
-                $last_value = 0;
-                $sum = 0;
-                $avg = 0;
-                for ($i = 0; $i < $report->size; $i++) {
-                  if ($last_value != 0) {
-                    $percent = 100 * $report->info[$i]['sum'] / $last_value - 100;
-                  } else {
-                    $percent = "0";
-                  }
-                  $sum += $report->info[$i]['sum'];
-                  $avg += $report->info[$i]['avg'];
-                  $last_value = $report->info[$i]['sum'];
-                  ?>
+$last_value = 0;
+$sum = 0;
+$avg = 0;
+for ($i = 0; $i < $report->size; $i++) {
+    if ($last_value != 0) {
+        $percent = 100 * $report->info[$i]['sum'] / $last_value - 100;
+    } else {
+        $percent = '0';
+    }
+    $sum += $report->info[$i]['sum'];
+    $avg += $report->info[$i]['avg'];
+    $last_value = $report->info[$i]['sum'];
+    ?>
                 <tr class="dataTableRow">
                   <td class="dataTableContent">
                       <?php
-                      if (strlen($report->info[$i]['link']) > 0) {
-                        echo '<a href="' . zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->info[$i]['link']) . '">';
-                      }
-                      switch ($sales_report_view) {
-                          case statsSalesReportGraph::HOURLY_VIEW:
-                              echo $zcDate->output('%H', $report->info[$i]['startDates']) . ' - ' . $zcDate->output('%H', $report->info[$i]['endDates']) . (($i === 0) ? ' ' . $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) : '');
-                              break;
-                          case statsSalesReportGraph::DAILY_VIEW:
-                              echo $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']);
-                              break;
-                          case statsSalesReportGraph::WEEKLY_VIEW:
-                              echo $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) . " - " . $zcDate->output(DATE_FORMAT_SHORT, mktime(0, 0, 0, (int)date('m', $report->info[$i]['endDates']), date('d', $report->info[$i]['endDates']) - 1, (int)date('Y', $report->info[$i]['endDates'])));
-                              break;
-                          case statsSalesReportGraph::MONTHLY_VIEW:
-                              echo $zcDate->output(DATE_FORMAT_SHORT_NO_DAY, $report->info[$i]['startDates']);
-                              break;
-                          case statsSalesReportGraph::YEARLY_VIEW:
-                              echo $zcDate->output('%Y', $report->info[$i]['startDates']);
-                              break;
-                      }
-                      if (strlen($report->info[$i]['link']) > 0) {
-                        echo '</a>';
-                      }
-                      ?></td>
+        if (strlen((string) $report->info[$i]['link']) > 0) {
+            echo '<a href="' . zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->info[$i]['link']) . '">';
+        }
+    switch ($sales_report_view) {
+        case statsSalesReportGraph::HOURLY_VIEW:
+            echo $zcDate->output('%H', $report->info[$i]['startDates']) . ' - ' . $zcDate->output('%H', $report->info[$i]['endDates']) . (($i === 0) ? ' ' . $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) : '');
+            break;
+        case statsSalesReportGraph::DAILY_VIEW:
+            echo $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']);
+            break;
+        case statsSalesReportGraph::WEEKLY_VIEW:
+            echo $zcDate->output(DATE_FORMAT_SHORT, $report->info[$i]['startDates']) . ' - ' . $zcDate->output(DATE_FORMAT_SHORT, mktime(0, 0, 0, (int)date('m', $report->info[$i]['endDates']), date('d', $report->info[$i]['endDates']) - 1, (int)date('Y', $report->info[$i]['endDates'])));
+            break;
+        case statsSalesReportGraph::MONTHLY_VIEW:
+            echo $zcDate->output(DATE_FORMAT_SHORT_NO_DAY, $report->info[$i]['startDates']);
+            break;
+        case statsSalesReportGraph::YEARLY_VIEW:
+            echo $zcDate->output('%Y', $report->info[$i]['startDates']);
+            break;
+    }
+    if (strlen((string) $report->info[$i]['link']) > 0) {
+        echo '</a>';
+    }
+    ?></td>
                   <td class="dataTableContent text-center"><?php echo $report->info[$i]['count'] ?></td>
                   <td class="dataTableContent text-right"><?php echo $currencies->format($report->info[$i]['avg']) ?></td>
                   <td class="dataTableContent text-right"><?php echo $currencies->format($report->info[$i]['sum']) ?></td>
                   <td class="dataTableContent text-right">
                       <?php
-                      if ($percent == 0) {
-                        echo "---";
-                      } else {
-                        echo number_format($percent, 0) . "%";
-                      }
-                      ?>
+    if ($percent == 0) {
+        echo '---';
+    } else {
+        echo number_format($percent, 0) . '%';
+    }
+    ?>
                   </td>
                 </tr>
                 <?php
-              }
-              ?>
+}
+?>
             </tbody>
             <tfoot>
                 <?php
-                if (strlen($report->previous . " " . $report->next) > 1) {
-                  ?>
+  if (strlen($report->previous . ' ' . $report->next) > 1) {
+      ?>
                 <tr>
                   <td colspan="2">
                       <?php if (strlen($report->previous) > 0) { ?>
@@ -302,22 +306,22 @@ for ($i = 0; $i < $report->size; $i++) {
                   </td>
                 </tr>
                 <?php
-              }
-              ?>
+  }
+?>
             </tfoot>
           </table>
         </div>
         <table class="table">
             <?php if (!empty($order_cnt)) { /* This section of code does not appear to be executed */
-              ?>
+                ?>
             <tr class="dataTableRow">
               <td class="dataTableContent text-right"><?php echo '<strong>' . AVERAGE_ORDER . ' </strong>' ?></td>
               <td class="dataTableContent text-right"><?php echo $currencies->format($sum / $order_cnt) ?></td>
             </tr>
             <?php
-          }
-          if ($report->size != 0) {
-            ?>
+            }
+if ($report->size != 0) {
+    ?>
             <tr class="dataTableRow">
               <td class="dataTableContent text-right"><?php echo '<strong>' . $summary1 . ' </strong>' ?></td>
               <td class="dataTableContent text-right"><?php echo $currencies->format($sum / $report->size) ?></td>
@@ -335,37 +339,37 @@ for ($i = 0; $i < $report->size; $i++) {
           </tr>
           <?php
           if (empty($sales_report_filter)) {
-            for ($i = 0; $i < $report->status_available_size; $i++) {
-              $sales_report_filter .= "0";
-            }
+              for ($i = 0; $i < $report->status_available_size; $i++) {
+                  $sales_report_filter .= '0';
+              }
           }
-          for ($i = 0; $i < $report->status_available_size; $i++) {
-            ?>
+for ($i = 0; $i < $report->status_available_size; $i++) {
+    ?>
             <tr>
               <td class="dataTableContent text-left"><?php echo $report->status_available[$i]['text'] ?></td>
               <?php
-              if (substr($sales_report_filter, $i, 1) == "0") {
-                $tmp = substr($sales_report_filter, 0, $i) . "1" . substr($sales_report_filter, $i + 1, $report->status_available_size - ($i + 1));
-                $tmp = zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->filter_link . "&filter=" . $tmp);
-                ?>
+      if (substr((string) $sales_report_filter, $i, 1) == '0') {
+          $tmp = substr((string) $sales_report_filter, 0, $i) . '1' . substr((string) $sales_report_filter, $i + 1, $report->status_available_size - ($i + 1));
+          $tmp = zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->filter_link . '&filter=' . $tmp);
+          ?>
                 <td class="dataTableContent text-right col-sm-12">
                   <?php echo zen_icon('status-green', IMAGE_ICON_STATUS_GREEN) ?>&nbsp;
                   <a href="<?php echo $tmp; ?>"><?php echo zen_icon('status-red-light', IMAGE_ICON_STATUS_RED_LIGHT) ?></a></td>
                 <?php
-              } else {
-                $tmp = substr($sales_report_filter, 0, $i) . "0" . substr($sales_report_filter, $i + 1);
-                $tmp = zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->filter_link . "&filter=" . $tmp);
-                ?>
+      } else {
+          $tmp = substr((string) $sales_report_filter, 0, $i) . '0' . substr((string) $sales_report_filter, $i + 1);
+          $tmp = zen_href_link(FILENAME_STATS_SALES_REPORT_GRAPHS, $report->filter_link . '&filter=' . $tmp);
+          ?>
                 <td class="dataTableContent text-right col-sm-12">
                   <a href="<?php echo $tmp; ?>"><?php echo zen_icon('status-green-light', IMAGE_ICON_STATUS_GREEN) ?></a>
                   &nbsp;<?php echo zen_icon('status-red', IMAGE_ICON_STATUS_RED_LIGHT) ?></td>
                 <?php
-              }
-              ?>
+      }
+    ?>
             </tr>
             <?php
-          }
-          ?>
+}
+?>
         </table>
       </div>
       <!-- body_text_eof //-->

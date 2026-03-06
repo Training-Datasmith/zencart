@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * application_testing.php
  * Carry out some actions if we are using test framework
@@ -10,7 +12,7 @@
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-if  (isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] === 'Symfony BrowserKit') {
+if (isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] === 'Symfony BrowserKit') {
     define('ZENCART_TESTFRAMEWORK_RUNNING', true);
 }
 
@@ -34,10 +36,9 @@ foreach (array_unique($candidates) as $candidate) {
     }
 }
 if ($config === null) {
-  die($basePath . $user . '.' . $context . '.configure.php does not exist');
+    die($basePath . $user . '.' . $context . '.configure.php does not exist');
 }
 if (!defined('ZC_ADMIN_TWO_FACTOR_AUTHENTICATION_SERVICE')) {
     define('ZC_ADMIN_TWO_FACTOR_AUTHENTICATION_SERVICE', '');
 }
 require($config);
-

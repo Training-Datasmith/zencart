@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -19,26 +21,26 @@ class FmodRoundTest extends zcUnitTestCase
     /**
      * @dataProvider fmodRoundProvider
      */
-    public function testFmodRound($a, $b, $expected)
+    public function testFmodRound(float|int $a, float|int $b, int|float $expected): void
     {
         $this->assertEquals($expected, fmod_round($a, $b));
     }
 
-    public function fmodRoundProvider()
+    public function fmodRoundProvider(): array
     {
-        return array(
-            array(0.01, 0.01, 0),
-            array(0.02, 0.02, 0),
-            array(0.0003, 0.0003, 0),
-            array(0.1, 0.1, 0),
-            array(0.2, 0.2, 0),
-            array(0.3, 0.3, 0),
-            array(14, 0.00007, 0),
-            array(517.8, 17.26, 0),
-            array(400000, 800, 0),
-            array(7.3, 0.2, 0.1),
-            array(517.8, 17.27, .3),
-        );
+        return [
+            [0.01, 0.01, 0],
+            [0.02, 0.02, 0],
+            [0.0003, 0.0003, 0],
+            [0.1, 0.1, 0],
+            [0.2, 0.2, 0],
+            [0.3, 0.3, 0],
+            [14, 0.00007, 0],
+            [517.8, 17.26, 0],
+            [400000, 800, 0],
+            [7.3, 0.2, 0.1],
+            [517.8, 17.27, .3],
+        ];
     }
 
 }

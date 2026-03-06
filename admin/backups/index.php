@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 //
 // +----------------------------------------------------------------------+
 // |zen-cart Open Source E-commerce                                       |
@@ -21,7 +23,6 @@
 //
 
 // send to domain root
-    session_write_close();
-    header('Location: ' . 'http://' . $_SERVER['HTTP_HOST']);
-    exit();
-?>
+session_write_close();
+header('Location: ' . 'http://' . $_SERVER['HTTP_HOST']);
+exit();

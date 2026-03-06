@@ -48,12 +48,12 @@ $zen_admin_html_head_loaded = true;
     <link rel="stylesheet" href="<?php echo DIR_WS_INCLUDES ?>css/jAlert.css">
     <link rel="stylesheet" href="<?php echo DIR_WS_INCLUDES ?>css/menu.css">
     <link rel="stylesheet" href="<?php echo DIR_WS_INCLUDES ?>css/stylesheet.css">
-<?php if (file_exists($value = DIR_WS_INCLUDES . 'css/' . basename($PHP_SELF, '.php') . '.css')) { ?>
+<?php if (file_exists($value = DIR_WS_INCLUDES . 'css/' . basename((string) $PHP_SELF, '.php') . '.css')) { ?>
     <link rel="stylesheet" href="<?php echo $value; ?>">
 <?php
 }
 
-$page_base_name = basename($PHP_SELF, '.php');
+$page_base_name = basename((string) $PHP_SELF, '.php');
 
 foreach ($installedPlugins as $plugin) {
     if (is_object($plugin) && method_exists($plugin, 'getRelativePath') && method_exists($plugin, 'getAbsolutePath')) {
@@ -68,20 +68,20 @@ foreach ($installedPlugins as $plugin) {
     }
     $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/css/', '/^global_stylesheet/', '.css');
     foreach ($directory_array as $key => $value) {
-?>
+        ?>
         <link rel="stylesheet" href="<?php echo $relativeDir . 'admin/includes/css/' . $value; ?>">
 <?php
     }
 
     if (file_exists($absoluteDir  . 'admin/includes/css/' . $page_base_name . '.css')) {
-?>
+        ?>
         <link rel="stylesheet" href="<?php echo $relativeDir . 'admin/includes/css/' . $page_base_name . '.css'; ?>">
 <?php
     }
 
     $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/css/', '/^' . $page_base_name . '_/', '.css');
     foreach ($directory_array as $key => $value) {
-?>
+        ?>
         <link rel="stylesheet" href="<?php echo $relativeDir . 'admin/includes/css/' . $value; ?>">
 <?php
     }
@@ -95,7 +95,7 @@ foreach ($installedPlugins as $plugin) {
 
 $directory_array = $template->get_template_part(DIR_WS_INCLUDES . 'css/', '/^' . $page_base_name . '_/', '.css');
 foreach ($directory_array as $key => $value) {
-?>
+    ?>
     <link rel="stylesheet" href="<?php echo DIR_WS_INCLUDES ?>css/<?php echo $value; ?>">
 <?php
 }

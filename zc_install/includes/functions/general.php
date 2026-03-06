@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * zc_install general functions
  *
@@ -14,11 +16,11 @@ if (!defined('TABLE_UPGRADE_EXCEPTIONS')) {
 
 function zen_get_select_options(array $optionList, string|int $setDefault): string
 {
-    $optionString = "";
+    $optionString = '';
     foreach ($optionList as $option) {
         $optionString .= '<option value="' . $option['id'] . '"';
         if ((string)$setDefault === (string)$option['id']) {
-            $optionString .= " selected ";
+            $optionString .= ' selected ';
         }
         $optionString .= '>' . $option['text'];
         $optionString .= '</option>';
@@ -26,7 +28,7 @@ function zen_get_select_options(array $optionList, string|int $setDefault): stri
     return $optionString;
 }
 
-function logDetails(string $details, string $location = "General"): void
+function logDetails(string $details, string $location = 'General'): void
 {
     if (!isset($_SESSION['logfilename']) || $_SESSION['logfilename'] === '') {
         $_SESSION['logfilename'] = date('m-d-Y_h-i-s-') . zen_create_random_value(6);
@@ -60,7 +62,7 @@ function zen_rand(?int $min = null, ?int $max = null): int
 
 function zen_get_document_root(): string
 {
-    $dir_fs_www_root = realpath(dirname(basename(__FILE__)) . "/..");
+    $dir_fs_www_root = realpath(dirname(basename(__FILE__)) . '/..');
     if ($dir_fs_www_root === '') {
         $dir_fs_www_root = '/';
     }
@@ -70,7 +72,7 @@ function zen_get_document_root(): string
 function zen_get_http_server(): string
 {
     $host = $_SERVER['HTTP_HOST'];
-    $script = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
+    $script = explode('/', trim((string) $_SERVER['SCRIPT_NAME'], '/'));
     if (str_starts_with($script[0], '~')) {
         $host .= '/' . $script[0];
     }
@@ -108,7 +110,7 @@ function zen_parse_url(string $url, string $element = 'array', bool $detect_tild
 function zen_sanitize_request(): void
 {
     foreach ($_POST as $key => $value) {
-        $_POST[htmlspecialchars($key, ENT_COMPAT, 'UTF-8', false)] = addslashes($value);
+        $_POST[htmlspecialchars((string) $key, ENT_COMPAT, 'UTF-8', false)] = addslashes((string) $value);
     }
 }
 
@@ -125,14 +127,14 @@ function zen_output_string_protected(string $string): string
 function zen_get_install_languages_list(string $lng): string
 {
     global $languagesInstalled;
-    $optionString = "";
+    $optionString = '';
     foreach ($languagesInstalled as $code => $language) {
         $optionString .= '<option value="' . $code . '"';
         if ((string)$code === $lng) {
-            $optionString .= " selected ";
+            $optionString .= ' selected ';
         }
         $optionString .= '>' . $language['displayName'];
-        $optionString .= "</option>";
+        $optionString .= '</option>';
     }
     return $optionString;
 }
@@ -161,5 +163,3 @@ function getDetectedURIs($adminDir = 'admin'): array
 
     return [$adminDir, $documentRoot, $adminServer, $catalogHttpServer, $catalogHttpUrl, $catalogHttpsServer, $catalogHttpsUrl, $dir_ws_http_catalog, $dir_ws_https_catalog];
 }
-
-

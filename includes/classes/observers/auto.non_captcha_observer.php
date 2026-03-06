@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Designed for v1.5.7+
  *
@@ -13,7 +15,7 @@
 
 class zcObserverNonCaptchaObserver extends base
 {
-    private $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private string $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     public function __construct()
     {
@@ -34,7 +36,7 @@ class zcObserverNonCaptchaObserver extends base
     /**
      * @since ZC v1.5.7
      */
-    public function update(&$class, $eventID, $paramsArray)
+    public function update(&$class, $eventID, $paramsArray): void
     {
         $this->testURLSpam();
         $this->testAntiSpamFields();
@@ -43,7 +45,7 @@ class zcObserverNonCaptchaObserver extends base
     /**
      * @since ZC v1.5.7
      */
-    public function updateNotifyContactUsCaptchaCheck(&$class, $eventID, $paramsArray)
+    public function updateNotifyContactUsCaptchaCheck(&$class, $eventID, $paramsArray): void
     {
         // sanitize the contact-us name field more aggressively
         $GLOBALS['name'] = zen_db_prepare_input(zen_sanitize_string($_POST['contactname'] ?? ''));
@@ -65,9 +67,9 @@ class zcObserverNonCaptchaObserver extends base
     /**
      * @since ZC v1.5.7
      */
-    protected function generate_random_string($input, $strength = 16)
+    protected function generate_random_string($input, $strength = 16): string
     {
-        $input_length = strlen($input);
+        $input_length = strlen((string) $input);
         $random_string = '';
         for ($i = 0; $i < $strength; $i++) {
             $random_character = $input[random_int(0, $input_length - 1)];
@@ -110,23 +112,25 @@ class zcObserverNonCaptchaObserver extends base
         ];
 
         // prepare for inspection
-        $array_found = false; 
+        $array_found = false;
         foreach ($fields as $field) {
             if (!empty($_POST[$field])) {
                 if (is_array($_POST[$field])) {
-                   $array_found = true; 
-                   $_POST[$field] = '';
+                    $array_found = true;
+                    $_POST[$field] = '';
                 } else {
-                   $test_string .= $_POST[$field];
+                    $test_string .= $_POST[$field];
                 }
             }
         }
-        if ($array_found) { 
+        if ($array_found) {
             $GLOBALS['antiSpam'] = 'spam';
-            return; 
+            return;
         }
 
-        if (empty(trim($test_string))) return;
+        if (empty(trim($test_string))) {
+            return;
+        }
 
         $test_string = str_ireplace([HTTP_SERVER, HTTPS_SERVER], '', $test_string);
 

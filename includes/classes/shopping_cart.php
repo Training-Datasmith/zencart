@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Class for managing the Shopping Cart
  *
@@ -112,19 +114,19 @@ class shoppingCart extends base
             foreach ($this->contents as $uprid => $data) {
                 $uprid_db = zen_db_input($uprid);
                 $qty = $data['qty'];
-                $sql = "SELECT products_id
-                        FROM " . TABLE_CUSTOMERS_BASKET . "
-                        WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+                $sql = 'SELECT products_id
+                        FROM ' . TABLE_CUSTOMERS_BASKET . '
+                        WHERE customers_id = ' . (int)$_SESSION['customer_id'] . "
                         AND products_id = '" . $uprid_db . "'";
 
                 $product = $db->Execute($sql);
 
                 if ($product->EOF) {
                     $sql =
-                        "INSERT INTO " . TABLE_CUSTOMERS_BASKET . "
+                        'INSERT INTO ' . TABLE_CUSTOMERS_BASKET . '
                             (customers_id, products_id, customers_basket_quantity, customers_basket_date_added)
                          VALUES
-                            (" . (int)$_SESSION['customer_id'] . ", '$uprid_db', $qty, '" . date('Ymd') . "')";
+                            (' . (int)$_SESSION['customer_id'] . ", '$uprid_db', $qty, '" . date('Ymd') . "')";
 
                     $db->Execute($sql);
 
@@ -139,16 +141,16 @@ class shoppingCart extends base
                                 $attr_value = zen_db_input($attr_value);
                             }
                             $sql =
-                                "INSERT INTO " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
+                                'INSERT INTO ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . '
                                     (customers_id, products_id, products_options_id, products_options_value_id, products_options_value_text, products_options_sort_order)
                                  VALUES
-                                    (" . (int)$_SESSION['customer_id'] . ", '$uprid_db', '$option', '$value', '$attr_value', '$products_options_sort_order')";
+                                    (' . (int)$_SESSION['customer_id'] . ", '$uprid_db', '$option', '$value', '$attr_value', '$products_options_sort_order')";
 
                             $db->Execute($sql);
                         }
                     }
                 } else {
-                    $sql = "UPDATE " . TABLE_CUSTOMERS_BASKET . "
+                    $sql = 'UPDATE ' . TABLE_CUSTOMERS_BASKET . "
                             SET customers_basket_quantity = $qty
                             WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
                             AND products_id = '$uprid_db'";
@@ -161,10 +163,10 @@ class shoppingCart extends base
         // reset per-session cart contents, but not the database contents
         $this->reset(false);
 
-        $sql = "SELECT products_id, customers_basket_quantity
-                FROM " . TABLE_CUSTOMERS_BASKET . "
-                WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
-                ORDER BY customers_basket_id";
+        $sql = 'SELECT products_id, customers_basket_quantity
+                FROM ' . TABLE_CUSTOMERS_BASKET . '
+                WHERE customers_id = ' . (int)$_SESSION['customer_id'] . '
+                ORDER BY customers_basket_id';
         $products = $db->Execute($sql);
 
         foreach ($products as $next_product) {
@@ -175,9 +177,9 @@ class shoppingCart extends base
             $order_by = " ORDER BY LPAD(products_options_sort_order,11,'0')";
 
             $attributes = $db->Execute(
-                "SELECT products_options_id, products_options_value_id, products_options_value_text
-                   FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
-                  WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+                'SELECT products_options_id, products_options_value_id, products_options_value_text
+                   FROM ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . '
+                  WHERE customers_id = ' . (int)$_SESSION['customer_id'] . "
                     AND products_id = '" . zen_db_input($uprid) . "' " .
                     $order_by
             );
@@ -204,10 +206,9 @@ class shoppingCart extends base
      * if the customer is logged in)
      *
      * @param bool whether to reset customers db basket
-     * @return void
      * @since ZC v1.0.3
      */
-    public function reset($reset_database = false)
+    public function reset($reset_database = false): void
     {
         global $db;
         $this->notify('NOTIFIER_CART_RESET_START', null, $reset_database);
@@ -224,9 +225,9 @@ class shoppingCart extends base
         $this->free_shipping_weight = 0;
 
         if (zen_is_logged_in() && $reset_database) {
-            $sql = "DELETE FROM " . TABLE_CUSTOMERS_BASKET . " WHERE customers_id = " . (int)$_SESSION['customer_id'];
+            $sql = 'DELETE FROM ' . TABLE_CUSTOMERS_BASKET . ' WHERE customers_id = ' . (int)$_SESSION['customer_id'];
             $db->Execute($sql);
-            $sql = "DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " WHERE customers_id = " . (int)$_SESSION['customer_id'];
+            $sql = 'DELETE FROM ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . ' WHERE customers_id = ' . (int)$_SESSION['customer_id'];
             $db->Execute($sql);
         }
 
@@ -248,10 +249,9 @@ class shoppingCart extends base
      * @param float $qty the quantity of the item to be added
      * @param array $attributes any attributes that are attached to the product
      * @param bool $notify whether to add the product to the notify list
-     * @return void
      * @since ZC v1.0.3
      */
-    public function add_cart($product_id, $qty = 1, $attributes = [], $notify = true)
+    public function add_cart($product_id, $qty = 1, $attributes = [], $notify = true): void
     {
         global $db, $messageStack;
         if ($this->display_debug_messages) {
@@ -261,7 +261,7 @@ class shoppingCart extends base
             if (!zen_requires_attribute_selection($product_id)) {
                 // Build attributes array; determine correct qty
                 $attributes = [];
-                $query = $db->Execute("SELECT options_id, options_values_id FROM " . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = " . (int)$product_id);
+                $query = $db->Execute('SELECT options_id, options_values_id FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . (int)$product_id);
                 foreach ($query as $attr_rec) {
                     $attributes[$attr_rec['options_id']] = $attr_rec['options_values_id'];
                 }
@@ -303,10 +303,10 @@ class shoppingCart extends base
             // insert into database
             if (zen_is_logged_in() && !zen_in_guest_checkout()) {
                 $sql =
-                    "INSERT INTO " . TABLE_CUSTOMERS_BASKET . "
+                    'INSERT INTO ' . TABLE_CUSTOMERS_BASKET . '
                         (customers_id, products_id, customers_basket_quantity, customers_basket_date_added)
                     VALUES
-                        (" . (int)$_SESSION['customer_id'] . ", '$uprid_db', $qty, '" . date('Ymd') . "')";
+                        (' . (int)$_SESSION['customer_id'] . ", '$uprid_db', $qty, '" . date('Ymd') . "')";
                 $db->Execute($sql);
             }
 
@@ -318,15 +318,15 @@ class shoppingCart extends base
                     $attr_value = null;
                     $blank_value = false;
                     if (is_string($option) && str_starts_with($option, TEXT_PREFIX)) {
-                        if (trim($value) === '') {
+                        if (trim((string) $value) === '') {
                             $blank_value = true;
                         } else {
-                            $option = substr((string)$option, strlen(TEXT_PREFIX));
-                            $attr_value = stripslashes($value);
+                            $option = substr($option, strlen(TEXT_PREFIX));
+                            $attr_value = stripslashes((string) $value);
                             $value = PRODUCTS_OPTIONS_VALUES_TEXT_ID;
 
                             // Validate max-length of TEXT attribute
-                            $check = $db->Execute("SELECT products_options_length FROM " . TABLE_PRODUCTS_OPTIONS . " WHERE products_options_id = " . (int)$option . " LIMIT 1");
+                            $check = $db->Execute('SELECT products_options_length FROM ' . TABLE_PRODUCTS_OPTIONS . ' WHERE products_options_id = ' . (int)$option . ' LIMIT 1');
                             if (!$check->EOF) {
                                 if (strlen($attr_value) > (int)$check->fields['products_options_length']) {
                                     $attr_value = zen_trunc_string($attr_value, (int)$check->fields['products_options_length'], '');
@@ -338,7 +338,7 @@ class shoppingCart extends base
 
                     if ($blank_value === false) {
                         if (is_array($value)) {
-                            foreach ($value as $opt => $val) {
+                            foreach ($value as $val) {
                                 $this->contents[$uprid]['attributes'][$option . '_chk' . $val] = $val;
                             }
                         } else {
@@ -353,7 +353,7 @@ class shoppingCart extends base
                                     $products_options_sort_order = zen_get_attributes_options_sort_order($prid, $option, $opt);
                                     $val = (int)$val;
                                     $sql =
-                                        "INSERT INTO " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
+                                        'INSERT INTO ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
                                             (customers_id, products_id, products_options_id, products_options_value_id, products_options_sort_order)
                                         VALUES
                                             ($customer_id, '$uprid_db', '" . $option . '_chk' . $val . "', $val, '$products_options_sort_order')";
@@ -365,7 +365,7 @@ class shoppingCart extends base
                                 }
                                 $products_options_sort_order = zen_get_attributes_options_sort_order($prid, $option, $value);
                                 $sql =
-                                    "INSERT INTO " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
+                                    'INSERT INTO ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
                                         (customers_id, products_id, products_options_id, products_options_value_id, products_options_value_text, products_options_sort_order)
                                      VALUES
                                         ($customer_id, '$uprid_db', '$option', " . (int)$value . ", '$attr_value', '$products_options_sort_order')";
@@ -396,7 +396,7 @@ class shoppingCart extends base
      * @return bool
      * @since ZC v1.0.3
      */
-    function update_quantity($uprid, $quantity = 0, $attributes = [])
+    public function update_quantity(string $uprid, $quantity = 0, $attributes = [])
     {
         global $db, $messageStack;
         if ($this->display_debug_messages) {
@@ -432,7 +432,7 @@ class shoppingCart extends base
 
         if (zen_is_logged_in() && !zen_in_guest_checkout()) {
             $sql =
-                "UPDATE " . TABLE_CUSTOMERS_BASKET . "
+                'UPDATE ' . TABLE_CUSTOMERS_BASKET . "
                     SET customers_basket_quantity = '" . (float)$quantity . "'
                   WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
                     AND products_id = '$uprid_db'";
@@ -447,11 +447,11 @@ class shoppingCart extends base
                 $attr_value = null;
                 $blank_value = false;
                 if (is_string($option) && str_starts_with($option, TEXT_PREFIX)) {
-                    if (trim($value) === '') {
+                    if (trim((string) $value) === '') {
                         $blank_value = true;
                     } else {
                         $option = substr($option, strlen(TEXT_PREFIX));
-                        $attr_value = stripslashes($value);
+                        $attr_value = stripslashes((string) $value);
                         $value = PRODUCTS_OPTIONS_VALUES_TEXT_ID;
                         $this->contents[$uprid]['attributes_values'][$option] = $attr_value;
                     }
@@ -459,7 +459,7 @@ class shoppingCart extends base
 
                 if ($blank_value === false) {
                     if (is_array($value)) {
-                        foreach ($value as $opt => $val) {
+                        foreach ($value as $val) {
                             $this->contents[$uprid]['attributes'][$option . '_chk' . $val] = $val;
                         }
                     } else {
@@ -474,7 +474,7 @@ class shoppingCart extends base
                             foreach ($value as $opt => $val) {
                                 $products_options_sort_order = zen_get_attributes_options_sort_order($prid, $option, $opt);
                                 $sql =
-                                    "UPDATE " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
+                                    'UPDATE ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
                                         SET products_options_value_id = '" . (int)$val . "'
                                       WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
                                         AND products_id = '$uprid_db'
@@ -483,8 +483,8 @@ class shoppingCart extends base
                             }
                         } else {
                             $sql =
-                                "UPDATE " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
-                                    SET products_options_value_id = " . (int)$value . ", products_options_value_text = '$attr_value'
+                                'UPDATE ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . '
+                                    SET products_options_value_id = ' . (int)$value . ", products_options_value_text = '$attr_value'
                                   WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
                                     AND products_id = '$uprid_db'
                                     AND products_options_id = '" . (int)$option . "'"; // intentionally passing a string
@@ -506,10 +506,9 @@ class shoppingCart extends base
      * all items that have reached this state. The database-stored cart
      * is also updated where necessary
      *
-     * @return void
      * @since ZC v1.0.3
      */
-    function cleanup()
+    public function cleanup(): void
     {
         $this->notify('NOTIFIER_CART_CLEANUP_START');
         foreach ($this->contents as $key => $data) {
@@ -535,14 +534,14 @@ class shoppingCart extends base
 
         if (zen_is_logged_in() && !zen_in_guest_checkout()) {
             $sql =
-                "DELETE FROM " . TABLE_CUSTOMERS_BASKET . "
-                  WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+                'DELETE FROM ' . TABLE_CUSTOMERS_BASKET . '
+                  WHERE customers_id = ' . (int)$_SESSION['customer_id'] . "
                     AND products_id = '$uprid'";
             $db->Execute($sql);
 
             $sql =
-                "DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
-                  WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
+                'DELETE FROM ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . '
+                  WHERE customers_id = ' . (int)$_SESSION['customer_id'] . "
                     AND products_id = '$uprid'";
             $db->Execute($sql);
         }
@@ -559,7 +558,7 @@ class shoppingCart extends base
      * @return int|float total number of items in cart
      * @since ZC v1.0.3
      */
-    public function count_contents()
+    public function count_contents(): int|float
     {
         $this->notify('NOTIFIER_CART_COUNT_CONTENTS_START');
         $total_items = 0;
@@ -598,10 +597,9 @@ class shoppingCart extends base
      * Check whether a product exists in the cart
      *
      * @param mixed $uprid product ID of product to check
-     * @return boolean
      * @since ZC v1.0.3
      */
-    public function in_cart($uprid)
+    public function in_cart($uprid): bool
     {
         $this->notify('NOTIFIER_CART_IN_CART_START', null, $uprid);
         if (isset($this->contents[$uprid])) {
@@ -617,10 +615,9 @@ class shoppingCart extends base
      * Remove a product from the cart
      *
      * @param string|int $uprid product ID of product to remove
-     * @return void
      * @since ZC v1.0.3
      */
-    public function remove($uprid)
+    public function remove($uprid): void
     {
         $this->notify('NOTIFIER_CART_REMOVE_START', null, $uprid);
         $this->removeUprid(zen_db_input($uprid));
@@ -634,7 +631,7 @@ class shoppingCart extends base
      * Remove all products from the cart
      * @since ZC v1.0.3
      */
-    public function remove_all()
+    public function remove_all(): void
     {
         $this->notify('NOTIFIER_CART_REMOVE_ALL_START');
         $this->reset();
@@ -648,7 +645,7 @@ class shoppingCart extends base
      * @return string csv
      * @since ZC v1.0.3
      */
-    public function get_product_id_list()
+    public function get_product_id_list(): string
     {
         if (!is_array($this->contents)) {
             return '';
@@ -677,8 +674,8 @@ class shoppingCart extends base
             return 0;
         }
 
-// By default, Price Factor is based on Price and is called from function zen_get_attributes_price_factor
-// Setting a define for ATTRIBUTES_PRICE_FACTOR_FROM_SPECIAL to 1 to calculate the Price Factor from Special rather than Price switches this to be based on Special, if it exists
+        // By default, Price Factor is based on Price and is called from function zen_get_attributes_price_factor
+        // Setting a define for ATTRIBUTES_PRICE_FACTOR_FROM_SPECIAL to 1 to calculate the Price Factor from Special rather than Price switches this to be based on Special, if it exists
         zen_define_default('ATTRIBUTES_PRICE_FACTOR_FROM_SPECIAL', 1);
         foreach ($this->contents as $uprid => $data) {
             $total_before_discounts = 0;
@@ -690,7 +687,7 @@ class shoppingCart extends base
             $qty = $data['qty'];
             $prid = zen_get_prid($uprid);
 
-            $product = (new Product((int)$prid))->withDefaultLanguage()->getData();
+            $product = (new Product($prid))->withDefaultLanguage()->getData();
             if (empty($product)) {
                 $this->removeUprid($uprid);
                 continue;
@@ -743,7 +740,7 @@ class shoppingCart extends base
             $productTotal += $products_price;
             $this->weight += ($qty * $products_weight);
 
-// ****** WARNING NEED TO ADD ATTRIBUTES AND QTY
+            // ****** WARNING NEED TO ADD ATTRIBUTES AND QTY
             // calculate Product Price without Specials, Sales or Discounts
             $total_before_discounts += zen_str_to_numeric($products_raw_price);
 
@@ -818,8 +815,8 @@ class shoppingCart extends base
 
                     // adjust for downloads
                     // adjust products price
-                    $sql = "SELECT products_attributes_id
-                            FROM " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
+                    $sql = 'SELECT products_attributes_id
+                            FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
                             WHERE products_attributes_id = $attributes_id";
                     $check_download = $db->Execute($sql, 1);
                     if (!$check_download->EOF) {
@@ -995,7 +992,7 @@ class shoppingCart extends base
                 $this->free_shipping_price += zen_add_tax($totalOnetimeCharge, $products_tax);
             }
 
-// ******* WARNING ADD ONE TIME ATTRIBUTES, PRICE FACTOR
+            // ******* WARNING ADD ONE TIME ATTRIBUTES, PRICE FACTOR
             // calculate Product Price without Specials, Sales or Discounts
             $total_before_discounts = $total_before_discounts * $qty;
             $total_before_discounts += $totalOnetimeChargeNoDiscount;
@@ -1010,7 +1007,7 @@ class shoppingCart extends base
      * @return float the price of the item's attributes
      * @since ZC v1.0.3
      */
-    public function attributes_price($uprid)
+    public function attributes_price($uprid): float|int
     {
         global $db, $currencies;
 
@@ -1133,7 +1130,7 @@ class shoppingCart extends base
      * @return float the price of the items attributes
      * @since ZC v1.2.0d
      */
-    public function attributes_price_onetime_charges($uprid, $qty)
+    public function attributes_price_onetime_charges($uprid, $qty): float|int
     {
         $this->notify('NOTIFY_CART_ATTRIBUTES_PRICE_ONETIME_CHARGES_START', $uprid);
 
@@ -1195,7 +1192,7 @@ class shoppingCart extends base
      * @return float the weight of the items attributes
      * @since ZC v1.0.3
      */
-    public function attributes_weight($uprid)
+    public function attributes_weight($uprid): float|int
     {
         if (!isset($this->contents[$uprid]['attributes'])) {
             return 0;
@@ -1247,7 +1244,7 @@ class shoppingCart extends base
         $products_array = [];
         foreach ($this->contents as $uprid => $data) {
             $prid = zen_get_prid($uprid);
-            $product = (new Product((int)$prid))->withDefaultLanguage()->getData();
+            $product = (new Product($prid))->withDefaultLanguage()->getData();
             if (empty($product)) {
                 $this->removeUprid($uprid);
                 continue;
@@ -1315,6 +1312,7 @@ class shoppingCart extends base
                 }
 
                 // check only if valid products_status
+                // Check Quantity Max if not already an error on Minimum
                 if ($fix_once === 0) {
                     $check_quantity = $data['qty'];
                     $check_quantity_min = $product['products_quantity_order_min'];
@@ -1322,10 +1320,6 @@ class shoppingCart extends base
                     if ($new_check_quantity = $this->in_cart_mixed($prid)) {
                         $check_quantity = $new_check_quantity;
                     }
-                }
-
-                // Check Quantity Max if not already an error on Minimum
-                if ($fix_once === 0) {
                     if ($product['products_quantity_order_max'] != 0 && $check_quantity > $product['products_quantity_order_max'] && !isset($this->flag_duplicate_quantity_msgs_set[$prid]['max'])) {
                         $fix_once++;
                         $_SESSION['valid_to_checkout'] = false;
@@ -1378,10 +1372,10 @@ class shoppingCart extends base
 
             // convert quantity to proper decimals
             $precision = QUANTITY_DECIMALS > 0 ? (int)QUANTITY_DECIMALS : 0;
-            if ($precision === 0 || !str_contains($data['qty'], '.')) {
+            if ($precision === 0 || !str_contains((string) $data['qty'], '.')) {
                 $new_qty = $data['qty'];
             } else {
-                $new_qty = rtrim($data['qty'], '0');
+                $new_qty = rtrim((string) $data['qty'], '0');
             }
             $check_unit_decimals = $product['products_quantity_order_units'];
             if (!str_contains($check_unit_decimals, '.')) {
@@ -1477,7 +1471,7 @@ class shoppingCart extends base
      * @return string cart ID
      * @since ZC v1.0.3
      */
-    public function generate_cart_id($length = 5)
+    public function generate_cart_id(int $length = 5): string|false
     {
         return zen_create_random_value($length, 'digits');
     }
@@ -1489,7 +1483,7 @@ class shoppingCart extends base
      * @return string
      * @since ZC v1.0.3
      */
-    public function get_content_type($gv_only = false)
+    public function get_content_type($gv_only = false): float|int|string|false
     {
         global $db;
 
@@ -1511,12 +1505,12 @@ class shoppingCart extends base
                 $free_ship_check = (new Product($prid))->withDefaultLanguage()->getData();
 
                 if (str_starts_with($free_ship_check['products_model'] ?? '', 'GIFT')) {
-// @TODO - fix GIFT price in cart special/attribute
+                    // @TODO - fix GIFT price in cart special/attribute
                     $gift_special = zen_get_products_special_price($prid, true);
                     $gift_pba = zen_get_products_price_is_priced_by_attributes($prid);
                     $gift_price = zen_get_retail_or_wholesale_price($free_ship_check['products_price'], $free_ship_check['products_price_w']);
                     if ($gift_special !== false) {
-                        if (!$gift_pba && !empty($gift_special) && (string)$gift_special !== (string)$gift_price) {
+                        if (!$gift_pba && !empty($gift_special) && (string)$gift_special !== $gift_price) {
                             $gift_voucher += ($gift_special * $data['qty']);
                         } else {
                             $gift_voucher += (zen_str_to_numeric($gift_price) + $this->attributes_price($uprid)) * $data['qty'];
@@ -1530,9 +1524,9 @@ class shoppingCart extends base
                 // Example: Product with download
                 if (isset($data['attributes']) && $free_ship_check['product_is_always_free_shipping'] !== '2') {
                     foreach ($data['attributes'] as $value) {
-                        $sql = "SELECT COUNT(*) as total
-                                FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                                INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad USING (products_attributes_id)
+                        $sql = 'SELECT COUNT(*) as total
+                                FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+                                INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad USING (products_attributes_id)
                                 WHERE pa.products_id = $prid
                                 AND pa.options_values_id = " . (int)$value;
 
@@ -1680,7 +1674,7 @@ class shoppingCart extends base
      * @return int number of items matching constraint
      * @since ZC v1.1.0
      */
-    public function in_cart_check($check_what, $check_value = '1')
+    public function in_cart_check($check_what, $check_value = '1'): float|int
     {
         // if nothing is in cart return 0
         if (!is_array($this->contents)) {
@@ -1765,7 +1759,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionUpdateProduct($goto, $parameters)
+    public function actionUpdateProduct($goto, $parameters): void
     {
         global $messageStack;
         if ($this->display_debug_messages) {
@@ -1874,12 +1868,7 @@ class shoppingCart extends base
                             $adjust_max = 'true';
                             $new_qty = $add_max;
                             break;
-                        case ($chk_mixed == true && ($add_max - $cart_qty + $new_qty) >= $add_max && $new_qty > $add_max):
-                            $adjust_max = 'true';
-                            $requested_qty = $new_qty;
-                            $alter_qty = $add_max - $cart_qty + $current_qty;
-                            $new_qty = ($alter_qty > 0) ? $alter_qty : $current_qty;
-                            break;
+                        case $chk_mixed == true && ($add_max - $cart_qty + $new_qty) >= $add_max && $new_qty > $add_max:
                         case ($chk_mixed === true && ($cart_qty + $new_qty - $current_qty) > $add_max):
                             $adjust_max = 'true';
                             $requested_qty = $new_qty;
@@ -1932,7 +1921,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionAddProduct($goto, $parameters = [])
+    public function actionAddProduct($goto, $parameters = []): void
     {
         global $db, $messageStack;
         if ($this->display_debug_messages) {
@@ -1955,7 +1944,7 @@ class shoppingCart extends base
                 //
                 foreach ($_POST['id'] as $key => $value) {
                     if (zen_get_attributes_valid($_POST['products_id'], $key, $value) === false) {
-                        if (str_starts_with($key, TEXT_PREFIX) === true && $value === '') {
+                        if (str_starts_with((string) $key, TEXT_PREFIX) === true && $value === '') {
                             $selection_text = '';
                             $value_text = ' ' . ltrim(TEXT_INVALID_USER_INPUT, ' ');
                         } else {
@@ -2062,14 +2051,14 @@ class shoppingCart extends base
                                 $products_options_file->set_destination(DIR_FS_UPLOADS);
                                 $products_options_file->set_output_messages('session');
                                 if ($products_options_file->parse($text_prefix)) {
-                                    $products_image_extension = substr($products_options_file->filename, strrpos($products_options_file->filename, '.'));
+                                    $products_image_extension = substr((string) $products_options_file->filename, strrpos((string) $products_options_file->filename, '.'));
                                     if (zen_is_logged_in()) {
-                                        $db->Execute("INSERT INTO " . TABLE_FILES_UPLOADED . " (sesskey, customers_id, files_uploaded_name) VALUES ('" . zen_session_id() . "', " . (int)$_SESSION['customer_id'] . ", '" . zen_db_input($products_options_file->filename) . "')");
+                                        $db->Execute('INSERT INTO ' . TABLE_FILES_UPLOADED . " (sesskey, customers_id, files_uploaded_name) VALUES ('" . zen_session_id() . "', " . (int)$_SESSION['customer_id'] . ", '" . zen_db_input($products_options_file->filename) . "')");
                                     } else {
-                                        $db->Execute("INSERT INTO " . TABLE_FILES_UPLOADED . " (sesskey, files_uploaded_name) VALUES ('" . zen_session_id() . "', '" . zen_db_input($products_options_file->filename) . "')");
+                                        $db->Execute('INSERT INTO ' . TABLE_FILES_UPLOADED . " (sesskey, files_uploaded_name) VALUES ('" . zen_session_id() . "', '" . zen_db_input($products_options_file->filename) . "')");
                                     }
                                     $insert_id = $db->Insert_ID();
-                                    $real_ids[$text_prefix] = $insert_id . ". " . $products_options_file->filename;
+                                    $real_ids[$text_prefix] = $insert_id . '. ' . $products_options_file->filename;
                                     $products_options_file->set_filename($insert_id . $products_image_extension);
                                     if (!($products_options_file->save())) {
                                         break;
@@ -2141,7 +2130,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionBuyNow($goto, $parameters = [])
+    public function actionBuyNow($goto, $parameters = []): void
     {
         global $messageStack;
         if ($this->display_debug_messages) {
@@ -2206,7 +2195,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionMultipleAddProduct($goto, $parameters = [])
+    public function actionMultipleAddProduct($goto, $parameters = []): void
     {
         global $messageStack;
         if ($this->display_debug_messages) {
@@ -2296,7 +2285,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionNotify($goto, $parameters = ['ignored'])
+    public function actionNotify($goto, $parameters = ['ignored']): void
     {
         global $db;
         if (zen_is_logged_in() && !zen_in_guest_checkout()) {
@@ -2310,10 +2299,10 @@ class shoppingCart extends base
             }
             foreach ($notify as $product_id) {
                 $sql =
-                    "INSERT IGNORE INTO " . TABLE_PRODUCTS_NOTIFICATIONS . "
+                    'INSERT IGNORE INTO ' . TABLE_PRODUCTS_NOTIFICATIONS . '
                         (products_id, customers_id, date_added)
                      VALUES
-                        (" . (int)$product_id . ", " . (int)$_SESSION['customer_id'] . ", now())";
+                        (' . (int)$product_id . ', ' . (int)$_SESSION['customer_id'] . ', now())';
                 $db->Execute($sql);
             }
             zen_redirect(zen_href_link($_GET['main_page'], zen_get_all_get_params(['action', 'notify', 'main_page'])));
@@ -2332,14 +2321,14 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionNotifyRemove($goto, $parameters = ['ignored'])
+    public function actionNotifyRemove($goto, $parameters = ['ignored']): void
     {
         global $db;
         if (zen_is_logged_in() && !zen_in_guest_checkout() && isset($_GET['products_id'])) {
             $sql =
-                "DELETE FROM " . TABLE_PRODUCTS_NOTIFICATIONS . "
-                  WHERE products_id = " . (int)$_GET['products_id'] . "
-                    AND customers_id = " . (int)$_SESSION['customer_id'];
+                'DELETE FROM ' . TABLE_PRODUCTS_NOTIFICATIONS . '
+                  WHERE products_id = ' . (int)$_GET['products_id'] . '
+                    AND customers_id = ' . (int)$_SESSION['customer_id'];
             $db->Execute($sql, 1);
             zen_redirect(zen_href_link($_GET['main_page'], zen_get_all_get_params(['action', 'main_page'])));
         }
@@ -2355,7 +2344,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionCustomerOrder($goto, $parameters)
+    public function actionCustomerOrder($goto, array|string $parameters): void
     {
         global $messageStack;
         if ($this->display_debug_messages) {
@@ -2388,7 +2377,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionRemoveProduct($goto, $parameters)
+    public function actionRemoveProduct($goto, array|string $parameters): void
     {
         if (!empty($_GET['product_id'])) {
             $this->remove($_GET['product_id']);
@@ -2405,7 +2394,7 @@ class shoppingCart extends base
      * @param array $parameters URL parameters to ignore
      * @since ZC v1.3.0
      */
-    public function actionCartUserAction($goto, $parameters)
+    public function actionCartUserAction($goto, $parameters): void
     {
         $this->notify('NOTIFY_CART_USER_ACTION', null, $goto, $parameters);
     }
@@ -2455,7 +2444,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_check_attrib_quantity($check_option_id, $check_option_values_id)
+    public function in_cart_check_attrib_quantity($check_option_id, $check_option_values_id): float|int
     {
         // if nothing is in cart return 0
         if (!is_array($this->contents)) {
@@ -2487,12 +2476,12 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_price($product_id)
+    public function in_cart_product_total_price($product_id): int|float
     {
         $products = $this->get_products();
         $in_cart_product_price = 0;
 
-        foreach ($products as $key => $val) {
+        foreach ($products as $val) {
             if ((int)$product_id === (int)$val['id']) {
                 $in_cart_product_price += ($val['final_price'] * $val['quantity']) + $val['onetime_charges'];
             }
@@ -2509,12 +2498,12 @@ class shoppingCart extends base
      * @return int|mixed
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_quantity($product_id)
+    public function in_cart_product_total_quantity($product_id): float|int
     {
         $products = $this->get_products();
 
         $in_cart_product_quantity = 0;
-        foreach ($products as $key => $val) {
+        foreach ($products as $val) {
             if ((int)$product_id === (int)$val['id']) {
                 $in_cart_product_quantity += $val['quantity'];
             }
@@ -2531,7 +2520,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_weight($product_id)
+    public function in_cart_product_total_weight($product_id): int|float
     {
         $products = $this->get_products();
         $in_cart_product_weight = 0;
@@ -2552,7 +2541,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_weight_category($category_id)
+    public function in_cart_product_total_weight_category($category_id): int|float
     {
         $products = $this->get_products();
         $in_cart_product_weight = 0;
@@ -2570,15 +2559,14 @@ class shoppingCart extends base
      * USAGE:  $chk_category_cart_total_price_cat = $_SESSION['cart']->in_cart_product_total_price_category(9);
      *
      * @param int $category_id
-     * @return float|int
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_price_category($category_id)
+    public function in_cart_product_total_price_category($category_id): int|float
     {
         $products = $this->get_products();
         $in_cart_product_price = 0;
 
-        foreach ($products as $key => $val) {
+        foreach ($products as $val) {
             if ((int)$val['category'] === (int)$category_id) {
                 $in_cart_product_price += ($val['final_price'] * $val['quantity']) + $val['onetime_charges'];
             }
@@ -2595,12 +2583,12 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_quantity_category($category_id)
+    public function in_cart_product_total_quantity_category($category_id): float|int
     {
         $products = $this->get_products();
 
         $in_cart_product_quantity = 0;
-        foreach ($products as $key => $val) {
+        foreach ($products as $val) {
             if ((int)$val['category'] === (int)$category_id) {
                 $in_cart_product_quantity += $val['quantity'];
             }
@@ -2620,7 +2608,7 @@ class shoppingCart extends base
     public function in_cart_product_total_weight_category_sub($category_id)
     {
         if (!zen_has_category_subcategories($category_id)) {
-           return $this->in_cart_product_total_weight_category($category_id);
+            return $this->in_cart_product_total_weight_category($category_id);
         }
 
         $subcategories_array = [];
@@ -2689,10 +2677,9 @@ class shoppingCart extends base
      *
      * @param int|string $product_id
      * @param bool $chk
-     * @return array|bool
      * @since ZC v1.5.6
      */
-    public function in_cart_product_mixed_changed($product_id, $chk = false)
+    public function in_cart_product_mixed_changed($product_id, $chk = false): true|array
     {
         global $db;
 

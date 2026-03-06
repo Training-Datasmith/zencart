@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $define = [
     'MODULE_ORDER_TOTAL_COUPON_TITLE' => 'Discount Coupon',
     'MODULE_ORDER_TOTAL_COUPON_HEADER' => TEXT_GV_NAMES . '/Discount Coupon',

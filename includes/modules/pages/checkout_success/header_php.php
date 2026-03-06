@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * checkout_success header_php.php
  *
@@ -16,7 +18,7 @@ if (!zen_is_logged_in()) {
     zen_redirect(zen_href_link(FILENAME_TIME_OUT));
 }
 
-$customer = new Customer;
+$customer = new Customer();
 
 if (!isset($_GET['action']) || $_GET['action'] !== 'confirm') {
     require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
@@ -112,7 +114,7 @@ if (!isset($_GET['action']) || $_GET['action'] !== 'confirm') {
             $notificationsArray[] = [
                 'counter' => $counter,
                 'products_id' => $product['products_id'],
-                'products_name' => $product['products_name']
+                'products_name' => $product['products_name'],
             ];
             $counter++;
         }
@@ -160,10 +162,10 @@ if (!isset($_GET['action']) || $_GET['action'] !== 'confirm') {
         '<div style="text-align: center;  width: 600px;  margin-left: auto;  margin-right: auto; margin-top:20%;">
          <p>This page will automatically redirect you back to ' . STORE_NAME . ' for your order confirmation details.<br>If you are not redirected within 5 seconds, please click the button below to continue.</p>' .
         "\n" .
-        '<form action="' . zen_href_link(FILENAME_CHECKOUT_SUCCESS, zen_get_all_get_params(array('action')), 'SSL', false) . '" method="post" name="formpost">' . "\n";
+        '<form action="' . zen_href_link(FILENAME_CHECKOUT_SUCCESS, zen_get_all_get_params(['action']), 'SSL', false) . '" method="post" name="formpost">' . "\n";
     foreach ($_POST as $key => $value) {
         if (!is_array($_POST[$key])) {
-            echo zen_draw_hidden_field($key, htmlspecialchars(stripslashes($value), ENT_COMPAT, CHARSET, true)) . "\n";
+            echo zen_draw_hidden_field($key, htmlspecialchars(stripslashes((string) $value), ENT_COMPAT, CHARSET, true)) . "\n";
         }
     }
     if (!isset($_POST['securityToken'])) {

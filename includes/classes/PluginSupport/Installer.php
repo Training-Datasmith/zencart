@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -15,7 +17,7 @@ class Installer
     protected string $pluginDir;
     protected string $pluginKey;
     protected string $version;
-    protected ?string $oldVersion;
+    protected ?string $oldVersion = null;
 
     public function __construct(protected SqlPatchInstaller $patchInstaller, protected ScriptedInstallerFactory $scriptedInstallerFactory, protected PluginErrorContainer $errorContainer)
     {
@@ -98,7 +100,7 @@ class Installer
     /**
      * @since ZC v1.5.7
      */
-    protected function executePatchFile($pluginDir, $patchFile): void
+    protected function executePatchFile(string $pluginDir, string $patchFile): void
     {
         if (!file_exists($pluginDir . '/Installer/' . $patchFile)) {
             return;
@@ -114,7 +116,7 @@ class Installer
     /**
      * @since ZC v1.5.7
      */
-    protected function executeScriptedInstaller($pluginDir): void
+    protected function executeScriptedInstaller(string $pluginDir): void
     {
         if (!file_exists($pluginDir . '/Installer/ScriptedInstaller.php')) {
             return;
@@ -127,7 +129,7 @@ class Installer
     /**
      * @since ZC v1.5.7
      */
-    protected function executeScriptedUninstaller($pluginDir): void
+    protected function executeScriptedUninstaller(string $pluginDir): void
     {
         if (!file_exists($pluginDir . '/Installer/ScriptedInstaller.php')) {
             return;
@@ -140,7 +142,7 @@ class Installer
     /**
      * @since ZC v1.5.8
      */
-    protected function executeScriptedUpgrader($pluginDir, $oldVersion): void
+    protected function executeScriptedUpgrader(string $pluginDir, $oldVersion): void
     {
         if (!file_exists($pluginDir . '/Installer/ScriptedInstaller.php')) {
             return;

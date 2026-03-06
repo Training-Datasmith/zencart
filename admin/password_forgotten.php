@@ -11,12 +11,12 @@ define('ADMIN_PWD_TOKEN_DURATION', (24 * 60 * 60));
 /////////
 require 'includes/application_top.php';
 if (isset($_POST['action']) && $_POST['action'] == 'login') {
-  zen_redirect(zen_href_link(FILENAME_LOGIN));
+    zen_redirect(zen_href_link(FILENAME_LOGIN));
 }
 // Slam prevention:
 if (isset($_SESSION['login_attempt']) && $_SESSION['login_attempt'] > 9) {
-  header('HTTP/1.1 406 Not Acceptable');
-  exit(0);
+    header('HTTP/1.1 406 Not Acceptable');
+    exit(0);
 }
 $error = false;
 $resetToken = '';
@@ -26,16 +26,16 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $error = true;
         $email_message = ERROR_WRONG_EMAIL_NULL;
     }
-    $sql = "SELECT admin_id, admin_name, admin_email, admin_pass, lockout_expires
-            FROM " . TABLE_ADMIN . "
-            WHERE admin_email = :admEmail:";
+    $sql = 'SELECT admin_id, admin_name, admin_email, admin_pass, lockout_expires
+            FROM ' . TABLE_ADMIN . '
+            WHERE admin_email = :admEmail:';
     $sql = $db->bindVars($sql, ':admEmail:', $_POST['admin_email'], 'string');
     $emailResult = $db->Execute($sql);
 
     if (!empty($_POST['admin_username'])) {
-        $sql = "SELECT admin_id, admin_name, admin_email, admin_pass, lockout_expires
-                FROM " . TABLE_ADMIN . "
-                WHERE admin_email = :admEmail: AND admin_name = :admUsername: LIMIT 1";
+        $sql = 'SELECT admin_id, admin_name, admin_email, admin_pass, lockout_expires
+                FROM ' . TABLE_ADMIN . '
+                WHERE admin_email = :admEmail: AND admin_name = :admUsername: LIMIT 1';
         $sql = $db->bindVars($sql, ':admEmail:', $_POST['admin_email'], 'string');
         $sql = $db->bindVars($sql, ':admUsername:', $_POST['admin_username'], 'string');
         $usernameResult = $db->Execute($sql);
@@ -61,41 +61,39 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $result = $emailResult;
     }
 
-
     if ($error === false && $result->fields['lockout_expires'] != 0) {
         header('HTTP/1.1 406 Not Acceptable');
         exit(0);
     }
 
+    // BEGIN SLAM PREVENTION
+    if (empty($_POST['admin_email'])) {
+        if (!isset($_SESSION['login_attempt'])) {
+            $_SESSION['login_attempt'] = 0;
+        }
+        $_SESSION['login_attempt']++;
+    } // END SLAM PREVENTION
 
-  // BEGIN SLAM PREVENTION
-  if (empty($_POST['admin_email'])) {
-    if (!isset($_SESSION['login_attempt'])) {
-      $_SESSION['login_attempt'] = 0;
-    }
-    $_SESSION['login_attempt']++;
-  } // END SLAM PREVENTION
-
-  if ($error === false) {
-    $new_password = zen_create_PADSS_password((int)ADMIN_PASSWORD_MIN_LENGTH < 7 ? 7 : (int)ADMIN_PASSWORD_MIN_LENGTH);
-    $resetToken = (time() + ADMIN_PWD_TOKEN_DURATION) . '}' . zen_encrypt_password($new_password);
-    $sql = "UPDATE " . TABLE_ADMIN . "
+    if ($error === false) {
+        $new_password = zen_create_PADSS_password((int)ADMIN_PASSWORD_MIN_LENGTH < 7 ? 7 : (int)ADMIN_PASSWORD_MIN_LENGTH);
+        $resetToken = (time() + ADMIN_PWD_TOKEN_DURATION) . '}' . zen_encrypt_password($new_password);
+        $sql = 'UPDATE ' . TABLE_ADMIN . '
             SET reset_token = :token:
-            WHERE admin_id = " . (int)$result->fields['admin_id'];
-    $sql = $db->bindVars($sql, ':token:', $resetToken, 'string');
-    $db->Execute($sql);
-    $html_msg['EMAIL_CUSTOMERS_NAME'] = $result->fields['admin_name'];
-    $html_msg['EMAIL_MESSAGE_HTML'] = sprintf(TEXT_EMAIL_MESSAGE_PWD_RESET, $_SERVER['REMOTE_ADDR'], $new_password);
-    zen_mail($result->fields['admin_name'], $result->fields['admin_email'], TEXT_EMAIL_SUBJECT_PWD_RESET, sprintf(TEXT_EMAIL_MESSAGE_PWD_RESET, $_SERVER['REMOTE_ADDR'], $new_password), STORE_NAME, EMAIL_FROM, $html_msg, 'password_forgotten_admin');
-    $email_message = MESSAGE_PASSWORD_SENT;
-  } else {
-    $html_msg['EMAIL_MESSAGE_HTML'] = sprintf(TEXT_EMAIL_MESSAGE_PWD_FAILED_RESET, $_SERVER['REMOTE_ADDR']);
-    zen_mail(STORE_NAME, STORE_OWNER_EMAIL_ADDRESS, TEXT_EMAIL_SUBJECT_PWD_FAILED_RESET, sprintf(TEXT_EMAIL_MESSAGE_PWD_FAILED_RESET, $_SERVER['REMOTE_ADDR']), STORE_NAME, EMAIL_FROM, $html_msg, 'password_forgotten_admin');
-    $email_message = MESSAGE_PASSWORD_SENT;
-  }
+            WHERE admin_id = ' . (int)$result->fields['admin_id'];
+        $sql = $db->bindVars($sql, ':token:', $resetToken, 'string');
+        $db->Execute($sql);
+        $html_msg['EMAIL_CUSTOMERS_NAME'] = $result->fields['admin_name'];
+        $html_msg['EMAIL_MESSAGE_HTML'] = sprintf(TEXT_EMAIL_MESSAGE_PWD_RESET, $_SERVER['REMOTE_ADDR'], $new_password);
+        zen_mail($result->fields['admin_name'], $result->fields['admin_email'], TEXT_EMAIL_SUBJECT_PWD_RESET, sprintf(TEXT_EMAIL_MESSAGE_PWD_RESET, $_SERVER['REMOTE_ADDR'], $new_password), STORE_NAME, EMAIL_FROM, $html_msg, 'password_forgotten_admin');
+        $email_message = MESSAGE_PASSWORD_SENT;
+    } else {
+        $html_msg['EMAIL_MESSAGE_HTML'] = sprintf(TEXT_EMAIL_MESSAGE_PWD_FAILED_RESET, $_SERVER['REMOTE_ADDR']);
+        zen_mail(STORE_NAME, STORE_OWNER_EMAIL_ADDRESS, TEXT_EMAIL_SUBJECT_PWD_FAILED_RESET, sprintf(TEXT_EMAIL_MESSAGE_PWD_FAILED_RESET, $_SERVER['REMOTE_ADDR']), STORE_NAME, EMAIL_FROM, $html_msg, 'password_forgotten_admin');
+        $email_message = MESSAGE_PASSWORD_SENT;
+    }
 }
 
-$sql = "SELECT admin_email FROM " . TABLE_ADMIN . " GROUP BY admin_email HAVING COUNT(admin_email) > 1";
+$sql = 'SELECT admin_email FROM ' . TABLE_ADMIN . ' GROUP BY admin_email HAVING COUNT(admin_email) > 1';
 $result = $db->Execute($sql);
 $has_duplicate_admin_emails = ($result->RecordCount() > 0);
 ?>
@@ -111,7 +109,7 @@ $has_duplicate_admin_emails = ($result->RecordCount() > 0);
         <div class="col-sm-offset-1 col-md-offset-3 col-lg-offset-4 col-xs-12 col-sm-10 col-md-6 col-lg-4 text-center">
           <div class="login-main-div login-box-shadow">
             <?php echo zen_image(DIR_WS_IMAGES . HEADER_LOGO_IMAGE, HEADER_ALT_TEXT, HEADER_LOGO_WIDTH, HEADER_LOGO_HEIGHT, 'class="login-img"') . PHP_EOL; ?>
-            <?php echo zen_draw_form('loginForm', FILENAME_PASSWORD_FORGOTTEN, '', 'post', 'id="loginForm" class="form-horizontal"', 'true') . PHP_EOL; ?>
+            <?php echo zen_draw_form('loginForm', FILENAME_PASSWORD_FORGOTTEN, '', 'post') . PHP_EOL; ?>
             <h2><?php echo HEADING_TITLE; ?></h2>
             <?php if ($resetToken == '') { ?>
               <div class="form-group">

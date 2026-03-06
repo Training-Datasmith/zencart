@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'BOX_HEADING_WHOS_ONLINE' => 'Who\'s Online',
     'BOX_WHOS_ONLINE_THEREIS' => 'There currently is',
     'BOX_WHOS_ONLINE_THEREARE' => 'There currently are',
@@ -10,5 +12,3 @@ $define = [
     'BOX_WHOS_ONLINE_MEMBERS' => 'members',
     'BOX_WHOS_ONLINE_ONLINE' => 'online.',
 ];
-
-return $define;

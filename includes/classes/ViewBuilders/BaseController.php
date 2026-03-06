@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -7,7 +9,6 @@
 
 namespace Zencart\ViewBuilders;
 
-use Zencart\Request\Request;
 use Zencart\Traits\NotifierManager;
 
 /**
@@ -16,26 +17,17 @@ use Zencart\Traits\NotifierManager;
 class BaseController
 {
     use NotifierManager;
+    protected array $infoBox;
 
-    protected $request;
-    protected $messageStack;
-    protected $tableDefinition;
-    protected $infoBox = [];
-    protected $formatter;
-
-    public function __construct(Request $request, $messageStack, TableViewDefinition $tableDefinition, $formatter)
+    public function __construct(protected \Zencart\Request\Request $request, protected $messageStack, protected \Zencart\ViewBuilders\TableViewDefinition $tableDefinition, protected $formatter)
     {
-        $this->request = $request;
-        $this->messageStack = $messageStack;
-        $this->tableDefinition = $tableDefinition;
         $this->infoBox = ['header' => [], 'content' => []];
-        $this->formatter = $formatter;
     }
 
     /**
      * @since ZC v1.5.8
      */
-    public function processRequest()
+    public function processRequest(): void
     {
         $action = $this->getAction();
         $method = ($action == '') ? 'processDefaultAction' : 'processAction' . ucfirst($action);
@@ -48,16 +40,15 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    protected function getAction() : string
+    protected function getAction(): string
     {
-        $action = $this->request->input('action', '');
-        return $action;
+        return $this->request->input('action', '');
     }
 
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxHeader(string $content, array $params = [])
+    public function setBoxHeader(string $content, array $params = []): void
     {
         $this->infoBox['header'][] = ['text' => $content, 'params' => $params];
     }
@@ -65,7 +56,7 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxForm(string $content)
+    public function setBoxForm(string $content): void
     {
         $this->infoBox['content']['form'] = $content;
     }
@@ -81,7 +72,7 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxContent(string $content, array $params = [])
+    public function setBoxContent(string $content, array $params = []): void
     {
         $this->infoBox['content'][] = ['text' => $content, 'params' => $params];
     }
@@ -106,7 +97,7 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    public function colKeyLink() : string
+    public function colKeyLink(): string
     {
         return $this->tableDefinition->colKeyName() . '=' . $this->currentFieldValue($this->tableDefinition->getParameter('colKey'));
     }
@@ -126,7 +117,7 @@ class BaseController
     /**
      * @since ZC v1.5.8
      */
-    public function outputMessageList($errorList, $errorType)
+    public function outputMessageList($errorList, $errorType): void
     {
         if (!count($errorList)) {
             return;

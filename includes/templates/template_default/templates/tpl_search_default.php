@@ -18,7 +18,9 @@
 
 <h1 id="searchDefaultHeading"><?php echo HEADING_TITLE_1; ?></h1>
 
-<?php if ($messageStack->size('search') > 0) echo $messageStack->output('search'); ?>
+<?php if ($messageStack->size('search') > 0) {
+    echo $messageStack->output('search');
+} ?>
 
 <fieldset>
 <legend><?php echo HEADING_SEARCH_CRITERIA; ?></legend>
@@ -32,7 +34,7 @@
 
 <fieldset class="floatingBox back">
     <legend><?php echo ENTRY_CATEGORIES; ?></legend>
-    <div class="floatLeft"><?php echo zen_draw_pull_down_menu('categories_id', zen_get_categories(array(array('id' => '', 'text' => TEXT_ALL_CATEGORIES)), '0' ,'', '1'), $sData['categories_id'], 'id="searchCategoryId" aria-label="' . PLEASE_SELECT . '"'); ?></div>
+    <div class="floatLeft"><?php echo zen_draw_pull_down_menu('categories_id', zen_get_categories([['id' => '', 'text' => TEXT_ALL_CATEGORIES]], '0', '', '1'), $sData['categories_id'], 'id="searchCategoryId" aria-label="' . PLEASE_SELECT . '"'); ?></div>
 <?php echo zen_draw_checkbox_field('inc_subcat', '1', $sData['inc_subcat'], 'id="inc-subcat"'); ?><label class="checkboxLabel" for="inc-subcat"><?php echo ENTRY_INCLUDE_SUBCATEGORIES; ?></label>
 <br class="clearBoth">
 </fieldset>
@@ -40,7 +42,7 @@
 <?php if (empty($skip_manufacturers)) { ?>
 <fieldset class="floatingBox forward">
     <legend><?php echo ENTRY_MANUFACTURERS; ?></legend>
-    <?php echo zen_draw_pull_down_menu('manufacturers_id', zen_get_manufacturers(array(array('id' => '', 'text' => TEXT_ALL_MANUFACTURERS)), PRODUCTS_MANUFACTURERS_STATUS), $sData['manufacturers_id'], 'id="searchMfgId" aria-label="' . PLEASE_SELECT . '"'); ?>
+    <?php echo zen_draw_pull_down_menu('manufacturers_id', zen_get_manufacturers([['id' => '', 'text' => TEXT_ALL_MANUFACTURERS]], PRODUCTS_MANUFACTURERS_STATUS), $sData['manufacturers_id'], 'id="searchMfgId" aria-label="' . PLEASE_SELECT . '"'); ?>
 <br class="clearBoth">
 </fieldset>
 <?php } ?>

@@ -8,8 +8,10 @@
 <script>
     let tax_rates = [];
 <?php
-    foreach($tax_class_array as $key => $value) {
-        if ($key === 0) continue;
+    foreach ($tax_class_array as $key => $value) {
+        if ($key === 0) {
+            continue;
+        }
         echo '    tax_rates["' . $value['id'] . '"] = ' . zen_get_tax_rate_value($value['id']) . ';' . "\n";
     }
 ?>

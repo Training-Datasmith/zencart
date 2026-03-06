@@ -1,12 +1,13 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Renderer;
 
 use BaconQrCode\Encoder\QrCode;
 use BaconQrCode\Exception\InvalidArgumentException;
 
-final class PlainTextRenderer implements RendererInterface
+final readonly class PlainTextRenderer implements RendererInterface
 {
     /**
      * UTF-8 full block (U+2588)
@@ -28,14 +29,14 @@ final class PlainTextRenderer implements RendererInterface
      */
     private const EMPTY_BLOCK = "\xc2\xa0";
 
-    public function __construct(private readonly int $margin = 2)
+    public function __construct(private int $margin = 2)
     {
     }
 
     /**
      * @throws InvalidArgumentException if matrix width doesn't match height
      */
-    public function render(QrCode $qrCode) : string
+    public function render(QrCode $qrCode): string
     {
         $matrix = $qrCode->getMatrix();
         $matrixSize = $matrix->getWidth();
@@ -73,8 +74,6 @@ final class PlainTextRenderer implements RendererInterface
             $result .= $horizontalMargin . "\n";
         }
 
-        $result .= str_repeat("\n", (int) ceil($this->margin / 2));
-
-        return $result;
+        return $result . str_repeat("\n", (int) ceil($this->margin / 2));
     }
 }

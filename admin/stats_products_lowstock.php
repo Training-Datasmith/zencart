@@ -43,37 +43,37 @@ require('includes/application_top.php');
         </thead>
         <tbody>
             <?php
-            $products_query_raw = "SELECT p.products_id, pd.products_name, p.products_quantity
-                                   FROM " . TABLE_PRODUCTS . " p,
-                                        " . TABLE_PRODUCTS_DESCRIPTION . " pd
+            $products_query_raw = 'SELECT p.products_id, pd.products_name, p.products_quantity
+                                   FROM ' . TABLE_PRODUCTS . ' p,
+                                        ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                                    WHERE p.products_id = pd.products_id
-                                   AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
-                                   ORDER BY p.products_quantity, pd.products_name";
-            $products_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $products_query_raw, $products_query_numrows);
-            $products = $db->Execute($products_query_raw);
+                                   AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                                   ORDER BY p.products_quantity, pd.products_name';
+$products_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $products_query_raw, $products_query_numrows);
+$products = $db->Execute($products_query_raw);
 
-            foreach ($products as $productRecord) {
-                $productData = (new Product((int)$productRecord['products_id']))->withDefaultLanguage();
-                $product = $productData->getData();
+foreach ($products as $productRecord) {
+    $productData = (new Product((int)$productRecord['products_id']))->withDefaultLanguage();
+    $product = $productData->getData();
 
-              // only show low stock on products that can be added to the cart
-              if ($productData->allowsAddToCart()) {
-                $cPath = zen_get_product_path($product['products_id']);
-                ?>
+    // only show low stock on products that can be added to the cart
+    if ($productData->allowsAddToCart()) {
+        $cPath = zen_get_product_path($product['products_id']);
+        ?>
               <tr class="dataTableRow" onclick="document.location.href = '<?php echo zen_href_link(FILENAME_PRODUCT, '&product_type=' . $product['products_type'] . '&cPath=' . $cPath . '&pID=' . $product['products_id'] . '&action=new_product'); ?>'">
                 <td class="dataTableContent text-right"><?php echo $product['products_id']; ?></td>
                 <td class="dataTableContent"><a href="<?php echo zen_href_link(FILENAME_PRODUCT, '&product_type=' . $product['products_type'] . '&cPath=' . $cPath . '&pID=' . $product['products_id'] . '&action=new_product'); ?>"><?php echo $product['products_name']; ?></a></td>
                 <td class="dataTableContent text-center"><?php echo $product['products_quantity']; ?></td>
               </tr>
               <?php
-            }
-          }
-          ?>
+    }
+}
+?>
         </tbody>
       </table>
       <table class="table">
         <tr>
-          <td><?php echo $products_split->display_count($products_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?></td>
+          <td><?php echo $products_split->display_count($products_query_numrows); ?></td>
           <td class="text-right"><?php echo $products_split->display_links($products_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
         </tr>
       </table>

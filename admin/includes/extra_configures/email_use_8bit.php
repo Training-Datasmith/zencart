@@ -1,6 +1,8 @@
 <?php
-/** 
- * used only to override the email encoding method for backward compatibility. 
+
+declare(strict_types=1);
+/**
+ * used only to override the email encoding method for backward compatibility.
  *
  * This file may NOT be required, depending on your host mailserver configuration.
  *
@@ -15,5 +17,4 @@
  *
  * To use 7bit, simply delete this file, or change the following to 7bit:
  */
-  define('EMAIL_ENCODING_METHOD', '8bit');
-?>
+define('EMAIL_ENCODING_METHOD', '8bit');

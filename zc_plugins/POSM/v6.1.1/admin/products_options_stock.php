@@ -41,10 +41,10 @@ require DIR_WS_FUNCTIONS . 'products_options_stock_admin_functions.php';
 $pos_names_array = [];
 $pos_names_date_array = [];
 $pos_names_info = $db->Execute(
-    "SELECT pos_name_id AS id, pos_name AS text
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
-      WHERE language_id = " . (int)$_SESSION['languages_id'] . "
-   ORDER BY pos_name_id"
+    'SELECT pos_name_id AS id, pos_name AS text
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
+      WHERE language_id = ' . (int)$_SESSION['languages_id'] . '
+   ORDER BY pos_name_id'
 );
 foreach ($pos_names_info as $next_name) {
     $pos_names_array[] = $next_name;
@@ -102,7 +102,7 @@ if ($action === 'update') {
             } else {
                 $replace_quantities = ($sub_action === 'replace');
                 $is_multiple_insert = false;
-                foreach ($_POST['option_values'] as $option_id => $options_values_id) {
+                foreach ($_POST['option_values'] as $options_values_id) {
                     if ($options_values_id == 0) {
                         $is_multiple_insert = true;
                         break;
@@ -114,7 +114,7 @@ if ($action === 'update') {
                 } else {
                     $options = [];
                     foreach ($_POST['option_values'] as $options_id => $options_value) {
-                        if ($options_value != 0 ) {
+                        if ($options_value != 0) {
                             $options[$options_id] = [$options_value];
                         } else {
                             $options_values_list = get_pos_options_values($_POST['pID'], $options_id);
@@ -220,7 +220,7 @@ if ($action === 'update') {
                         'pos_name_id' => $name_id,
                         'pos_date' => $date,
                         'pos_model' => $model,
-                        'last_modified' => 'now()'
+                        'last_modified' => 'now()',
                     ];
 
                     // -----
@@ -260,8 +260,8 @@ if ($action === 'update') {
             if (isset($_POST['pos_remove']) && is_array($_POST['pos_remove'])) {
                 foreach ($_POST['pos_remove'] as $pos_id => $selected) {
                     $pos_id = (int)$pos_id;
-                    $db->Execute("DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . " WHERE pos_id = $pos_id");
-                    $db->Execute("DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " WHERE pos_id = $pos_id");
+                    $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . " WHERE pos_id = $pos_id");
+                    $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " WHERE pos_id = $pos_id");
                 }
 
                 // -----
@@ -276,8 +276,8 @@ if ($action === 'update') {
 
         case 'insert_options':
             $pos_records = $db->Execute(
-                "SELECT pos_id
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT pos_id
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pID"
             );
             $posa_sql = ['products_id' => $pID];
@@ -290,9 +290,9 @@ if ($action === 'update') {
                 }
 
                 $pos_attributes = $db->Execute(
-                    "SELECT options_id, options_values_id
-                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-                      WHERE pos_id = " . $next_record['pos_id']
+                    'SELECT options_id, options_values_id
+                       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+                      WHERE pos_id = ' . $next_record['pos_id']
                 );
                 $attributes = [];
                 foreach ($pos_attributes as $next_attr) {
@@ -301,11 +301,11 @@ if ($action === 'update') {
                 $attributes = array_merge($attributes, $_POST['option_values']);
 
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                         SET pos_hash = '" . generate_pos_option_hash($pID, $attributes) . "',
                             last_modified = now()
-                      WHERE pos_id = " . $next_record['pos_id'] . "
-                      LIMIT 1"
+                      WHERE pos_id = " . $next_record['pos_id'] . '
+                      LIMIT 1'
                 );
             }
             $messageStack->add_session(SUCCESS_OPTIONS_ADDED, 'success');
@@ -376,23 +376,23 @@ if ($include_model) {
 if ($current_category_id === 0) {
     $products_list = $db->Execute(
         "SELECT $select_name as `text`, p.products_model, pd.products_id as `id`, p.products_quantity, p.products_status
-           FROM " . TABLE_PRODUCTS . " p
-                INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+           FROM " . TABLE_PRODUCTS . ' p
+                INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                     ON pd.products_id = p.products_id
-                   AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+                   AND pd.language_id = ' . (int)$_SESSION['languages_id'] . "
           $include_disabled_sql
        ORDER BY $order_by"
     );
 } elseif ($current_category_id !== -1) {
     $products_list = $db->Execute(
         "SELECT $select_name as `text`, p.products_model, pd.products_id as `id`, p.products_quantity, p.products_status
-           FROM " . TABLE_PRODUCTS . " p
-                INNER JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc
+           FROM " . TABLE_PRODUCTS . ' p
+                INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . " ptc
                     ON ptc.categories_id = $current_category_id
                    AND ptc.products_id = p.products_id
-                INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd
+                INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . ' pd
                     ON pd.products_id = ptc.products_id
-                   AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+                   AND pd.language_id = ' . (int)$_SESSION['languages_id'] . "
           $include_disabled_sql
        ORDER BY $order_by"
     );
@@ -426,10 +426,10 @@ if ($current_category_id !== -1) {
 // -----
 // Check for invalid values in the POSM_STOCK_REORDER_LEVEL setting (it should contain only digits 0-9) and reset it to 0 if found invalid.
 //
-$posm_stock_reorder_level = preg_replace("/[^0-9]/", '', POSM_STOCK_REORDER_LEVEL);
+$posm_stock_reorder_level = preg_replace('/[^0-9]/', '', POSM_STOCK_REORDER_LEVEL);
 if ($posm_stock_reorder_level !== POSM_STOCK_REORDER_LEVEL) {
     $db->Execute(
-        "UPDATE " . TABLE_CONFIGURATION . "
+        'UPDATE ' . TABLE_CONFIGURATION . "
             SET configuration_value = '0'
           WHERE configuration_key = 'POSM_STOCK_REORDER_LEVEL'
           LIMIT 1"
@@ -527,12 +527,12 @@ $css_content = '';
 $js_content = '';
 $zco_notifier->notify('NOTIFY_POSM_INSERT_HEAD', '', $onload, $css_content, $js_content);
 if ($css_content !== '') {
-?>
+    ?>
     <style><?= $css_content ?></style>
 <?php
 }
 if ($js_content !== '') {
-?>
+    ?>
     <script><?= $js_content ?></script>
 <?php
 }
@@ -554,7 +554,7 @@ foreach ($options as $next_option) {
     $product_options[$options_id] = $next_option['options_name'];
     $product_options_sort[$options_id] = [
         'sort_order' => $next_option['sort_order'] . $next_option['options_name'],
-        'values' => []
+        'values' => [],
     ];
 
     $options_values = get_pos_options_values($pID, $options_id);
@@ -568,25 +568,25 @@ $options_removed_array = [];
 $options_added_array = [];
 $pos_product_options = [];
 $pos_options = $db->Execute(
-    "SELECT *
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+    'SELECT *
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
       WHERE products_id = $pID"
 );
 foreach ($pos_options as $next_option) {
     $pos_id = $next_option['pos_id'];
     $pos_attributes = $db->Execute(
-        "SELECT DISTINCT posa.options_id, posa.options_values_id
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " posa
-                INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " pa
+        'SELECT DISTINCT posa.options_id, posa.options_values_id
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . ' posa
+                INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
                     ON pa.products_id = posa.products_id
                    AND pa.options_id = posa.options_id
                    AND pa.options_values_id = posa.options_values_id
-                INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+                INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                     ON po.products_options_id = posa.options_id
-                   AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-                INNER JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov
+                   AND po.language_id = ' . (int)$_SESSION['languages_id'] . '
+                INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' pov
                     ON pov.products_options_values_id = posa.options_values_id
-                   AND pov.language_id = " . (int)$_SESSION['languages_id'] . "
+                   AND pov.language_id = ' . (int)$_SESSION['languages_id'] . "
           WHERE posa.pos_id = $pos_id"
     );
 
@@ -594,8 +594,8 @@ foreach ($pos_options as $next_option) {
     if ($pos_attributes->EOF || $pos_attributes->RecordCount() != count($product_options_sort)) {
         $valid = false;
         $pos_attributes = $db->Execute(
-            "SELECT options_id, options_values_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+            'SELECT options_id, options_values_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
               WHERE pos_id = $pos_id"
         );
     }
@@ -632,7 +632,7 @@ foreach ($pos_options as $next_option) {
     // database default) to prevent unwanted PHP deprecations/errors from being logged
     // when it's output as a protected string.
     //
-    $next_option['pos_model'] = $next_option['pos_model'] ?? '';
+    $next_option['pos_model'] ??= '';
     $pos_product_options[$pos_id] = [
         'valid' => $valid,
         'label_id' => $next_option['pos_name_id'],
@@ -655,21 +655,18 @@ unset($pos_options, $option_array, $pos_attributes);
 //
 if ($posObserver->stringPos($sort_by, 'model-') === 0) {
     if ($sort_by === 'model-asc') {
-        uasort($pos_product_options, static function($a, $b)
-        {
-            $result = strcasecmp($a['model'], $b['model']);
-            return ($result < 0) ? -1 : (($result > 0) ? 1 : 0);
+        uasort($pos_product_options, static function (array $a, array $b): int {
+            $result = strcasecmp((string) $a['model'], (string) $b['model']);
+            return $result <=> 0;
         });
     } else {
-        uasort($pos_product_options, static function($a, $b)
-        {
-            $result = strcasecmp($b['model'], $a['model']);
-            return ($result < 0) ? -1 : (($result > 0) ? 1 : 0);
+        uasort($pos_product_options, static function (array $a, array $b): int {
+            $result = strcasecmp((string) $b['model'], (string) $a['model']);
+            return $result <=> 0;
         });
     }
 } else {
-    uasort($pos_product_options, static function($a, $b)
-    {
+    uasort($pos_product_options, static function (array $a, array $b): int {
         global $product_options_sort;
 
         $result = 0;
@@ -703,9 +700,9 @@ define('STATIC_FIELD_COUNT', $static_field_count);
 // variant.
 //
 $check = $db->Execute(
-    "SELECT pos_id
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-      LIMIT 1"
+    'SELECT pos_id
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+      LIMIT 1'
 );
 $view_all_link = '';
 if (!$check->EOF) {
@@ -731,7 +728,7 @@ $product_type = zen_get_products_type($pID);
 <?php
 $cat_form_parameters = zen_get_all_get_params(['category_id', 'disabled', 'disabled_check', 'use_model', 'use_model_check', 'sort_by']);
 ?>
-    <?= zen_draw_form('cat-form', FILENAME_PRODUCTS_OPTIONS_STOCK, $cat_form_parameters, 'get', 'id="cat-form" class="form-inline"') ?>
+    <?= zen_draw_form('cat-form', FILENAME_PRODUCTS_OPTIONS_STOCK, $cat_form_parameters, 'get') ?>
         <?= zen_draw_hidden_field('disabled', ($include_disabled ? 'true' : ''), 'id="posm-disabled"') ?>
         <?= zen_draw_hidden_field('use_model', ($include_model ? 'true' : ''), 'id="posm-use-model"') ?>
         <?= zen_draw_hidden_field('pID', $pID, 'id="pid-sort"') ?>
@@ -751,13 +748,13 @@ array_unshift($category_select, ['id' => -1, 'text' => TEXT_PLEASE_SELECT]);
         </div>
         <div class="checkbox">
             <label>
-                <?= zen_draw_checkbox_field('disabled_check', 'yes', $include_disabled, '', 'id="disabled-check"') ?>
+                <?= zen_draw_checkbox_field('disabled_check', 'yes', $include_disabled, '') ?>
                 <?= ' ' . TEXT_INCLUDE_DISABLED ?>
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <?= zen_draw_checkbox_field('use_model_check', 'yes', $include_model, '', 'id="use-model-check"') ?>
+                <?= zen_draw_checkbox_field('use_model_check', 'yes', $include_model, '') ?>
                 <?= ' ' . TEXT_INCLUDE_MODEL ?>
             </label>
         </div>
@@ -768,15 +765,15 @@ array_unshift($category_select, ['id' => -1, 'text' => TEXT_PLEASE_SELECT]);
 $sort_array = [
     [
         'id' => 'default',
-        'text' => POSM_TEXT_SORT_BY_DEFINITION
+        'text' => POSM_TEXT_SORT_BY_DEFINITION,
     ],
     [
         'id' => 'model-asc',
-        'text' => POSM_TEXT_SORT_BY_MODEL_ASC
+        'text' => POSM_TEXT_SORT_BY_MODEL_ASC,
     ],
     [
         'id' => 'model-desc',
-        'text' => POSM_TEXT_SORT_BY_MODEL_DESC
+        'text' => POSM_TEXT_SORT_BY_MODEL_DESC,
     ],
 ];
 ?>
@@ -790,9 +787,9 @@ $sort_array = [
 <?php
 if (count($products_select) !== 0) {
     $prod_form_parameters = zen_get_all_get_params(['pID', 'disabled', 'disabled_check', 'use_model', 'use_model_check']);
-?>
+    ?>
     <hr>
-    <?= zen_draw_form('prod-form', FILENAME_PRODUCTS_OPTIONS_STOCK, $prod_form_parameters, 'get', 'id="prod-form" class="form-inline"') ?>
+    <?= zen_draw_form('prod-form', FILENAME_PRODUCTS_OPTIONS_STOCK, $prod_form_parameters, 'get') ?>
 
         <div class="form-group">
             <?= zen_draw_label(TEXT_CHOOSE_PRODUCT, 'pID', 'class="control-label"') ?>
@@ -816,12 +813,12 @@ if (count($products_select) !== 0) {
 //
 if (count($products_select) === 0) {
     $product_model = '';
-?>
+    ?>
     <hr>
     <p id="no-products"><?= TEXT_NO_PRODUCTS_IN_CATEGORY ?></p>
 <?php
-// -----
-// Otherwise,
+    // -----
+    // Otherwise,
 } else {
     // -----
     // If a single Out-of-stock label is defined, display it here.  This allows us to remove
@@ -829,44 +826,44 @@ if (count($products_select) === 0) {
     // of variables to post.
     //
     if ($show_oos_label_column === false) {
-?>
+        ?>
     <hr>
     <p><?= sprintf(TEXT_SINGLE_LABEL_NAME, $single_label_text) ?></p>
 <?php
     }
 
     $options_added = (count($options_added_array) !== 0);
-?>
+    ?>
     <p><?= ($options_added === true) ? TEXT_POS_OPTIONS_ADDED : TEXT_POS_INSERT ?></p>
 <?php
-    // -----
-    // The total number of columns displayed is the sum of those associated with the current
-    // product's options and those that are static.
-    //
-    $option_cols = count($product_options);
+        // -----
+        // The total number of columns displayed is the sum of those associated with the current
+        // product's options and those that are static.
+        //
+        $option_cols = count($product_options);
     $total_cols = $option_cols + STATIC_FIELD_COUNT;
-?>
+    ?>
     <?= zen_draw_form('modify_form', FILENAME_PRODUCTS_OPTIONS_STOCK, zen_get_all_get_params(['action', 'disabled', 'disabled_check', 'use_model', 'use_model_check']) . 'action=update', 'post') ?>
         <?= zen_draw_hidden_field('pID', $pID) ?>
         <table class="table table-condensed">
             <tr class="dataTableHeadingRow">
 <?php
-    foreach ($product_options as $option_id => $option_name) {
-?>
+        foreach ($product_options as $option_id => $option_name) {
+            ?>
                 <td class="dataTableHeadingContent"><?= $option_name ?></td>
 <?php
-    }
-?>
+        }
+    ?>
                 <td class="dataTableHeadingContent">&nbsp;</td>
 <?php
-    if ($show_oos_label_column === true) {
-?>
+        if ($show_oos_label_column === true) {
+            ?>
                 <td class="dataTableHeadingContent text-center"><?= TEXT_OOS_LABEL ?></td>
 <?php
-    }
+        }
 
     if ($show_date_column === true) {
-?>
+        ?>
                 <td class="dataTableHeadingContent text-center">&nbsp;</td>
 <?php
     }
@@ -890,38 +887,38 @@ if (count($products_select) === 0) {
     foreach ($additional_content as $content) {
         $additional_class = (isset($content['align'])) ? ' text-' . $content['align'] : '';
         $additional_params = (isset($content['params'])) ? ' ' . $content['params'] : '';
-?>
+        ?>
                 <td class="dataTableHeadingContent<?= $additional_class ?>"<?= $additional_params ?>><?= $content['text'] ?></td>
 <?php
     }
-?>
+    ?>
                 <td class="dataTableHeadingContent text-center"><?= TEXT_POS_STOCK_QUANTITY ?></td>
                 <td class="dataTableHeadingContent text-center">&nbsp;</td>
             </tr>
 
             <tr>
 <?php
-    foreach ($product_options as $option_id => $option_name) {
-        if ($options_added) {
-            $option_output = (isset($options_added_array[$option_id])) ? draw_option_pulldown($pID, $option_id, "option_values[$option_id]", '', false) : '&mdash;';
-        } else {
-            $option_output = draw_option_pulldown($pID, $option_id, "option_values[$option_id]");
-        }
-?>
+        foreach ($product_options as $option_id => $option_name) {
+            if ($options_added) {
+                $option_output = (isset($options_added_array[$option_id])) ? draw_option_pulldown($pID, $option_id, "option_values[$option_id]", '', false) : '&mdash;';
+            } else {
+                $option_output = draw_option_pulldown($pID, $option_id, "option_values[$option_id]");
+            }
+            ?>
                 <td class="dataTableContent"><?= $option_output ?></td>
 <?php
-    }
-?>
+        }
+    ?>
                 <td class="dataTableContent">&nbsp;</td>
 <?php
-    if ($show_oos_label_column === true) {
-?>
+        if ($show_oos_label_column === true) {
+            ?>
                 <td class="dataTableContent text-center"><?= (count($pos_names_array) === 0) ? TEXT_NONE_DEFINED : zen_draw_pull_down_menu('pos_name', $pos_names_array, $pos_name, 'class="form-control input-sm"') ?></td>
 <?php
-    }
+        }
 
     if ($show_date_column === true) {
-?>
+        ?>
                 <td class="dataTableContent">&nbsp;</td>
 <?php
     }
@@ -945,7 +942,7 @@ if (count($products_select) === 0) {
     foreach ($additional_content as $content) {
         $additional_class = (isset($content['align'])) ? ' text-' . $content['align'] : '';
         $additional_params = (isset($content['params'])) ? ' ' . $content['params'] : '';
-?>
+        ?>
                 <td class="dataTableHeadingContent<?= $additional_class ?>"<?= $additional_params ?>><?= $content['text'] ?></td>
 <?php
     }
@@ -962,8 +959,8 @@ if (count($products_select) === 0) {
     // pre-existing managed options.
     //
     $q = $db->Execute(
-        "SELECT products_quantity
-           FROM " . TABLE_PRODUCTS . "
+        'SELECT products_quantity
+           FROM ' . TABLE_PRODUCTS . "
           WHERE products_id = $pID
           LIMIT 1"
     );
@@ -1010,144 +1007,144 @@ if (count($products_select) === 0) {
             ];
         }
     }
-?>
+    ?>
                 <td class="dataTableContent text-center"><?= $quantity_field ?></td>
                 <td class="dataTableContent text-center">
 <?php
-    foreach ($upper_buttons as $next_button) {
-        $button_class = (isset($next_button['class'])) ? $next_button['class'] : 'btn-primary';
-?>
+        foreach ($upper_buttons as $next_button) {
+            $button_class = $next_button['class'] ?? 'btn-primary';
+            ?>
                     <button type="submit" name="sub_action" value="<?= $next_button['value'] ?>" class="btn btn-default btn-sm <?= $button_class ?>" id="btn-<?= $next_button['value'] ?>">
                         <?= $next_button['text'] ?>
                     </button>
 <?php
-    }
-?>
+        }
+    ?>
                 </td>
             </tr>
 <?php
-    if (count($pos_product_options) !== 0) {
-?>
+        if (count($pos_product_options) !== 0) {
+            ?>
             <tr>
                 <td colspan="<?= $total_cols ?>"><?= TEXT_POS_INSTRUCTIONS2 ?></td>
             </tr>
 <?php
-        // -----
-        // This notification enables an observer to identify one or more rows of content to be output
-        // under the control of this main tool.
-        //
-        $additional_instructions = [];
-        $zco_notifier->notify('NOTIFY_POSM_SET_INSTRUCTIONS', $pID, $additional_instructions);
-        foreach ($additional_instructions as $next_instruction) {
-            $parameters = (!empty($next_instruction['params'])) ? ' ' . $next_instruction['params'] : '';
-?>
+                    // -----
+                    // This notification enables an observer to identify one or more rows of content to be output
+                    // under the control of this main tool.
+                    //
+                    $additional_instructions = [];
+            $zco_notifier->notify('NOTIFY_POSM_SET_INSTRUCTIONS', $pID, $additional_instructions);
+            foreach ($additional_instructions as $next_instruction) {
+                $parameters = (!empty($next_instruction['params'])) ? ' ' . $next_instruction['params'] : '';
+                ?>
             <tr>
                 <td colspan="<?= $total_cols ?>"<?= $parameters ?>><?= $next_instruction['text'] ?></td>
             </tr>
 <?php
-        }
-?>
+            }
+            ?>
             <tr class="dataTableHeadingRow">
 <?php
-        foreach ($product_options as $option_id => $option_name) {
-?>
+                    foreach ($product_options as $option_name) {
+                        ?>
                 <td class="dataTableHeadingContent"><?= $option_name ?></td>
 <?php
-        }
-?>
+                    }
+            ?>
                 <td class="dataTableHeadingContent text-center"><?= TEXT_OPTION_MODEL ?></td>
 <?php
-        if ($show_oos_label_column === true) {
-?>
+                    if ($show_oos_label_column === true) {
+                        ?>
                 <td class="dataTableHeadingContent text-center"><?= TEXT_OOS_LABEL ?></td>
 <?php
-        }
+                    }
 
-        if ($show_date_column === true) {
-?>
+            if ($show_date_column === true) {
+                ?>
                 <td class="dataTableHeadingContent text-center"><?= TEXT_OOS_DATE ?></td>
 <?php
-        }
+            }
 
-        // -----
-        // This is the now-current version of the notification; enabling additional headings/columns to be added to the left
-        // of the 'Qty./Update' column.
-        //
-        // $extra_headings = [
-        //   [
-        //      'text' => 'Column Data',            //- The data to be included for the column (required)
-        //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
-        //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
-        //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
-        //   ],
-        //   ...
-        // ];
-        //
-        // NOTE: Columns can be added to the right of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_HEADING_INSERT_AFTER_QTY
-        // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
-        // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
-        //
-        $extra_headings = [];
-        $zco_notifier->notify('NOTIFY_POSM_LOWER_HEADING_INSERT_B4_QTY', '', $extra_headings);
-        foreach ($extra_headings as $current_heading) {
-            $class = '';
-            if (isset($current_heading['align']) && ($current_heading['align'] === 'right' || $current_heading['align'] === 'center')) {
-                $class = ' text-' . $current_heading['align'];
-            }
-            if (isset($current_heading['class'])) {
-                $class .= ' ' . $current_heading['class'];
-            }
-            $parameters = (isset($current_heading['params'])) ? ' ' . $current_heading['params'] : '';
-?>
+            // -----
+            // This is the now-current version of the notification; enabling additional headings/columns to be added to the left
+            // of the 'Qty./Update' column.
+            //
+            // $extra_headings = [
+            //   [
+            //      'text' => 'Column Data',            //- The data to be included for the column (required)
+            //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
+            //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
+            //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
+            //   ],
+            //   ...
+            // ];
+            //
+            // NOTE: Columns can be added to the right of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_HEADING_INSERT_AFTER_QTY
+            // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
+            // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
+            //
+            $extra_headings = [];
+            $zco_notifier->notify('NOTIFY_POSM_LOWER_HEADING_INSERT_B4_QTY', '', $extra_headings);
+            foreach ($extra_headings as $current_heading) {
+                $class = '';
+                if (isset($current_heading['align']) && ($current_heading['align'] === 'right' || $current_heading['align'] === 'center')) {
+                    $class = ' text-' . $current_heading['align'];
+                }
+                if (isset($current_heading['class'])) {
+                    $class .= ' ' . $current_heading['class'];
+                }
+                $parameters = (isset($current_heading['params'])) ? ' ' . $current_heading['params'] : '';
+                ?>
                 <td class="dataTableHeadingContent<?= $class ?>"<?= $parameters ?>><?= $current_heading['text'] ?></td>
 <?php
-        }
-?>
+            }
+            ?>
                 <td class="dataTableHeadingContent text-center">
                     <?= TEXT_POS_STOCK_QUANTITY ?><br>
                     <span class="smaller"><?= sprintf(TEXT_CURRENT_TOTAL, $product_quantity) ?></span>
                 </td>
 <?php
-        // -----
-        // This is the now-current version of the notification; enabling additional headings/columns to be added to the right
-        // of the 'Qty./Update' column.
-        //
-        // $extra_headings = [
-        //   [
-        //      'text' => 'Column Data',            //- The data to be included for the column (required)
-        //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
-        //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
-        //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
-        //   ],
-        //   ...
-        // ];
-        //
-        // NOTE: Columns can be added to the left of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_HEADING_INSERT_B4_QTY
-        // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
-        // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
-        //
-        $extra_headings = [];
-        $zco_notifier->notify('NOTIFY_POSM_LOWER_HEADING_INSERT_AFTER_QTY', '', $extra_headings);
+                    // -----
+                    // This is the now-current version of the notification; enabling additional headings/columns to be added to the right
+                    // of the 'Qty./Update' column.
+                    //
+                    // $extra_headings = [
+                    //   [
+                    //      'text' => 'Column Data',            //- The data to be included for the column (required)
+                    //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
+                    //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
+                    //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
+                    //   ],
+                    //   ...
+                    // ];
+                    //
+                    // NOTE: Columns can be added to the left of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_HEADING_INSERT_B4_QTY
+                    // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
+                    // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
+                    //
+                    $extra_headings = [];
+            $zco_notifier->notify('NOTIFY_POSM_LOWER_HEADING_INSERT_AFTER_QTY', '', $extra_headings);
 
-        $columns_to_right = count($extra_headings);
-        foreach ($extra_headings as $current_heading) {
-            $class = '';
-            if (isset($current_heading['align']) && ($current_heading['align'] === 'right' || $current_heading['align'] === 'center')) {
-                $class = ' text-' . $current_heading['align'];
-            }
-            if (isset($current_heading['class'])) {
-                $class .= ' ' . $current_heading['class'];
-            }
-            $parameters = (isset($current_heading['params'])) ? ' ' . $current_heading['params'] : '';
-?>
+            $columns_to_right = count($extra_headings);
+            foreach ($extra_headings as $current_heading) {
+                $class = '';
+                if (isset($current_heading['align']) && ($current_heading['align'] === 'right' || $current_heading['align'] === 'center')) {
+                    $class = ' text-' . $current_heading['align'];
+                }
+                if (isset($current_heading['class'])) {
+                    $class .= ' ' . $current_heading['class'];
+                }
+                $parameters = (isset($current_heading['params'])) ? ' ' . $current_heading['params'] : '';
+                ?>
                 <td class="dataTableHeadingContent<?= $class ?>"<?= $parameters ?>><?= $current_heading['text'] ?></td>
 <?php
-        }
-?>
+            }
+            ?>
                 <td class="dataTableHeadingContent text-center">
                     <?= TEXT_POS_REMOVE ?><br>
                     <span class="smaller"><?= TABLE_HEADING_CHECK_UNCHECK ?></span>
-                    <?= zen_draw_checkbox_field('check-uncheck', '', false, '', 'id="check-uncheck"') ?>
+                    <?= zen_draw_checkbox_field('check-uncheck', '', false, '') ?>
                 </td>
             </tr>
 
@@ -1156,54 +1153,54 @@ if (count($products_select) === 0) {
                 <td class="dataTableContent text-center">
                     <span id="base-model"><?= $product_model ?></span><br>
 <?php
-        // -----
-        // Don't render the model-prefill checkbox if the model number is an empty string.
-        //
-        if ($product_model !== '') {
-?>
+                    // -----
+                    // Don't render the model-prefill checkbox if the model number is an empty string.
+                    //
+                    if ($product_model !== '') {
+                        ?>
                     <span id="set-model-span">
                         <span class="smaller" title="<?= TEXT_MODEL_DEFAULT_TITLE ?>">
                             <?= TEXT_MODEL_DEFAULT ?>&nbsp;
                         </span>
-                        <?= zen_draw_checkbox_field('set_default', '', false, '', 'id="set-model-default"') ?>
+                        <?= zen_draw_checkbox_field('set_default', '', false, '') ?>
                     </span>
 <?php
-        }
-?>
+                    }
+            ?>
                 </td>
 <?php
-        // -----
-        // If the current STATIC_FIELD_COUNT indicates more columns than those always displayed (the
-        // model-number, 'Update' and 'Remove' buttons), add a blank column-span to account for any
-        // un-rendered columns prior to the 'Update/Qty.' column.
-        //
-        if (STATIC_FIELD_COUNT > 3) {
-?>
+                    // -----
+                    // If the current STATIC_FIELD_COUNT indicates more columns than those always displayed (the
+                    // model-number, 'Update' and 'Remove' buttons), add a blank column-span to account for any
+                    // un-rendered columns prior to the 'Update/Qty.' column.
+                    //
+                    if (STATIC_FIELD_COUNT > 3) {
+                        ?>
                 <td colspan="<?= STATIC_FIELD_COUNT - 3 - $columns_to_right ?>">&nbsp;</td>
 <?php
-        }
+                    }
 
-        // -----
-        // Enable an observer to add HTML parameters to the 'Update' button.
-        //
-        $posm_update_button_parms = '';
-        $zco_notifier->notify('NOTIFY_POSM_SET_UPDATE_BUTTON_PARAMETERS', '', $posm_update_button_parms);
-        if ($posm_update_button_parms !== '' && strpos($posm_update_button_parms, ' ') !== 0) {
-            $posm_update_button_parms = ' ' . $posm_update_button_parms;
-        }
-?>
+            // -----
+            // Enable an observer to add HTML parameters to the 'Update' button.
+            //
+            $posm_update_button_parms = '';
+            $zco_notifier->notify('NOTIFY_POSM_SET_UPDATE_BUTTON_PARAMETERS', '', $posm_update_button_parms);
+            if ($posm_update_button_parms !== '' && !str_starts_with($posm_update_button_parms, ' ')) {
+                $posm_update_button_parms = ' ' . $posm_update_button_parms;
+            }
+            ?>
                 <td class="dataTableContent text-center">
                     <button class="btn btn-primary btn-sm posm-update" type="submit" title="<?= TEXT_UPDATE_ALT ?>" name="sub_action" value="update"<?= $posm_update_button_parms ?>>
                         <?= BUTTON_UPDATE ?>
                     </button>
                 </td>
 <?php
-        if ($columns_to_right !== 0) {
-?>
+                    if ($columns_to_right !== 0) {
+                        ?>
                 <td colspan="<?= $columns_to_right ?>">&nbsp;</td>
 <?php
-        }
-?>
+                    }
+            ?>
                 <td class="dataTableContent text-center">
                     <button class="btn btn-danger btn-sm posm-remove" type="submit" title="<?= TEXT_REMOVE_ALT ?>" name="sub_action" value="remove">
                         <?= BUTTON_REMOVE ?>
@@ -1211,7 +1208,7 @@ if (count($products_select) === 0) {
                 </td>
             </tr>
 <?php
-    }
+        }
 
     // -----
     // Set the model-field's width if-and-only-if the POSM_ADMIN_MODEL_WIDTH setting is empty; otherwise, the width
@@ -1253,33 +1250,33 @@ if (count($products_select) === 0) {
             $additional_class = ' removed';
             $quantity_parms = ' class="form-control input-xs quantity" readonly';
         }
-?>
+        ?>
             <tr class="hoverRow<?= $additional_class ?>">
 <?php
-        foreach ($product_options as $option_id => $option_name) {
-            $option_value_name = zen_values_name($info_array['options'][$option_id] ?? -1);
-            if ($option_value_name === '') {
-                $option_value_name = '<b>* UNKNOWN VALUE *</b>';
-            }
-?>
+                foreach ($product_options as $option_id => $option_name) {
+                    $option_value_name = zen_values_name($info_array['options'][$option_id] ?? -1);
+                    if ($option_value_name === '') {
+                        $option_value_name = '<b>* UNKNOWN VALUE *</b>';
+                    }
+                    ?>
                 <td class="dataTableContent"><?= $option_value_name ?></td>
 <?php
-        }
-?>
+                }
+        ?>
                 <td class="dataTableContent text-center">
                     <?= zen_draw_input_field("pos_model[$pos_id]", $pos_model, 'class="form-control input-xs model-num' . $extra_model_class . '" ' . $model_field_size) ?>
                 </td>
 <?php
-        if ($show_oos_label_column === true) {
-?>
+                if ($show_oos_label_column === true) {
+                    ?>
                 <td class="dataTableContent text-center">
                     <?= (count($pos_names_array) === 0) ? TEXT_NONE_DEFINED : zen_draw_pull_down_menu("pos_names[$pos_id]", $pos_names_array, $pos_name_id, 'class="pos-name form-control input-xs" data-posid="' . $pos_id . '"') ?>
                 </td>
 <?php
-        }
+                }
 
         if ($show_date_column === true) {
-?>
+            ?>
                 <td class="dataTableContent text-center">
                     <?= zen_draw_input_field("pos_date[$pos_id]", $pos_date, 'class="form-control input-xs ' . $date_class . '" ' . $date_field_size) ?>
                 </td>
@@ -1323,34 +1320,34 @@ if (count($products_select) === 0) {
                 $class .= ' ' . $current_content['class'];
             }
             $parameters = (isset($current_content['params'])) ? ' ' . $current_content['params'] : '';
-?>
+            ?>
                 <td class="dataTableHeadingContent<?= $class ?>"<?= $parameters ?>><?= $current_content['text'] ?></td>
 <?php
         }
-?>
+        ?>
                 <td class="dataTableContent text-center">
                     <?= zen_draw_input_field("pos_quantity[$pos_id]", $pos_quantity, $quantity_parms) ?>
                 </td>
 <?php
-        // -----
-        // This is the now-current version of the notification; enabling additional content-columns to be added to the right
-        // of the 'Qty./Update' column.
-        //
-        // $lower_content = [
-        //   [
-        //      'text' => 'Column Data',            //- The data to be included for the column (required)
-        //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
-        //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
-        //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
-        //   ],
-        //   ...
-        // ];
-        //
-        // NOTE: Columns can be added to the left of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_CONTENT_INSERT_B4_QTY
-        // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
-        // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
-        //
-        $lower_content = [];
+                // -----
+                // This is the now-current version of the notification; enabling additional content-columns to be added to the right
+                // of the 'Qty./Update' column.
+                //
+                // $lower_content = [
+                //   [
+                //      'text' => 'Column Data',            //- The data to be included for the column (required)
+                //      'align' => 'left|center|right',     //- The text direction for the column's data (optional)
+                //      'params' => 'Column Parameters',    //- Any additional HTML non-class parameters to apply to the data (optional)
+                //      'class' => '',                      //- Any additional HTML class-name to apply to the data (optional)
+                //   ],
+                //   ...
+                // ];
+                //
+                // NOTE: Columns can be added to the left of the 'Qty./Update' column via the NOTIFY_POSM_LOWER_CONTENT_INSERT_B4_QTY
+                // notification.  The sum of the number of columns added for these two notifications is expected to total to the number
+                // of additional columns the observer has indicated as a result of the NOTIFY_POSM_START_HTML_OUTPUT notification.
+                //
+                $lower_content = [];
         $zco_notifier->notify(
             'NOTIFY_POSM_LOWER_CONTENT_INSERT_AFTER_QTY',
             [
@@ -1370,47 +1367,47 @@ if (count($products_select) === 0) {
                 $class .= ' ' . $current_content['class'];
             }
             $parameters = (isset($current_content['params'])) ? ' ' . $current_content['params'] : '';
-?>
+            ?>
                 <td class="dataTableHeadingContent<?= $class ?>"<?= $parameters ?>><?= $current_content['text'] ?></td>
 <?php
         }
-?>
+        ?>
                 <td class="dataTableContent text-center">
-                    <?= zen_draw_checkbox_field("pos_remove[$pos_id]", false, false, '', 'class="cBox"') ?>
+                    <?= zen_draw_checkbox_field("pos_remove[$pos_id]", false, false, '') ?>
                 </td>
             </tr>
 <?php
     }
 
     if (count($pos_product_options) > 0) {
-?>
+        ?>
             <tr>
                 <td colspan="<?= $option_cols ?>">&nbsp;</td>
                 <td class="dataTableContent text-center"><?= $product_model ?></td>
 <?php
-        // -----
-        // If the current STATIC_FIELD_COUNT indicates more columns than those always displayed (the
-        // model-number, 'Update' and 'Remove' buttons), add a blank column-span to account for any
-        // un-rendered columns prior to the 'Update/Qty.' column.
-        //
-        if (STATIC_FIELD_COUNT > 3) {
-?>
+                // -----
+                // If the current STATIC_FIELD_COUNT indicates more columns than those always displayed (the
+                // model-number, 'Update' and 'Remove' buttons), add a blank column-span to account for any
+                // un-rendered columns prior to the 'Update/Qty.' column.
+                //
+                if (STATIC_FIELD_COUNT > 3) {
+                    ?>
                 <td colspan="<?= STATIC_FIELD_COUNT - 3 - $columns_to_right ?>">&nbsp;</td>
 <?php
-        }
-?>
+                }
+        ?>
                 <td class="dataTableContent text-center">
                     <button class="btn btn-primary btn-sm posm-update" type="submit" title="<?= TEXT_UPDATE_ALT ?>" name="sub_action" value="update"<?= $posm_update_button_parms ?>>
                         <?= BUTTON_UPDATE ?>
                     </button>
                 </td>
 <?php
-        if ($columns_to_right !== 0) {
-?>
+                if ($columns_to_right !== 0) {
+                    ?>
                 <td colspan="<?= $columns_to_right ?>">&nbsp;</td>
 <?php
-        }
-?>
+                }
+        ?>
                 <td class="dataTableContent text-center">
                     <button class="btn btn-danger btn-sm posm-remove" type="submit" title="<?= TEXT_REMOVE_ALT ?>" name="sub_action" value="remove">
                         <?= BUTTON_REMOVE ?>
@@ -1419,7 +1416,7 @@ if (count($products_select) === 0) {
             </tr>
 <?php
     }
-?>
+    ?>
         </table>
         <?= $hidden_fields ?>
     <?= '</form>' ?>
@@ -1443,7 +1440,7 @@ $(function() {
     });
 <?php
 if (POSM_DUPLICATE_MODELNUMS !== 'Allow') {
-?>
+    ?>
     $('input[type="text"].model-num').on('change', function() {
         let modelField = $(this).attr('name');
         let posID = $(this).attr('name').match(/\d+/g);
@@ -1459,13 +1456,13 @@ if (POSM_DUPLICATE_MODELNUMS !== 'Allow') {
             if (response.isOk === false) {
                 $('input[type="text"][name="'+modelField+'"].model-num').addClass('duplicate');
 <?php
-    if (POSM_DUPLICATE_MODELNUMS === 'Disallow') {
-?>
+        if (POSM_DUPLICATE_MODELNUMS === 'Disallow') {
+            ?>
                 alert(<?= JSCRIPT_ERROR_DUPLICATE_MODEL ?>);
                 document.modify_form['pos_model['+posID+']'].focus();
 <?php
-    }
-?>
+        }
+    ?>
             }
         });
     });

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *  document_general_info main_template_vars.php
  *
@@ -14,7 +16,7 @@
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_START_DOCUMENT_GENERAL_INFO');
 
-if (!isset($product_info) || get_class($product_info) !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
+if (!isset($product_info) || $product_info::class !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
     $product_info = new Product((int)$_GET['products_id']);
 }
 
@@ -50,17 +52,17 @@ if ($product_not_found) {
         $specials_price = $currencies->display_price($new_price, $products_tax_rate);
     }
 
-// set flag for attributes module usage:
+    // set flag for attributes module usage:
     $flag_show_weight_attrib_for_this_prod_type = 0;
-// get attributes
+    // get attributes
     require DIR_WS_MODULES . zen_get_module_directory(FILENAME_ATTRIBUTES);
 
     $reviews_query =
-        "SELECT COUNT(*) AS count FROM " . TABLE_REVIEWS . " r, " . TABLE_REVIEWS_DESCRIPTION . " rd
-          WHERE r.products_id = " . $products_id_current . "
+        'SELECT COUNT(*) AS count FROM ' . TABLE_REVIEWS . ' r, ' . TABLE_REVIEWS_DESCRIPTION . ' rd
+          WHERE r.products_id = ' . $products_id_current . '
             AND r.reviews_id = rd.reviews_id
-            AND rd.languages_id = " . (int)$_SESSION['languages_id'] . "
-            AND r.status = 1";
+            AND rd.languages_id = ' . (int)$_SESSION['languages_id'] . '
+            AND r.status = 1';
 
     $reviews = $db->Execute($reviews_query);
 

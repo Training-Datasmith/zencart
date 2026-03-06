@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Customer Authorization 
+ * Customer Authorization
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -91,7 +93,7 @@ if (empty($customer_data['activation_required'])) {
     $customer_authorization_heading_title = HEADING_TITLE_ACTIVATE;
     $main_content = sprintf(TEXT_INFORMATION_ACTIVATE, '<b>' . $auth_token_info['email_address'] . '</b>');
 
-    $auth_token_time_remaining = strtotime($auth_token_info['created_at']) + (Customer::getAuthTokenMinutesValid() * 60) - time();
+    $auth_token_time_remaining = strtotime((string) $auth_token_info['created_at']) + (Customer::getAuthTokenMinutesValid() * 60) - time();
     if ($auth_token_time_remaining < 0) {
         $main_content .= ' ' . TEXT_INFORMATION_LINK_EXPIRED;
     } else {

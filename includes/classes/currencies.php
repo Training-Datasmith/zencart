@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * currencies class
  *
@@ -31,8 +33,8 @@ class currencies extends base
         global $db;
 
         $query =
-            "SELECT code, title, symbol_left, symbol_right, decimal_point, thousands_point, decimal_places, `value`
-               FROM " . TABLE_CURRENCIES;
+            'SELECT code, title, symbol_left, symbol_right, decimal_point, thousands_point, decimal_places, `value`
+               FROM ' . TABLE_CURRENCIES;
         $results = $db->Execute($query);
 
         foreach ($results as $result) {
@@ -52,10 +54,7 @@ class currencies extends base
      * Format the specified number according to the specified currency's rules
      *
      * @param numeric $number
-     * @param bool $calculate_using_exchange_rate
-     * @param string $currency_code
      * @param numeric $currency_value
-     * @return string
      * @since ZC v1.0.3
      */
     public function format(mixed $number, bool $calculate_using_exchange_rate = true, string $currency_code = '', mixed $currency_value = ''): string
@@ -93,10 +92,7 @@ class currencies extends base
      * Convert amount based on currency values and round it to the relevant decimal places
      *
      * @param numeric $number
-     * @param bool $calculate_using_exchange_rate
-     * @param string $currency_code
      * @param numeric|null $currency_value
-     * @return float|int
      * @since ZC v1.3.9a
      */
     public function rateAdjusted(mixed $number, bool $calculate_using_exchange_rate = true, string $currency_code = '', mixed $currency_value = null): float|int
@@ -115,10 +111,7 @@ class currencies extends base
      * Convert amount based on currency rate without applying formatting
      *
      * @param numeric $number
-     * @param bool $calculate_using_exchange_rate
-     * @param string $currency_code
      * @param numeric|null $currency_value
-     * @return float|int
      *
      * @since ZC v1.1.1
      */
@@ -139,8 +132,6 @@ class currencies extends base
      * Normalize "decimal" placeholder to actually use "."
      *
      * @param numeric $valueIn
-     * @param string|null $currencyCode
-     * @return string
      * @since ZC v1.5.5
      */
     public function normalizeValue(mixed $valueIn, ?string $currencyCode = null): string
@@ -233,7 +224,7 @@ class currencies extends base
             $this->currencies[$currency_code]['symbol_left'] = $currency_code . ' ';
             $this->currencies[$currency_code]['symbol_right'] = '';
             if ($this->debug === true) {
-                trigger_error("Creating currency settings for $currency_code, based on " . DEFAULT_CURRENCY . " settings.", E_USER_NOTICE);
+                trigger_error("Creating currency settings for $currency_code, based on " . DEFAULT_CURRENCY . ' settings.', E_USER_NOTICE);
             }
         }
 
@@ -248,7 +239,6 @@ class currencies extends base
      * @param numeric $product_price
      * @param numeric $product_tax
      * @param int|float $quantity
-     * @return string
      * @since ZC v1.0.3
      */
     public function display_price(mixed $product_price, mixed $product_tax, mixed $quantity = 1): string

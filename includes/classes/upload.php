@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * upload Class.
  *
@@ -17,15 +19,14 @@ if (!defined('IS_ADMIN_FLAG')) {
  *
  * @since ZC v1.0.3
  */
- //
+//
 // This is the old UPLOAD_FILENAME_EXTENSIONS which was in the database
 if (!defined('UPLOAD_FILENAME_EXTENSIONS_LIST')) {
-   define('UPLOAD_FILENAME_EXTENSIONS_LIST', 'jpg,jpeg,gif,png,eps,cdr,ai,pdf,tif,tiff,bmp,zip');
+    define('UPLOAD_FILENAME_EXTENSIONS_LIST', 'jpg,jpeg,gif,png,eps,cdr,ai,pdf,tif,tiff,bmp,zip');
 }
 
 class upload extends base
 {
-
     protected $file;
     protected $destination;
     protected $extensions;
@@ -33,15 +34,15 @@ class upload extends base
     protected $message_location;
     protected $permissions;
     protected $tmp_filename;
-    
-    function __construct($file = '', $destination = '', $permissions = '644', $extensions = array())
+
+    public function __construct($file = '', $destination = '', $permissions = '644', $extensions = [])
     {
         $this->set_file($file);
         $this->set_destination($destination);
         $this->set_permissions($permissions);
 
         if (empty($extensions)) {
-            $extensions = explode(" ", preg_replace('/[.,;\s]+/', ' ', UPLOAD_FILENAME_EXTENSIONS_LIST));
+            $extensions = explode(' ', (string) preg_replace('/[.,;\s]+/', ' ', UPLOAD_FILENAME_EXTENSIONS_LIST));
         }
         $this->set_extensions($extensions);
 
@@ -66,28 +67,30 @@ class upload extends base
      * @return bool
      * @since ZC v1.0.3
      */
-    function parse($key = '')
+    public function parse($key = '')
     {
         if (empty($_FILES[$this->file])) {
             return false;
         }
         if (zen_not_null($key)) {
-            $file = array(
+            $file = [
                 'name'     => $_FILES[$this->file]['name'][$key],
                 'type'     => $_FILES[$this->file]['type'][$key],
                 'size'     => $_FILES[$this->file]['size'][$key],
                 'tmp_name' => $_FILES[$this->file]['tmp_name'][$key],
-            );
+            ];
         } else {
-            $file = array(
+            $file = [
                 'name'     => $_FILES[$this->file]['name'],
                 'type'     => $_FILES[$this->file]['type'],
                 'size'     => $_FILES[$this->file]['size'],
                 'tmp_name' => $_FILES[$this->file]['tmp_name'],
-            );
+            ];
         }
 
-        if (!zen_not_null($file['tmp_name'])) return false;
+        if (!zen_not_null($file['tmp_name'])) {
+            return false;
+        }
         //if ($file['tmp_name'] == 'none') return false;
         //if (!is_uploaded_file($file['tmp_name'])) return false;
 
@@ -103,7 +106,7 @@ class upload extends base
 
                 return false;
             }
-            if (substr($file['name'], -9) == '.htaccess' || (sizeof($this->extensions) > 0 && !in_array(strtolower(substr($file['name'], strrpos($file['name'], '.') + 1)), $this->extensions))) {
+            if (str_ends_with((string) $file['name'], '.htaccess') || (sizeof($this->extensions) > 0 && !in_array(strtolower(substr((string) $file['name'], strrpos((string) $file['name'], '.') + 1)), $this->extensions))) {
                 $this->message_stack(ERROR_FILETYPE_NOT_ALLOWED . ' .' . implode(', .', $this->extensions), 'error');
 
                 return false;
@@ -125,10 +128,9 @@ class upload extends base
 
     /**
      * @param bool $overwrite
-     * @return bool
      * @since ZC v1.0.3
      */
-    function save($overwrite = true)
+    public function save($overwrite = true): bool
     {
         if (!$overwrite and file_exists($this->destination . $this->filename)) {
             $this->message_stack(TEXT_IMAGE_OVERWRITE_WARNING . $this->filename, 'caution');
@@ -136,7 +138,7 @@ class upload extends base
             return true;
         }
 
-        if (substr($this->destination, -1) != '/') {
+        if (!str_ends_with((string) $this->destination, '/')) {
             $this->destination .= '/';
         }
 
@@ -162,7 +164,7 @@ class upload extends base
      * @param string $file
      * @since ZC v1.0.3
      */
-    function set_file($file)
+    public function set_file($file): void
     {
         $this->file = $file;
     }
@@ -171,7 +173,7 @@ class upload extends base
      * @param string $destination
      * @since ZC v1.0.3
      */
-    function set_destination($destination)
+    public function set_destination($destination): void
     {
         $this->destination = $destination;
     }
@@ -180,16 +182,15 @@ class upload extends base
      * @param string $permissions
      * @since ZC v1.0.3
      */
-    function set_permissions($permissions)
+    public function set_permissions($permissions): void
     {
         $this->permissions = octdec($permissions);
     }
 
     /**
-     * @param string $filename
      * @since ZC v1.0.3
      */
-    function set_filename($filename)
+    public function set_filename(string $filename): void
     {
         $this->filename = $this->sanitizeFileName($filename);
     }
@@ -198,7 +199,7 @@ class upload extends base
      * @param string $filename
      * @since ZC v1.0.3
      */
-    function set_tmp_filename($filename)
+    public function set_tmp_filename($filename): void
     {
         $this->tmp_filename = $filename;
     }
@@ -207,23 +208,23 @@ class upload extends base
      * @param array $extensions
      * @since ZC v1.0.3
      */
-    function set_extensions($extensions)
+    public function set_extensions($extensions): void
     {
         if (!empty($extensions)) {
             if (is_array($extensions)) {
                 $this->extensions = $extensions;
             } else {
-                $this->extensions = array($extensions);
+                $this->extensions = [$extensions];
             }
         } else {
-            $this->extensions = array();
+            $this->extensions = [];
         }
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function check_destination()
+    public function check_destination(): bool
     {
         if (!is_writeable($this->destination)) {
             if (is_dir($this->destination)) {
@@ -242,23 +243,18 @@ class upload extends base
      * @param string $location
      * @since ZC v1.0.3
      */
-    function set_output_messages($location)
+    public function set_output_messages($location): void
     {
-        switch ($location) {
-            case 'session':
-                $this->message_location = 'session';
-                break;
-            case 'direct':
-            default:
-                $this->message_location = 'direct';
-                break;
-        }
+        $this->message_location = match ($location) {
+            'session' => 'session',
+            default => 'direct',
+        };
     }
 
     /**
      * @since ZC v1.5.5e
      */
-    function message_stack($msg = '', $type = '')
+    public function message_stack($msg = '', $type = '')
     {
         global $messageStack;
         if (!isset($messageStack) || !is_object($messageStack)) {
@@ -292,7 +288,7 @@ class upload extends base
         $filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $filename);
 
         // Replace multiple dots with a single dot
-        $filename = preg_replace('/\.+/', '.', $filename);
+        $filename = preg_replace('/\.+/', '.', (string) $filename);
 
         return $filename;
     }

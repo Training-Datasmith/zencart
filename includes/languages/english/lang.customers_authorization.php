@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $define = [
     'HEADING_TITLE' => 'Account Authorization Pending ...',
     'HEADING_TITLE_ACTIVATE' => 'Check Your Email &mdash; Authorization Pending',

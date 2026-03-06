@@ -14,17 +14,17 @@ if (!function_exists('makeUnixTimestampFromDate')) {
      */
     function makeUnixTimestampFromDate($input, $format)
     {
-        if (strtolower($format) == 'mm/dd/yyyy') {
+        if (strtolower((string) $format) == 'mm/dd/yyyy') {
             // Use US date format (m/d/Y)
-            return mktime(0, 0, 0, (int)substr($input, 0, 2), (int)substr($input, 3, 2), (int)substr($input, 6, 4));
+            return mktime(0, 0, 0, (int)substr((string) $input, 0, 2), (int)substr((string) $input, 3, 2), (int)substr((string) $input, 6, 4));
         }
-        if (strtolower($format) == 'dd/mm/yyyy') {
+        if (strtolower((string) $format) == 'dd/mm/yyyy') {
             // Use UK date format (d/m/Y)
-            return mktime(0, 0, 0, (int)substr($input, 3, 2), (int)substr($input, 0, 2), (int)substr($input, 6, 4));
+            return mktime(0, 0, 0, (int)substr((string) $input, 3, 2), (int)substr((string) $input, 0, 2), (int)substr((string) $input, 6, 4));
         }
-        if (strtolower($format) == 'dd.mm.yyyy') {
+        if (strtolower((string) $format) == 'dd.mm.yyyy') {
             // Use CZ, SK date format (d/m/Y)
-            return mktime(0, 0, 0, (int)substr($input, 3, 2), (int)substr($input, 0, 2), (int)substr($input, 6, 4));
+            return mktime(0, 0, 0, (int)substr((string) $input, 3, 2), (int)substr((string) $input, 0, 2), (int)substr((string) $input, 6, 4));
         }
     }
 }
@@ -32,15 +32,15 @@ if (!function_exists('makeUnixTimestampFromDate')) {
 $startdate  = zen_db_input($_REQUEST['start_date'] ?? date('Y') . '-01-01');
 $enddate = zen_db_input($_REQUEST['end_date'] ?? date('Y-m-d'));
 
-$sql = "SELECT p.products_id, pd.products_name, sum(v.views) as total_views, l.name as language, p.products_type, pt.type_handler, pt.allow_add_to_cart
-        FROM " . TABLE_PRODUCTS . " p
-        LEFT JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd ON p.products_id = pd.products_id
-        LEFT JOIN " . TABLE_LANGUAGES . " l ON l.languages_id = pd.language_id
-        INNER JOIN " . TABLE_COUNT_PRODUCT_VIEWS . " v ON p.products_id = v.product_id AND v.language_id = l.languages_id
-        LEFT JOIN " . TABLE_PRODUCT_TYPES . " pt ON p.products_type = pt.type_id
+$sql = 'SELECT p.products_id, pd.products_name, sum(v.views) as total_views, l.name as language, p.products_type, pt.type_handler, pt.allow_add_to_cart
+        FROM ' . TABLE_PRODUCTS . ' p
+        LEFT JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd ON p.products_id = pd.products_id
+        LEFT JOIN ' . TABLE_LANGUAGES . ' l ON l.languages_id = pd.language_id
+        INNER JOIN ' . TABLE_COUNT_PRODUCT_VIEWS . ' v ON p.products_id = v.product_id AND v.language_id = l.languages_id
+        LEFT JOIN ' . TABLE_PRODUCT_TYPES . ' pt ON p.products_type = pt.type_id
         WHERE date_viewed BETWEEN CAST(:startdate AS DATE) AND CAST(:enddate AS DATE)
         GROUP BY p.products_id, pd.products_name, language, p.products_type, pt.type_handler, pt.allow_add_to_cart
-        ORDER BY total_views DESC";
+        ORDER BY total_views DESC';
 $sql = $db->bindVars($sql, ':startdate', $startdate, 'string');
 $sql = $db->bindVars($sql, ':enddate', $enddate, 'string');
 
@@ -63,7 +63,7 @@ $products = $db->Execute($sql);
 
 
         <div class="row">
-            <?php echo zen_draw_form('date_range', FILENAME_STATS_PRODUCTS_VIEWED, '', 'post', 'class="form-horizontal"'); ?>
+            <?php echo zen_draw_form('date_range', FILENAME_STATS_PRODUCTS_VIEWED, '', 'post'); ?>
 
             <div class="form-group">
                 <?php echo zen_draw_label(TEXT_REPORT_START_DATE, 'start_date', 'class="col-sm-3 control-label"'); ?>
@@ -124,13 +124,13 @@ $products = $db->Execute($sql);
                 </tr>
                 <?php
             }
-            ?>
+?>
             </tbody>
         </table>
         <table class="table">
             <tr>
-                <td><?php echo $products_split->display_count($products_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?></td>
-                <td class="text-right"><?php echo $products_split->display_links($products_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], 'start_date=' . $startdate . '&end_date=' . $enddate); ?></td>
+                <td><?php echo $products_split->display_count($products_query_numrows); ?></td>
+                <td class="text-right"><?php echo $products_split->display_links($products_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
             </tr>
         </table>
         <!-- body_text_eof //-->

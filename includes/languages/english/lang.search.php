@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'Search',
     'NAVBAR_TITLE_2' => 'Search Results',
     'HEADING_TITLE' => 'Search',
@@ -14,5 +16,3 @@ $define = [
     'TEXT_NO_PRODUCTS' => 'There is no product that matches the search criteria.',
     'KEYWORD_FORMAT_STRING' => 'keywords',
 ];
-
-return $define;

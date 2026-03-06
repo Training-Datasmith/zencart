@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -8,10 +10,10 @@
 /**
  * @since ZC v1.5.3
  */
-function zen_update_music_artist_clicked($artistId, $languageId)
+function zen_update_music_artist_clicked($artistId, $languageId): void
 {
     global $db;
-    $sql = "UPDATE " . TABLE_RECORD_ARTISTS_INFO . " SET url_clicked = url_clicked +1, date_last_click = NOW() WHERE artists_id = :artistId: AND languages_id = :languageId:";
+    $sql = 'UPDATE ' . TABLE_RECORD_ARTISTS_INFO . ' SET url_clicked = url_clicked +1, date_last_click = NOW() WHERE artists_id = :artistId: AND languages_id = :languageId:';
     $sql = $db->bindVars($sql, ':artistId:', $artistId, 'integer');
     $sql = $db->bindVars($sql, ':languageId:', $languageId, 'integer');
     $db->execute($sql);
@@ -20,10 +22,10 @@ function zen_update_music_artist_clicked($artistId, $languageId)
 /**
  * @since ZC v1.5.3
  */
-function zen_update_record_company_clicked($recordCompanyId, $languageId)
+function zen_update_record_company_clicked($recordCompanyId, $languageId): void
 {
     global $db;
-    $sql = "UPDATE " . TABLE_RECORD_COMPANY_INFO . " SET url_clicked = url_clicked +1, date_last_click = NOW() WHERE record_company_id = :rcId: AND languages_id = :languageId:";
+    $sql = 'UPDATE ' . TABLE_RECORD_COMPANY_INFO . ' SET url_clicked = url_clicked +1, date_last_click = NOW() WHERE record_company_id = :rcId: AND languages_id = :languageId:';
     $sql = $db->bindVars($sql, ':rcId:', $recordCompanyId, 'integer');
     $sql = $db->bindVars($sql, ':languageId:', $languageId, 'integer');
     $db->execute($sql);

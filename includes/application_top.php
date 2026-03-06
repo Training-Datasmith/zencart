@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * application_top.php Common actions carried out at the start of each page invocation.
  *
@@ -14,8 +16,8 @@
 use Zencart\DbRepositories\PluginControlRepository;
 use Zencart\DbRepositories\PluginControlVersionRepository;
 use Zencart\FileSystem\FileSystem;
-use Zencart\PluginManager\PluginManager;
 use Zencart\InitSystem\InitSystem;
+use Zencart\PluginManager\PluginManager;
 
 // Set session ID
 $zenSessionId = 'zenid';
@@ -111,12 +113,12 @@ if (!$contaminated) {
             $contaminated = true;
             break;
         }
-        if (str_starts_with(strtolower($_GET[$key]), 'http') || str_contains($_GET[$key], '//')) {
+        if (str_starts_with(strtolower((string) $_GET[$key]), 'http') || str_contains((string) $_GET[$key], '//')) {
             $contaminated = true;
             break;
         }
         $len = (in_array($key, [$zenSessionId, 'error_message', 'payment_error'])) ? 255 : 43;
-        if (strlen($_GET[$key]) > $len) {
+        if (strlen((string) $_GET[$key]) > $len) {
             $contaminated = true;
             break;
         }
@@ -131,12 +133,12 @@ if (!empty($_SERVER['QUERY_STRING'])) {
 
     // check for the specific '¤' (%C2%A4) or characters outside standard range
     // allow basic printable ASCII but specifically target high-bit "junk"
-    if (preg_match('/[\x00-\x1F\x7F-\xFF]/', $_SERVER['QUERY_STRING'])) {
+    if (preg_match('/[\x00-\x1F\x7F-\xFF]/', (string) $_SERVER['QUERY_STRING'])) {
         $contaminated = true;
     }
 
     // cap query string length (prevents buffer overflow/fuzzing)
-    if (strlen($_SERVER['QUERY_STRING']) > 256) {
+    if (strlen((string) $_SERVER['QUERY_STRING']) > 256) {
         $contaminated = true;
     }
 }
@@ -147,7 +149,7 @@ if (!empty($_SERVER['QUERY_STRING'])) {
  */
 if (!empty($_SERVER['QUERY_STRING'])) {
     // break the query string into individual "key=value" pairs
-    $pairs = explode('&', $_SERVER['QUERY_STRING']);
+    $pairs = explode('&', (string) $_SERVER['QUERY_STRING']);
     $keys = [];
 
     foreach ($pairs as $pair) {
@@ -165,7 +167,7 @@ if (!empty($_SERVER['QUERY_STRING'])) {
 
     // count occurrences of each key
     $counts = array_count_values($keys);
-    foreach ($counts as $name => $count) {
+    foreach ($counts as $count) {
         // allow one duplication (possibly accidental), more than 2 is not accidental
         if ($count > 2) {
             $contaminated = true;
@@ -181,10 +183,10 @@ if (!empty($_SERVER['QUERY_STRING'])) {
 if (!$contaminated && isset($_GET['action']) && $_GET['action'] === 'buy_now') {
     $isCrawlerUA = (
         empty($_SERVER['HTTP_USER_AGENT']) ||
-        preg_match('/bot|crawl|spider|facebook|meta|externalagent/i', $_SERVER['HTTP_USER_AGENT'])
+        preg_match('/bot|crawl|spider|facebook|meta|externalagent/i', (string) $_SERVER['HTTP_USER_AGENT'])
     );
 
-    $hasInternalReferer = (!empty($_SERVER['HTTP_REFERER']) && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) === $_SERVER['HTTP_HOST']);
+    $hasInternalReferer = (!empty($_SERVER['HTTP_REFERER']) && parse_url((string) $_SERVER['HTTP_REFERER'], PHP_URL_HOST) === $_SERVER['HTTP_HOST']);
 
     if ($isCrawlerUA || !$hasInternalReferer) {
         $contaminated = true;
@@ -218,16 +220,6 @@ define('PAGE_PARSE_START_TIME', microtime());
 @ini_set('html_errors', '0');
 
 /**
- * Ensure minimum PHP version.
- * This is intended to run before any dependencies are required
- * See https://www.zen-cart.com/requirements or run zc_install to see actual requirements!
- */
-if (PHP_VERSION_ID < 80200) {
-    require 'includes/templates/template_default/templates/tpl_zc_phpupgrade_default.php';
-    exit(0);
-}
-
-/**
  * Set the local configuration parameters - mainly for developers
  */
 if (file_exists('includes/local/configure.php')) {
@@ -248,7 +240,7 @@ define('DEBUG_AUTOLOAD', false);
  * Note STRICT_ERROR_REPORTING should never be set to true on a production site.
  * It is mainly there to show php warnings during testing/bug fixing phases.
  */
-if (DEBUG_AUTOLOAD || (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true)) {
+if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
     @ini_set('display_errors', true);
     error_reporting(defined('STRICT_ERROR_REPORTING_LEVEL') ? STRICT_ERROR_REPORTING_LEVEL : E_ALL);
 } else {
@@ -305,7 +297,6 @@ if (file_exists('includes/defined_paths.php')) {
     require 'includes/defined_paths.php';
 } else {
     die('ERROR: /includes/defined_paths.php file not found. Cannot continue.');
-    exit;
 }
 
 require DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'php_polyfills.php';
@@ -345,7 +336,7 @@ if (!defined('ZENCART_TESTFRAMEWORK_RUNNING')) {
  * psr-4 autoloading
  */
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
-$psr4Autoloader = new \Aura\Autoload\Loader;
+$psr4Autoloader = new \Aura\Autoload\Loader();
 $psr4Autoloader->register();
 require('includes/psr4Autoload.php');
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.base.php';
@@ -361,15 +352,15 @@ require 'includes/init_includes/init_database.php';
 $pluginManager = new PluginManager(new PluginControlRepository($db), new PluginControlVersionRepository($db));
 $installedPlugins = $pluginManager->getInstalledPlugins();
 
-$fs = new FileSystem;
+$fs = new FileSystem();
 $fs->loadFilesFromPluginsDirectory($installedPlugins, 'catalog/includes/extra_configures', '~^[^\._].*\.php$~i');
 $fs->loadFilesFromPluginsDirectory($installedPlugins, 'catalog/includes/extra_datafiles', '~^[^\._].*\.php$~i');
 $fs->loadFilesFromPluginsDirectory($installedPlugins, '', '~^database_tables\.php$~i');
 $fs->loadFilesFromPluginsDirectory($installedPlugins, '', '~^filenames\.php$~i');
 
 foreach ($installedPlugins as $plugin) {
-    $namespaceAdmin = 'Zencart\\Plugins\\Admin\\' . ucfirst($plugin['unique_key']);
-    $namespaceCatalog = 'Zencart\\Plugins\\Catalog\\' . ucfirst($plugin['unique_key']);
+    $namespaceAdmin = 'Zencart\\Plugins\\Admin\\' . ucfirst((string) $plugin['unique_key']);
+    $namespaceCatalog = 'Zencart\\Plugins\\Catalog\\' . ucfirst((string) $plugin['unique_key']);
     $filePath = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/';
     $filePathAdmin = $filePath . 'admin/includes/classes/';
     $filePathCatalog = $filePath . 'catalog/includes/classes/';
@@ -382,7 +373,7 @@ if (isset($loaderPrefix)) {
 } else {
     $loaderPrefix = 'config';
 }
-$initSystem = new InitSystem('catalog', $loaderPrefix, new FileSystem, $pluginManager, $installedPlugins);
+$initSystem = new InitSystem('catalog', $loaderPrefix, new FileSystem(), $pluginManager, $installedPlugins);
 
 if (defined('DEBUG_AUTOLOAD') && DEBUG_AUTOLOAD == true) {
     $initSystem->setDebug(true);

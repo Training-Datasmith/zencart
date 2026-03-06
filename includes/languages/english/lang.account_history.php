@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'My Account',
     'NAVBAR_TITLE_2' => 'History',
     'HEADING_TITLE' => 'My Order History',
@@ -12,5 +14,3 @@ $define = [
     'TEXT_ORDER_COST' => 'Order Cost: ',
     'TEXT_NO_PURCHASES' => 'You have not yet made any purchases.',
 ];
-
-return $define;

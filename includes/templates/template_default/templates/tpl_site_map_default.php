@@ -22,7 +22,7 @@
  * require the html_define for the site_map page
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 
@@ -30,7 +30,7 @@
       <ul>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_ABOUT_US) . '">' . BOX_INFORMATION_ABOUT_US . '</a>'; ?></li>
 
-<?php if (SHOW_ACCOUNT_LINKS_ON_SITE_MAP=='Yes') { ?>
+<?php if (SHOW_ACCOUNT_LINKS_ON_SITE_MAP == 'Yes') { ?>
         <li><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . PAGE_ACCOUNT . '</a>'; ?>
         <ul>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT_EDIT, '', 'SSL') . '">' . PAGE_ACCOUNT_EDIT . '</a>'; ?></li>
@@ -40,7 +40,7 @@
         </ul></li>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_SHOPPING_CART) . '">' . PAGE_SHOPPING_CART . '</a>'; ?></li>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL') . '">' . PAGE_CHECKOUT_SHIPPING . '</a>'; ?></li>
-<?php } //endif ?>
+<?php } //endif?>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_SEARCH) . '">' . PAGE_ADVANCED_SEARCH . '</a>'; ?></li>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_PRODUCTS_ALL) . '">' . PAGE_PRODUCTS_ALL. '</a>'; ?></li>
           <li><?php echo '<a href="' . zen_href_link(FILENAME_PRODUCTS_NEW) . '">' . PAGE_PRODUCTS_NEW . '</a>'; ?></li>
@@ -86,42 +86,38 @@
 
          </ul></li>
 <?php
-    $pages_query = $db->Execute("SELECT e.*, ec.*
-                                FROM " . TABLE_EZPAGES . " e,
-                                     " . TABLE_EZPAGES_CONTENT . " ec
+        $pages_query = $db->Execute('SELECT e.*, ec.*
+                                FROM ' . TABLE_EZPAGES . ' e,
+                                     ' . TABLE_EZPAGES_CONTENT . ' ec
                                 WHERE e.pages_id = ec.pages_id
-                                AND ec.languages_id = " . (int)$_SESSION['languages_id'] . "
+                                AND ec.languages_id = ' . (int)$_SESSION['languages_id'] . '
                                 AND (
                                   (e.status_sidebox = 1 AND e.sidebox_sort_order > 0) OR
                                   (e.status_header = 1 AND e.header_sort_order > 0) OR
                                   (e.status_footer = 1 AND e.footer_sort_order > 0) OR
                                   (e.status_visible = 1) )
-                                ORDER BY e.sidebox_sort_order, ec.pages_title");
-    if ($pages_query->RecordCount()>0) {
-      $rows = 0;
-      $page_query_list = array();
-      foreach ($pages_query as $page_query) {
+                                ORDER BY e.sidebox_sort_order, ec.pages_title');
+if ($pages_query->RecordCount() > 0) {
+    $rows = 0;
+    $page_query_list = [];
+    foreach ($pages_query as $page_query) {
         $rows++;
         $page_query_list[$rows]['id'] = $page_query['pages_id'];
         $page_query_list[$rows]['name'] = $page_query['pages_title'];
-        $page_query_list[$rows]['altURL']  = "";
+        $page_query_list[$rows]['altURL']  = '';
         switch (true) {
-          // external link new window or same window
-          case ($page_query['alt_url_external'] != ''):
-          $page_query_list[$rows]['altURL']  = $page_query['alt_url_external'];
-          break;
-          // internal link new window
-          case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '1'):
-          $page_query_list[$rows]['altURL']  = (substr($page_query['alt_url'],0,4) == 'http') ?
-          $page_query['alt_url'] :
-          ($page_query['alt_url']=='' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
-          break;
-          // internal link same window
-          case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '0'):
-          $page_query_list[$rows]['altURL']  = (substr($page_query['alt_url'],0,4) == 'http') ?
-          $page_query['alt_url'] :
-          ($page_query['alt_url']=='' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
-          break;
+            // external link new window or same window
+            case ($page_query['alt_url_external'] != ''):
+                $page_query_list[$rows]['altURL']  = $page_query['alt_url_external'];
+                break;
+                // internal link new window
+            case $page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '1':
+                // internal link same window
+            case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '0'):
+                $page_query_list[$rows]['altURL']  = (str_starts_with((string) $page_query['alt_url'], 'http')) ?
+                $page_query['alt_url'] :
+                ($page_query['alt_url'] == '' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
+                break;
         }
 
         // if altURL is specified, use it; otherwise, use EZPage ID to create link
@@ -129,9 +125,9 @@
         zen_href_link(FILENAME_EZPAGES, 'id=' . $page_query['pages_id'] . ($page_query['toc_chapter'] > 0 ? '&chapter=' . $page_query['toc_chapter'] : ''), 'SSL') :
         $page_query_list[$rows]['altURL'];
         $page_query_list[$rows]['link'] .= ($page_query['page_open_new_window'] == '1' ? '" rel="noreferrer noopener" target="_blank' : '');
-      }
-      if (!empty($page_query_list)) {
-?>
+    }
+    if (!empty($page_query_list)) {
+        ?>
           <li><?php echo BOX_HEADING_EZPAGES; ?>
           <ul>
 <?php foreach ($page_query_list as $item) {  ?>

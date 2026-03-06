@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * site_map header_php.php
  *
@@ -21,7 +23,6 @@ $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] .
  * load the site map class
  */
 require DIR_WS_CLASSES . 'site_map.php';
-$zen_SiteMapTree = new zen_SiteMapTree;
+$zen_SiteMapTree = new zen_SiteMapTree();
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_SITE_MAP');
-?>

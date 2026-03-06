@@ -1,7 +1,9 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Handler for page not found errors
- * 
+ *
  * Generates a 301 Moved permanently error and redirects to index.php?main_page=page_not_found
  * Especially useful as for Google indexing
  *
@@ -13,6 +15,5 @@
 /*
 * redirect to the page_not_found page after sending spiders the "moved" message
 */
-header("HTTP/1.1 301 Moved Permanently");
-header("Location: index.php?main_page=page_not_found");
-?>
+header('HTTP/1.1 301 Moved Permanently');
+header('Location: index.php?main_page=page_not_found');

@@ -1,13 +1,14 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
-namespace Zencart\LanguageLoader;
 
-use Zencart\FileSystem\FileSystem;
+namespace Zencart\LanguageLoader;
 
 /**
  * @since ZC v1.5.8
@@ -31,7 +32,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
                 $constants_made = true;
                 continue;
             }
-            preg_match_all('/%{2}([^%]+)%{2}/', $defineValue, $matches, PREG_PATTERN_ORDER);
+            preg_match_all('/%{2}([^%]+)%{2}/', (string) $defineValue, $matches, PREG_PATTERN_ORDER);
             if (count($matches[1])) {
                 foreach ($matches[1] as $index => $match) {
                     if (isset($defines[$match])) {
@@ -61,8 +62,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
     {
         $path = $rootPath . $language . $extraPath;
         $fileList = $this->fileSystem->listFilesFromDirectory($path, '~^lang\.(.*)\.php$~i');
-        $defineList = $this->processArrayFileList($path, $fileList);
-        return $defineList;
+        return $this->processArrayFileList($path, $fileList);
     }
 
     /**
@@ -179,8 +179,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         $arrayFileName = 'lang.' . $fileName;
         $mainFile = $rootPath . $language . $extraPath. '/' . $arrayFileName;
         $fallbackFile = $rootPath . $language . '/' . $arrayFileName;
-        $defineList = $this->loadDefinesWithFallback($mainFile, $fallbackFile);
-        return $defineList;
+        return $this->loadDefinesWithFallback($mainFile, $fallbackFile);
     }
 
     /**
@@ -196,8 +195,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         }
         $mainFile = $rootPath . $language . '/modules/' . $module_type . $templateDir . $arrayFileName;
         $fallbackFile = $rootPath . $this->fallback . '/modules/' . $module_type . $templateDir . $arrayFileName;
-        $defineList = $this->loadDefinesWithFallback($mainFile, $fallbackFile);
-        return $defineList;
+        return $this->loadDefinesWithFallback($mainFile, $fallbackFile);
     }
 
     /**
@@ -225,8 +223,7 @@ class ArraysLanguageLoader extends BaseLanguageLoader
             $defineListFallback = $this->loadArrayDefineFile($fallbackFile);
         }
         $defineListMain = $this->loadArrayDefineFile($mainFile);
-        $defineList = array_merge($defineListFallback, $defineListMain);
-        return $defineList;
+        return array_merge($defineListFallback, $defineListMain);
     }
 
     /**
@@ -251,9 +248,9 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         }
 
         $this->mainLoader->addLanguageFilesLoaded('arrays', $definesFile);
-        // file should return a variable 
+        // file should return a variable
         $definesList = require $definesFile;
-        return $definesList; 
+        return $definesList;
     }
 
     // -----

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,21 +13,19 @@
  * @return string
  * @since ZC v1.0.3
  */
-function zen_get_ip_address() {
-    $ip = '';
+function zen_get_ip_address()
+{
     /**
      * resolve any proxies
      */
-    if (isset($_SERVER)) {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ??
-            $_SERVER['HTTP_CLIENT_IP'] ??
-                $_SERVER['HTTP_X_FORWARDED'] ??
-                    $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'] ??
-                        $_SERVER['HTTP_FORWARDED_FOR'] ??
-                            $_SERVER['HTTP_FORWARDED'] ??
-                                $_SERVER['REMOTE_ADDR'] ?? '';
-    }
-    if (trim($ip) === '') {
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ??
+        $_SERVER['HTTP_CLIENT_IP'] ??
+            $_SERVER['HTTP_X_FORWARDED'] ??
+                $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'] ??
+                    $_SERVER['HTTP_FORWARDED_FOR'] ??
+                        $_SERVER['HTTP_FORWARDED'] ??
+                            $_SERVER['REMOTE_ADDR'] ?? '';
+    if (trim((string) $ip) === '') {
         if (getenv('HTTP_X_FORWARDED_FOR')) {
             $ip = getenv('HTTP_X_FORWARDED_FOR');
         } elseif (getenv('HTTP_CLIENT_IP')) {
@@ -58,16 +58,15 @@ function zen_get_ip_address() {
     return $ip;
 }
 
-
 /**
  * Stop execution completely
  * @since ZC v1.0.3
  */
-function zen_exit() {
+function zen_exit(): never
+{
     session_write_close();
     exit();
 }
-
 
 /**
  * Return whether the browser client is of a certain type
@@ -76,8 +75,10 @@ function zen_exit() {
  * @return false|string
  * @since ZC v1.0.3
  */
-function zen_browser_detect($lookup_pattern) {
-    if (!isset($_SERVER['HTTP_USER_AGENT'])) return false;
-    return stristr($_SERVER['HTTP_USER_AGENT'], $lookup_pattern);
+function zen_browser_detect($lookup_pattern): false|string
+{
+    if (!isset($_SERVER['HTTP_USER_AGENT'])) {
+        return false;
+    }
+    return stristr((string) $_SERVER['HTTP_USER_AGENT'], $lookup_pattern);
 }
-

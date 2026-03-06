@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2015-2024 Vinos de Frutas Tropicales
@@ -7,9 +9,7 @@
 //
 // Last updated: POSM 5.0.0
 //
-if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
-    die('Illegal Access');
-}
+die('Illegal Access');
 
 class PosmSalesReport
 {
@@ -17,10 +17,19 @@ class PosmSalesReport
     public string $end;
     public int $pID;
     public int $number_of_orders;
+    /**
+     * @var int
+     */
     public $quantity;
+    /**
+     * @var int
+     */
     public $total_price;
     public array $orders;
     public array $options;
+    /**
+     * @var \currencies
+     */
     public $currencies;
 
     public function __construct($pID, $start_timestamp, $end_timestamp)
@@ -34,18 +43,18 @@ class PosmSalesReport
         $this->currencies = new currencies();
 
         $op_list = $db->Execute(
-            "SELECT op.orders_products_id, op.final_price, op.products_quantity
-               FROM " . TABLE_ORDERS_PRODUCTS . " op, " . TABLE_ORDERS . " o
+            'SELECT op.orders_products_id, op.final_price, op.products_quantity
+               FROM ' . TABLE_ORDERS_PRODUCTS . ' op, ' . TABLE_ORDERS . " o
               WHERE o.date_purchased >= '" . $this->start . "'
                 AND o.date_purchased <= '" . $this->end . "'
                 AND o.orders_id = op.orders_id
-                AND op.products_id = " . $this->pID . "
+                AND op.products_id = " . $this->pID . '
                 AND EXISTS (
                     SELECT opa.orders_products_attributes_id
-                      FROM " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " opa
+                      FROM ' . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . ' opa
                      WHERE opa.orders_products_id = op.orders_products_id
                      LIMIT 1
-                )"
+                )'
         );
         $this->number_of_orders = (int)$op_list->RecordCount();
         $this->total_price = 0;
@@ -60,8 +69,8 @@ class PosmSalesReport
             $this->total_price += $product_price;
 
             $opa_list = $db->Execute(
-                "SELECT products_options as options_name, products_options_values as options_values_name, products_options_id as options_id, products_options_values_id as options_values_id
-                   FROM " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
+                'SELECT products_options as options_name, products_options_values as options_values_name, products_options_id as options_id, products_options_values_id as options_values_id
+                   FROM ' . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
                   WHERE orders_products_id = $opID 
                ORDER BY orders_products_attributes_id ASC"
             );
@@ -91,7 +100,7 @@ class PosmSalesReport
                         'names' => [],
                         'number_of_orders' => 0,
                         'quantity' => 0,
-                        'total_price' => 0
+                        'total_price' => 0,
                     ];
                 }
                 if (!in_array($options_values_name, $this->options[$options_id]['values'][$options_values_id]['names'])) {

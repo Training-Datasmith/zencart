@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -47,21 +49,21 @@ class zcAjaxSelect2Lookups extends base
             $currencies = new currencies();
         }
 
-        $query = "SELECT p.products_id, pd.products_name, p.products_price, p.products_model
-            FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        $query = 'SELECT p.products_id, pd.products_name, p.products_price, p.products_model
+            FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
             WHERE p.products_id = pd.products_id
-            AND pd.language_id = :languageID";
+            AND pd.language_id = :languageID';
 
-        $order_by = " ORDER BY products_name";
+        $order_by = ' ORDER BY products_name';
 
         $exclude_specials = '';
         if (in_array('specials', $exclusion_formulas, true)) {
-            $exclude_specials = " AND p.products_id NOT IN (SELECT DISTINCT products_id FROM " . TABLE_SPECIALS . ") ";
+            $exclude_specials = ' AND p.products_id NOT IN (SELECT DISTINCT products_id FROM ' . TABLE_SPECIALS . ') ';
         }
 
         $exclude_featured_products = '';
         if (in_array('featured', $exclusion_formulas, true)) {
-            $exclude_featured_products = " AND p.products_id NOT IN (SELECT DISTINCT products_id FROM " . TABLE_FEATURED . ") ";
+            $exclude_featured_products = ' AND p.products_id NOT IN (SELECT DISTINCT products_id FROM ' . TABLE_FEATURED . ') ';
         }
 
         $exclude_gv = '';
@@ -70,9 +72,9 @@ class zcAjaxSelect2Lookups extends base
             $exclude_gv = " AND p.products_model NOT LIKE 'GIFT%' ";
         }
 
-// @TODO:optionally offer exclusion of products that cannot be added to cart:
-//        LEFT JOIN " . TABLE_PRODUCT_TYPES . " pt ON p.products_type = pt.type_id
-//        WHERE pt.allow_add_to_cart = 'N'
+        // @TODO:optionally offer exclusion of products that cannot be added to cart:
+        //        LEFT JOIN " . TABLE_PRODUCT_TYPES . " pt ON p.products_type = pt.type_id
+        //        WHERE pt.allow_add_to_cart = 'N'
 
         $search_query = '';
         if ($lookup !== '') {
@@ -101,7 +103,7 @@ class zcAjaxSelect2Lookups extends base
 
             $records[] = [
                 'id' => (string)$result['products_id'],
-                'text' => ($this->stripTags ? strip_tags($result['products_name']) : $result['products_name']) .
+                'text' => ($this->stripTags ? strip_tags((string) $result['products_name']) : $result['products_name']) .
                     ' (' . $currencies->format($display_price) . ')' .
                     ($show_model ? ' [' . $result['products_model'] . '] ' : '') .
                     ($show_id ? ' - ID# ' . $result['products_id'] : '')

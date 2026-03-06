@@ -6,15 +6,15 @@
  * @version $Id: neekfenwick 2023 Dec 09 Modified in v2.0.0-alpha1 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 // select downloads for current order
-$orders_download_query = "select * from " . TABLE_ORDERS_PRODUCTS_DOWNLOAD . " where orders_id='" . (int)$_GET['oID'] . "'";
+$orders_download_query = 'select * from ' . TABLE_ORDERS_PRODUCTS_DOWNLOAD . " where orders_id='" . (int)$_GET['oID'] . "'";
 $orders_download = $db->Execute($orders_download_query);
 
 // only display if there are downloads to display
 if ($orders_download->RecordCount() > 0) {
-  ?>
+    ?>
   <table class="table-bordered">
     <tr>
       <td class="smallText"><?php echo TEXT_LEGEND; ?></td>
@@ -32,39 +32,22 @@ if ($orders_download->RecordCount() > 0) {
     </tr>
     <?php
 // add legend
-    while (!$orders_download->EOF) {
-      // $order->info['date_purchased'] . ' vs ' . (zen_date_diff($order->info['date_purchased'], date('Y-m-d')) > $orders_download->fields['download_maxdays'] ? 'NO' : 'YES') . ' vs ' .
-      switch (true) {
-        case ($orders_download->fields['download_maxdays'] <= 0 && $orders_download->fields['download_count'] <= 0):
-          $zc_file_status = TEXT_INFO_EXPIRED_DATE . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>';
-          break;
-        case ($orders_download->fields['download_maxdays'] != 0 && (zen_date_diff($order->info['date_purchased'], date('Y-m-d')) > $orders_download->fields['download_maxdays'])):
-          $zc_file_status = TEXT_INFO_EXPIRED_DATE . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>';
-          break;
-        case ($orders_download->fields['download_maxdays'] == 0):
-          $zc_file_status = '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_off=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('enabled', IMAGE_ICON_STATUS_CURRENT, 'lg') . '</a>';
-          break;
-        case ($orders_download->fields['download_maxdays'] > 0 and $orders_download->fields['download_count'] > 0):
-          $zc_file_status = '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_off=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('enabled', IMAGE_ICON_STATUS_CURRENT, 'lg') . '</a>';
-          break;
-        /*
-          case ($orders_download->fields['download_maxdays'] <= 1 or $orders_download->fields['download_count'] <= 1):
-          $zc_file_status = TEXT_INFO_EXPIRED_COUNT . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED) . '</a>';
-          break;
-         */
-        case ($orders_download->fields['download_maxdays'] != 0 && $orders_download->fields['download_count'] <= 1):
-          $zc_file_status = TEXT_INFO_EXPIRED_COUNT . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>';
-          break;
-        default:
-          $zc_file_status = '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(array('oID', 'action')) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>';
-          break;
-      }
+      while (!$orders_download->EOF) {
+          // $order->info['date_purchased'] . ' vs ' . (zen_date_diff($order->info['date_purchased'], date('Y-m-d')) > $orders_download->fields['download_maxdays'] ? 'NO' : 'YES') . ' vs ' .
+          $zc_file_status = match (true) {
+              $orders_download->fields['download_maxdays'] <= 0 && $orders_download->fields['download_count'] <= 0 => TEXT_INFO_EXPIRED_DATE . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>',
+              $orders_download->fields['download_maxdays'] != 0 && (zen_date_diff($order->info['date_purchased'], date('Y-m-d')) > $orders_download->fields['download_maxdays']) => TEXT_INFO_EXPIRED_DATE . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>',
+              $orders_download->fields['download_maxdays'] == 0 => '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_off=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('enabled', IMAGE_ICON_STATUS_CURRENT, 'lg') . '</a>',
+              $orders_download->fields['download_maxdays'] > 0 and $orders_download->fields['download_count'] > 0 => '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_off=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('enabled', IMAGE_ICON_STATUS_CURRENT, 'lg') . '</a>',
+              $orders_download->fields['download_maxdays'] != 0 && $orders_download->fields['download_count'] <= 1 => TEXT_INFO_EXPIRED_COUNT . '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>',
+              default => '<a href="' . zen_href_link(FILENAME_ORDERS, zen_get_all_get_params(['oID', 'action']) . 'oID=' . $_GET['oID'] . '&action=edit&download_reset_on=' . $orders_download->fields['orders_products_download_id'], 'NONSSL') . '">' . zen_icon('linked', IMAGE_ICON_STATUS_EXPIRED, 'lg') . '</a>',
+          };
 
-// if not on server show red
-      if (!zen_orders_products_downloads($orders_download->fields['orders_products_filename'])) {
-        $zc_file_status = zen_icon('disabled', IMAGE_ICON_STATUS_OFF, 'lg');
-      }
-      ?>
+          // if not on server show red
+          if (!zen_orders_products_downloads($orders_download->fields['orders_products_filename'])) {
+              $zc_file_status = zen_icon('disabled', IMAGE_ICON_STATUS_OFF, 'lg');
+          }
+          ?>
       <tr>
         <td class="smallText text-center"><?php echo $zc_file_status; ?></td>
         <td class="smallText"><?php echo $orders_download->fields['orders_products_filename']; ?></td>
@@ -72,8 +55,8 @@ if ($orders_download->RecordCount() > 0) {
         <td class="smallText text-center"><?php echo $orders_download->fields['download_count']; ?></td>
       </tr>
       <?php
-      $orders_download->MoveNext();
-    }
+          $orders_download->MoveNext();
+      }
     ?>
   </table>
   <?php

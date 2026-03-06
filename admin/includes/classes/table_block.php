@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -15,7 +17,7 @@ class boxTableBlock
     /**
      * @since ZC v1.5.5
      */
-    public function tableBlock($contents): string
+    public function tableBlock(array $contents): string
     {
         $tableBox_string = '';
 

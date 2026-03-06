@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * product_info header_php.php
  *

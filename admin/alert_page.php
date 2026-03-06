@@ -6,10 +6,10 @@
  */
 require('includes/application_top.php');
 $adminDirectoryExists = $installDirectoryExists = false;
-if (substr(DIR_WS_ADMIN, -7) == '/admin/' || substr(DIR_WS_HTTPS_ADMIN, -7) == '/admin/') {
+if (str_ends_with(DIR_WS_ADMIN, '/admin/') || str_ends_with(DIR_WS_HTTPS_ADMIN, '/admin/')) {
     $adminDirectoryExists = true;
 }
-$check_path = dirname($_SERVER['SCRIPT_FILENAME']) . '/../zc_install';
+$check_path = dirname((string) $_SERVER['SCRIPT_FILENAME']) . '/../zc_install';
 if (is_dir($check_path)) {
     $installDirectoryExists = true;
 }

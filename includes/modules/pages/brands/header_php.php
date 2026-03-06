@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * brands header_php.php
  *
@@ -18,17 +20,17 @@ $typefilter = $_GET['typefilter'] = 'brands';
 
 if ((int)PRODUCTS_MANUFACTURERS_STATUS === 1) {
     $listing_sql =
-        "SELECT DISTINCT m.manufacturers_name, m.manufacturers_image, m.manufacturers_id, m.featured
-           FROM " . TABLE_MANUFACTURERS . " m
-                LEFT JOIN " . TABLE_PRODUCTS . " p
+        'SELECT DISTINCT m.manufacturers_name, m.manufacturers_image, m.manufacturers_id, m.featured
+           FROM ' . TABLE_MANUFACTURERS . ' m
+                LEFT JOIN ' . TABLE_PRODUCTS . ' p
                     ON m.manufacturers_id = p.manufacturers_id
           WHERE p.products_status = 1
-          ORDER BY m.featured DESC, m.manufacturers_name";
+          ORDER BY m.featured DESC, m.manufacturers_name';
 } else {
     $listing_sql =
-        "SELECT m.manufacturers_name, m.manufacturers_image, m.manufacturers_id, m.featured
-           FROM " . TABLE_MANUFACTURERS . " m
-           ORDER BY m.featured DESC, m.manufacturers_name";
+        'SELECT m.manufacturers_name, m.manufacturers_image, m.manufacturers_id, m.featured
+           FROM ' . TABLE_MANUFACTURERS . ' m
+           ORDER BY m.featured DESC, m.manufacturers_name';
 }
 
 $brands = [

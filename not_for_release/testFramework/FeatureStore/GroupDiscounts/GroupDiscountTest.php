@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Tests\FeatureStore\GroupDiscounts;
 
 use Tests\Support\helpers\ProfileManager;
@@ -10,7 +13,7 @@ class GroupDiscountTest extends zcFeatureTestCaseStore
      * @test
      * scenario GD 1
      */
-    public function testGroupDiscountsSimple()
+    public function testGroupDiscountsSimple(): void
     {
 
         $profile = ProfileManager::getProfile('florida-basic1');
@@ -33,7 +36,7 @@ class GroupDiscountTest extends zcFeatureTestCaseStore
      * @test
      * scenario GD 2
      */
-    public function testGroupDiscountsWithDiscountCoupon()
+    public function testGroupDiscountsWithDiscountCoupon(): void
     {
         $profile = ProfileManager::getProfile('florida-basic1');
         $this->createCustomerAccountOrLogin('florida-basic1');
@@ -57,7 +60,7 @@ class GroupDiscountTest extends zcFeatureTestCaseStore
      * @test
      * scenario GD 3
      */
-    public function testGroupDiscountsSimpleTaxInclusive()
+    public function testGroupDiscountsSimpleTaxInclusive(): void
     {
         $this->switchToTaxInclusive();
         $profile = ProfileManager::getProfile('florida-basic1');
@@ -81,7 +84,7 @@ class GroupDiscountTest extends zcFeatureTestCaseStore
      * @test
      * scenario GD 4
      */
-    public function testGroupDiscountsSimpleTaxInclusiveShippingTax()
+    public function testGroupDiscountsSimpleTaxInclusiveShippingTax(): void
     {
         $this->switchToTaxInclusive();
         $this->switchItemShippingTax('on');
@@ -107,7 +110,7 @@ class GroupDiscountTest extends zcFeatureTestCaseStore
      * @test
      * scenario GD 5
      */
-    public function testGroupDiscountsSimpleTaxInclusiveShippingTaxSplitMode()
+    public function testGroupDiscountsSimpleTaxInclusiveShippingTaxSplitMode(): void
     {
         $this->switchToTaxInclusive();
         $this->switchItemShippingTax('on');

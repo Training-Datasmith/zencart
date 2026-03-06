@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * categories_tabs.php module
  *
@@ -22,13 +24,13 @@ $includeAllCategories ??= true;
 //$includeAllCategories = $zca_include_zero_product_categories ?? true;
 
 $categories_tab_query =
-    "SELECT c.sort_order, c.categories_id, cd.categories_name
-       FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+    'SELECT c.sort_order, c.categories_id, cd.categories_name
+       FROM ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . ' cd
       WHERE c.categories_id = cd.categories_id
-        AND c.parent_id = " . (int)TOPMOST_CATEGORY_PARENT_ID . "
-        AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
+        AND c.parent_id = ' . (int)TOPMOST_CATEGORY_PARENT_ID . '
+        AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
         AND c.categories_status = 1
-    ORDER BY c.sort_order, cd.categories_name";
+    ORDER BY c.sort_order, cd.categories_name';
 $results = $db->Execute($categories_tab_query);
 
 $links_list = [];
@@ -59,4 +61,3 @@ foreach ($results as $category) {
     // stuff category id into array for later querying; note: we add the 'c' prefix to avoid array renumbering of numeric values (it can be stripped later where used)
     $links_list_by_category['c' . $category['categories_id']] = $link;
 }
-

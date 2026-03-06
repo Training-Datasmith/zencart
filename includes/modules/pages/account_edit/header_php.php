@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Header code file for the customer's Account-Edit page
  *
@@ -34,8 +36,8 @@ if (!empty($_POST['action']) && $_POST['action'] === 'process') {
     $fax = zen_db_prepare_input($_POST['fax'] ?? '');
     $email_format = in_array($_POST['email_format'], ['HTML', 'TEXT', 'NONE', 'OUT'], true) ? $_POST['email_format'] : 'TEXT';
 
-    $customers_referral = ''; 
-    if (CUSTOMERS_REFERRAL_STATUS === '2' && !empty($_POST['customers_referral']) ) {
+    $customers_referral = '';
+    if (CUSTOMERS_REFERRAL_STATUS === '2' && !empty($_POST['customers_referral'])) {
         $customers_referral = zen_db_prepare_input($_POST['customers_referral']);
     }
 
@@ -55,7 +57,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'process') {
     }
 
     if (ACCOUNT_DOB === 'true' && (ENTRY_DOB_MIN_LENGTH > 0 || !empty($_POST['dob']))) {
-        if (strlen($dob) > 10 || zen_valid_date($dob) === false) {
+        if (strlen((string) $dob) > 10 || zen_valid_date($dob) === false) {
             $error = true;
             $messageStack->add('account_edit', ENTRY_DATE_OF_BIRTH_ERROR);
         }
@@ -72,10 +74,10 @@ if (!empty($_POST['action']) && $_POST['action'] === 'process') {
     }
 
     $check_email_query =
-        "SELECT COUNT(*) AS total
-           FROM " . TABLE_CUSTOMERS . "
+        'SELECT COUNT(*) AS total
+           FROM ' . TABLE_CUSTOMERS . '
           WHERE customers_email_address = :emailAddress
-            AND customers_id != :customersID";
+            AND customers_id != :customersID';
 
     $check_email_query = $db->bindVars($check_email_query, ':emailAddress', $email_address, 'string');
     $check_email_query = $db->bindVars($check_email_query, ':customersID', $_SESSION['customer_id'], 'integer');
@@ -93,7 +95,6 @@ if (!empty($_POST['action']) && $_POST['action'] === 'process') {
     if ($nick_error) {
         $error = true;
     }
-
 
     if (strlen($telephone) < ENTRY_TELEPHONE_MIN_LENGTH) {
         $error = true;
@@ -159,7 +160,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'process') {
         if ($customer_data['activation_required']) {
             $auth_token_info = $customer->getAuthTokenInfo();
             $token_valid_minutes = Customer::getAuthTokenMinutesValid();
-            if ($auth_token_info === false || $auth_token_info['email_address'] !== $email_address || strtotime($auth_token_info['created_at']) + $token_valid_minutes > time()) {
+            if ($auth_token_info === false || $auth_token_info['email_address'] !== $email_address || strtotime((string) $auth_token_info['created_at']) + $token_valid_minutes > time()) {
                 require DIR_WS_MODULES . zen_get_module_directory(FILENAME_SEND_AUTH_TOKEN_EMAIL);
             }
             zen_redirect(zen_href_link(CUSTOMERS_AUTHORIZATION_FILENAME, '', 'SSL'));

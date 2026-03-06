@@ -53,7 +53,7 @@ if (!empty($_POST['action'])) {
         }
         // validate manual-generated token such as one sent via email
         if (isset($_SESSION['mfa']['expires']) && !empty($_SESSION['mfa']['token'])) {
-            if (trim($_POST['mfa_code']) === $_SESSION['mfa']['token']) {
+            if (trim((string) $_POST['mfa_code']) === $_SESSION['mfa']['token']) {
                 // check for re-used code
                 if (zen_check_if_mfa_token_is_reused($_POST['mfa_code'], $_SESSION['mfa']['admin_name'] ?? zen_get_admin_name($_SESSION['admin_id']))) {
                     // re-use of already-used token is a security violation, so log the user out
@@ -77,7 +77,7 @@ if (!empty($_POST['action'])) {
                 // store secret if this is first validated otp code from qr code
                 if (!empty($_SESSION['mfa']['secret_not_yet_persisted'])) {
                     // store validated secret
-                    zen_db_perform(TABLE_ADMIN, ['mfa' => json_encode(['secret' => $_SESSION['mfa']['secret'], 'generated_at' => time()])], 'update', "admin_id = " . (int)$_SESSION['mfa']['admin_id']);
+                    zen_db_perform(TABLE_ADMIN, ['mfa' => json_encode(['secret' => $_SESSION['mfa']['secret'], 'generated_at' => time()])], 'update', 'admin_id = ' . (int)$_SESSION['mfa']['admin_id']);
                 }
                 // store used token code as expired, to prevent re-use by hijacked devices
                 zen_db_perform(TABLE_ADMIN_EXPIRED_TOKENS, ['admin_name' => $_SESSION['mfa']['admin_name'] ?? zen_get_admin_name($_SESSION['admin_id']), 'otp_code' => $_POST['mfa_code']]);
@@ -96,7 +96,7 @@ if (!empty($_POST['action'])) {
 
     } elseif ($_POST['action'] === 'setup' . $_SESSION['securityToken']) {
         if ($_POST['selected'] === 'email') {
-            zen_db_perform(TABLE_ADMIN, ['mfa' => json_encode(['via_email' => true])], 'update', "admin_id = " . (int)$_SESSION['admin_id']);
+            zen_db_perform(TABLE_ADMIN, ['mfa' => json_encode(['via_email' => true])], 'update', 'admin_id = ' . (int)$_SESSION['admin_id']);
             zen_mfa_by_email(['admin_id' => $user['admin_id'], 'email' => $user['admin_email'], 'admin_name' => $user['admin_name'], 'mfa' => json_encode(['via_email' => true])]);
             $redirect = zen_href_link($_GET['camefrom'] ?? FILENAME_DEFAULT, zen_get_all_get_params(['camefrom', 'action']), 'SSL');
             zen_redirect($redirect);
@@ -133,7 +133,7 @@ $fieldAttributes .= match ($_SESSION['mfa']['type'] ?? 'digits') {
             <div class="row">
                 <div class="col-sm-12 mfa-main-div mfa-box-shadow">
                     <?= zen_image(DIR_WS_IMAGES . HEADER_LOGO_IMAGE, HEADER_ALT_TEXT, HEADER_LOGO_WIDTH, HEADER_LOGO_HEIGHT, 'class="mfa-img"') . PHP_EOL ?>
-                    <?= zen_draw_form('mfaForm', FILENAME_MFA, zen_get_all_get_params(), 'post', 'id="mfaForm" class="form-horizontal"', 'true') . PHP_EOL ?>
+                    <?= zen_draw_form('mfaForm', FILENAME_MFA, zen_get_all_get_params(), 'post') . PHP_EOL ?>
 
                     <?php if ($setup_required) { ?>
                     <?= zen_draw_hidden_field('action', 'setup' . $_SESSION['securityToken'], 'id="otpsetup"') . PHP_EOL ?>
@@ -151,7 +151,7 @@ $fieldAttributes .= match ($_SESSION['mfa']['type'] ?? 'digits') {
 
                     <?php if (empty($_SESSION['mfa']['qrcode'])) { ?>
                     <div id="mfa-intro" class="col-xs-12 mt-3">
-                        <p><?= ''//TEXT_MFA_INTRO ?></p>
+                        <p><?= ''//TEXT_MFA_INTRO?></p>
                     </div>
                     <?php } ?>
 
@@ -161,13 +161,13 @@ $fieldAttributes .= match ($_SESSION['mfa']['type'] ?? 'digits') {
                             <?= TEXT_MFA_SCAN_QR_CODE ?><br><br>
                             <div id="mfa_qr_img"><?php
                                 $qrCode = $_SESSION['mfa']['qrcode'];
-                                if (str_starts_with($qrCode, '<')) {
-                                    echo $qrCode;
-                                } else {
-                                    echo sprintf('<img class="text-center" src="%s" alt="QR Code"/>', $qrCode);
-                                }
-                                ?>
-                            <?php echo "<pre>" . $_SESSION['mfa']['secret'] . "</pre>";?></div>
+                        if (str_starts_with((string) $qrCode, '<')) {
+                            echo $qrCode;
+                        } else {
+                            echo sprintf('<img class="text-center" src="%s" alt="QR Code"/>', $qrCode);
+                        }
+                        ?>
+                            <?php echo '<pre>' . $_SESSION['mfa']['secret'] . '</pre>';?></div>
                         </div>
                     <?php
                     } ?>
@@ -182,7 +182,7 @@ $fieldAttributes .= match ($_SESSION['mfa']['type'] ?? 'digits') {
                                         echo TEXT_MFA_ENTER_OTP_CODE;
                                     }
                                 }
-                                ?>
+                        ?>
                                 <div class="input-group mt-4">
                                     <span class="input-group-addon"><i class="fa-solid fa-lg fa-lock"></i></span>
                                     <?= zen_draw_input_field('mfa_code', '', 'class="form-control input-md" autocapitalize="none" spellcheck="false" autocomplete="one-time-code" autofocus placeholder="' . TEXT_MFA_INPUT . '"' . $fieldAttributes . ' id="mfa-' . $_SESSION['securityToken'] . '" required', false, 'text') . PHP_EOL ?>

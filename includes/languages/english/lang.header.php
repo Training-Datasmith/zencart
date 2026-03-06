@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'HEADER_TITLE_MY_ACCOUNT' => 'My Account',
     'HEADER_TITLE_CART_CONTENTS' => 'Shopping Cart',
     'HEADER_TITLE_CHECKOUT' => 'Checkout',
@@ -15,5 +17,3 @@ $define = [
     'HEADER_SEARCH_DEFAULT_TEXT' => 'Enter search keywords here',
     'SEARCH_DEFAULT_TEXT' => 'search here',
 ];
-
-return $define;

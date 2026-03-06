@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Ask a Question',
     'HEADING_TITLE' => 'Ask a Question About ',
     'FORM_TITLE' => 'What is Your Question?',
@@ -10,5 +12,3 @@ $define = [
     'CALL_FOR_PRICE_FORM_TITLE' => 'Please Complete Contact Detail',
     'CALL_FOR_PRICE_EMAIL_SUBJECT' => 'Product Price Inquiry at ' . STORE_NAME,
 ];
-
-return $define;

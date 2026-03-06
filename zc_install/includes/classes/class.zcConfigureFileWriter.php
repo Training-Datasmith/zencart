@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * file contains zcConfigureFileWriter class
  * @copyright Copyright 2003-2024 Zen Cart Development Team
@@ -19,46 +21,46 @@ class zcConfigureFileWriter
         $replaceVars = [];
         $replaceVars['INSTALLER_METHOD'] = (isset($inputs['installer_method'])) ? trim($inputs['installer_method']) : 'Zen Cart Installer';
         $replaceVars['DATE_NOW'] = date('D M d Y H:i:s');
-        $replaceVars['CATALOG_HTTP_SERVER'] = trim($inputs['http_server_catalog'], '/ ');
-        $replaceVars['CATALOG_HTTPS_SERVER'] = trim($inputs['https_server_catalog'], '/ ');
+        $replaceVars['CATALOG_HTTP_SERVER'] = trim((string) $inputs['http_server_catalog'], '/ ');
+        $replaceVars['CATALOG_HTTPS_SERVER'] = trim((string) $inputs['https_server_catalog'], '/ ');
         $replaceVars['ENABLE_SSL_CATALOG'] = !empty($inputs['enable_ssl_catalog']) ? $inputs['enable_ssl_catalog'] : 'false';
-        $replaceVars['DIR_WS_CATALOG'] = preg_replace('~//~', '/', '/' . trim($inputs['dir_ws_http_catalog'], ' /\\') . '/');
-        $replaceVars['DIR_WS_HTTPS_CATALOG'] = preg_replace('~//~', '/', '/' . trim($inputs['dir_ws_https_catalog'], ' /\\') . '/');
-        $replaceVars['DIR_FS_CATALOG'] = rtrim($inputs['physical_path'], ' /\\') . '/';
+        $replaceVars['DIR_WS_CATALOG'] = preg_replace('~//~', '/', '/' . trim((string) $inputs['dir_ws_http_catalog'], ' /\\') . '/');
+        $replaceVars['DIR_WS_HTTPS_CATALOG'] = preg_replace('~//~', '/', '/' . trim((string) $inputs['dir_ws_https_catalog'], ' /\\') . '/');
+        $replaceVars['DIR_FS_CATALOG'] = rtrim((string) $inputs['physical_path'], ' /\\') . '/';
 
-        $replaceVars['DB_TYPE'] = trim($inputs['db_type']);
+        $replaceVars['DB_TYPE'] = trim((string) $inputs['db_type']);
         if (empty($replaceVars['DB_TYPE'])) {
             $replaceVars['DB_TYPE'] = 'mysql';
         }
 
-        $replaceVars['DB_PREFIX'] = trim($inputs['db_prefix']);
+        $replaceVars['DB_PREFIX'] = trim((string) $inputs['db_prefix']);
 
-        $replaceVars['DB_CHARSET'] = trim($inputs['db_charset']);
+        $replaceVars['DB_CHARSET'] = trim((string) $inputs['db_charset']);
         if (empty($replaceVars['DB_CHARSET'])) {
             $replaceVars['DB_CHARSET'] = 'utf8mb4';
         }
 
-        $replaceVars['DB_SERVER'] = trim($inputs['db_host']);
-        $replaceVars['DB_SERVER_USERNAME'] = trim($inputs['db_user']);
-        $replaceVars['DB_SERVER_PASSWORD'] = trim($inputs['db_password']);
-        $replaceVars['DB_DATABASE'] = trim($inputs['db_name']);
-        $replaceVars['SQL_CACHE_METHOD'] = trim($inputs['sql_cache_method']);
-        $replaceVars['HTTP_SERVER_ADMIN'] = trim($inputs['http_server_admin']);
+        $replaceVars['DB_SERVER'] = trim((string) $inputs['db_host']);
+        $replaceVars['DB_SERVER_USERNAME'] = trim((string) $inputs['db_user']);
+        $replaceVars['DB_SERVER_PASSWORD'] = trim((string) $inputs['db_password']);
+        $replaceVars['DB_DATABASE'] = trim((string) $inputs['db_name']);
+        $replaceVars['SQL_CACHE_METHOD'] = trim((string) $inputs['sql_cache_method']);
+        $replaceVars['HTTP_SERVER_ADMIN'] = trim((string) $inputs['http_server_admin']);
         $replaceVars['SESSION_STORAGE'] = 'reserved for future use';
 
         $this->replaceVars = $replaceVars;
         $adminDir = $inputs['adminDir'];
 
-// die('<pre>' . print_r($inputs, true));
+        // die('<pre>' . print_r($inputs, true));
 
         $this->processAllConfigureFiles($adminDir);
     }
 
-    protected function processAllConfigureFiles($adminDir): int
+    protected function processAllConfigureFiles(string $adminDir): int
     {
         $tplFile = DIR_FS_INSTALL . 'includes/catalog-configure-template.php';
-        $outputFile = rtrim($this->inputs['physical_path'], '/') . '/includes/configure.php';
-        $outputFileLocal = rtrim($this->inputs['physical_path'], '/') . '/includes/local/configure.php';
+        $outputFile = rtrim((string) $this->inputs['physical_path'], '/') . '/includes/configure.php';
+        $outputFileLocal = rtrim((string) $this->inputs['physical_path'], '/') . '/includes/local/configure.php';
         if (file_exists($outputFileLocal)) {
             $outputFile = $outputFileLocal;
         }
@@ -69,8 +71,8 @@ class zcConfigureFileWriter
         }
 
         $tplFile = DIR_FS_INSTALL . 'includes/admin-configure-template.php';
-        $outputFile = rtrim($this->inputs['physical_path'], '/') . '/' . $adminDir . '/includes/configure.php';
-        $outputFileLocal = rtrim($this->inputs['physical_path'], '/') . '/' . $adminDir . '/includes/local/configure.php';
+        $outputFile = rtrim((string) $this->inputs['physical_path'], '/') . '/' . $adminDir . '/includes/configure.php';
+        $outputFileLocal = rtrim((string) $this->inputs['physical_path'], '/') . '/' . $adminDir . '/includes/local/configure.php';
         if (file_exists($outputFileLocal)) {
             $outputFile = $outputFileLocal;
         }
@@ -84,7 +86,7 @@ class zcConfigureFileWriter
         return $result1 & $result2;
     }
 
-    protected function transformConfigureTplFile($tplFile, $outputFile): int|false
+    protected function transformConfigureTplFile(string $tplFile, string $outputFile): int|false
     {
         $tplOriginal = file_get_contents($tplFile);
         if ($tplOriginal === false) {

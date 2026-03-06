@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Header code file for the Search Results page
  *

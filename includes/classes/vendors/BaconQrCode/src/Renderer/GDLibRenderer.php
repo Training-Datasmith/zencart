@@ -17,7 +17,7 @@ use GdImage;
 
 final class GDLibRenderer implements RendererInterface
 {
-    private ?GdImage $image;
+    private ?GdImage $image = null;
 
     /**
      * @var array<string, int>
@@ -25,10 +25,10 @@ final class GDLibRenderer implements RendererInterface
     private array $colors;
 
     public function __construct(
-        private int $size,
-        private int $margin = 4,
-        private string $imageFormat = 'png',
-        private int $compressionQuality = 9,
+        private readonly int $size,
+        private readonly int $margin = 4,
+        private readonly string $imageFormat = 'png',
+        private readonly int $compressionQuality = 9,
         private ?Fill $fill = null
     ) {
         if (! extension_loaded('gd') || ! function_exists('gd_info')) {
@@ -72,7 +72,6 @@ final class GDLibRenderer implements RendererInterface
         $this->image = $img;
         imagealphablending($this->image, false);
         imagesavealpha($this->image, true);
-
 
         $bg = $this->getColor($this->fill->getBackgroundColor());
         imagefilledrectangle($this->image, 0, 0, $this->size, $this->size, $bg);
@@ -121,10 +120,12 @@ final class GDLibRenderer implements RendererInterface
 
         for ($y = 0; $y < 7; $y += 1) {
             for ($x = 0; $x < 7; $x += 1) {
-                if ((($y === 1 || $y === 5) && $x > 0 && $x < 6) || (($x === 1 || $x === 5) && $y > 0 && $y < 6)) {
+                if (($y === 1 || $y === 5) && $x > 0 && $x < 6) {
                     continue;
                 }
-
+                if (($x === 1 || $x === 5) && $y > 0 && $y < 6) {
+                    continue;
+                }
                 $points = $this->normalizePoints([
                     ($this->margin + $x + $xOffset) * $pointInPx, ($this->margin + $y + $yOffset) * $pointInPx,
                     ($this->margin + $x + $xOffset + 1) * $pointInPx, ($this->margin + $y + $yOffset) * $pointInPx,
@@ -180,7 +181,7 @@ final class GDLibRenderer implements RendererInterface
                 break;
 
             case 'gif':
-                imagegif($this->image, null);
+                imagegif($this->image);
                 break;
 
             case 'jpeg':

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2025 Vinos de Frutas Tropicales
@@ -9,9 +11,7 @@ use Zencart\DbRepositories\PluginControlRepository;
 use Zencart\DbRepositories\PluginControlVersionRepository;
 use Zencart\PluginManager\PluginManager;
 
-if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
-    die('Illegal Access');
-}
+die('Illegal Access');
 
 class products_options_stock_observer extends base
 {
@@ -65,7 +65,7 @@ class products_options_stock_observer extends base
         zen_define_default('POSM_EXTRACT_STOCK_PAGES', FILENAME_ORDERS_INVOICE . ', ' . FILENAME_ORDERS_PACKINGSLIP);
 
         $extract_stock_pages = explode(',', str_replace(' ', '', POSM_EXTRACT_STOCK_PAGES));
-        $current_admin_page = pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_FILENAME);
+        $current_admin_page = pathinfo((string) $_SERVER['SCRIPT_FILENAME'], PATHINFO_FILENAME);
         $this->extract_stock_messages = in_array($current_admin_page, $extract_stock_pages);
 
         // -----
@@ -74,7 +74,7 @@ class products_options_stock_observer extends base
         // doesn't "overflow" that field length -- especially important for stores with MySql Strict-mode where
         // that "too big" value will result in an error.
         //
-        $this->name_max_length = (int)zen_field_length(TABLE_ORDERS_PRODUCTS, 'products_name');
+        $this->name_max_length = zen_field_length(TABLE_ORDERS_PRODUCTS, 'products_name');
 
         $this->attach(
             $this,
@@ -155,14 +155,14 @@ class products_options_stock_observer extends base
 
         if ($restock === 'on') {
             $products = $db->Execute(
-                "SELECT orders_products_id
-                   FROM " . TABLE_ORDERS_PRODUCTS . "
-                  WHERE orders_id = " . (int)$orders_id
+                'SELECT orders_products_id
+                   FROM ' . TABLE_ORDERS_PRODUCTS . '
+                  WHERE orders_id = ' . (int)$orders_id
             );
             foreach ($products as $next_product) {
                 $this->removeProductUpdateQuantity($next_product['orders_products_id'], false);
             }
-         }
+        }
     }
 
     // -----
@@ -174,11 +174,11 @@ class products_options_stock_observer extends base
 
         $pid = (int)$products_id;
         $db->Execute(
-            "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE products_id = $pid"
         );
         $db->Execute(
-            "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+            'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
               WHERE products_id = $pid"
         );
     }
@@ -213,15 +213,15 @@ class products_options_stock_observer extends base
             return;
         }
 
-        $pid = (int)zen_get_prid($info['product']['id']);
+        $pid = zen_get_prid($info['product']['id']);
 
         $prod_info = $db->Execute(
-            "SELECT pd.products_name, p.products_model
-               FROM " . TABLE_PRODUCTS_DESCRIPTION . " pd, " . TABLE_PRODUCTS . " p
+            'SELECT pd.products_name, p.products_model
+               FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' pd, ' . TABLE_PRODUCTS . " p
               WHERE p.products_id = $pid
                 AND pd.products_id = p.products_id
-                AND pd.language_id = " . $_SESSION['languages_id'] . "
-              LIMIT 1"
+                AND pd.language_id = " . $_SESSION['languages_id'] . '
+              LIMIT 1'
         );
 
         // -----
@@ -240,10 +240,10 @@ class products_options_stock_observer extends base
         }
         $products_name = $db->prepareInput($products_name . $stock_message);
         $db->Execute(
-            "UPDATE " . TABLE_ORDERS_PRODUCTS . "
+            'UPDATE ' . TABLE_ORDERS_PRODUCTS . "
                 SET products_name = '$products_name'
-              WHERE orders_products_id = " . $info['orders_products_id'] . "
-              LIMIT 1"
+              WHERE orders_products_id = " . $info['orders_products_id'] . '
+              LIMIT 1'
         );
 
         if (!(is_pos_product($pid) && isset($info['product']['attributes']))) {
@@ -252,8 +252,8 @@ class products_options_stock_observer extends base
             $attributes_array = $this->ordersProductsAttributesArray((int)$info['orders_products_id']);
             $hash = generate_pos_option_hash($pid, $attributes_array);
             $pos_record = $db->Execute(
-                "SELECT pos_id, products_quantity, pos_model
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT pos_id, products_quantity, pos_model
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -265,14 +265,14 @@ class products_options_stock_observer extends base
         //
         if ($pos_record === false) {
             $quantity_record = $db->Execute(
-                "SELECT products_quantity
-                   FROM " . TABLE_PRODUCTS . "
+                'SELECT products_quantity
+                   FROM ' . TABLE_PRODUCTS . "
                   WHERE products_id = $pid
                   LIMIT 1"
             );
             if ($quantity_record->fields['products_quantity'] < 0) {
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS . "
+                    'UPDATE ' . TABLE_PRODUCTS . "
                         SET products_quantity = 0
                       WHERE products_id = $pid
                       LIMIT 1"
@@ -290,7 +290,7 @@ class products_options_stock_observer extends base
             'NOTIFY_POSM_EO_PRODUCT_ADD_STOCK_UPDATE',
             [
                 'pos_record' => $pos_record,
-                'product' => $info
+                'product' => $info,
             ],
             $bypass_managed_stock_update
         );
@@ -302,18 +302,18 @@ class products_options_stock_observer extends base
         //
         if ($pos_record->EOF || $bypass_managed_stock_update === true) {
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS . "
-                    SET products_quantity = products_quantity + " . $info['product']['qty'] . "
+                'UPDATE ' . TABLE_PRODUCTS . '
+                    SET products_quantity = products_quantity + ' . $info['product']['qty'] . "
                   WHERE products_id = $pid
                   LIMIT 1"
             );
             $this->debug("edit_orders_add_product ($pid): Unmanaged variant, attributes:\n" . json_encode($attributes_array, JSON_PRETTY_PRINT));
 
             $db->Execute(
-                "UPDATE " . TABLE_ORDERS_PRODUCTS . "
+                'UPDATE ' . TABLE_ORDERS_PRODUCTS . "
                     SET products_model = '" . zen_db_input($prod_info->fields['products_model']) . "'
-                  WHERE orders_products_id = " . (int)$info['orders_products_id'] . "
-                  LIMIT 1"
+                  WHERE orders_products_id = " . (int)$info['orders_products_id'] . '
+                  LIMIT 1'
             );
             return;
         }
@@ -329,10 +329,10 @@ class products_options_stock_observer extends base
             $new_option_quantity = 0;
         }
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                 SET products_quantity = $new_option_quantity
-              WHERE pos_id = " . $pos_record->fields['pos_id'] . "
-              LIMIT 1"
+              WHERE pos_id = " . $pos_record->fields['pos_id'] . '
+              LIMIT 1'
         );
         $this->adjustOverallProductQuantity($pid);
         $this->debug("edit_orders_add_product ($pid): Managed variant, setting quantity to $new_option_quantity, attributes_array: \n" . json_encode($attributes_array, JSON_PRETTY_PRINT));
@@ -344,10 +344,10 @@ class products_options_stock_observer extends base
         }
         $options_model_num = zen_db_input($options_model_num);
         $db->Execute(
-            "UPDATE " . TABLE_ORDERS_PRODUCTS . "
+            'UPDATE ' . TABLE_ORDERS_PRODUCTS . "
                 SET products_model = '$options_model_num'
-              WHERE orders_products_id = " . (int)$info['orders_products_id'] . "
-              LIMIT 1"
+              WHERE orders_products_id = " . (int)$info['orders_products_id'] . '
+              LIMIT 1'
         );
     }
 
@@ -359,9 +359,9 @@ class products_options_stock_observer extends base
         global $db, $messageStack;
 
         $option_values = $db->Execute(
-            "SELECT pos_id, products_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-              WHERE options_values_id = " . (int)$info['value_id']
+            'SELECT pos_id, products_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+              WHERE options_values_id = ' . (int)$info['value_id']
         );
         if (!$option_values->EOF) {
             $messageStack->add_session(sprintf(CAUTION_REMOVING_OPTIONS_STOCK, $option_values->RecordCount()), 'caution');
@@ -369,12 +369,12 @@ class products_options_stock_observer extends base
             foreach ($option_values as $next_option) {
                 $affected_products[] = $next_option['products_id'];
                 $db->Execute(
-                    "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                      WHERE pos_id = " . $next_option['pos_id']
+                    'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                      WHERE pos_id = ' . $next_option['pos_id']
                 );
                 $db->Execute(
-                    "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-                      WHERE pos_id = " . $next_option['pos_id']
+                    'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+                      WHERE pos_id = ' . $next_option['pos_id']
                 );
             }
             $affected_products = array_unique($affected_products);
@@ -392,29 +392,29 @@ class products_options_stock_observer extends base
         global $db, $messageStack;
 
         $attribute_info = $db->Execute(
-            "SELECT products_id, options_id, options_values_id
-               FROM " . TABLE_PRODUCTS_ATTRIBUTES . "
-              WHERE products_attributes_id = " . (int)$info['attribute_id'] . "
-              LIMIT 1"
+            'SELECT products_id, options_id, options_values_id
+               FROM ' . TABLE_PRODUCTS_ATTRIBUTES . '
+              WHERE products_attributes_id = ' . (int)$info['attribute_id'] . '
+              LIMIT 1'
         );
         if (!$attribute_info->EOF) {
             $pos_attribute_info = $db->Execute(
-                "SELECT pos_id FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-                  WHERE products_id = " . $attribute_info->fields['products_id'] . "
-                    AND options_id = " . $attribute_info->fields['options_id'] . "
-                    AND options_values_id = " . $attribute_info->fields['options_values_id']
+                'SELECT pos_id FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+                  WHERE products_id = ' . $attribute_info->fields['products_id'] . '
+                    AND options_id = ' . $attribute_info->fields['options_id'] . '
+                    AND options_values_id = ' . $attribute_info->fields['options_values_id']
             );
             if (!$pos_attribute_info->EOF) {
                 $messageStack->add_session(sprintf(CAUTION_REMOVING_OPTIONS_STOCK, $pos_attribute_info->RecordCount()), 'caution');
                 foreach ($pos_attribute_info as $next_attr) {
                     $db->Execute(
-                        "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                          WHERE pos_id = " . $next_attr['pos_id'] . "
-                          LIMIT 1"
+                        'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                          WHERE pos_id = ' . $next_attr['pos_id'] . '
+                          LIMIT 1'
                     );
                     $db->Execute(
-                        "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-                          WHERE pos_id = " . $next_attr['pos_id']
+                        'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+                          WHERE pos_id = ' . $next_attr['pos_id']
                     );
                 }
                 posm_update_base_product_quantity($attribute_info->fields['products_id']);
@@ -438,22 +438,22 @@ class products_options_stock_observer extends base
         global $db, $messageStack;
 
         $pos_info = $db->Execute(
-            "SELECT pos_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-              WHERE products_id = " . (int)$info['pID'] . "
-                AND options_id = " . (int)$info['options_id']
-         );
+            'SELECT pos_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+              WHERE products_id = ' . (int)$info['pID'] . '
+                AND options_id = ' . (int)$info['options_id']
+        );
         if (!$pos_info->EOF) {
             $messageStack->add_session(sprintf(CAUTION_REMOVING_OPTIONS_STOCK, $pos_info->RecordCount()), 'caution');
             foreach ($pos_info as $next_option) {
                 $db->Execute(
-                    "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                      WHERE pos_id = " . $next_option['pos_id'] . "
-                      LIMIT 1"
+                    'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                      WHERE pos_id = ' . $next_option['pos_id'] . '
+                      LIMIT 1'
                 );
                 $db->Execute(
-                    "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
-                      WHERE pos_id = " . $next_option['pos_id']
+                    'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . '
+                      WHERE pos_id = ' . $next_option['pos_id']
                 );
             }
             posm_update_base_product_quantity((int)$info['pID']);
@@ -465,7 +465,7 @@ class products_options_stock_observer extends base
     // Actions" dropdown.  If the selected product currently has attributes (non-readonly), then
     // add a link to the Options' Stock Manager.
     //
-    protected function notify_attribute_controller_additional_actions_dropdown_submenu(&$class, string $e, $unused1, &$unused2, &$products_filter, &$current_category_id, array &$additional_actions)
+    protected function notify_attribute_controller_additional_actions_dropdown_submenu(&$class, string $e, $unused1, &$unused2, string &$products_filter, string &$current_category_id, array &$additional_actions)
     {
         // -----
         // Using 'false' value to exclude read-only attributes from the check!
@@ -519,7 +519,7 @@ class products_options_stock_observer extends base
         if (empty($_GET['cPath'])) {
             $category_id = zen_get_products_category_id($product['products_id']);
         } else {
-            $categories = explode('_', $_GET['cPath']);
+            $categories = explode('_', (string) $_GET['cPath']);
             $category_id = end($categories);
         }
         $additional_icons .=
@@ -597,18 +597,18 @@ class products_options_stock_observer extends base
 
         // create additional products option stock names records
         $products_option_stock_names = $db->Execute(
-            "SELECT pos_name_id, pos_name
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
-              WHERE language_id = " . (int)$_SESSION['languages_id']
+            'SELECT pos_name_id, pos_name
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
+              WHERE language_id = ' . (int)$_SESSION['languages_id']
         );
 
         foreach ($products_option_stock_names as $option_stock_name) {
-          $db->Execute(
-              "INSERT IGNORE INTO " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
+            $db->Execute(
+                'INSERT IGNORE INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
                   (pos_name_id, language_id, pos_name)
                VALUES
-                  (" . $option_stock_name['pos_name_id'] . ", $insert_id, '" . zen_db_input($option_stock_name['pos_name']) . "')"
-          );
+                  (' . $option_stock_name['pos_name_id'] . ", $insert_id, '" . zen_db_input($option_stock_name['pos_name']) . "')"
+            );
         }
     }
 
@@ -620,7 +620,7 @@ class products_options_stock_observer extends base
     {
         global $db;
 
-        $db->Execute("DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " WHERE language_id = $lID");
+        $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " WHERE language_id = $lID");
     }
 
     // -----
@@ -654,8 +654,8 @@ class products_options_stock_observer extends base
         } else {
             $hash = generate_pos_option_hash($prid, $attributes);
             $pos_record = $db->Execute(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $prid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -693,8 +693,8 @@ class products_options_stock_observer extends base
         } else {
             $hash = generate_pos_option_hash($prid, $attributes);
             $pos_record = $db->Execute(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $prid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -725,8 +725,8 @@ class products_options_stock_observer extends base
         global $db;
         $hash = generate_pos_option_hash($prid, $attributes);
         $check = $db->ExecuteNoCache(
-            "SELECT *
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'SELECT *
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE products_id = $prid
                 AND pos_hash = '$hash'
               LIMIT 1"
@@ -792,8 +792,8 @@ class products_options_stock_observer extends base
         } else {
             $hash = generate_pos_option_hash($prid, $attributes);
             $pos_record = $db->Execute(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $prid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -809,7 +809,7 @@ class products_options_stock_observer extends base
         $products_name = $this->getProductNameWithMessage($pos_record, $prid, '', $updated_product['name'], 0, $stock_adjustment);
         $products_name = $db->prepareInput($products_name);
         $db->Execute(
-            "UPDATE " . TABLE_ORDERS_PRODUCTS . "
+            'UPDATE ' . TABLE_ORDERS_PRODUCTS . "
                 SET products_name = '$products_name'
               WHERE orders_products_id = $orders_products_id
               LIMIT 1"
@@ -842,12 +842,6 @@ class products_options_stock_observer extends base
             $this->updateUnmanagedProductsQuantity($prid, $stock_adjustment);
             return;
         }
-
-        // -----
-        // Otherwise, the current product's option-combination IS being stock-managed.  Subtract from the option-specific stock -- the overall product's stock has
-        // previously been reduced by the order class' processing.  Check that the overall product's stock value hasn't gone negative and set it back to 0 if it has.
-        //
-        $product_quantity_changed = true;
         $this->updateManagedProductsQuantity($pos_record, $stock_adjustment);
     }
 
@@ -875,8 +869,8 @@ class products_options_stock_observer extends base
 
         $hash = generate_pos_option_hash($prid, $attributes);
         $pos_record = $db->Execute(
-            "SELECT *
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'SELECT *
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE products_id = $prid
                 AND pos_hash = '$hash'
               LIMIT 1"
@@ -919,8 +913,8 @@ class products_options_stock_observer extends base
         } else {
             $hash = generate_pos_option_hash($prid, $attributes);
             $pos_record = $db->Execute(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $prid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -937,7 +931,7 @@ class products_options_stock_observer extends base
         $products_name = $this->getProductNameWithMessage($pos_record, $prid, $original_name, $updated_product['name'], $original_qty, $changed_qty);
         $products_name = $db->prepareInput($products_name);
         $db->Execute(
-            "UPDATE " . TABLE_ORDERS_PRODUCTS . "
+            'UPDATE ' . TABLE_ORDERS_PRODUCTS . "
                 SET products_name = '$products_name'
               WHERE orders_products_id = $orders_products_id
               LIMIT 1"
@@ -999,21 +993,21 @@ class products_options_stock_observer extends base
 
         if ($changed_qty < 0) {
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS . "
-                    SET products_quantity = products_quantity + " . ($changed_qty * -1) . "
+                'UPDATE ' . TABLE_PRODUCTS . '
+                    SET products_quantity = products_quantity + ' . ($changed_qty * -1) . "
                   WHERE products_id = $prid
                   LIMIT 1"
             );
         } else {
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS . "
+                'UPDATE ' . TABLE_PRODUCTS . "
                     SET products_quantity = products_quantity - $changed_qty
                   WHERE products_id = $prid
                   LIMIT 1"
             );
         }
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS . "
+            'UPDATE ' . TABLE_PRODUCTS . "
                 SET products_quantity = 0
               WHERE products_id = $prid
                 AND products_quantity < 0
@@ -1031,7 +1025,7 @@ class products_options_stock_observer extends base
         }
 
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                 SET products_quantity = $updated_qty
               WHERE pos_id = $pos_id
               LIMIT 1"
@@ -1040,7 +1034,7 @@ class products_options_stock_observer extends base
         $prid = (int)$pos_record->fields['products_id'];
         posm_update_base_product_quantity($prid);
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS . "
+            'UPDATE ' . TABLE_PRODUCTS . "
                 SET products_quantity = 0
               WHERE products_id = $prid
                 AND products_quantity < 0
@@ -1075,8 +1069,8 @@ class products_options_stock_observer extends base
         global $db;
 
         $product = $db->Execute(
-            "SELECT products_type, products_quantity
-               FROM " . TABLE_PRODUCTS . "
+            'SELECT products_type, products_quantity
+               FROM ' . TABLE_PRODUCTS . "
               WHERE products_id = $prid
               LIMIT 1"
         );
@@ -1164,7 +1158,7 @@ class products_options_stock_observer extends base
     // Return the plugin's currently-installed zc_plugin directory name, either the 'admin' (default)
     // or 'catalog'.
     //
-    public function zcPluginDir($location = 'admin')
+    public function zcPluginDir(string $location = 'admin'): string
     {
         return $this->zcPluginDir . $location . '/';
     }
@@ -1189,8 +1183,8 @@ class products_options_stock_observer extends base
         // Gather the managed-option 'base' information for the original/source product.
         //
         $source = $db->Execute(
-            "SELECT *
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'SELECT *
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE products_id = $source_pid
               ORDER BY pos_id ASC"
         );
@@ -1213,8 +1207,8 @@ class products_options_stock_observer extends base
             // Gather the 'source' product's managed options for the copy operation.
             //
             $source_options = $db->Execute(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+                'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
                   WHERE products_id = $source_pid
                     AND pos_id = $pos_id
                   ORDER BY pos_attribute_id ASC"
@@ -1230,8 +1224,8 @@ class products_options_stock_observer extends base
             if (!empty($options)) {
                 $base_sql['pos_hash'] = generate_pos_option_hash($target_pid, $options);
                 $check = $db->Execute(
-                    "SELECT *
-                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'SELECT *
+                       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                       WHERE products_id = $target_pid
                         AND pos_hash = '{$base_sql['pos_hash']}'
                       LIMIT 1"
@@ -1262,10 +1256,10 @@ class products_options_stock_observer extends base
         if ($options_copied > 0) {
             $messageStack->add_session(sprintf(SUCCESS_COPYING_OPTIONS_STOCK, $options_copied), 'success');
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS . " p
+                'UPDATE ' . TABLE_PRODUCTS . ' p
                     INNER JOIN (
                         SELECT products_id, SUM(products_quantity) AS total
-                          FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                          FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                          GROUP BY products_id
                     ) posm ON posm.products_id = p.products_id
                     SET p.products_quantity = posm.total
@@ -1284,18 +1278,18 @@ class products_options_stock_observer extends base
 
         $this->debug("Attempting to remove all POSM options from product ID#$pid");
         $pos_info = $db->Execute(
-            "SELECT count(*) as total
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'SELECT count(*) as total
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE products_id = $pid"
         );
         if ($pos_info->fields['total'] != 0) {
             $messageStack->add_session(sprintf(CAUTION_REMOVING_OPTIONS_STOCK, $pos_info->fields['total']), 'caution');
             $db->Execute(
-                "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pid"
             );
             $db->Execute(
-                "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+                'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
                   WHERE products_id = $pid"
             );
             posm_update_base_product_quantity($pid);
@@ -1318,8 +1312,8 @@ class products_options_stock_observer extends base
         // specified options_id.
         //
         $pos_entries = $db->Execute(
-            "SELECT pos_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+            'SELECT pos_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
               WHERE products_id = $pid
                 AND options_id = $options_id
               LIMIT 1"
@@ -1336,7 +1330,7 @@ class products_options_stock_observer extends base
         // Remove all POSM-managed entries for the specified product and option.
         //
         $db->Execute(
-            "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+            'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
               WHERE products_id = $pid
                 AND options_id = $options_id"
         );
@@ -1349,14 +1343,14 @@ class products_options_stock_observer extends base
         // pid's hash needs to be recalculated.
         //
         $product_check = $db->Execute(
-            "SELECT pos_id, options_id, options_values_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+            'SELECT pos_id, options_id, options_values_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
               WHERE products_id = $pid
               ORDER BY pos_id ASC"
         );
         if ($product_check->EOF) {
             $db->Execute(
-                "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pid"
             );
         } else {
@@ -1372,7 +1366,7 @@ class products_options_stock_observer extends base
             foreach ($products_options_array as $pos_id => $pos_attributes) {
                 $new_hash = generate_pos_option_hash($pid, $pos_attributes);
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                         SET pos_hash = '$new_hash'
                       WHERE pos_id = $pos_id
                       LIMIT 1"
@@ -1386,7 +1380,7 @@ class products_options_stock_observer extends base
     {
         $products_quantity = posm_update_base_product_quantity($products_id);
         if ($products_quantity === null) {
-            $products_quantity = '-not managed-';
+            return '-not managed-';
         }
         return $products_quantity;
     }
@@ -1418,8 +1412,8 @@ class products_options_stock_observer extends base
         }
 
         $product_info = $db->Execute(
-            "SELECT products_id, products_name, products_quantity
-               FROM " . TABLE_ORDERS_PRODUCTS . "
+            'SELECT products_id, products_name, products_quantity
+               FROM ' . TABLE_ORDERS_PRODUCTS . "
               WHERE orders_products_id = $orders_products_id
               LIMIT 1"
         );
@@ -1447,7 +1441,7 @@ class products_options_stock_observer extends base
 
                 $option_hash = generate_pos_option_hash($products_id, $attributes_array);
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                         SET products_quantity = products_quantity + $in_stock,
                             last_modified = now()
                       WHERE products_id = $products_id
@@ -1506,8 +1500,8 @@ class products_options_stock_observer extends base
 
         $attributes_array = [];
         $attributes = $db->Execute(
-            "SELECT products_options_id, products_options_values_id
-               FROM " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
+            'SELECT products_options_id, products_options_values_id
+               FROM ' . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
               WHERE orders_products_id = $orders_products_id"
         );
         foreach ($attributes as $next_attr) {
@@ -1526,8 +1520,8 @@ class products_options_stock_observer extends base
         global $db;
 
         $op_info = $db->Execute(
-            "SELECT products_id, products_quantity
-               FROM " . TABLE_ORDERS_PRODUCTS . "
+            'SELECT products_id, products_quantity
+               FROM ' . TABLE_ORDERS_PRODUCTS . "
               WHERE orders_products_id = $orders_products_id
               LIMIT 1"
         );
@@ -1535,8 +1529,8 @@ class products_options_stock_observer extends base
         $ordered_quantity = $op_info->fields['products_quantity'];
 
         $prod_info = $db->Execute(
-            "SELECT products_type, products_quantity
-               FROM " . TABLE_PRODUCTS . "
+            'SELECT products_type, products_quantity
+               FROM ' . TABLE_PRODUCTS . "
               WHERE products_id = $pid
               LIMIT 1"
         );
@@ -1551,8 +1545,8 @@ class products_options_stock_observer extends base
         } else {
             $hash = generate_pos_option_hash($op_info->fields['products_id'], $attributes_array);
             $check = $db->Execute(
-                "SELECT pos_id, products_quantity, pos_date, pos_name_id
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'SELECT pos_id, products_quantity, pos_date, pos_name_id
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pid
                     AND pos_hash = '$hash'
                   LIMIT 1"
@@ -1620,7 +1614,7 @@ class products_options_stock_observer extends base
     //
     public function stripStockMessage($products_name): string
     {
-        return rtrim(preg_replace('/\[.*\]$/', '', (string)$products_name));
+        return rtrim((string) preg_replace('/\[.*\]$/', '', (string)$products_name));
     }
 
     // -----
@@ -1635,7 +1629,7 @@ class products_options_stock_observer extends base
     public function extractStockMessage($products_name): string
     {
         if ($this->show_stock_messages) {
-            if (preg_match('/(.*)\[(.*)\]$/', $products_name, $matches)) {
+            if (preg_match('/(.*)\[(.*)\]$/', (string) $products_name, $matches)) {
                 $products_name = $matches[1];
                 $products_name .= '<br>' . zen_draw_checkbox_field('check');
                 if (!empty($matches[2])) {
@@ -1650,7 +1644,7 @@ class products_options_stock_observer extends base
     // Implements a call to either the PHP strlen or mb_strlen function, using mb_strlen
     // if available and the site's current CHARSET is valid.
     //
-    public function stringLen($string)
+    public function stringLen($string): int
     {
         // -----
         // Return the length of the supplied string, using either strlen or mb_strlen, as determined
@@ -1659,7 +1653,7 @@ class products_options_stock_observer extends base
         $this->initMbStrings();
         return ($this->use_mb === true) ? mb_strlen((string)$string, CHARSET) : strlen((string)$string);
     }
-    public function subString($string, $start, $length = null)
+    public function subString($string, $start, $length = null): string
     {
         // -----
         // Return the substring requested, using either substr or mb_substr, as determined by the
@@ -1668,7 +1662,7 @@ class products_options_stock_observer extends base
         $this->initMbStrings();
         return ($this->use_mb === true) ? mb_substr((string)$string, $start, $length, CHARSET) : substr((string)$string, $start, $length);
     }
-    public function stringPos($string, $needle, $offset = 0)
+    public function stringPos($string, $needle, $offset = 0): int|false
     {
         // -----
         // Return the position requested, using either strpos or mb_strpos, as determined by the
@@ -1690,9 +1684,7 @@ class products_options_stock_observer extends base
         if (!isset($this->use_mb)) {
             $this->use_mb = false;
             if (function_exists('mb_encoding_aliases')) {
-                if (@mb_encoding_aliases(CHARSET) !== false) {
-                    $this->use_mb = true;
-                }
+                $this->use_mb = true;
             }
         }
     }
@@ -1702,7 +1694,7 @@ class products_options_stock_observer extends base
         $this->debug_message("posmAdminObserver: $message");
     }
 
-    public function debug_message($message)
+    public function debug_message($message): void
     {
         if ($this->debug) {
             error_log(date('Y-m-d H:i:s') . ": $message\n", 3, $this->debug_log_file);

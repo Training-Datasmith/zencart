@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'pluginVersion' => 'v1.6.0',
     'pluginName' => 'System Inspection',

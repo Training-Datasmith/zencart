@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -40,10 +42,10 @@ if (!isset($_SESSION['language']) || isset($_GET['language'])) {
 // display.
 //
 $template_query = $db->Execute(
-    "SELECT template_dir
-       FROM " . TABLE_TEMPLATE_SELECT . "
-       WHERE template_language in (" . (int)$_SESSION['languages_id'] . ', 0' . ")
-       ORDER BY template_language DESC"
+    'SELECT template_dir
+       FROM ' . TABLE_TEMPLATE_SELECT . '
+       WHERE template_language in (' . (int)$_SESSION['languages_id'] . ', 0' . ')
+       ORDER BY template_language DESC'
 );
 $template_dir = $template_query->fields['template_dir'];
 

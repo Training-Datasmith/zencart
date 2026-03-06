@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Payment Class.
  *
@@ -27,17 +29,14 @@ class payment
 
     /**
      * $doesCollectsCardDataOnsite is a flag to indicate if card details are collected on site
-     * @var boolean
      */
     public bool $doesCollectsCardDataOnsite;
     /**
      * $form_action_url is the URL to process the payment or not set for local processing
-     * @var string
      */
     public string $form_action_url;
     /**
      * $modules array of payment module names
-     * @var array
      */
     public array $modules;
     /**
@@ -47,18 +46,17 @@ class payment
     public $paymentClass;
     /**
      * $selected_module is the selected payment module
-     * @var string
      */
     public string $selected_module;
 
-    public function __construct($module = '')
+    public function __construct(?string $module = '')
     {
         global $language, $credit_covers, $messageStack, $languageLoader, $installedPlugins;
 
         $this->doesCollectsCardDataOnsite = false;
 
         if (defined('MODULE_PAYMENT_INSTALLED') && !empty(MODULE_PAYMENT_INSTALLED)) {
-            $this->modules = explode(';', MODULE_PAYMENT_INSTALLED);
+            $this->modules = explode(';', (string) MODULE_PAYMENT_INSTALLED);
         }
         $this->notify('NOTIFY_PAYMENT_CLASS_GET_INSTALLED_MODULES', $module);
 
@@ -85,13 +83,13 @@ class payment
             $freecharger_enabled = (defined('MODULE_PAYMENT_FREECHARGER_STATUS') && MODULE_PAYMENT_FREECHARGER_STATUS === 'True' && isset($modules_found['freecharger.php']));
             if ($freecharger_enabled && $_SESSION['cart']->show_total() == 0 && (!isset($_SESSION['shipping']['cost']) || $_SESSION['shipping']['cost'] == 0)) {
                 $this->selected_module = $module;
-                $include_modules[] = ['class'=> 'freecharger', 'file' => 'freecharger.php'];
+                $include_modules[] = ['class' => 'freecharger', 'file' => 'freecharger.php'];
             } else {
                 // All Other Payment Modules show
                 foreach ($this->modules as $value) {
                     // double check that the module really exists before adding to the array
                     if (isset($modules_found[$value])) {
-                        $class = pathinfo($value, PATHINFO_FILENAME);
+                        $class = pathinfo((string) $value, PATHINFO_FILENAME);
                         // Don't show Free Payment Module
                         if ($class !== 'freecharger') {
                             $include_modules[] = ['class' => $class, 'file' => $value];
@@ -227,7 +225,7 @@ class payment
             '  }' . "\n\n";
 
         foreach ($this->modules as $value) {
-            $class = pathinfo($value, PATHINFO_FILENAME);
+            $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (!empty($GLOBALS[$class]->enabled)) {
                 $js .= $GLOBALS[$class]->javascript_validation();
             }
@@ -247,9 +245,8 @@ class payment
         }
         $js .=  ' if (result == false) doCollectsCardDataOnsite();' . "\n";
         $js .=  '    return result;' . "\n";
-        $js .=  '  }' . "\n" . '}' . "\n" . '</script>' . "\n";
 
-        return $js;
+        return $js . ('  }' . "\n" . '}' . "\n" . '</script>' . "\n");
     }
 
     /**
@@ -263,7 +260,7 @@ class payment
 
         $selection_array = [];
         foreach ($this->modules as $value) {
-            $class = pathinfo($value, PATHINFO_FILENAME);
+            $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (empty($GLOBALS[$class]->enabled)) {
                 continue;
             }
@@ -274,7 +271,7 @@ class payment
                 $selection['fields'][] = [
                     'title' => '',
                     'field' => zen_draw_hidden_field($class . '_collects_onsite', 'true', 'id="' . $class . '_collects_onsite"'),
-                    'tag' => ''
+                    'tag' => '',
                 ];
             }
             if (is_array($selection)) {
@@ -295,7 +292,7 @@ class payment
 
         $result = false;
         foreach ($this->modules as $value) {
-            $class = pathinfo($value, PATHINFO_FILENAME);
+            $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (isset($GLOBALS[$class]) && is_object($GLOBALS[$class]) && $GLOBALS[$class]->enabled && method_exists($GLOBALS[$class], 'in_special_checkout')) {
                 $module_result = $GLOBALS[$class]->in_special_checkout();
                 if ($module_result === true) {
@@ -354,7 +351,7 @@ class payment
      */
     public function process_button_ajax()
     {
-         if ($this->isPaymentModuleMethodPresent('process_button_ajax') === false) {
+        if ($this->isPaymentModuleMethodPresent('process_button_ajax') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->process_button_ajax();
@@ -409,7 +406,7 @@ class payment
      */
     public function admin_notification($zf_order_id)
     {
-         if ($this->isPaymentModuleMethodPresent('admin_notification') === false) {
+        if ($this->isPaymentModuleMethodPresent('admin_notification') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->admin_notification($zf_order_id);

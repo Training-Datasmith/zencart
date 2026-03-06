@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Session functions
  *
@@ -31,7 +33,7 @@ if (IS_ADMIN_FLAG === true) {
 }
 
 // Initialize session save-handler
-$zen_session_handler = new \Zencart\SessionHandler;
+$zen_session_handler = new \Zencart\SessionHandler();
 session_set_save_handler($zen_session_handler, true);
 
 /**
@@ -62,7 +64,7 @@ function zen_session_id($sessid = ''): bool|string
 {
     if (!empty($sessid)) {
         $tempSessid = $sessid;
-        if (preg_replace('/[a-zA-Z0-9,-]/', '', $tempSessid) != '') {
+        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $tempSessid) != '') {
             $sessid = \bin2hex(\random_bytes(16));
         }
 
@@ -79,7 +81,9 @@ function zen_session_name($name = ''): bool|string
 {
     if (!empty($name)) {
         $tempName = $name;
-        if (preg_replace('/[a-zA-Z0-9,-]/', '', $tempName) == '') return session_name($name);
+        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $tempName) == '') {
+            return session_name($name);
+        }
 
         return false;
     }
@@ -90,7 +94,7 @@ function zen_session_name($name = ''): bool|string
 /**
  * @since ZC v1.5.2
  */
-function zen_session_write_close()
+function zen_session_write_close(): void
 {
     session_write_close();
 }
@@ -98,7 +102,7 @@ function zen_session_write_close()
 /**
  * @since ZC v1.0.3
  */
-function zen_session_destroy()
+function zen_session_destroy(): bool
 {
     return session_destroy();
 }
@@ -106,7 +110,7 @@ function zen_session_destroy()
 /**
  * @since ZC v1.0.3
  */
-function zen_session_save_path($path = '')
+function zen_session_save_path($path = ''): string|false
 {
     if (!empty($path)) {
         return session_save_path($path);
@@ -127,8 +131,6 @@ function zen_session_recreate(): void
         session_regenerate_id();
         $newSessID = session_id();
         $_SESSION = $saveSession;
-        if (IS_ADMIN_FLAG !== true) {
-            whos_online_session_recreate($oldSessID, $newSessID);
-        }
+        whos_online_session_recreate($oldSessID, $newSessID);
     }
 }

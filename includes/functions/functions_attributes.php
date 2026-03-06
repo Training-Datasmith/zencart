@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Attribute functions
  *
@@ -6,12 +8,10 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: lat9 2025 Nov 02 Modified in v2.2.0 $
  */
-
 /**
  * Query a 'known' (i.e. by the attributes_id) attribute's details,
  * returning a db QueryFactory response.
  *
- * @param int $attributes_id
  * @return queryFactoryResult
  * @since ZC v2.0.0
  */
@@ -20,8 +20,8 @@ function zen_get_attribute_details_by_id(int $attributes_id)
     global $db, $zco_notifier;
 
     $sql =
-        "SELECT *
-           FROM " . TABLE_PRODUCTS_ATTRIBUTES . "
+        'SELECT *
+           FROM ' . TABLE_PRODUCTS_ATTRIBUTES . "
           WHERE products_attributes_id = $attributes_id";
     $result = $db->Execute($sql, 1);
 
@@ -36,9 +36,6 @@ function zen_get_attribute_details_by_id(int $attributes_id)
  * Query a specific attribute's details, based on the products_id, options_id and
  * options_values_id, returning a db QueryFactory response.
  *
- * @param int $products_id
- * @param int $options_id
- * @param int $options_values_id
  * @return queryFactoryResult
  * @since ZC v2.0.0
  */
@@ -47,11 +44,11 @@ function zen_get_attribute_details(int $products_id, int $options_id, int $optio
     global $db, $zco_notifier;
 
     $sql =
-        "SELECT *
-           FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+        'SELECT *
+           FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+                INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                     ON po.products_options_id = pa.options_id
-                    AND po.language_id = " . (int)$_SESSION['languages_id'] . "
+                    AND po.language_id = ' . (int)$_SESSION['languages_id'] . "
           WHERE pa.products_id = $products_id
             AND pa.options_id = $options_id
             AND pa.options_values_id = $options_values_id";
@@ -70,8 +67,6 @@ function zen_get_attribute_details(int $products_id, int $options_id, int $optio
  * (On catalog-side, this is often used to determine if attributes must be selected to add to cart)
  *
  * @param numeric $product_id
- * @param bool|string $not_readonly
- * @return bool
  * @since ZC v1.0.3
  */
 function zen_has_product_attributes(mixed $product_id, bool|string $not_readonly = true): bool
@@ -93,22 +88,22 @@ function zen_has_product_attributes(mixed $product_id, bool|string $not_readonly
     if (PRODUCTS_OPTIONS_TYPE_READONLY_IGNORED === '1' && $exclude_readonly === true) {
         // don't include READONLY attributes or *invalid* options
         $sql =
-            "SELECT pa.products_attributes_id
-               FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                    INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+            'SELECT pa.products_attributes_id
+               FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+                    INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                         ON pa.options_id = po.products_options_id
-                       AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-              WHERE pa.products_id = " . (int)$product_id . "
+                       AND po.language_id = ' . (int)$_SESSION['languages_id'] . '
+              WHERE pa.products_id = ' . (int)$product_id . "
                 AND po.products_options_type != '" . $db->prepare_input(PRODUCTS_OPTIONS_TYPE_READONLY) . "'";
     } else {
         // regardless of READONLY attributes, at least one *valid* option must exist
         $sql =
-            "SELECT pa.products_attributes_id
-               FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-                    INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+            'SELECT pa.products_attributes_id
+               FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+                    INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                         ON pa.options_id = po.products_options_id
-                       AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-              WHERE pa.products_id = " . (int)$product_id;
+                       AND po.language_id = ' . (int)$_SESSION['languages_id'] . '
+              WHERE pa.products_id = ' . (int)$product_id;
     }
 
     $result = $db->Execute($sql, 1);
@@ -116,17 +111,15 @@ function zen_has_product_attributes(mixed $product_id, bool|string $not_readonly
     return !$result->EOF && $result->fields['products_attributes_id'] > 0;
 }
 
-
 /**
  *  Check if specified product has attributes which require selection before adding product to the cart.
  *  This is used by various parts of the code to determine whether to allow for add-to-cart actions
  *  since adding a product without selecting attributes could lead to undesired basket contents.
  *
  * @param int $products_id
- * @return int
  * @since ZC v1.5.7
  */
-function zen_requires_attribute_selection($products_id)
+function zen_requires_attribute_selection($products_id): bool
 {
     global $db, $zco_notifier;
 
@@ -137,7 +130,7 @@ function zen_requires_attribute_selection($products_id)
     $has_attributes = false;
     $zco_notifier->notify('NOTIFY_FUNCTIONS_LOOKUPS_REQUIRES_ATTRIBUTES_SELECTION_OTHER', ['products_id' => $products_id], $has_attributes);
     if ($has_attributes === true) {
-          return true;
+        return true;
     }
 
     $noDoubles = [
@@ -155,13 +148,13 @@ function zen_requires_attribute_selection($products_id)
     }
 
     $query =
-        "SELECT products_options_id, COUNT(pa.options_values_id) AS number_of_choices, po.products_options_type AS options_type
-          FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-             INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+        'SELECT products_options_id, COUNT(pa.options_values_id) AS number_of_choices, po.products_options_type AS options_type
+          FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+             INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                 ON pa.options_id = po.products_options_id
-               AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-         WHERE pa.products_id = " . (int)$products_id . "
-         GROUP BY products_options_id, options_type";
+               AND po.language_id = ' . (int)$_SESSION['languages_id'] . '
+         WHERE pa.products_id = ' . (int)$products_id . '
+         GROUP BY products_options_id, options_type';
 
     $zco_notifier->notify('NOTIFY_FUNCTIONS_LOOKUPS_REQUIRES_ATTRIBUTES_SELECTION', '', $query, $noSingles, $noDoubles);
 
@@ -174,7 +167,7 @@ function zen_requires_attribute_selection($products_id)
 
     // loop through the results, auditing for whether each kind of attribute requires "selection" or not
     // return whether selections must be made, so a more-info button needs to be presented, if true
-    foreach ($result as $row => $field) {
+    foreach ($result as $field) {
         // if there's more than one for any $noDoubles type, can't add from listing
         if (in_array($field['options_type'], $noDoubles) && $field['number_of_choices'] > 1) {
             return true;
@@ -204,14 +197,14 @@ function zen_option_name_base_expects_no_values($option_name_id_array)
         $option_name_id_array = [$option_name_id_array];
     }
 
-    $sql = "SELECT products_options_type FROM " . TABLE_PRODUCTS_OPTIONS . " WHERE products_options_id :option_name_id:";
+    $sql = 'SELECT products_options_type FROM ' . TABLE_PRODUCTS_OPTIONS . ' WHERE products_options_id :option_name_id:';
     if (count($option_name_id_array) > 1) {
         $sql2 = 'IN (';
         foreach ($option_name_id_array as $option_id) {
             $sql2 .= ':option_id:,';
             $sql2 = $db->bindVars($sql2, ':option_id:', $option_id, 'integer');
         }
-        $sql2 = rtrim($sql2, ','); // Need to remove the final comma off of the above.
+        $sql2 = rtrim((string) $sql2, ','); // Need to remove the final comma off of the above.
         $sql2 .= ')';
     } else {
         $sql2 = ' = :option_id:';
@@ -253,16 +246,15 @@ function zen_has_product_attributes_values($product_id)
         return $value_to_return;
     }
 
-    $sql = "SELECT options_values_price
-            FROM " . TABLE_PRODUCTS_ATTRIBUTES . "
-            WHERE products_id = " . (int)$product_id . "
-            AND options_values_price <> 0";
+    $sql = 'SELECT options_values_price
+            FROM ' . TABLE_PRODUCTS_ATTRIBUTES . '
+            WHERE products_id = ' . (int)$product_id . '
+            AND options_values_price <> 0';
 
     $result = $db->Execute($sql, 1);
 
     return (!$result->EOF);
 }
-
 
 /**
  * check if Product is set to use downloads
@@ -279,14 +271,13 @@ function zen_has_product_attributes_downloads_status($product_id)
 
     global $db;
 
-    $sql = "SELECT pad.products_attributes_id
-            FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad USING (products_attributes_id)
-            WHERE pa.products_id = " . (int)$product_id;
+    $sql = 'SELECT pad.products_attributes_id
+            FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' pad USING (products_attributes_id)
+            WHERE pa.products_id = ' . (int)$product_id;
 
     return ($db->Execute($sql, 1)->RecordCount() > 0);
 }
-
 
 /**
  * Return attributes products_options_sort_order
@@ -307,7 +298,6 @@ function zen_get_attributes_sort_order($products_id, $options_id, $options_value
  * based on an options_id and an optional language_id,
  * returning a db QueryFactory response.
  *
- * @param int $options_id
  * @param int $language_id (optional)
  * @return queryFactoryResult
  * @since ZC v2.0.0
@@ -321,8 +311,8 @@ function zen_get_option_details(int $options_id, int $language_id = 0)
     }
 
     $sql =
-        "SELECT *
-           FROM " . TABLE_PRODUCTS_OPTIONS . "
+        'SELECT *
+           FROM ' . TABLE_PRODUCTS_OPTIONS . "
           WHERE products_options_id = $options_id
             AND language_id = $language_id";
 
@@ -335,10 +325,9 @@ function zen_get_option_details(int $options_id, int $language_id = 0)
  * @param int $options_id
  * @param int $options_values_id
  * @param int $language_id
- * @return string
  * @since ZC v1.0.3
  */
-function zen_get_attributes_options_sort_order($products_id, $options_id, $options_values_id, $language_id = 0)
+function zen_get_attributes_options_sort_order($products_id, $options_id, $options_values_id, $language_id = 0): string
 {
     $check = zen_get_option_details((int)$options_id, (int)$language_id);
     $check_sort_order = ($check->EOF) ? '0' : $check->fields['products_options_sort_order'];
@@ -346,7 +335,7 @@ function zen_get_attributes_options_sort_order($products_id, $options_id, $optio
     $check_options_id = zen_get_attribute_details((int)$products_id, (int)$options_id, (int)$options_values_id);
     $check_options_sort_order = ($check_options_id->EOF) ? '0' : $check_options_id->fields['products_options_sort_order'];
 
-    return $check_sort_order . '.' . str_pad($check_options_sort_order, 5, '0', STR_PAD_LEFT);
+    return $check_sort_order . '.' . str_pad((string) $check_options_sort_order, 5, '0', STR_PAD_LEFT);
 }
 
 /**
@@ -370,7 +359,7 @@ function zen_get_attributes_valid($product_id, $option, $value)
     }
 
     // text required validation
-    if (strpos($option, 'txt_') === 0) {
+    if (str_starts_with($option, 'txt_')) {
         $lookup = str_replace('txt_', '', $option);
         $check_attributes = zen_get_attribute_details((int)$product_id, (int)$lookup, 0);
 
@@ -397,12 +386,8 @@ function zen_options_name($options_id)
     return ($options_values->EOF) ? '' : $options_values->fields['products_options_name'];
 }
 
-
 /**
  * Return Options_values_name from value-ID
- * @param  int|string  $values_id
- * @param  int  $languages_id
- * @return string
  * @since ZC v1.0.3
  */
 function zen_values_name(int|string $values_id, int $languages_id = 0): string
@@ -411,28 +396,26 @@ function zen_values_name(int|string $values_id, int $languages_id = 0): string
     if ($languages_id === 0) {
         $languages_id = (int)$_SESSION['languages_id'];
     }
-    $values_values = $db->Execute("SELECT products_options_values_name
-                                   FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . "
-                                   WHERE products_options_values_id = " . (int)$values_id . "
-                                   AND language_id = " . $languages_id, 1);
+    $values_values = $db->Execute('SELECT products_options_values_name
+                                   FROM ' . TABLE_PRODUCTS_OPTIONS_VALUES . '
+                                   WHERE products_options_values_id = ' . (int)$values_id . '
+                                   AND language_id = ' . $languages_id, 1);
     return ($values_values->EOF) ? '' : $values_values->fields['products_options_values_name'];
 }
-
 
 /**
  * Validate Option Name and Option Type Match
  * @param int $products_options_id
  * @param int $products_options_values_id
- * @return bool
  * @since ZC v1.0.3
  */
-function zen_validate_options_to_options_value($products_options_id, $products_options_values_id)
+function zen_validate_options_to_options_value($products_options_id, $products_options_values_id): bool
 {
     global $db;
-    $sql = "SELECT products_options_id
-            FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
-            WHERE products_options_id= " . (int)$products_options_id . "
-            AND products_options_values_id=" . (int)$products_options_values_id;
+    $sql = 'SELECT products_options_id
+            FROM ' . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . '
+            WHERE products_options_id= ' . (int)$products_options_id . '
+            AND products_options_values_id=' . (int)$products_options_values_id;
     $result = $db->Execute($sql, 1);
     return !$result->EOF;
 }
@@ -451,9 +434,9 @@ function zen_get_products_options_name_from_value($option_values_id)
         return 'RESERVED FOR TEXT/FILES ONLY ATTRIBUTES';
     }
 
-    $result = $db->Execute("SELECT products_options_id
-                            FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
-                            WHERE products_options_values_id=" . (int)$option_values_id, 1);
+    $result = $db->Execute('SELECT products_options_id
+                            FROM ' . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . '
+                            WHERE products_options_values_id=' . (int)$option_values_id, 1);
     if ($result->EOF) {
         return '';
     }
@@ -463,7 +446,6 @@ function zen_get_products_options_name_from_value($option_values_id)
 }
 
 /**
- * @param int $product_id
  * @param int $option_id
  * @param int $value_id
  * @return string
@@ -478,10 +460,9 @@ function zen_get_attributes_image(int $product_id, $option_id, $value_id)
 /**
  * @param int $products_id_from
  * @param int $products_id_to
- * @return bool
  * @since ZC v1.0.3
  */
-function zen_copy_products_attributes($products_id_from, $products_id_to)
+function zen_copy_products_attributes($products_id_from, $products_id_to): bool
 {
     global $db, $zco_notifier, $messageStack;
     global $copy_attributes_delete_first, $copy_attributes_duplicates_skipped, $copy_attributes_duplicates_overwrite, $copy_attributes_include_downloads, $copy_attributes_include_filename;
@@ -515,14 +496,14 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
         // delete all attributes first from destination products_id_to
         zen_products_attributes_download_delete($products_id_to);
         // delete the attributes
-        $db->Execute("DELETE FROM " . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = $products_id_to");
+        $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = $products_id_to");
 
         // Notify that attributes have been deleted for the product.
         $zco_notifier->notify('ZEN_COPY_PRODUCTS_ATTRIBUTES_DELETE', $products_id_to);
     }
 
     // get attributes to copy from
-    $products_copy_from = $db->Execute("SELECT * FROM " . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = $products_id_from ORDER BY products_attributes_id");
+    $products_copy_from = $db->Execute('SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = $products_id_from ORDER BY products_attributes_id");
 
     foreach ($products_copy_from as $copy_from) {
         $update_attribute = false;
@@ -545,7 +526,8 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
 
         // New attribute - insert it
         if ($add_attribute === true) {
-            $db->Execute("INSERT INTO " . TABLE_PRODUCTS_ATTRIBUTES . "
+            $db->Execute(
+                'INSERT INTO ' . TABLE_PRODUCTS_ATTRIBUTES . '
               (products_id, options_id, options_values_id, options_values_price, options_values_price_w, price_prefix, products_options_sort_order,
               product_attribute_is_free, products_attributes_weight, products_attributes_weight_prefix, attributes_display_only,
               attributes_default, attributes_discounted, attributes_image, attributes_price_base_included,
@@ -553,7 +535,7 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
               attributes_price_factor_onetime_offset, attributes_qty_prices, attributes_qty_prices_onetime,
               attributes_price_words, attributes_price_words_free, attributes_price_letters, attributes_price_letters_free,
               attributes_required)
-              VALUES (" . $products_id_to . ",
+              VALUES (' . $products_id_to . ",
               '" . $copy_from['options_id'] . "',
               '" . $copy_from['options_values_id'] . "',
               '" . $copy_from['options_values_price'] . "',
@@ -588,20 +570,19 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
             // Notify that an attribute has been added for the product.
             $zco_notifier->notify('ZEN_COPY_PRODUCTS_ATTRIBUTES_ADD', ['pID' => $products_id_to, 'fields' => $copy_from]);
 
-
             // Downloads
             if (DOWNLOAD_ENABLED === 'true') {
-                $sql = "SELECT products_attributes_id, products_attributes_filename, products_attributes_maxdays, products_attributes_maxcount
-                        FROM " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
-                        WHERE products_attributes_id = " . (int)$copy_from['products_attributes_id'];
+                $sql = 'SELECT products_attributes_id, products_attributes_filename, products_attributes_maxdays, products_attributes_maxcount
+                        FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . '
+                        WHERE products_attributes_id = ' . (int)$copy_from['products_attributes_id'];
                 $results = $db->Execute($sql);
                 foreach ($results as $result) {
-                    $db->Execute("INSERT INTO " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
+                    $db->Execute('INSERT INTO ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . '
                         (products_attributes_id, products_attributes_filename, products_attributes_maxdays, products_attributes_maxcount)
-                        VALUES (" . (int)$new_products_attributes_id . ",
+                        VALUES (' . (int)$new_products_attributes_id . ",
                                 '" . zen_db_input($result['products_attributes_filename']) . "',
-                                " . (int)$result['products_attributes_maxdays'] . ",
-                                " . (int)$result['products_attributes_maxcount'] . ")");
+                                " . (int)$result['products_attributes_maxdays'] . ',
+                                ' . (int)$result['products_attributes_maxcount'] . ')');
 
                     $new_attribute_id = $db->Insert_ID();
                     $zco_notifier->notify('ZEN_COPY_PRODUCTS_ATTRIBUTES_ADDED_DOWNLOAD', $products_id_to, $new_products_attributes_id, $new_attribute_id);
@@ -611,7 +592,8 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
 
         // Update attribute - Just attribute settings not ids
         if ($update_attribute === true) {
-            $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . " SET
+            $db->Execute(
+                'UPDATE ' . TABLE_PRODUCTS_ATTRIBUTES . " SET
                   options_values_price = '" . $copy_from['options_values_price'] . "',
                   options_values_price_w = '" . $copy_from['options_values_price_w'] . "',
                   price_prefix = '" . $copy_from['price_prefix'] . "',
@@ -636,11 +618,11 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
                   attributes_price_letters = '" . $copy_from['attributes_price_letters'] . "',
                   attributes_price_letters_free = '" . $copy_from['attributes_price_letters_free'] . "',
                   attributes_required = '" . $copy_from['attributes_required'] . "'
-                  WHERE products_id = " . $products_id_to . "
-                   AND options_id = " . (int)$copy_from['options_id'] . "
-                   AND options_values_id = " . (int)$copy_from['options_values_id']
-// and attributes_image='" . $copy_from['attributes_image'] . "'
-// and attributes_price_base_included=" . $copy_from['attributes_price_base_included']
+                  WHERE products_id = " . $products_id_to . '
+                   AND options_id = ' . (int)$copy_from['options_id'] . '
+                   AND options_values_id = ' . (int)$copy_from['options_values_id']
+                // and attributes_image='" . $copy_from['attributes_image'] . "'
+                // and attributes_price_base_included=" . $copy_from['attributes_price_base_included']
             );
             $messageStack->add_session(sprintf(TEXT_ATTRIBUTE_COPY_UPDATING, (int)$copy_from['products_attributes_id'], $products_id_to), 'success');
 
@@ -657,7 +639,6 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
 
     return true;
 }
-
 
 /**
  * Get the Option Name for a particular language
@@ -685,27 +666,26 @@ function zen_get_option_name_language_sort_order($option_id, $language_id)
     return ($result->EOF) ? '' : $result->fields['products_options_sort_order'];
 }
 
-
 /**
  * Delete all attributes for a specified product
  * @param int $product_id
  * @since ZC v1.0.3
  */
-function zen_delete_products_attributes($product_id)
+function zen_delete_products_attributes($product_id): void
 {
     global $db, $zco_notifier;
     $zco_notifier->notify('NOTIFIER_ADMIN_ZEN_DELETE_PRODUCTS_ATTRIBUTES', [], $product_id);
 
-    $sql = "SELECT pa.products_id, pad.products_attributes_id
-            FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad USING (products_attributes_id)
-            WHERE pa.products_id=" . (int)$product_id;
+    $sql = 'SELECT pa.products_id, pad.products_attributes_id
+            FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            LEFT JOIN ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' pad USING (products_attributes_id)
+            WHERE pa.products_id=' . (int)$product_id;
     $results = $db->Execute($sql);
     foreach ($results as $result) {
-        $db->Execute("DELETE FROM " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " WHERE products_attributes_id = " . (int)$results->fields['products_attributes_id']);
+        $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = ' . (int)$results->fields['products_attributes_id']);
     }
 
-    $db->Execute("DELETE FROM " . TABLE_PRODUCTS_ATTRIBUTES . " WHERE products_id = " . (int)$product_id);
+    $db->Execute('DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . (int)$product_id);
 }
 
 /**
@@ -713,39 +693,37 @@ function zen_delete_products_attributes($product_id)
  * @param int $product_id
  * @since ZC v1.0.3
  */
-function zen_update_attributes_products_option_values_sort_order($product_id)
+function zen_update_attributes_products_option_values_sort_order($product_id): void
 {
     global $db;
-    $sql = "SELECT DISTINCT pa.products_attributes_id, pa.options_id, pa.options_values_id, pa.products_options_sort_order, pov.products_options_values_sort_order
-            FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov ON (pa.options_values_id = pov.products_options_values_id)
-            WHERE pa.products_id = " . (int)$product_id;
+    $sql = 'SELECT DISTINCT pa.products_attributes_id, pa.options_id, pa.options_values_id, pa.products_options_sort_order, pov.products_options_values_sort_order
+            FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            LEFT JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' pov ON (pa.options_values_id = pov.products_options_values_id)
+            WHERE pa.products_id = ' . (int)$product_id;
     $results = $db->Execute($sql);
     foreach ($results as $result) {
-        $db->Execute("UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . "
+        $db->Execute('UPDATE ' . TABLE_PRODUCTS_ATTRIBUTES . "
                       SET products_options_sort_order = '" . $results->fields['products_options_values_sort_order'] . "'
-                      WHERE products_id = " . (int)$product_id . "
-                      AND products_attributes_id = " . (int)$results->fields['products_attributes_id']);
+                      WHERE products_id = " . (int)$product_id . '
+                      AND products_attributes_id = ' . (int)$results->fields['products_attributes_id']);
     }
 }
-
 
 /**
  * @param int $product_id
  * @param bool $check_if_valid
- * @return string
  * @since ZC v1.1.0
  */
-function zen_has_product_attributes_downloads($product_id, $check_if_valid = false)
+function zen_has_product_attributes_downloads($product_id, $check_if_valid = false): string
 {
     global $db;
     if (DOWNLOAD_ENABLED !== 'true') {
         return 'disabled';
     }
-    $sql = "SELECT pa.products_attributes_id, pad.products_attributes_filename
-            FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad USING (products_attributes_id)
-            WHERE pa.products_id=" . (int)$product_id;
+    $sql = 'SELECT pa.products_attributes_id, pad.products_attributes_filename
+            FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' pad USING (products_attributes_id)
+            WHERE pa.products_id=' . (int)$product_id;
     $results = $db->Execute($sql);
 
     if ($check_if_valid) {
@@ -766,7 +744,6 @@ function zen_has_product_attributes_downloads($product_id, $check_if_valid = fal
     return 'none';
 }
 
-
 /**
  * Is the option_id a File option-type?
  * @param int $option_id
@@ -782,7 +759,7 @@ function zen_is_option_file($option_id)
     }
 
     $option_type = $result->fields['products_options_type'];
-    $result = $db->Execute("SELECT products_options_types_name FROM " . TABLE_PRODUCTS_OPTIONS_TYPES . " WHERE products_options_types_id = " . (int)$option_type, 1);
+    $result = $db->Execute('SELECT products_options_types_name FROM ' . TABLE_PRODUCTS_OPTIONS_TYPES . ' WHERE products_options_types_id = ' . (int)$option_type, 1);
     return (!$result->EOF && $result->fields['products_options_types_name'] === 'File');
 }
 
@@ -792,7 +769,7 @@ function zen_is_option_file($option_id)
  * @return bool
  * @since ZC v1.2.1d
  */
-function zen_orders_products_downloads($check_filename)
+function zen_orders_products_downloads(?string $check_filename)
 {
     global $zco_notifier;
 
@@ -814,7 +791,9 @@ function zen_orders_products_downloads($check_filename)
     $zco_notifier->notify('NOTIFY_TEST_DOWNLOADABLE_FILE_EXISTS', $check_filename, $handler);
 
     // if handler is set but isn't local (internal) then we simply return true since there's no way to "test"
-    if ($handler != '') return true;
+    if ($handler != '') {
+        return true;
+    }
 
     // else if the notifier caused $handler to be empty then that means it failed verification, so we return false
     return false;
@@ -825,9 +804,9 @@ function zen_orders_products_downloads($check_filename)
  * If yes, it will be because the filename contains colons as delimiters ... service:filename:filesize
  * @since ZC v1.5.6
  */
-function zen_get_download_handler($filename)
+function zen_get_download_handler($filename): string
 {
-    $file_parts = explode(':', $filename);
+    $file_parts = explode(':', (string) $filename);
 
     // if the filename doesn't contain any colons, then there's no delimiter to return, so must be using built-in file handling
     if (count($file_parts) < 2) {
@@ -842,25 +821,26 @@ function zen_get_download_handler($filename)
  * does to verify that downloads don't have invalid shipping settings.
  * @since ZC v1.5.8
  */
-function zen_check_for_misconfigured_downloads() {
-   global $db;
-   if (DOWNLOAD_ENABLED === 'false') {
-       return true;
-   }
-   // use SELECT from admin/downloads_manager.php
-   $sql = "SELECT pad.*, pa.*, pd.*, p.*
-                      FROM " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad
-                      LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " pa ON pad.products_attributes_id = pa.products_attributes_id
-                      LEFT JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd ON pa.products_id = pd.products_id
-                        AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
-                      LEFT JOIN " . TABLE_PRODUCTS . " p ON p.products_id = pd.products_id
-                      WHERE pa.products_attributes_id = pad.products_attributes_id";
+function zen_check_for_misconfigured_downloads(): bool
+{
+    global $db;
+    if (DOWNLOAD_ENABLED === 'false') {
+        return true;
+    }
+    // use SELECT from admin/downloads_manager.php
+    $sql = 'SELECT pad.*, pa.*, pd.*, p.*
+                      FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' pad
+                      LEFT JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa ON pad.products_attributes_id = pa.products_attributes_id
+                      LEFT JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd ON pa.products_id = pd.products_id
+                        AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                      LEFT JOIN ' . TABLE_PRODUCTS . ' p ON p.products_id = pd.products_id
+                      WHERE pa.products_attributes_id = pad.products_attributes_id';
 
-   $results = $db->Execute($sql);
-   foreach ($results as $result) {
-      if ($result['product_is_always_free_shipping'] === '1' || $result['products_virtual'] === '1') {
-         return false;
-      }
-   }
-   return true;
+    $results = $db->Execute($sql);
+    foreach ($results as $result) {
+        if ($result['product_is_always_free_shipping'] === '1' || $result['products_virtual'] === '1') {
+            return false;
+        }
+    }
+    return true;
 }

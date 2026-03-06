@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * index category_row.php
  *
@@ -50,8 +52,6 @@ foreach ($categories as $next_category) {
 
     //    $categories->fields['products_name'] = zen_get_products_name($categories->fields['products_id']);
 
-
-
     // Set css classes for "row" wrapper, to allow for fluid grouping of cells based on viewport
     // these defaults are inspired by Bootstrap4, but can be customized to suit your own framework
     if ($category_row_layout_style === 'fluid') {
@@ -83,8 +83,8 @@ foreach ($categories as $next_category) {
     if ($category_row_layout_style === 'columns') {
         $style = ' style="width:' . $col_width . '%;"';
     }
-    $grid_category_card_params = $grid_category_card_params ?? 'categoryListBoxContents centeredContent back gridlayout';
-    $grid_category_wrap_classes = $grid_category_wrap_classes ?? '';
+    $grid_category_card_params ??= 'categoryListBoxContents centeredContent back gridlayout';
+    $grid_category_wrap_classes ??= '';
     $list_box_contents[$rows][] = [
         'params' => 'class="' . $grid_category_card_params . '"' . $style,
         'text' =>

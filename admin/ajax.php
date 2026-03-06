@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ajax front controller (admin version)
  *
@@ -13,5 +15,5 @@
 // Let the "base" ajax.php processing "know" that this request came from the admin,
 // so that the admin version of the application_top.php processing will be loaded.
 //
-$zc_ajax_base_dir = basename(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+$zc_ajax_base_dir = basename(__DIR__) . DIRECTORY_SEPARATOR;
 require '../ajax.php';

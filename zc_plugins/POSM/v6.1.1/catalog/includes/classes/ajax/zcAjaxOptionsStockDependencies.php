@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Products' Options' Stock Manager" plugin by Cindy Merkin (lat9)
 // Copyright (c) 2014-2024, Vinos de Frutas Tropicales
@@ -23,7 +25,7 @@ class zcAjaxOptionsStockDependencies extends base
     // ----
     // Return the available option values for a specified options_id, given a products_id, an array of already-selected option name/value pairs.
     //
-    public function availableOptionValues()
+    public function availableOptionValues(): array
     {
         global $db;
 
@@ -66,14 +68,14 @@ class zcAjaxOptionsStockDependencies extends base
                 $num_selected++;
                 $sa = "sa$num_selected";
                 $temp = explode(':', $current_value);
-                $join_clause .= (" INNER JOIN " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " $sa ON $sa.products_id = $products_id AND $sa.options_id = {$temp[0]} AND $sa.options_values_id = {$temp[1]}");
+                $join_clause .= (' INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " $sa ON $sa.products_id = $products_id AND $sa.options_id = {$temp[0]} AND $sa.options_values_id = {$temp[1]}");
                 $and_clause .= " AND sa0.pos_id = $sa.pos_id";
             }
             unset($temp, $values_array);
 
             $sql_query =
-                "SELECT DISTINCT sa0.pos_id, sa0.options_values_id
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " sa0$join_clause
+                'SELECT DISTINCT sa0.pos_id, sa0.options_values_id
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " sa0$join_clause
                   WHERE sa0.products_id = $products_id
                     AND sa0.options_id = $options_id$and_clause";
             $this->debug_message("join_clause: $join_clause, and_clause: $and_clause, sql: $sql_query");
@@ -81,8 +83,8 @@ class zcAjaxOptionsStockDependencies extends base
 
             if ($pos_info->EOF) {
                 $unmanaged_option_info = $db->Execute(
-                    "SELECT options_values_id 
-                       FROM " . TABLE_PRODUCTS_ATTRIBUTES . "
+                    'SELECT options_values_id 
+                       FROM ' . TABLE_PRODUCTS_ATTRIBUTES . "
                       WHERE products_id = $products_id 
                         AND options_id = $options_id"
                 );
@@ -95,9 +97,9 @@ class zcAjaxOptionsStockDependencies extends base
                 } else {
                     $this->debug_message("Processing unmanaged option ($options_id) ...");
                     $unmanaged_option = [
-                        'quantity' => 0, 
-                        'oos_message' => (POSM_SHOW_UNMANAGED_OPTIONS_STATUS === 'true') ? PRODUCTS_OPTIONS_STOCK_NOT_IN_STOCK : '', 
-                        'model' => ''
+                        'quantity' => 0,
+                        'oos_message' => (POSM_SHOW_UNMANAGED_OPTIONS_STATUS === 'true') ? PRODUCTS_OPTIONS_STOCK_NOT_IN_STOCK : '',
+                        'model' => '',
                     ];
                     foreach ($unmanaged_option_info as $next_unmanaged) {
                         $unmanaged_option['options_values_id'] = $next_unmanaged['options_values_id'];
@@ -106,13 +108,13 @@ class zcAjaxOptionsStockDependencies extends base
                 }
             } else {
                 $this->debug_message("Processing managed option ($options_id) ...");
-                $select_clause = "SELECT posa.options_id, posa.options_values_id, pos.products_quantity AS quantity, pos.pos_name_id AS oos_msg_id, pos.pos_model AS model, pos.pos_date AS oos_date";
+                $select_clause = 'SELECT posa.options_id, posa.options_values_id, pos.products_quantity AS quantity, pos.pos_name_id AS oos_msg_id, pos.pos_model AS model, pos.pos_date AS oos_date';
                 $this->notify('NOTIFY_AJAX_POSM_DEPENDENCIES_SELECT_CLAUSE', '', $select_clause);
                 foreach ($pos_info as $next_pos) {
                     $attr_info = $db->Execute(
                         "$select_clause
-                           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " posa, " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
-                          WHERE pos.pos_id = " . $next_pos['pos_id'] . "
+                           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . ' posa, ' . TABLE_PRODUCTS_OPTIONS_STOCK . ' pos
+                          WHERE pos.pos_id = ' . $next_pos['pos_id'] . "
                             AND pos.pos_id = posa.pos_id
                             AND posa.options_id = $options_id
                           LIMIT 1"
@@ -137,15 +139,15 @@ class zcAjaxOptionsStockDependencies extends base
                 }
             }
             $select_info = $db->Execute(
-                "SELECT COUNT(pos_id) AS total, COUNT(DISTINCT pos_id) AS unique_ids
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+                'SELECT COUNT(pos_id) AS total, COUNT(DISTINCT pos_id) AS unique_ids
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
                   WHERE products_id = $products_id"
             );
             $last_selection = ($num_selected == (($select_info->fields['unique_ids'] == 0) ? 1 : (($select_info->fields['total'] / $select_info->fields['unique_ids']) - 1)));
 
             $this->notify('NOTIFY_AJAX_POSM_DEPENDENCIES_EXTENSION_INFO', $option_values, $extra_functions);
             $this->debug_message(
-                "option_values -- " . json_encode($option_values, JSON_PRETTY_PRINT) .
+                'option_values -- ' . json_encode($option_values, JSON_PRETTY_PRINT) .
                 "\nselect_info: " . json_encode($select_info->fields, JSON_PRETTY_PRINT) .
                 "\nlast_selection [$last_selection]" .
                 "\nextension_info: " . json_encode($extra_functions, JSON_PRETTY_PRINT)
@@ -153,16 +155,16 @@ class zcAjaxOptionsStockDependencies extends base
         }
 
         $return_array = [
-            'error' => $error, 
+            'error' => $error,
             'error_message' => $error_message,
             'option_values' => $option_values,
-            'last_selection' => $last_selection
+            'last_selection' => $last_selection,
         ];
         $return_array['extra_functions'] = ($extra_functions !== false) ? $extra_functions : [];
         return $return_array;
     }
 
-    function debug_message($message)
+    public function debug_message($message): void
     {
         if ($this->debug) {
             error_log("$message\n", 3, $this->debug_log_file);

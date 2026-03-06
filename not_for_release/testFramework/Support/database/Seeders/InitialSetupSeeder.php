@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seeders;
 
 use Tests\Support\Database\TestDb;
 
 class InitialSetupSeeder
 {
-
     /**
      * Auto generated seed file
-     *
-     * @return void
      */
-    public function run($mainConfigs)
+    public function run(array $mainConfigs): void
     {
         $now = date('Y-m-d H:i:s');
 
@@ -84,7 +83,7 @@ class InitialSetupSeeder
         ]);
 
         // see if we need to set a custom smtp server - e.g. for mailpit
-        if (isset($mainConfigs['use-server']) && $mainConfigs['use-mailserver'] ) {
+        if (isset($mainConfigs['use-server']) && $mainConfigs['use-mailserver']) {
             self::setConfiguration('SEND_EMAILS', 'true');
             self::setConfiguration('EMAIL_TRANSPORT', 'smtp');
             self::setConfiguration('EMAIL_SMTPAUTH_MAIL_SERVER', $mainConfigs['mailserver-host'] ?? 'localhost');

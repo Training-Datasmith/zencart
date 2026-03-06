@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ZCAdditions.com Mega UL/LI Menu Template
  * Important Links (ez-pages) Option
@@ -11,12 +13,12 @@
  * @author Altered by rbarbour (ZCAdditions.com), Mega UL/LI Menu (menus/0)
  */
 
-  $content .= '<li><a href="javascript:void(0)">'.$title_ezpages.'</a>';
-  $content .= '<ul>';
+$content .= '<li><a href="javascript:void(0)">'.$title_ezpages.'</a>';
+$content .= '<ul>';
 
-  for ($i=1, $n=sizeof($var_linksList); $i<=$n; $i++) { 
+for ($i = 1, $n = sizeof($var_linksList); $i <= $n; $i++) {
     $content .= '<li><a href="' . $var_linksList[$i]['link'] . '">' . $var_linksList[$i]['name'] . '</a></li>' . "\n" ;
-  } // end FOR loop
+} // end FOR loop
 
-  $content .= '</ul>';
-  $content .= '</li>';
+$content .= '</ul>';
+$content .= '</li>';

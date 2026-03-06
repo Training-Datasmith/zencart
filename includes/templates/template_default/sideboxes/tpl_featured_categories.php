@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Side Box Template
  *
@@ -9,7 +11,7 @@
  * @version $Id: Jeff Rutt 2024 Aug 14 New in v2.1.0-alpha2 $
  * based on tpl_featured
  */
-$content = "";
+$content = '';
 $content .= '<div class="sideBoxContent centeredContent">';
 $featured_category_box_counter = 0;
 while (!$random_featured_categories->EOF) {
@@ -23,4 +25,3 @@ while (!$random_featured_categories->EOF) {
     $random_featured_categories->MoveNextRandom();
 }
 $content .= '</div>' . "\n";
-

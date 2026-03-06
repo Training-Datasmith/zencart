@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'BUTTON_IMAGE_ADD_ADDRESS' => 'button_add_address.gif',
     'BUTTON_IMAGE_ADD_PRODUCTS_TO_CART' => 'button_add_selected.gif',
     'BUTTON_IMAGE_BACK' => 'button_back.gif',
@@ -89,5 +91,3 @@ $define = [
     'BUTTON_VIEW_ALL_ALT' => 'View All',
     'BUTTON_ASK_A_QUESTION_ALT' => 'Ask a Question',
 ];
-
-return $define;

@@ -20,27 +20,27 @@
 //  $Id: popup_image.php   drbyte  Modified in v1.5.6 $
 //
 
-  require('includes/application_top.php');
+require('includes/application_top.php');
 
-  foreach($_GET as $key => $value) {
+foreach ($_GET as $key => $value) {
     switch ($key) {
-      case 'banner':
-        $banners_id = zen_db_prepare_input($_GET['banner']);
+        case 'banner':
+            $banners_id = zen_db_prepare_input($_GET['banner']);
 
-        $banner = $db->Execute("SELECT banners_title, banners_image, banners_html_text
-                                FROM " . TABLE_BANNERS . "
+            $banner = $db->Execute('SELECT banners_title, banners_image, banners_html_text
+                                FROM ' . TABLE_BANNERS . "
                                 WHERE banners_id = '" . (int)$banners_id . "'");
 
-        $page_title = $banner->fields['banners_title'];
+            $page_title = $banner->fields['banners_title'];
 
-        if ($banner->fields['banners_html_text']) {
-          $image_source = $banner->fields['banners_html_text'];
-        } elseif ($banner->fields['banners_image']) {
-          $image_source = zen_image(DIR_WS_CATALOG_IMAGES . $banner->fields['banners_image'], $page_title);
-        }
-        break;
+            if ($banner->fields['banners_html_text']) {
+                $image_source = $banner->fields['banners_html_text'];
+            } elseif ($banner->fields['banners_image']) {
+                $image_source = zen_image(DIR_WS_CATALOG_IMAGES . $banner->fields['banners_image'], $page_title);
+            }
+            break;
     }
-  }
+}
 ?>
 <!doctype html>
 <html <?php echo HTML_PARAMS; ?>>

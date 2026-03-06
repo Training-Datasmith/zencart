@@ -34,8 +34,8 @@ $save_to_file_checked = !empty($_POST['savetofile']) ? $_POST['savetofile'] : 0;
 $post_format = (isset($_POST['format']) && zen_not_null($_POST['format']) ? $_POST['format'] : 1);
 $format = $available_export_formats[$post_format]['format'];
 $result = $db->Execute('SELECT access_date FROM ' . TABLE_ADMIN_ACTIVITY_LOG . ' WHERE log_id=1 LIMIT 1');
-$date_start = $result->RecordCount() ? date('Y-m-d_H-i-s', strtotime($result->fields['access_date'])) : '';
-$file = (isset($_POST['filename']) ? preg_replace('/[^\w\.-]/', '', $_POST['filename']) : 'admin_activity_archive_' . $date_start . '__' . date('Y-m-d_H-i-s') . '.csv');
+$date_start = $result->RecordCount() ? date('Y-m-d_H-i-s', strtotime((string) $result->fields['access_date'])) : '';
+$file = (isset($_POST['filename']) ? preg_replace('/[^\w\.-]/', '', (string) $_POST['filename']) : 'admin_activity_archive_' . $date_start . '__' . date('Y-m-d_H-i-s') . '.csv');
 if (!preg_match('/.*\.(csv|txt|html?|xml)$/', $file)) {
   $file .= '.txt';
 }
@@ -108,22 +108,13 @@ if ($action != '') {
         $sort = ' DESC ';
       }
 
-      switch ($selected_filter) {
-        case 'warning':
-          $where = " severity='warning'";
-          break;
-        case 'notice+warning':
-          $where = " severity in ('warning','notice')";
-          break;
-        case 'notice':
-          $where = " severity='notice'";
-          break;
-        case 'info':
-          $where = " severity='info'";
-          break;
-        default:
-          $where = '';
-      }
+      $where = match ($selected_filter) {
+          'warning' => " severity='warning'",
+          'notice+warning' => " severity in ('warning','notice')",
+          'notice' => " severity='notice'",
+          'info' => " severity='info'",
+          default => '',
+      };
       if ($where != '') {
         $where = " WHERE " . $where;
       }
@@ -149,29 +140,27 @@ if ($action != '') {
           $exporter_output .= '<table class="table table-bordered table-striped">' . $NL;
         }
         // add column headers if CSV or HTML format
-        if ($format === "CSV" || $format === "HTML") {
-          $exporter_output .= $LINESTART;
-          $exporter_output .= $FIELDSTART . "severity" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "timestamp" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "ip_address" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "admin_user" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "page_accessed" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "parameters" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "flagged" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "attention" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "logmessage" . $FIELDEND;
-          $exporter_output .= $FIELDSEPARATOR;
-          $exporter_output .= $FIELDSTART . "postdata" . $FIELDEND;
-          $exporter_output .= $LINEBREAK;
-        }
+        $exporter_output .= $LINESTART;
+        $exporter_output .= $FIELDSTART . "severity" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "timestamp" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "ip_address" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "admin_user" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "page_accessed" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "parameters" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "flagged" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "attention" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "logmessage" . $FIELDEND;
+        $exporter_output .= $FIELDSEPARATOR;
+        $exporter_output .= $FIELDSTART . "postdata" . $FIELDEND;
+        $exporter_output .= $LINEBREAK;
           if ($format === "HTML") {
               $FIELDSTART = '<td>';
               $FIELDEND = '</td>';
@@ -196,13 +185,13 @@ if ($action != '') {
             $exporter_output .= "    <severity>" . $result['severity'] . "</severity>\n";
             $exporter_output .= "    <access_date>" . $result['access_date'] . "</access_date>\n";
             $exporter_output .= "    <admin_id>" . $result['admin_id'] . "</admin_id>\n";
-            $exporter_output .= "    <admin_name>" . htmlspecialchars($result['admin_name'], ENT_COMPAT, CHARSET, TRUE) . "</admin_name>\n";
+            $exporter_output .= "    <admin_name>" . htmlspecialchars((string) $result['admin_name'], ENT_COMPAT, CHARSET, TRUE) . "</admin_name>\n";
             $exporter_output .= "    <ip_address>" . $result['ip_address'] . "</ip_address>\n";
             $exporter_output .= "    <page_accessed>" . $result['page_accessed'] . "</page_accessed>\n";
-            $exporter_output .= "    <page_parameters>" . htmlspecialchars($result['page_parameters'], ENT_COMPAT, CHARSET, TRUE) . "</page_parameters>\n";
-            $exporter_output .= "    <flagged>" . htmlspecialchars($result['flagged'], ENT_COMPAT, CHARSET, TRUE) . "</flagged>\n";
-            $exporter_output .= "    <attention>" . htmlspecialchars($result['attention'], ENT_COMPAT, CHARSET, TRUE) . "</attention>\n";
-            $exporter_output .= "    <logmessage>" . htmlspecialchars($result['logmessage'], ENT_COMPAT, CHARSET, TRUE) . "</logmessage>\n";
+            $exporter_output .= "    <page_parameters>" . htmlspecialchars((string) $result['page_parameters'], ENT_COMPAT, CHARSET, TRUE) . "</page_parameters>\n";
+            $exporter_output .= "    <flagged>" . htmlspecialchars((string) $result['flagged'], ENT_COMPAT, CHARSET, TRUE) . "</flagged>\n";
+            $exporter_output .= "    <attention>" . htmlspecialchars((string) $result['attention'], ENT_COMPAT, CHARSET, TRUE) . "</attention>\n";
+            $exporter_output .= "    <logmessage>" . htmlspecialchars((string) $result['logmessage'], ENT_COMPAT, CHARSET, TRUE) . "</logmessage>\n";
             $exporter_output .= "    <postdata>" . $postoutput . "</postdata>\n";
             $exporter_output .= "  </row>\n";
           } else { // output non-XML data-format
@@ -258,7 +247,7 @@ if ($action != '') {
             } elseif ($format === "XML") {
               $content_type = 'text/xml; charset=' . CHARSET;
             }
-            if (str_contains($_SERVER['HTTP_USER_AGENT'], "MSIE")) {
+            if (str_contains((string) $_SERVER['HTTP_USER_AGENT'], "MSIE")) {
               header('Content-Type: application/octetstream');
 //              header('Content-Type: '.$content_type);
 //              header('Content-Disposition: inline; filename="' . $file . '"');
@@ -279,58 +268,60 @@ if ($action != '') {
             session_write_close();
             echo $exporter_output;
             exit();
-          } else {
-            // HTML
-            ?>
-            <!doctype html>
-            <html <?= HTML_PARAMS ?>>
-              <head>
-                  <?php require DIR_WS_INCLUDES . 'admin_html_head.php';
-                  if ($format === 'HTML') { ?>
+          }
+          // HTML
+          ?>
+
+                      <!doctype html>
+          <html 
+          <?= HTML_PARAMS ?>
+          >
+            <head>
+
+          require DIR_WS_INCLUDES . 'admin_html_head.php';
+          if ($format === 'HTML') { ?>
                       <style>
-                          /* Set header row static */
-                          thead tr:nth-child(1) th {
-                              background: white;
-                              position: sticky;
-                              top: 0;
-                              z-index: 10;
-                          }
-                          /* header/column row aligns */
-                          thead tr th:nth-child(2), thead tr th:nth-child(3), thead th:nth-child(7) {
-                              text-align: center;
-                          }
-                          tbody tr td:nth-child(2), tbody tr td:nth-child(3), tbody tr td:nth-child(7) {
-                              text-align: center;
-                          }
-                      </style>
-                  <?php
-                  } ?>
-              </head>
-              <body>
-                  <?php
-                  echo $exporter_output;
-                  ?>
-              </body>
-            </html>
-            <?php
-            exit();
-          }
-        } else { //write to file
-          //open output file for writing
-          $f = fopen(DIR_FS_ADMIN_ACTIVITY_EXPORT . $file, 'w');
-          if ($f) {
-            fwrite($f, $exporter_output);
-            fclose($f);
-            //open output file for readback
-            $readback = file_get_contents(DIR_FS_ADMIN_ACTIVITY_EXPORT . $file);
-          }
-          if ($readback !== FALSE && $readback == $exporter_output) {
-            $messageStack->add_session(SUCCESS_EXPORT_ADMIN_ACTIVITY_LOG . $file, 'success');
-          } else {
-            $messageStack->add_session(FAILURE_EXPORT_ADMIN_ACTIVITY_LOG . $file, 'error');
-          }
-          unset($f);
-        } // endif $save_to_file
+                  /* Set header row static */
+                  thead tr:nth-child(1) th {
+                      background: white;
+                      position: sticky;
+                      top: 0;
+                      z-index: 10;
+                  }
+                  /* header/column row aligns */
+                  thead tr th:nth-child(2), thead tr th:nth-child(3), thead th:nth-child(7) {
+                      text-align: center;
+                  }
+                  tbody tr td:nth-child(2), tbody tr td:nth-child(3), tbody tr td:nth-child(7) {
+                      text-align: center;
+                  }
+              </style>
+          <?php
+                  }
+                        </head>
+      <body>
+
+          echo $exporter_output;
+                        </body>
+    </html>
+
+          exit();
+        }
+        //write to file
+        //open output file for writing
+        $f = fopen(DIR_FS_ADMIN_ACTIVITY_EXPORT . $file, 'w');
+        if ($f) {
+          fwrite($f, $exporter_output);
+          fclose($f);
+          //open output file for readback
+          $readback = file_get_contents(DIR_FS_ADMIN_ACTIVITY_EXPORT . $file);
+        }
+        if ($readback !== FALSE && $readback == $exporter_output) {
+          $messageStack->add_session(SUCCESS_EXPORT_ADMIN_ACTIVITY_LOG . $file, 'success');
+        } else {
+          $messageStack->add_session(FAILURE_EXPORT_ADMIN_ACTIVITY_LOG . $file, 'error');
+        }
+        unset($f); // endif $save_to_file
           zen_redirect(zen_href_link(FILENAME_ADMIN_ACTIVITY));
       } //end if $records for processing not 0
       break;
@@ -367,7 +358,7 @@ if ($action != '') {
 
       <?php if ($action == '') { ?>
         <div class="row">
-            <?php echo zen_draw_form('export', FILENAME_ADMIN_ACTIVITY, 'action=save', 'post', 'class="form-horizontal"'); //, 'onsubmit="return check_form(export);"');     ?>
+            <?php echo zen_draw_form('export', FILENAME_ADMIN_ACTIVITY, 'action=save', 'post'); //, 'onsubmit="return check_form(export);"');     ?>
           <h4><?= HEADING_SUB1 ?></h4>
             <div class="row"><?= TEXT_INSTRUCTIONS ?></div>
             <div class="form-group"><?= zen_draw_label(TEXT_ACTIVITY_EXPORT_FILTER, 'filter', 'class="col-sm-3 control-label"') ?>

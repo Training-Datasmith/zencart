@@ -20,8 +20,10 @@
         /**
          * require the html_define for the about_us page
          */
-        if (!empty($define_page)) require($define_page);
-        ?>
+        if (!empty($define_page)) {
+            require($define_page);
+        }
+?>
 
 
     </div>

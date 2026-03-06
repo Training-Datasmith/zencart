@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
 * best_sellers sidebox - displays selected number of (usually top ten) best selling products
 *
@@ -9,27 +11,27 @@
 */
 if (isset($current_category_id) && ($current_category_id > 0)) {
     $best_sellers_query =
-        "SELECT DISTINCT p.products_id, pd.*, p.*
-           FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd, "
-                    . TABLE_PRODUCTS_TO_CATEGORIES . " p2c, " . TABLE_CATEGORIES . " c
+        'SELECT DISTINCT p.products_id, pd.*, p.*
+           FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd, '
+                    . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c, ' . TABLE_CATEGORIES . ' c
           WHERE p.products_status = 1
             AND p.products_ordered > 0
             AND p.products_id = pd.products_id
-            AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+            AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
             AND p.products_id = p2c.products_id
             AND p2c.categories_id = c.categories_id
-            AND " . (int)$current_category_id . " IN (c.categories_id, c.parent_id)
-          ORDER BY p.products_ordered desc, pd.products_name";
+            AND ' . (int)$current_category_id . ' IN (c.categories_id, c.parent_id)
+          ORDER BY p.products_ordered desc, pd.products_name';
 
 } else {
     $best_sellers_query =
-        "SELECT DISTINCT p.products_id, pd.*, p.*
-           FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        'SELECT DISTINCT p.products_id, pd.*, p.*
+           FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
           WHERE p.products_status = 1
             AND p.products_ordered > 0
             AND p.products_id = pd.products_id
-            AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
-          ORDER BY p.products_ordered desc, pd.products_name";
+            AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+          ORDER BY p.products_ordered desc, pd.products_name';
 }
 
 $limit = (trim(MAX_DISPLAY_BESTSELLERS) === '') ? '' : (' LIMIT ' . (int)MAX_DISPLAY_BESTSELLERS);

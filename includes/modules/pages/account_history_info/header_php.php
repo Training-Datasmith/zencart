@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Header code file for the Account History Information/Details page (which displays details for a single specific order)
  *
@@ -11,24 +13,24 @@
 $zco_notifier->notify('NOTIFY_HEADER_START_ACCOUNT_HISTORY_INFO');
 
 if (!zen_is_logged_in()) {
-  $_SESSION['navigation']->set_snapshot();
-  zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
+    $_SESSION['navigation']->set_snapshot();
+    zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
 
 if (empty($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
-  zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
+    zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
 }
 
 require DIR_WS_CLASSES . 'order.php';
 $order = new order($_GET['order_id']);
-if (empty($order->info)) { 
-  zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
+if (empty($order->info)) {
+    zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
 }
 $statusArray = $order->statuses;    //- For compatability with pre-existing templates
 
-$customer = new Customer;
+$customer = new Customer();
 if (!$customer->isSameAsLoggedIn($order->info['customer_id'])) {
-     zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
+    zen_redirect(zen_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'));
 }
 
 require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');

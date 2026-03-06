@@ -1,6 +1,6 @@
 <?php
-    $define = [
+
+declare(strict_types=1);
+return [
         'TABLE_HEADING_IMAGE' => '',
     ];
-
-    return $define;

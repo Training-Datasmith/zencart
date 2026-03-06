@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * initialise template system variables
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -23,9 +25,9 @@ if (!defined('IS_ADMIN_FLAG')) {
  * The 'choice' aliases help with weighting for fallback to default selection
  */
 $template_dir = 'template_default';
-$sql = "SELECT *, template_language=" . (int)$_SESSION['languages_id'] . " AS choice1, template_language=0 AS choice2
-        FROM " . TABLE_TEMPLATE_SELECT . "
-        ORDER BY choice1 DESC, choice2 DESC, template_language";
+$sql = 'SELECT *, template_language=' . (int)$_SESSION['languages_id'] . ' AS choice1, template_language=0 AS choice2
+        FROM ' . TABLE_TEMPLATE_SELECT . '
+        ORDER BY choice1 DESC, choice2 DESC, template_language';
 $result = $db->Execute($sql);
 $template_dir = $result->fields['template_dir'];
 
@@ -89,7 +91,7 @@ if (empty($tpl_settings) || !is_array($tpl_settings)) {
  * Load any template override settings from db
  */
 if (!empty($result->fields['template_settings'])) {
-    $tmp = json_decode($result->fields['template_settings'], true);
+    $tmp = json_decode((string) $result->fields['template_settings'], true);
     if (is_array($tmp)) {
         $tpl_settings = array_merge($tmp, $tpl_settings);
     }
@@ -112,4 +114,4 @@ $tplSetting->setFromArray($tpl_settings);
 /**
  * send the content charset "now" so that all content is impacted by it
  */
-header("Content-Type: text/html; charset=" . CHARSET);
+header('Content-Type: text/html; charset=' . CHARSET);

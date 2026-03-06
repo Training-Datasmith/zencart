@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2025 Vinos de Frutas Tropicales

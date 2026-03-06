@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * MFA functions for Multi-Factor Authentication
@@ -23,7 +24,6 @@ zen_define_default('ZC_ADMIN_TWO_FACTOR_AUTHENTICATION_SERVICE', 'zen_mfa_handle
  * Depending on actual configured method for the user, dispatches appropriate MFA function.
  *
  * @param array $admin_info receives four values: admin_id, email, admin_name, mfa array
- * @return bool
  * @since ZC v2.1.0
  */
 function zen_mfa_handler(array $admin_info = []): bool

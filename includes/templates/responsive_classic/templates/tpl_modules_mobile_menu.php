@@ -21,7 +21,7 @@
 // comments for the way to override this setting.
 //
 if ($flag_show_about_us_sidebox_link === true) {
-?>
+    ?>
     <li><?php echo '<a href="' . zen_href_link(FILENAME_ABOUT_US) . '">' . BOX_INFORMATION_ABOUT_US . '</a>'; ?></li>
 <?php
 }
@@ -30,8 +30,8 @@ if ($flag_show_about_us_sidebox_link === true) {
     <li><a href="<?php echo zen_href_link(FILENAME_LOGOFF, '', 'SSL'); ?>"><?php echo HEADER_TITLE_LOGOFF; ?></a></li>
     <li><a href="<?php echo zen_href_link(FILENAME_ACCOUNT, '', 'SSL'); ?>"><?php echo HEADER_TITLE_MY_ACCOUNT; ?></a></li>
 <?php
-  } elseif (STORE_STATUS == '0') {
-?>
+} elseif (STORE_STATUS == '0') {
+    ?>
     <li><a href="<?php echo zen_href_link(FILENAME_LOGIN, '', 'SSL'); ?>"><?php echo HEADER_TITLE_LOGIN; ?></a></li>
 <?php } ?>
 <?php if ($_SESSION['cart']->count_contents() > 0) { ?>
@@ -41,61 +41,61 @@ if ($flag_show_about_us_sidebox_link === true) {
 
     <li><span><?php echo BOX_HEADING_CATEGORIES; ?></span>
 <?php
-// load the UL-generator class and produce the menu list dynamically from there
-require_once (DIR_WS_CLASSES . 'categories_ul_generator.php');
-$zen_CategoriesUL = new zen_categories_ul_generator;
+    // load the UL-generator class and produce the menu list dynamically from there
+    require_once(DIR_WS_CLASSES . 'categories_ul_generator.php');
+$zen_CategoriesUL = new zen_categories_ul_generator();
 $menulist = $zen_CategoriesUL->buildTree(true);
-$menulist = str_replace('"level4"','"level5"',$menulist);
-$menulist = str_replace('"level3"','"level4"',$menulist);
-$menulist = str_replace('"level2"','"level3"',$menulist);
-$menulist = str_replace('"level1"','"level2"',$menulist);
-$menulist = str_replace('<li>','<li>',$menulist);
-$menulist = str_replace("</li>\n</ul>\n</li>\n</ul>\n","</li>\n</ul>\n",$menulist);
+$menulist = str_replace('"level4"', '"level5"', $menulist);
+$menulist = str_replace('"level3"', '"level4"', $menulist);
+$menulist = str_replace('"level2"', '"level3"', $menulist);
+$menulist = str_replace('"level1"', '"level2"', $menulist);
+$menulist = str_replace('<li>', '<li>', $menulist);
+$menulist = str_replace("</li>\n</ul>\n</li>\n</ul>\n", "</li>\n</ul>\n", $menulist);
 echo $menulist;
 ?>
     </li>
 
 <?php
   if (SHOW_CATEGORIES_BOX_SPECIALS === 'true') {
-   $show_this = $db->Execute("SELECT s.products_id FROM " . TABLE_SPECIALS . " s WHERE s.status= 1", 1);
-   if ($show_this->RecordCount() > 0) { ?>
+      $show_this = $db->Execute('SELECT s.products_id FROM ' . TABLE_SPECIALS . ' s WHERE s.status= 1', 1);
+      if ($show_this->RecordCount() > 0) { ?>
     <li><a class="category-links" href="<?php echo zen_href_link(FILENAME_SPECIALS); ?>"><?php echo CATEGORIES_BOX_HEADING_SPECIALS; ?></a></li>
 <?php
-    }
+      }
   }
 ?>
 
 <?php if (SHOW_CATEGORIES_BOX_PRODUCTS_NEW === 'true') {
-      // display limits
-      $display_limit = zen_get_new_date_range();
+    // display limits
+    $display_limit = zen_get_new_date_range();
 
-      $show_this = $db->Execute("SELECT p.products_id
-                                 FROM " . TABLE_PRODUCTS . " p
-                                 WHERE p.products_status = 1 " . $display_limit, 1);
-      if ($show_this->RecordCount() > 0) {
-?>
+    $show_this = $db->Execute('SELECT p.products_id
+                                 FROM ' . TABLE_PRODUCTS . ' p
+                                 WHERE p.products_status = 1 ' . $display_limit, 1);
+    if ($show_this->RecordCount() > 0) {
+        ?>
     <li><a class="category-links" href="<?php echo zen_href_link(FILENAME_PRODUCTS_NEW); ?>"><?php echo CATEGORIES_BOX_HEADING_WHATS_NEW; ?></a></li>
 <?php
     }
-  }
+}
 ?>
 <?php if (SHOW_CATEGORIES_BOX_FEATURED_PRODUCTS === 'true') {
-       $show_this = $db->Execute("SELECT products_id FROM " . TABLE_FEATURED . " WHERE status= 1", 1);
-       if ($show_this->RecordCount() > 0) {
-?>
+    $show_this = $db->Execute('SELECT products_id FROM ' . TABLE_FEATURED . ' WHERE status= 1', 1);
+    if ($show_this->RecordCount() > 0) {
+        ?>
     <li><a class="category-links" href="<?php echo zen_href_link(FILENAME_FEATURED_PRODUCTS); ?>"><?php echo CATEGORIES_BOX_HEADING_FEATURED_PRODUCTS; ?></a></li>
 <?php
     }
-  }
+}
 ?>
 <?php if (SHOW_CATEGORIES_BOX_FEATURED_CATEGORIES === 'true') {
-       $show_this = $db->Execute("SELECT categories_id FROM " . TABLE_FEATURED_CATEGORIES . " WHERE status= 1", 1);
-       if ($show_this->RecordCount() > 0) {
-?>
+    $show_this = $db->Execute('SELECT categories_id FROM ' . TABLE_FEATURED_CATEGORIES . ' WHERE status= 1', 1);
+    if ($show_this->RecordCount() > 0) {
+        ?>
     <li><a class="category-links" href="<?php echo zen_href_link(FILENAME_FEATURED_CATEGORIES); ?>"><?php echo CATEGORIES_BOX_HEADING_FEATURED_CATEGORIES; ?></a></li>
 <?php
     }
-  }
+}
 ?>
 <?php if (SHOW_CATEGORIES_BOX_PRODUCTS_ALL === 'true') { ?>
     <li><a class="category-links" href="<?php echo zen_href_link(FILENAME_PRODUCTS_ALL); ?>"><?php echo CATEGORIES_BOX_HEADING_PRODUCTS_ALL; ?></a></li>
@@ -118,12 +118,12 @@ echo $menulist;
 // comments for the way to override this setting.
 //
 if ($flag_show_accessibility_sidebox_link === true) {
-?>
+    ?>
     <li><?php echo '<a href="' . zen_href_link(FILENAME_ACCESSIBILITY) . '">' . BOX_INFORMATION_ACCESSIBILITY . '</a>'; ?></li>
 <?php
 }
 ?>
-<?php if (!empty($external_bb_url) && !empty($external_bb_text)) { // forum/bb link ?>
+<?php if (!empty($external_bb_url) && !empty($external_bb_text)) { // forum/bb link?>
         <li><a href="<?php echo $external_bb_url; ?>" rel="noopener" target="_blank"><?php echo $external_bb_text; ?></a></li>
 <?php } ?>
 <?php if (DEFINE_SITE_MAP_STATUS <= 1) { ?>
@@ -152,19 +152,19 @@ if ($flag_show_accessibility_sidebox_link === true) {
 
 <?php
   include(DIR_WS_MODULES . zen_get_module_directory('ezpages_mobile.php'));
-  if (!empty($var_linksList)) {
-?>
+if (!empty($var_linksList)) {
+    ?>
     <li><span><?php echo BOX_HEADING_EZPAGES; ?></span>
       <ul>
 <?php
-    for ($i=1, $n=count($var_linksList); $i<=$n; $i++) {
-      echo '<li><a href="' . $var_linksList[$i]['link'] . '">' . $var_linksList[$i]['name'] . '</a></li>' . "\n";
-    }
-?>
+        for ($i = 1, $n = count($var_linksList); $i <= $n; $i++) {
+            echo '<li><a href="' . $var_linksList[$i]['link'] . '">' . $var_linksList[$i]['name'] . '</a></li>' . "\n";
+        }
+    ?>
       </ul>
     </li>
 <?php
-  }
+}
 ?>
 
     <li id="menu-search">
@@ -174,8 +174,8 @@ if ($flag_show_accessibility_sidebox_link === true) {
   </ul>
 </nav>
 
-<script src="<?php echo $template->get_template_dir('jquery.mmenu.min.all.js',DIR_WS_TEMPLATE, $current_page_base,'jscript') . '/jquery.mmenu.min.all.js' ?>"></script>
-<script src="<?php echo $template->get_template_dir('jquery.mmenu.fixedelements.min.js',DIR_WS_TEMPLATE, $current_page_base,'jscript') . '/jquery.mmenu.fixedelements.min.js' ?>"></script>
+<script src="<?php echo $template->get_template_dir('jquery.mmenu.min.all.js', DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/jquery.mmenu.min.all.js' ?>"></script>
+<script src="<?php echo $template->get_template_dir('jquery.mmenu.fixedelements.min.js', DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/jquery.mmenu.fixedelements.min.js' ?>"></script>
 <script>
   $(function() {
     $("#menu")

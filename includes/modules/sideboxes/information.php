@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * information sidebox - displays list of general info links, as defined in this file
  *

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Password Forgotten
  *
@@ -41,14 +43,13 @@ if (($_GET['action'] ?? '') === 'process') {
         $_SESSION['login_attempt']++;
     } // END SLAM PREVENTION
 
-
     if (empty($_POST['email_address'])) {
         $messageStack->add_session('password_forgotten', ENTRY_EMAIL_ADDRESS_ERROR, 'error');
         zen_redirect(zen_href_link(FILENAME_PASSWORD_FORGOTTEN, '', 'SSL'));
     }
 
     $sessionMessage = SUCCESS_PASSWORD_RESET_SENT;
-    $email_address = zen_db_prepare_input(trim($_POST['email_address']));
+    $email_address = zen_db_prepare_input(trim((string) $_POST['email_address']));
 
     // -----
     // Check to see if a password reset-token was already sent for the
@@ -60,7 +61,7 @@ if (($_GET['action'] ?? '') === 'process') {
     $check_token_sent = Customer::getPasswordResetTokenForEmail($email_address);
     if ($check_token_sent !== false) {
         $max_minutes_token_valid = Customer::getPasswordResetTokenMinutesValid();
-        if ((strtotime($check_token_sent['created_at']) + $max_minutes_token_valid / 2) < time()) {
+        if ((strtotime((string) $check_token_sent['created_at']) + $max_minutes_token_valid / 2) < time()) {
             $continue_with_reset_email = false;
             $check_token_sent['email_address'] = $email_address;
             $check_token_sent['max_minutes_token_valid'] = $max_minutes_token_valid;

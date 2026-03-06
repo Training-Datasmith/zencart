@@ -26,23 +26,23 @@
 // vertical TOC listing
 // create a table of contents for chapter when more than 1 page in the TOC
   if (count($toc_links) > 1 && EZPAGES_SHOW_TABLE_CONTENTS == '1') {
-    ?>
+      ?>
     <div id="navEZPagesTOCWrapper">
       <h2 id="ezPagesTOCHeading"><?php echo TEXT_EZ_PAGES_TABLE_CONTEXT; ?></h2>
       <div id="navEZPagesTOC">
         <ul class="list">
           <?php
-          foreach ($toc_links as $link) {
-// could be used to change classes on current link and toc (table of contents) links
-            if ($link['pages_id'] == $_GET['id']) {
-              ?>
+            foreach ($toc_links as $link) {
+                // could be used to change classes on current link and toc (table of contents) links
+                if ($link['pages_id'] == $_GET['id']) {
+                    ?>
               <li><?php echo CURRENT_PAGE_INDICATOR; ?><a href="<?php echo zen_ez_pages_link($link['pages_id']); ?>"><?php echo $link['pages_title']; ?></a></li>
             <?php } else { ?>
               <li><?php echo NOT_CURRENT_PAGE_INDICATOR; ?><a href="<?php echo zen_ez_pages_link($link['pages_id']); ?>"><?php echo $link['pages_title']; ?></a></li>
               <?php
             }
-          }
-          ?>
+            }
+      ?>
         </ul>
       </div>
     </div>

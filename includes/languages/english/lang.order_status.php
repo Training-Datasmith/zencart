@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Order Status',
     'NAVBAR_TITLE_1' => 'My Account',
 
@@ -40,4 +42,3 @@ $define = [
     'FOOTER_DOWNLOAD' => 'You can also download your products at a later time at \'%s\'',
     'FOOTER_DOWNLOAD_COWOA' => 'You can download your products using the Order Status page until you reach max downloads or run out of time!',
 ];
-return $define;

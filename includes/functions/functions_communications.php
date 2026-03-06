@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use http\Exception\BadQueryStringException;
 
 /*
@@ -35,8 +37,7 @@ function zenDoCurlRequest(
     bool $decodeJsonResponses = false,
     ?array $extraCurlOptions = [],
     bool $returnWithMetadata = false
-): string|array|false
-{
+): string|array|false {
     $base_UA_host = defined('HTTP_CATALOG_SERVER') ? HTTP_CATALOG_SERVER : HTTP_SERVER;
     $referrer = $base_UA_host . DIR_WS_CATALOG;
     $userAgent = empty($_SERVER['HTTP_USER_AGENT']) ? $base_UA_host . DIR_WS_CATALOG : $_SERVER['HTTP_USER_AGENT'];
@@ -78,7 +79,7 @@ function zenDoCurlRequest(
                 $messageStack->add_session('Communications curl_init() failed. Contact server administrator.', 'error');
             }
         }
-        trigger_error("CURL instantiation error. Could not do curl_init().", E_USER_WARNING);
+        trigger_error('CURL instantiation error. Could not do curl_init().', E_USER_WARNING);
         return false;
     }
 
@@ -93,7 +94,7 @@ function zenDoCurlRequest(
     $proxy = false;
     if (CURL_PROXY_REQUIRED === 'True') {
         $proxy = true;
-        $proxy_tunnel_flag = !((defined('CURL_PROXY_TUNNEL_FLAG') && strtoupper(CURL_PROXY_TUNNEL_FLAG) === 'FALSE'));
+        $proxy_tunnel_flag = !((defined('CURL_PROXY_TUNNEL_FLAG') && strtoupper((string) CURL_PROXY_TUNNEL_FLAG) === 'FALSE'));
         curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, $proxy_tunnel_flag);
         curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
         curl_setopt($ch, CURLOPT_PROXY, CURL_PROXY_SERVER_DETAILS);
@@ -118,7 +119,7 @@ function zenDoCurlRequest(
     }
 
     // json decode if requested and if possible
-    if ($response !== false && $decodeJsonResponses && str_contains($info['content_type'], 'application/json')) {
+    if ($response !== false && $decodeJsonResponses && str_contains((string) $info['content_type'], 'application/json')) {
         $rawResponse = $response;
         $jsonResponse = json_decode($response, true);
         return $returnWithMetadata ? compact('jsonResponse', 'httpCode', 'info', 'error', 'rawResponse') : $jsonResponse;

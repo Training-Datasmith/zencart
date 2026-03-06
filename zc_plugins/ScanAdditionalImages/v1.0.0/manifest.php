@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Scan For Additional Product Image Files for Database',

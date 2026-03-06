@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * list of pages that should not be indexed by robots
  */

@@ -21,7 +21,7 @@
  * require the html_define for the conditions page
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 

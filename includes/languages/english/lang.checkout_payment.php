@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'Checkout - Step 2',
     'NAVBAR_TITLE_2' => 'Payment Method',
     'HEADING_TITLE' => 'Step 2 of 3 - Payment Information',
@@ -15,5 +17,3 @@ $define = [
     'TEXT_CONDITIONS_CONFIRM' => '<span class="termsiagree">I have read and agreed to the terms and conditions bound to this order.</span>',
     'TEXT_YOUR_TOTAL' => 'Your Total',
 ];
-
-return $define;

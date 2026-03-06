@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * paypalwpp_admin_notification.php admin display component
  *
@@ -41,7 +43,6 @@ if (!empty($response['RESPMSG'])) {
     $outputPFmain .= '</td><td>'."\n";
     $outputPFmain .= $response['RESPMSG'] ."\n";
     $outputPFmain .= '</td></tr>'."\n";
-
 
     $outputPFmain .= '<tr><td>'."\n";
     $outputPFmain .= MODULE_PAYMENT_PAYPAL_ENTRY_AVSADDR."\n";
@@ -123,7 +124,7 @@ if (!empty($response['RESPMSG'])) {
 
         $outputPFmain .= '</table></td>'."\n\n";
     }
-} else if ($response === false) {
+} elseif ($response === false) {
     $outputPayPal .= '<td style="vertical-align: top">n/a</td>'."\n\n";
 } else {
     // display all paypal status fields (in admin Orders page):
@@ -145,7 +146,7 @@ if (!empty($response['RESPMSG'])) {
         $outputPayPal .= '<tr><td>'."\n";
         $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_BUSINESS_NAME."\n";
         $outputPayPal .= '</td><td>'."\n";
-        $outputPayPal .= urldecode($response['BUSINESS']) ."\n";
+        $outputPayPal .= urldecode((string) $response['BUSINESS']) ."\n";
         $outputPayPal .= '</td></tr>'."\n";
     }
 
@@ -166,31 +167,31 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_ADDRESS_NAME."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['SHIPTONAME']) ."\n";
+    $outputPayPal .= urldecode((string) $response['SHIPTONAME']) ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_ADDRESS_STREET."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['SHIPTOSTREET']) . ' ' . (!empty($response['SHIPTOSTREET2']) ? urldecode($response['SHIPTOSTREET2']) : '') ."\n";
+    $outputPayPal .= urldecode((string) $response['SHIPTOSTREET']) . ' ' . (!empty($response['SHIPTOSTREET2']) ? urldecode((string) $response['SHIPTOSTREET2']) : '') ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_ADDRESS_CITY."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['SHIPTOCITY']) ."\n";
+    $outputPayPal .= urldecode((string) $response['SHIPTOCITY']) ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_ADDRESS_STATE."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['SHIPTOSTATE']) . ' ' . urldecode($response['SHIPTOZIP']) ."\n";
+    $outputPayPal .= urldecode((string) $response['SHIPTOSTATE']) . ' ' . urldecode((string) $response['SHIPTOZIP']) ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_ADDRESS_COUNTRY."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['SHIPTOCOUNTRYNAME']) ."\n";
+    $outputPayPal .= urldecode((string) $response['SHIPTOCOUNTRYNAME']) ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '</table></td>'."\n\n";
@@ -206,7 +207,7 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_EBAY_ID."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= (!empty($response['BUYERID']) ? urldecode($response['BUYERID']) : '') ."\n";
+    $outputPayPal .= (!empty($response['BUYERID']) ? urldecode((string) $response['BUYERID']) : '') ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
@@ -231,16 +232,16 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_TXN_ID."\n";
     $outputPayPal .= '</td><td>'."\n";
     if (isset($response['TRANSACTIONID'])) {
-       $outputPayPal .= '<a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_view-a-trans&amp;id=' . urldecode($response['TRANSACTIONID']) . '" rel="noopener" target="_blank">' . urldecode($response['TRANSACTIONID']) . '</a>' ."\n";
+        $outputPayPal .= '<a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_view-a-trans&amp;id=' . urldecode($response['TRANSACTIONID']) . '" rel="noopener" target="_blank">' . urldecode($response['TRANSACTIONID']) . '</a>' ."\n";
     } else {
-       $outputPayPal .= 'n/a';
+        $outputPayPal .= 'n/a';
     }
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_PARENT_TXN_ID."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= (!empty($response['PARENTTRANSACTIONID']) ? urldecode($response['PARENTTRANSACTIONID']) : '') ."\n";
+    $outputPayPal .= (!empty($response['PARENTTRANSACTIONID']) ? urldecode((string) $response['PARENTTRANSACTIONID']) : '') ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     if (defined('MODULE_PAYMENT_PAYPALWPP_ENTRY_PROTECTIONELIG') && !empty($response['PROTECTIONELIGIBILITY'])) {
@@ -284,9 +285,9 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_PENDING_REASON."\n";
     $outputPayPal .= '</td><td>'."\n";
     if (isset($response['PENDINGREASON'])) {
-       $outputPayPal .= urldecode($response['PENDINGREASON']) . (empty($response['REASONCODE']) || $response['REASONCODE'] == 'None' ? '' : urldecode($response['PENDINGREASON'])) ."\n";
+        $outputPayPal .= urldecode($response['PENDINGREASON']) . (empty($response['REASONCODE']) || $response['REASONCODE'] == 'None' ? '' : urldecode($response['PENDINGREASON'])) ."\n";
     } else {
-       $outputPayPal .= 'n/a';
+        $outputPayPal .= 'n/a';
     }
     $outputPayPal .= '</td></tr>'."\n";
 
@@ -294,9 +295,9 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_INVOICE."\n";
     $outputPayPal .= '</td><td>'."\n";
     if (!empty($ipn->fields['invoice'])) {
-       $outputPayPal .= urldecode($ipn->fields['invoice']) . (urldecode($ipn->fields['invoice']) != urldecode($response['INVNUM'] ?? '') ? '<br>' . urldecode($response['INVNUM'] ?? '') : '') ."\n";
+        $outputPayPal .= urldecode((string) $ipn->fields['invoice']) . (urldecode((string) $ipn->fields['invoice']) != urldecode($response['INVNUM'] ?? '') ? '<br>' . urldecode($response['INVNUM'] ?? '') : '') ."\n";
     } else {
-       $outputPayPal .= 'n/a';
+        $outputPayPal .= 'n/a';
     }
     $outputPayPal .= '</td></tr>'."\n";
 
@@ -314,12 +315,12 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_CURRENCY."\n";
     $outputPayPal .= '</td><td>'."\n";
     if (!empty($ipn->fields['mc_currency']) && !empty($response['CURRENCYCODE'])) {
-       $outputPayPal .= $ipn->fields['mc_currency'] ."\n";
-       if ($ipn->fields['mc_currency'] !== urldecode($response['CURRENCYCODE'])) {
-           $outputPayPal .= ' ' . urldecode($response['CURRENCYCODE']);
-       }
+        $outputPayPal .= $ipn->fields['mc_currency'] ."\n";
+        if ($ipn->fields['mc_currency'] !== urldecode((string) $response['CURRENCYCODE'])) {
+            $outputPayPal .= ' ' . urldecode((string) $response['CURRENCYCODE']);
+        }
     } else {
-           $outputPayPal .= 'n/a';
+        $outputPayPal .= 'n/a';
     }
     $outputPayPal .= "\n";
     $outputPayPal .= '</td></tr>'."\n";
@@ -333,13 +334,13 @@ if (!empty($response['RESPMSG'])) {
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_PAYMENT_FEE."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= urldecode($response['FEEAMT']) ."\n";
+    $outputPayPal .= urldecode((string) $response['FEEAMT']) ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
     $outputPayPal .= MODULE_PAYMENT_PAYPAL_ENTRY_EXCHANGE_RATE."\n";
     $outputPayPal .= '</td><td>'."\n";
-    $outputPayPal .= (!empty($response['EXCHANGERATE']) ? urldecode($response['EXCHANGERATE']) : '') ."\n";
+    $outputPayPal .= (!empty($response['EXCHANGERATE']) ? urldecode((string) $response['EXCHANGERATE']) : '') ."\n";
     $outputPayPal .= '</td></tr>'."\n";
 
     $outputPayPal .= '<tr><td>'."\n";
@@ -355,11 +356,11 @@ if (method_exists($this, '_doRefund')) {
     $outputRefund .= '<td><table id="outputRefund" class="noprint">'."\n";
     $outputRefund .= '<tr style="background-color: #eeeeee;border: solid thin black;">'."\n";
     $outputRefund .= '<td>' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_TITLE . '<br>'. "\n";
-    $outputRefund .= zen_draw_form('pprefund', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doRefund', 'post', '', true) . zen_hide_session_id();
+    $outputRefund .= zen_draw_form('pprefund', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doRefund', 'post') . zen_hide_session_id();
     if (!isset($response['RESPMSG'])) {
         // full refund (only for PayPal transactions, not Payflow)
         $outputRefund .= MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_FULL;
-        $outputRefund .= '<br>' . MODULE_PAYMENT_PAYPALWPP_TEXT_REFUND_FULL_CONFIRM_CHECK . zen_draw_checkbox_field('reffullconfirm', '', false, '', 'id="reffullconfirm"') . ' <input type="submit" id="fullrefund" name="fullrefund" value="' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_BUTTON_TEXT_FULL . '" title="' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_BUTTON_TEXT_FULL . '">';
+        $outputRefund .= '<br>' . MODULE_PAYMENT_PAYPALWPP_TEXT_REFUND_FULL_CONFIRM_CHECK . zen_draw_checkbox_field('reffullconfirm', '', false, '') . ' <input type="submit" id="fullrefund" name="fullrefund" value="' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_BUTTON_TEXT_FULL . '" title="' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_BUTTON_TEXT_FULL . '">';
         $outputRefund .= '<script>$("#reffullconfirm").change(function () {$("#fullrefund").prop("disabled", !this.checked);}).change()</script>';
         $outputRefund .= MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_TEXT_FULL_OR;
     } else {
@@ -376,28 +377,28 @@ if (method_exists($this, '_doRefund')) {
     //message text
     $outputRefund .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_REFUND_SUFFIX;
     $outputRefund .= '</form>';
-    $outputRefund .='</td></tr></table></td>'."\n\n";
+    $outputRefund .= '</td></tr></table></td>'."\n\n";
 }
 
 if (method_exists($this, '_doAuth') && !isset($response['RESPMSG'])) {
     $outputAuth .= '<td style="vertical-align: top"><table id="outputAuth" class="noprint">'."\n";
     $outputAuth .= '<tr style="background-color: #eeeeee;border: solid thin black;">'."\n";
     $outputAuth .= '<td>' . MODULE_PAYMENT_PAYPAL_ENTRY_AUTH_TITLE . '<br>'. "\n";
-    $outputAuth .= zen_draw_form('ppauth', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doAuth', 'post', '', true);
+    $outputAuth .= zen_draw_form('ppauth', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doAuth', 'post');
     //partial auth - input field
     $outputAuth .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_AUTH_PARTIAL_TEXT . ' ' . zen_draw_input_field('authamt', 'enter amount', 'length="8"') . zen_hide_session_id();
     $outputAuth .= '<input type="submit" name="orderauth" value="' . MODULE_PAYMENT_PAYPAL_ENTRY_AUTH_BUTTON_TEXT_PARTIAL . '" title="' . MODULE_PAYMENT_PAYPAL_ENTRY_AUTH_BUTTON_TEXT_PARTIAL . '">' . MODULE_PAYMENT_PAYPALWPP_TEXT_AUTH_FULL_CONFIRM_CHECK . zen_draw_checkbox_field('authconfirm', '', false) . '<br>';
     //message text
     $outputAuth .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_AUTH_SUFFIX;
     $outputAuth .= '</form>';
-    $outputAuth .='</td></tr></table></td>'."\n\n";
+    $outputAuth .= '</td></tr></table></td>'."\n\n";
 }
 
 if (method_exists($this, '_doCapt')) {
     $outputCapt .= '<td style="vertical-align: top"><table id="outputCapt" class="noprint">'."\n";
     $outputCapt .= '<tr style="background-color: #eeeeee;border: solid thin black;">'."\n";
     $outputCapt .= '<td>' . MODULE_PAYMENT_PAYPAL_ENTRY_CAPTURE_TITLE . '<br>'. "\n";
-    $outputCapt .= zen_draw_form('ppcapture', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doCapture', 'post', '', true) . zen_hide_session_id();
+    $outputCapt .= zen_draw_form('ppcapture', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doCapture', 'post') . zen_hide_session_id();
     $outputCapt .= MODULE_PAYMENT_PAYPAL_ENTRY_CAPTURE_FULL;
     $outputCapt .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_CAPTURE_AMOUNT_TEXT . ' ' . zen_draw_input_field('captamt', 'enter amount', 'length="8"');
     $outputCapt .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_CAPTURE_FINAL_TEXT . ' ' . zen_draw_checkbox_field('captfinal', '', true) . '<br>';
@@ -407,23 +408,23 @@ if (method_exists($this, '_doCapt')) {
     //message text
     $outputCapt .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_CAPTURE_SUFFIX;
     $outputCapt .= '</form>';
-    $outputCapt .='</td></tr></table></td>'."\n\n";
+    $outputCapt .= '</td></tr></table></td>'."\n\n";
 }
 
 if (method_exists($this, '_doVoid')) {
     $outputVoid .= '<td style="vertical-align: top"><table id="outputVoid" class="noprint">'."\n";
     $outputVoid .= '<tr style="background-color: #eeeeee;border: solid thin black;">'."\n";
     $outputVoid .= '<td>' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_TITLE . '<br>'. "\n";
-    $outputVoid .= zen_draw_form('ppvoid', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doVoid', 'post', '', true) . zen_hide_session_id();
+    $outputVoid .= zen_draw_form('ppvoid', FILENAME_ORDERS, zen_get_all_get_params(['action']) . 'action=doVoid', 'post') . zen_hide_session_id();
     $outputVoid .= MODULE_PAYMENT_PAYPAL_ENTRY_VOID . '<br>' . zen_draw_input_field('voidauthid', '', 'size="16"');
-    $outputVoid .= MODULE_PAYMENT_PAYPALWPP_TEXT_VOID_CONFIRM_CHECK . zen_draw_checkbox_field('voidconfirm', '', false, '', 'id="voidconfirm"') . ' ' . '<input type="submit" id="ordervoid" name="ordervoid" value="' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_BUTTON_TEXT_FULL . '" title="' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_BUTTON_TEXT_FULL . '">';
+    $outputVoid .= MODULE_PAYMENT_PAYPALWPP_TEXT_VOID_CONFIRM_CHECK . zen_draw_checkbox_field('voidconfirm', '', false, '') . ' ' . '<input type="submit" id="ordervoid" name="ordervoid" value="' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_BUTTON_TEXT_FULL . '" title="' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_BUTTON_TEXT_FULL . '">';
     $outputVoid .= '<script>$("#voidconfirm").change(function () {$("#ordervoid").prop("disabled", !this.checked);}).change()</script>';
     //comment field
     $outputVoid .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_TEXT_COMMENTS . '<br>' . zen_draw_textarea_field('voidnote', 'soft', '50', '3', MODULE_PAYMENT_PAYPAL_ENTRY_VOID_DEFAULT_MESSAGE);
     //message text
     $outputVoid .= '<br>' . MODULE_PAYMENT_PAYPAL_ENTRY_VOID_SUFFIX;
     $outputVoid .= '</form>';
-    $outputVoid .='</td></tr></table></td>'."\n\n";
+    $outputVoid .= '</td></tr></table></td>'."\n\n";
 }
 
 //reused components
@@ -432,7 +433,7 @@ $outputEndBlock   = '</tr>' . "\n" . '</table>' . "\n\n";
 
 // prepare output based on suitable content components
 $output = '<!-- BOF: paypalwpp_admin_notification -->' . "\n";
-$output.= '<script title="paypalwpp_admin_notification">
+$output .= '<script title="paypalwpp_admin_notification">
 function characterCount(field, count, maxchars) {
   var realchars = field.value.replace(/\t|\r|\n|\r\n/g,\'\');
   var excesschars = realchars.length - maxchars;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Header code file for the Search Input page
  *
@@ -25,5 +27,5 @@ $sData['pfrom'] = (isset($_GET['pfrom']) ? zen_output_string($_GET['pfrom']) : '
 $sData['pto'] = (isset($_GET['pto']) ? zen_output_string($_GET['pto']) : '');
 
 // check manufacturers
-$result = $db->Execute("SELECT manufacturers_id FROM " . TABLE_MANUFACTURERS . " LIMIT 1");
+$result = $db->Execute('SELECT manufacturers_id FROM ' . TABLE_MANUFACTURERS . ' LIMIT 1');
 $skip_manufacturers = ($result->EOF);

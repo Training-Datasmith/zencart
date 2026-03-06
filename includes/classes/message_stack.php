@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * messageStack Class.
  *
@@ -30,9 +32,9 @@ class messageStack extends base
         }
     }
 
-    public function add($class, $message, $type = 'error')
+    public function add($class, $message, $type = 'error'): void
     {
-        $message = trim($message);
+        $message = trim((string) $message);
         $duplicate = false;
 
         if (strlen($message) > 0) {
@@ -76,7 +78,7 @@ class messageStack extends base
         $messageToStack[] = [
             'class' => $class,
             'text' => $message,
-            'type' => $type
+            'type' => $type,
         ];
         $_SESSION['messageToStack'] = $messageToStack;
         $this->add($class, $message, $type);
@@ -87,7 +89,7 @@ class messageStack extends base
         $this->messages = [];
     }
 
-    public function output(string $class = 'default')
+    public function output(string $class = 'default'): void
     {
         global $template, $current_page_base;
 
@@ -157,7 +159,6 @@ class messageStack extends base
     }
 
     /**
-     * @return array
      * @since ZC v1.5.8
      */
     public function getDefaultFormats(): array
@@ -167,19 +168,19 @@ class messageStack extends base
         return [
             'error' => [
                 'params' => 'class="messageStackError larger"',
-                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_ERROR, DIR_WS_TEMPLATE, $current_page_base,'images/icons'). '/' . ICON_IMAGE_ERROR, ICON_ERROR_ALT),
+                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_ERROR, DIR_WS_TEMPLATE, $current_page_base, 'images/icons'). '/' . ICON_IMAGE_ERROR, ICON_ERROR_ALT),
             ],
             'success' => [
                 'params' => 'class="messageStackSuccess larger"',
-                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_SUCCESS, DIR_WS_TEMPLATE, $current_page_base,'images/icons'). '/' . ICON_IMAGE_SUCCESS, ICON_SUCCESS_ALT),
+                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_SUCCESS, DIR_WS_TEMPLATE, $current_page_base, 'images/icons'). '/' . ICON_IMAGE_SUCCESS, ICON_SUCCESS_ALT),
             ],
             'warning' => [
                 'params' => 'class="messageStackWarning larger"',
-                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_WARNING, DIR_WS_TEMPLATE, $current_page_base,'images/icons'). '/' . ICON_IMAGE_WARNING, ICON_WARNING_ALT),
+                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_WARNING, DIR_WS_TEMPLATE, $current_page_base, 'images/icons'). '/' . ICON_IMAGE_WARNING, ICON_WARNING_ALT),
             ],
             'caution' => [
                 'params' => 'class="messageStackCaution larger"',
-                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_WARNING, DIR_WS_TEMPLATE, $current_page_base,'images/icons'). '/' . ICON_IMAGE_WARNING, ICON_WARNING_ALT),
+                'icon' => zen_image($template->get_template_dir(ICON_IMAGE_WARNING, DIR_WS_TEMPLATE, $current_page_base, 'images/icons'). '/' . ICON_IMAGE_WARNING, ICON_WARNING_ALT),
             ],
             'default' => [
                 'params' => 'class="messageStackError larger"'],

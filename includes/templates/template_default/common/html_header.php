@@ -46,7 +46,7 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
 <meta http-equiv="imagetoolbar" content="no"/>
 <meta name="author" content="<?php echo STORE_NAME ?>"/>
 <meta name="generator" content="shopping cart program by Zen Cart&reg;, https://www.zen-cart.com eCommerce"/>
-<?php if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($current_page_base,explode(",",constant('ROBOTS_PAGES_TO_SKIP'))) || $current_page_base=='down_for_maintenance' || $robotsNoIndex === true) { ?>
+<?php if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($current_page_base, explode(',', constant('ROBOTS_PAGES_TO_SKIP'))) || $current_page_base == 'down_for_maintenance' || $robotsNoIndex === true) { ?>
 <meta name="robots" content="noindex, nofollow"/>
 <?php } ?>
 
@@ -55,9 +55,9 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_TAG_START', $current_page_base);
 <?php if (defined('FAVICON')) { ?>
 <link rel="icon" href="<?php echo FAVICON; ?>" type="image/x-icon"/>
 <link rel="shortcut icon" href="<?php echo FAVICON; ?>" type="image/x-icon"/>
-<?php } //endif FAVICON ?>
+<?php } //endif FAVICON?>
 
-<base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER . DIR_WS_HTTPS_CATALOG : HTTP_SERVER . DIR_WS_CATALOG ); ?>"/>
+<base href="<?php echo(($request_type == 'SSL') ? HTTPS_SERVER . DIR_WS_HTTPS_CATALOG : HTTP_SERVER . DIR_WS_CATALOG); ?>"/>
 <?php if (isset($canonicalLink) && $canonicalLink != '') { ?>
 <link rel="canonical" href="<?php echo $canonicalLink; ?>"/>
 <?php } ?>
@@ -76,7 +76,7 @@ require $template->get_template_dir('html_header_css_loader.php', DIR_WS_TEMPLAT
 /** CDN for jQuery core **/
 ?>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script title="jQuery check - template">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js',DIR_WS_TEMPLATE, $current_page_base,'jscript') ?>/jquery.min.js"><\/script>');</script>
+<script title="jQuery check - template">window.jQuery || document.write('<script src="<?= $template->get_template_dir('.js', DIR_WS_TEMPLATE, $current_page_base, 'jscript') ?>/jquery.min.js"><\/script>');</script>
 
 <?php
 $zco_notifier->notify('NOTIFY_HTML_HEAD_JS_BEGIN', $current_page_base);
@@ -90,4 +90,4 @@ $zco_notifier->notify('NOTIFY_HTML_HEAD_END', $current_page_base);
 ?>
 
 </head>
-<?php // NOTE: Blank line following is intended: ?>
+<?php // NOTE: Blank line following is intended:?>

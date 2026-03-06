@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ajaxGetHelpText.php
  * @copyright Copyright 2003-2024 Zen Cart Development Team
@@ -14,9 +16,9 @@ require DIR_FS_INSTALL . 'includes/application_top.php';
 
 if (isset($_POST['id'])) {
     $result = str_replace('helpId', '', zen_output_string_protected($_POST['id']));
-    $content = "TEXT_HELP_CONTENT_" . strtoupper($result);
-    $content = "<p>" . constant($content) . "</p>";
-    $title = "TEXT_HELP_TITLE_" . strtoupper($result);
+    $content = 'TEXT_HELP_CONTENT_' . strtoupper($result);
+    $content = '<p>' . constant($content) . '</p>';
+    $title = 'TEXT_HELP_TITLE_' . strtoupper($result);
     $title = constant($title);
 }
 

@@ -1,20 +1,20 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Stubbed Function
  *
- * @return bool
  *
  */
-function is_product_valid()
+function is_product_valid(): bool
 {
     return true;
 }
 
 /**
  * Stubbed Function
- * @return bool
  */
-function is_coupon_valid_for_sales()
+function is_coupon_valid_for_sales(): bool
 {
     return true;
 }
@@ -28,8 +28,7 @@ function is_coupon_valid_for_sales()
  */
 function zen_round($value, $precision)
 {
-    $value = round($value * pow(10, $precision), 0);
-    $value = $value / pow(10, $precision);
+    $value = round($value * 10 ** $precision, 0);
 
-    return $value;
+    return $value / 10 ** $precision;
 }

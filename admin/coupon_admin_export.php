@@ -13,19 +13,19 @@ require ('includes/application_top.php');
 // change destination here for path when using "save to file on server"
 if (!defined('DIR_FS_COUPON_EXPORT')) define('DIR_FS_COUPON_EXPORT', DIR_FS_ADMIN . 'backups/');
 
-$action = (isset($_GET['action']) ? $_GET['action'] : '');
+$action = ($_GET['action'] ?? '');
 $start = (isset($_GET['s']) ? (int)$_GET['s'] : 0);
 $perpage = (isset($_GET['p']) ? (int)$_GET['p'] : 50);
-$available_export_formats[0] = array('id' => '0' , 'text' => 'Export as HTML (ideal for on-screen viewing)', 'format' => 'HTML'); // review on screen
-$available_export_formats[1] = array('id' => '1' , 'text' => 'Export to CSV (ideal for importing to spreadsheets)', 'format' => 'CSV'); // export to CSV
+$available_export_formats[0] = ['id' => '0' , 'text' => 'Export as HTML (ideal for on-screen viewing)', 'format' => 'HTML']; // review on screen
+$available_export_formats[1] = ['id' => '1' , 'text' => 'Export to CSV (ideal for importing to spreadsheets)', 'format' => 'CSV']; // export to CSV
 //  $available_export_formats[2]=array('id' => '2', 'text' => 'Export to TXT', 'format' => 'TXT');
 //  $available_export_formats[3]=array('id' => '3', 'text' => 'Export to XML', 'format' => 'XML');
 $save_to_file_checked = (isset($_POST['savetofile']) && !empty($_POST['savetofile']) ? $_POST['savetofile'] : 0);
 $post_format = (isset($_POST['format']) && !empty($_POST['format']) ? $_POST['format'] : 1);
 $format = $available_export_formats[$post_format]['format'];
-$file = (isset($_POST['filename']) ? preg_replace('/[^\w\.\-]/', '', $_POST['filename']) : 'coupon_export_' . date('Y-m-d_H-i-s') . '.csv');
+$file = (isset($_POST['filename']) ? preg_replace('/[^\w\.\-]/', '', (string) $_POST['filename']) : 'coupon_export_' . date('Y-m-d_H-i-s') . '.csv');
 if (!preg_match('/.*\.(csv|txt|html?|xml)$/', $file)) $file .= '.txt';
-if (isset($_GET['codebase'])) $_GET['codebase'] = preg_replace('/[^A-Za-z0-9\-\][\^!@#$%&*)(+=}{]/', '', $_GET['codebase']);
+if (isset($_GET['codebase'])) $_GET['codebase'] = preg_replace('/[^A-Za-z0-9\-\][\^!@#$%&*)(+=}{]/', '', (string) $_GET['codebase']);
 
 zen_set_time_limit(600);
 
@@ -36,9 +36,9 @@ if ($action != '')
   if ($perpage > 0 || $start > 0)
   {
     $limit = ' LIMIT ';
-    if ($start > 0) $limit .= (int)$start;
+    if ($start > 0) $limit .= $start;
     if ($start > 0 && $perpage > 0) $limit .= ', ';
-    if ($perpage > 0) $limit .= (int)$perpage;
+    if ($perpage > 0) $limit .= $perpage;
   }
   $sort = '';
 
@@ -151,7 +151,7 @@ if ($action != '')
             $exporter_output .= "<coupon_export_log>\n";
             $exporter_output .= "  <row>\n";
             $exporter_output .= "    <coupon_id>" . $result->fields['coupon_id'] . "</coupon_id>\n";
-            $exporter_output .= "    <coupon_code>" . htmlspecialchars($result->fields['coupon_code'], ENT_COMPAT, CHARSET, TRUE) . "</coupon_code>\n";
+            $exporter_output .= "    <coupon_code>" . htmlspecialchars((string) $result->fields['coupon_code'], ENT_COMPAT, CHARSET, TRUE) . "</coupon_code>\n";
             $exporter_output .= "    <coupon_amount>" . $result->fields['coupon_amount'] . "</coupon_amount>\n";
             $exporter_output .= "    <coupon_type>" . $result->fields['coupon_type'] . "</coupon_type>\n";
             $exporter_output .= "    <coupon_minimum_order>" . $result->fields['coupon_minimum_order'] . "</coupon_minimum_order>\n";
@@ -231,7 +231,7 @@ if ($action != '')
             {
               $content_type = 'text/xml; charset=' . CHARSET;
             }
-            if (preg_match('/MSIE/', $_SERVER['HTTP_USER_AGENT']))
+            if (preg_match('/MSIE/', (string) $_SERVER['HTTP_USER_AGENT']))
             {
               header('Content-Type: application/octetstream');
 //              header('Content-Type: '.$content_type);
@@ -254,41 +254,41 @@ if ($action != '')
             session_write_close();
             echo $exporter_output;
             exit();
-          } else
-          {
-            // HTML
-?>
-<!doctype html>
-<html <?php echo HTML_PARAMS; ?>>
-<head>
-    <?php require DIR_WS_INCLUDES . 'admin_html_head.php'; ?>
-</head>
-<body>
-<?php
-            echo $exporter_output;
-?>
-</body>
-</html>
-<?php
-            exit();
           }
-        } else
-        { //write to file
-          //open output file for writing
-          $f = fopen(DIR_FS_COUPON_EXPORT . $file, 'w');
-          if ($f) {
-            fwrite($f, $exporter_output);
-            fclose($f);
-            //open output file for readback
-            $readback = file_get_contents(DIR_FS_COUPON_EXPORT . $file);
-          }
-          if ($readback !== FALSE && $readback == $exporter_output) {
-            $messageStack->add_session(SUCCESS_EXPORT_DISCOUNT_COUPON_LOG . $file, 'success');
-          } else {
-            $messageStack->add_session(FAILURE_EXPORT_DISCOUNT_COUPON_LOG . $file, 'error');
-          }
-          unset($f);
-        } // endif $save_to_file
+          // HTML
+          ?>
+
+          <!doctype html>
+          <html 
+          echo HTML_PARAMS;
+          >
+          <head>
+
+          require DIR_WS_INCLUDES . 'admin_html_head.php';
+          </head>
+          <body>
+
+          echo $exporter_output;
+          </body>
+          </html>
+
+          exit();
+        }
+        //write to file
+        //open output file for writing
+        $f = fopen(DIR_FS_COUPON_EXPORT . $file, 'w');
+        if ($f) {
+          fwrite($f, (string) $exporter_output);
+          fclose($f);
+          //open output file for readback
+          $readback = file_get_contents(DIR_FS_COUPON_EXPORT . $file);
+        }
+        if ($readback !== FALSE && $readback == $exporter_output) {
+          $messageStack->add_session(SUCCESS_EXPORT_DISCOUNT_COUPON_LOG . $file, 'success');
+        } else {
+          $messageStack->add_session(FAILURE_EXPORT_DISCOUNT_COUPON_LOG . $file, 'error');
+        }
+        unset($f); // endif $save_to_file
       } //end if $records for processing not 0
       zen_redirect(zen_href_link(FILENAME_COUPON_ADMIN_EXPORT));
       break;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * currencies sidebox - allows customer to select from available currencies
  *
@@ -9,7 +11,7 @@
  */
 
 // test if box should display; it's not displayed on checkout-related pages
-$show_currencies = (strpos($current_page, 'checkout') !== 0);
+$show_currencies = (!str_starts_with((string) $current_page, 'checkout'));
 
 if ($show_currencies === true && isset($currencies) && is_object($currencies)) {
     $currencies_array = [];

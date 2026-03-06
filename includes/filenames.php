@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * filenames.php
  * Defines the filenames used in the project
@@ -83,8 +85,8 @@ define('FILENAME_DENIED', 'denied');
 define('FILENAME_DEVELOPERS_TOOL_KIT', 'developers_tool_kit');
 define('FILENAME_DISCOUNT_COUPON', 'discount_coupon');
 define('FILENAME_DOWNLOAD', 'download');
-define('FILENAME_DOWNLOAD_TIME_OUT','download_time_out');
-define('FILENAME_DOWNLOADS_MANAGER','downloads_manager');
+define('FILENAME_DOWNLOAD_TIME_OUT', 'download_time_out');
+define('FILENAME_DOWNLOADS_MANAGER', 'downloads_manager');
 define('FILENAME_EZPAGES', 'page');
 define('FILENAME_EZPAGES_ADMIN', 'ezpages');
 define('FILENAME_GEO_ZONES', 'geo_zones');
@@ -95,12 +97,12 @@ define('FILENAME_GV_SEND', 'gv_send');
 define('FILENAME_GV_QUEUE', 'gv_queue');
 define('FILENAME_GV_MAIL', 'gv_mail');
 define('FILENAME_GV_SENT', 'gv_sent');
-define('FILENAME_FEATURED','featured');
-define('FILENAME_FEATURED_PRODUCTS','featured_products');
-define('FILENAME_FEATURED_CATEGORIES','featured_categories');
+define('FILENAME_FEATURED', 'featured');
+define('FILENAME_FEATURED_PRODUCTS', 'featured_products');
+define('FILENAME_FEATURED_CATEGORIES', 'featured_categories');
 define('FILENAME_INFO_SHOPPING_CART', 'info_shopping_cart');
 define('FILENAME_LANGUAGES', 'languages');
-define('FILENAME_LAYOUT_CONTROLLER','layout_controller');
+define('FILENAME_LAYOUT_CONTROLLER', 'layout_controller');
 define('FILENAME_LOGIN', 'login');
 define('FILENAME_LOGOFF', 'logoff');
 define('FILENAME_MAIL', 'mail');
@@ -137,7 +139,7 @@ define('FILENAME_POPUP_CVV_HELP', 'popup_cvv_help');
 define('FILENAME_POPUP_ATTRIBUTES_QTY_PRICES', 'popup_attributes_qty_prices');
 define('FILENAME_PRIVACY', 'privacy');
 define('FILENAME_PRODUCT', 'product');
-define('FILENAME_PRODUCT_LISTING_ALPHA_SORTER','product_listing_alpha_sorter');
+define('FILENAME_PRODUCT_LISTING_ALPHA_SORTER', 'product_listing_alpha_sorter');
 define('FILENAME_PRODUCT_TYPES', 'product_types');
 define('FILENAME_PRODUCT_INFO', 'product_info');
 define('FILENAME_PRODUCT_REVIEWS', 'product_reviews');
@@ -147,8 +149,8 @@ define('FILENAME_PRODUCTS_ALL', 'products_all');
 define('FILENAME_PRODUCTS_PRICE_MANAGER', 'products_price_manager');
 define('FILENAME_PRODUCTS_EXPECTED', 'products_expected');
 define('FILENAME_PRODUCTS_NEW', 'products_new');
-define('FILENAME_PRODUCTS_OPTIONS_NAME','option_name');
-define('FILENAME_PRODUCTS_OPTIONS_VALUES','option_values');
+define('FILENAME_PRODUCTS_OPTIONS_NAME', 'option_name');
+define('FILENAME_PRODUCTS_OPTIONS_VALUES', 'option_values');
 define('FILENAME_PRODUCTS_QUANTITY_DISCOUNTS', 'products_quantity_discounts');
 define('FILENAME_PRODUCTS_TO_CATEGORIES', 'products_to_categories');
 define('FILENAME_PROFILES', 'profiles');
@@ -165,7 +167,7 @@ define('FILENAME_SHIPPING', 'shippinginfo');
 define('FILENAME_SHOPPING_CART', 'shopping_cart');
 define('FILENAME_SITE_MAP', 'site_map');
 define('FILENAME_SPECIALS', 'specials');
-define('FILENAME_SQLPATCH','sqlpatch');
+define('FILENAME_SQLPATCH', 'sqlpatch');
 define('FILENAME_STATS_CUSTOMERS', 'stats_customers');
 define('FILENAME_STATS_CUSTOMERS_REFERRALS', 'stats_customers_referrals');
 define('FILENAME_STATS_PRODUCTS_PURCHASED', 'stats_products_purchased');
@@ -176,7 +178,7 @@ define('FILENAME_STORE_MANAGER', 'store_manager');
 define('FILENAME_TAX_CLASSES', 'tax_classes');
 define('FILENAME_TAX_RATES', 'tax_rates');
 define('FILENAME_TEMPLATE_SELECT', 'template_select');
-define('FILENAME_TIME_OUT','time_out');
+define('FILENAME_TIME_OUT', 'time_out');
 define('FILENAME_UNSUBSCRIBE', 'unsubscribe');
 define('FILENAME_USERS', 'users');
 define('FILENAME_ZONES', 'zones');
@@ -184,23 +186,21 @@ define('FILENAME_WHOS_ONLINE', 'whos_online');
 
 // The following have .php or other suffix INTENTIONALLY !!!
 
-define('FILENAME_BUTTON_NAMES','button_names.php');
+define('FILENAME_BUTTON_NAMES', 'button_names.php');
 define('FILENAME_ALSO_PURCHASED_PRODUCTS', 'also_purchased_products.php');
-define('FILENAME_CATEGORIES_TABS','categories_tabs.php');
+define('FILENAME_CATEGORIES_TABS', 'categories_tabs.php');
 define('FILENAME_CREDIT_CARDS', 'credit_cards.php');
-define('FILENAME_DATABASE_TEMPORARILY_DOWN','nddbc.html');
-define('FILENAME_EMAIL_EXTRAS','email_extras.php');
-define('FILENAME_FEATURED_CATEGORIES_MODULE','featured_categories.php');
-define('FILENAME_FEATURED_PRODUCTS_MODULE','featured_products.php');
-define('FILENAME_HEADER','header.php');
-define('FILENAME_ICON_NAMES','icon_names.php');
+define('FILENAME_DATABASE_TEMPORARILY_DOWN', 'nddbc.html');
+define('FILENAME_EMAIL_EXTRAS', 'email_extras.php');
+define('FILENAME_FEATURED_CATEGORIES_MODULE', 'featured_categories.php');
+define('FILENAME_FEATURED_PRODUCTS_MODULE', 'featured_products.php');
+define('FILENAME_HEADER', 'header.php');
+define('FILENAME_ICON_NAMES', 'icon_names.php');
 define('FILENAME_LISTING_DISPLAY_ORDER', 'listing_display_order.php');
 define('FILENAME_NEW_PRODUCTS', 'new_products.php');
-define('FILENAME_OTHER_IMAGES_NAMES','other_images_names.php');
+define('FILENAME_OTHER_IMAGES_NAMES', 'other_images_names.php');
 define('FILENAME_PREV_NEXT', 'products_previous_next.php');
 define('FILENAME_PREV_NEXT_DISPLAY', 'products_previous_next_display.php');
 define('FILENAME_PRODUCT_LISTING', 'product_listing.php');
 define('FILENAME_SPECIALS_INDEX', 'specials_index.php');
 define('FILENAME_UPCOMING_PRODUCTS', 'upcoming_products.php');
-
-

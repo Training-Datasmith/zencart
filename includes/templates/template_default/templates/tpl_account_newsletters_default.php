@@ -15,7 +15,9 @@
 <?php echo zen_draw_form('account_newsletter', zen_href_link(FILENAME_ACCOUNT_NEWSLETTERS, '', 'SSL')) . zen_draw_hidden_field('action', 'process'); ?>
 
 <h1 id="acctNewslettersDefaultHeading"><?php echo HEADING_TITLE; ?></h1>
-<?php if ($messageStack->size('newsletter') > 0) echo $messageStack->output('newsletter'); ?>
+<?php if ($messageStack->size('newsletter') > 0) {
+    echo $messageStack->output('newsletter');
+} ?>
 
 <fieldset>
 <legend><?php echo MY_NEWSLETTERS_GENERAL_NEWSLETTER; ?></legend>

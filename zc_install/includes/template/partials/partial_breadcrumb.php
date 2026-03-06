@@ -18,7 +18,7 @@ $is_upgrade_mode = ($_POST['upgrade_mode'] ?? 'no') === 'yes';
                 <li class="breadcrumb-divider">&raquo;</li>
                 <?php
                 if ($current_page === 'database_upgrade' || $is_upgrade_mode) {
-                ?>
+                    ?>
                 <li class="breadcrumb-item badge<?= ($current_page === 'database_upgrade') ? ' active text-bg-primary' : ' text-bg-secondary' ?>"<?= ($current_page === 'database_upgrade') ? ' aria-current="page"' : '' ?>>
                     <span><?= TEXT_NAVBAR_DATABASE_UPGRADE ?></span>
                 </li>
@@ -39,7 +39,7 @@ $is_upgrade_mode = ($_POST['upgrade_mode'] ?? 'no') === 'yes';
                 <li class="breadcrumb-divider">&raquo;</li>
                 <?php
                 }
-                ?>
+?>
                 <li class="breadcrumb-item badge<?= ($current_page === 'completion') ? ' active text-bg-primary' : ' text-bg-secondary' ?>"<?= ($current_page === 'completion') ? ' aria-current="page"' : '' ?>>
                     <span><?= TEXT_NAVBAR_COMPLETION ?></span>
                 </li>

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Side Box Template: Searchbox
  *
@@ -25,5 +27,5 @@ if (strtolower(IMAGE_USE_CSS_BUTTONS) === 'yes' || strtolower(IMAGE_USE_CSS_BUTT
 $content .= '<br>';
 $content .= '<a href="' . zen_href_link(FILENAME_SEARCH) . '">' . BOX_SEARCH_ADVANCED_SEARCH . '</a>';
 
-$content .= "</form>";
+$content .= '</form>';
 $content .= '</div>';

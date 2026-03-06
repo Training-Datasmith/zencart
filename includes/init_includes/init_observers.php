@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * auto-load and instantiate all /includes/classes/observers/auto.xxxxxxxxx.php classes
  *
@@ -25,23 +27,27 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-$observersMain = (new FileSystem)->listFilesFromDirectory(DIR_WS_CLASSES . 'observers/', '~(^(auto\.|Auto[A-Z]).*\.php$)~');
-$observersMain = array_map(static fn($item) => DIR_WS_CLASSES . 'observers/' . $item, $observersMain);
+$observersMain = (new FileSystem())->listFilesFromDirectory(DIR_WS_CLASSES . 'observers/', '~(^(auto\.|Auto[A-Z]).*\.php$)~');
+$observersMain = array_map(static fn ($item): string => DIR_WS_CLASSES . 'observers/' . $item, $observersMain);
 $context = IS_ADMIN_FLAG ? 'admin' : 'catalog';
 $observersPlugins = [];
 foreach ($installedPlugins as $plugin) {
     $path = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/' . $context . '/' . DIR_WS_CLASSES . 'observers/';
-    $observersPlugin = (new FileSystem)->listFilesFromDirectory($path, '~(^(auto\.|Auto[A-Z]).*\.php$)~');
-    $observersPlugin = array_map(static fn($item) => $path . $item, $observersPlugin);
+    $observersPlugin = (new FileSystem())->listFilesFromDirectory($path, '~(^(auto\.|Auto[A-Z]).*\.php$)~');
+    $observersPlugin = array_map(static fn ($item): string => $path . $item, $observersPlugin);
     $observersPlugins = array_merge($observersPlugins, $observersPlugin);
 }
 $observers = array_merge($observersPlugins, $observersMain);
 
 // sort by filename so that observers are loaded in a predictable order
-$basenames = array_map('basename', $observers);
+$basenames = array_map(basename(...), $observers);
 array_multisort(
-    $basenames, SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE,
-    $observers, SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE
+    $basenames,
+    SORT_ASC,
+    SORT_NATURAL | SORT_FLAG_CASE,
+    $observers,
+    SORT_ASC,
+    SORT_NATURAL | SORT_FLAG_CASE
 );
 unset($basenames);
 
@@ -57,17 +63,20 @@ foreach ($observers as $observer) {
     $objectName = 'zcObserver' . base::camelize($className, true);
     if (class_exists($objectName)) {
         // 'auto.' prefix in filename and 'zcObserver' prefix in class name
-        $$objectName = new $objectName();
+        ${$objectName} = new $objectName();
     } elseif (class_exists($psr4ClassName)) {
         // 'Auto' prefix in filename and class name matches filename
-        $$objectName = new $psr4ClassName();
+        ${$objectName} = new $psr4ClassName();
     } elseif (class_exists($alternateClassName = preg_replace('~^Auto~', '', $psr4ClassName))) {
         // 'Auto' prefix in filename but not in class name
-        $$objectName = new $alternateClassName();
+        ${$objectName} = new $alternateClassName();
     } else {
         error_log(
-            sprintf('ERROR: Observer class %s (or alternate class %s) could not be instantiated despite file %s being found. Please follow the correct naming convention for the class name inside the file.',
-                $psr4ClassName, $objectName, $observer
+            sprintf(
+                'ERROR: Observer class %s (or alternate class %s) could not be instantiated despite file %s being found. Please follow the correct naming convention for the class name inside the file.',
+                $psr4ClassName,
+                $objectName,
+                $observer
             )
         );
     }

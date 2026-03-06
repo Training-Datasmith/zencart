@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * registry class.
  *
@@ -66,7 +68,7 @@ class zcRegistry extends base
         return false;
     }
 
-    public static function unSetValue($keyName): void
+    public static function unSetValue(string $keyName): void
     {
         if (isset(self::$values[$keyName])) {
             unset(self::$values[$keyName]);

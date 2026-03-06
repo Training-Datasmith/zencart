@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Include AJAX Framework for non-template_default templates **only**!
  *

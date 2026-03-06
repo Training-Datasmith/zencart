@@ -49,12 +49,12 @@ global $db;
 let oosMessages = {};
 <?php
 $oos_messages = $db->Execute(
-    "SELECT pos_name_id, pos_name
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
-      WHERE language_id = " . (int)$_SESSION['languages_id']
+    'SELECT pos_name_id, pos_name
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
+      WHERE language_id = ' . (int)$_SESSION['languages_id']
 );
 foreach ($oos_messages as $oos_message) {
-    echo 'oosMessages[' . $oos_message['pos_name_id'] . "] = '" . addslashes($oos_message['pos_name']) . "';\n";
+    echo 'oosMessages[' . $oos_message['pos_name_id'] . "] = '" . addslashes((string) $oos_message['pos_name']) . "';\n";
 }
 
 $check_select = false;
@@ -103,12 +103,12 @@ if ($check_radio) {
     $input_types_first .= ($separator . 'input[type="radio"]:first');
 }
 $option_check = $db->Execute(
-    "SELECT DISTINCT pa.options_id
-       FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_OPTIONS . " po
-      WHERE pa.products_id = " . (int)$_GET['products_id'] . "
+    'SELECT DISTINCT pa.options_id
+       FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa, ' . TABLE_PRODUCTS_OPTIONS . ' po
+      WHERE pa.products_id = ' . (int)$_GET['products_id'] . '
         AND pa.options_id = po.products_options_id
-        AND po.products_options_type IN (" . POSM_OPTIONS_TYPES_TO_MANAGE . ")" .
-        ((POSM_OPTIONAL_OPTION_NAMES_LIST === '') ? '' : " AND pa.options_id NOT IN (" . POSM_OPTIONAL_OPTION_NAMES_LIST . ")")
+        AND po.products_options_type IN (' . POSM_OPTIONS_TYPES_TO_MANAGE . ')' .
+        ((POSM_OPTIONAL_OPTION_NAMES_LIST === '') ? '' : ' AND pa.options_id NOT IN (' . POSM_OPTIONAL_OPTION_NAMES_LIST . ')')
 );
 $is_single_option = ($option_check->RecordCount() < 2);
 ?>
@@ -116,12 +116,12 @@ let swatchOptions = {};
 <?php
 foreach ($option_check as $next_option) {
     $option_info = $db->Execute(
-        "SELECT products_options_id, products_options_images_per_row, products_options_images_style
-           FROM " . TABLE_PRODUCTS_OPTIONS . "
-          WHERE products_options_id = " . $next_option['options_id'] . "
-          LIMIT 1"
+        'SELECT products_options_id, products_options_images_per_row, products_options_images_style
+           FROM ' . TABLE_PRODUCTS_OPTIONS . '
+          WHERE products_options_id = ' . $next_option['options_id'] . '
+          LIMIT 1'
     );
-?>
+    ?>
 swatchOptions[<?= $option_info->fields['products_options_id'] ?>] = {
     'num': "<?= $option_info->fields['products_options_images_per_row'] ?>",
     'style': "<?= $option_info->fields['products_options_images_style'] ?>"
@@ -162,13 +162,13 @@ if (PRODUCTS_OPTIONS_SORT_ORDER === '0') {
     $options_order_by = ' ORDER BY po.products_options_name';
 }
 $sql =
-    "SELECT DISTINCT po.products_options_id, po.products_options_name, po.products_options_sort_order,
+    'SELECT DISTINCT po.products_options_id, po.products_options_name, po.products_options_sort_order,
                      po.products_options_type
-       FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            INNER JOIN " . TABLE_PRODUCTS_OPTIONS . " po
+       FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' po
                 ON po.products_options_id = pa.options_id
-               AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-      WHERE pa.products_id = " . (int)$_GET['products_id'] .
+               AND po.language_id = ' . (int)$_SESSION['languages_id'] . '
+      WHERE pa.products_id = ' . (int)$_GET['products_id'] .
         $options_order_by;
 $option_check = $db->Execute($sql);
 

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -19,8 +21,8 @@ use zcObserverLogWriterTextfile;
  */
 class AdminLoggingTest extends zcUnitTestCase
 {
-    protected $preserveGlobalState = FALSE;
-    protected $runTestInSeparateProcess = TRUE;
+    protected $preserveGlobalState = false;
+    protected $runTestInSeparateProcess = true;
 
     public function setUp(): void
     {
@@ -41,38 +43,37 @@ class AdminLoggingTest extends zcUnitTestCase
         global $db;
         $db = $this->getMockBuilder('queryFactory')->getMock();
         $metaCol = (object)['max_length' => '255'];
-        $db->method('MetaColumns')->willReturn(array('ATTENTION' => $metaCol));
+        $db->method('MetaColumns')->willReturn(['ATTENTION' => $metaCol]);
     }
 
-    private function initTestFileSystem($hasFile = true, $contents = '')
+    private function initTestFileSystem(bool $hasFile = true, string $contents = '')
     {
-        $file = ($hasFile) ? array('admin_log.txt' => $contents) : array();
-        $structure = array(
-            'logDir' => $file
-        );
+        $file = ($hasFile) ? ['admin_log.txt' => $contents] : [];
+        $structure = [
+            'logDir' => $file,
+        ];
         vfsStream::setup('_virtualroot_', '0777', $structure);
-        $file = vfsStream::url('_virtualroot_/logDir/admin_log.txt');
 
-        return $file;
+        return vfsStream::url('_virtualroot_/logDir/admin_log.txt');
     }
 
-    public function testInstantiateLogEventListener()
+    public function testInstantiateLogEventListener(): void
     {
         $observer = new zcObserverLogEventListener();
         $this->assertInstanceOf('zcObserverLogEventListener', $observer);
     }
 
-    public function testFilterArrayElements()
+    public function testFilterArrayElements(): void
     {
         $observer = new zcObserverLogEventListener();
-        $data = array('x' => 'abc', 'password' => 'abc');
+        $data = ['x' => 'abc', 'password' => 'abc'];
         $result = $observer::filterArrayElements($data);
         $this->assertStringNotContainsString('abc', print_r($result, true));
         $this->assertArrayNotHasKey('x', $result);
         $this->assertArrayNotHasKey('password', $result);
     }
 
-    public function testParseForMaliciousContent()
+    public function testParseForMaliciousContent(): void
     {
         define('CHARSET', 'utf-8');
         $data = 'This is malicious <script>alert(123);</script> code.';
@@ -83,12 +84,12 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringNotContainsString('<script>', $result, 'Should be escaped');
     }
 
-    public function testPrepareLogData()
+    public function testPrepareLogData(): void
     {
         define('CHARSET', 'utf-8');
-        $message_to_log = array('field1' => 'abcdefg');
+        $message_to_log = ['field1' => 'abcdefg'];
         $requested_severity = 'warning';
-        $_POST = array('name' => 'x', 'desc' => 'y');
+        $_POST = ['name' => 'x', 'desc' => 'y'];
         $observer = new zcObserverLogEventListener();
         $result = $observer::prepareLogdata($message_to_log, $requested_severity);
 
@@ -96,13 +97,13 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('abcdefg', $result['specific_message']);
     }
 
-    public function testPrepareMaliciousLogData()
+    public function testPrepareMaliciousLogData(): void
     {
         define('CHARSET', 'utf-8');
         $_SERVER['REMOTE_ADDR'] = 'localhost';
         $message_to_log = 'bad <iframe>';
         $requested_severity = 'info';
-        $_POST = array('name' => 'risky <script> content', 'desc' => 'yes');
+        $_POST = ['name' => 'risky <script> content', 'desc' => 'yes'];
         // set up the logWriter dependencies
         $file = $this->initTestFileSystem(true);
         $observer = new zcObserverLogWriterTextfile();
@@ -111,7 +112,7 @@ class AdminLoggingTest extends zcUnitTestCase
         // test for expected notice
         $observer2 = new zcObserverLogEventListener();
         $stdClass = new \stdClass();
-        $result = $observer2->updateNotifyAdminActivityLogEvent($stdClass, '', $message_to_log, $requested_severity);
+        $observer2->updateNotifyAdminActivityLogEvent($stdClass, '', $message_to_log, $requested_severity);
 
         // and test that the malicious code doesn't appear in the log
         $var = file($file);
@@ -122,12 +123,12 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString(WARNING_REVIEW_ROGUE_ACTIVITY, $var[$line], 'warning should be present');
     }
 
-    public function testUpdateNotifyAdminActivityLogEvent()
+    public function testUpdateNotifyAdminActivityLogEvent(): void
     {
         define('CHARSET', 'utf-8');
         $message_to_log = '';
         $requested_severity = 'warning';
-        $_POST = array('name' => 'x', 'desc' => 'y');
+        $_POST = ['name' => 'x', 'desc' => 'y'];
 
         // set up the logWriter dependencies
         $file = $this->initTestFileSystem();
@@ -138,7 +139,7 @@ class AdminLoggingTest extends zcUnitTestCase
         // now trigger the notifier
         $observer = new zcObserverLogEventListener();
         $stdClass = new \stdClass();
-        $result = $observer->updateNotifyAdminActivityLogEvent($stdClass, '', $message_to_log, $requested_severity);
+        $observer->updateNotifyAdminActivityLogEvent($stdClass, '', $message_to_log, $requested_severity);
 
         // and test that the message appears in the log
         $var = file($file);
@@ -148,17 +149,16 @@ class AdminLoggingTest extends zcUnitTestCase
 
     /* filewriter */
 
-    public function testFileLogWriterInstantiation()
+    public function testFileLogWriterInstantiation(): void
     {
         $observer = new zcObserverLogWriterTextfile();
         $this->assertInstanceOf('zcObserverLogWriterTextfile', $observer);
     }
 
-
-    public function testFileLogWriterUpdateToEmptyLogFile()
+    public function testFileLogWriterUpdateToEmptyLogFile(): void
     {
         $file = $this->initTestFileSystem(true, '');
-        $data = array('severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testEmptyLogfile');
+        $data = ['severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testEmptyLogfile'];
 
         $observer = new zcObserverLogWriterTextfile();
         $observer->setLogFilename($file);
@@ -179,10 +179,10 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('testEmptyLogfile', $var[$line]); // should find the message
     }
 
-    public function testFileLogWriterUpdateToMissingLogFile()
+    public function testFileLogWriterUpdateToMissingLogFile(): void
     {
         $file = $this->initTestFileSystem(false);
-        $data = array('severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testMissingLogfile');
+        $data = ['severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testMissingLogfile'];
 
         $observer = new zcObserverLogWriterTextfile();
         $observer->setLogFilename($file);
@@ -204,11 +204,10 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('testMissingLogfile', $var[$line]); // should find the message
     }
 
-
-    public function testFileLogWriterUpdateToRegularLogFile()
+    public function testFileLogWriterUpdateToRegularLogFile(): void
     {
         $file = $this->initTestFileSystem(true, 'placeholder');
-        $data = array('severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testLogWriterUpdate');
+        $data = ['severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testLogWriterUpdate'];
 
         $observer = new zcObserverLogWriterTextfile();
         $observer->setLogFilename($file);
@@ -226,7 +225,7 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('testLogWriterUpdate', $var[$line]); // should find the message
     }
 
-    public function testFileLogWriterReset()
+    public function testFileLogWriterReset(): void
     {
         $file = $this->initTestFileSystem(true, 'This is dummy data which should disappear during reset');
         $observer = new zcObserverLogWriterTextfile();
@@ -241,7 +240,7 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('Log reset by', $var[0]); // should find the reset notice
     }
 
-    public function testFileLogWriterResetViaListener()
+    public function testFileLogWriterResetViaListener(): void
     {
         $file = $this->initTestFileSystem(true, 'This is dummy data which should disappear during reset');
         $observer = new zcObserverLogWriterTextfile();
@@ -255,10 +254,10 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('Log reset by', $var[0]); // should find the reset notice
     }
 
-    public function testFileLogWriterUpdate()
+    public function testFileLogWriterUpdate(): void
     {
         $file = $this->initTestFileSystem(true, 'placeholder');
-        $data = array('severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testLogWriterUpdate');
+        $data = ['severity' => 'warning', 'ip_address' => 'localhost', 'page_accessed' => 'testLogWriterUpdate'];
 
         $observer = new zcObserverLogWriterTextfile();
         $observer->setLogFilename($file);
@@ -276,10 +275,10 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertStringContainsString('testLogWriterUpdate', $var[$line]); // should find the message
     }
 
-    public function testHelperFunctionZenRecordAdminActivity()
+    public function testHelperFunctionZenRecordAdminActivity(): void
     {
         global $zco_notifier;
-        $zco_notifier = new notifier;
+        $zco_notifier = new notifier();
         define('CHARSET', 'utf-8');
         $message = '1abcdefgh';
         $severity = 'critical';
@@ -288,7 +287,7 @@ class AdminLoggingTest extends zcUnitTestCase
 
         $observer = new zcObserverLogWriterTextfile();
         $observer->setLogFilename($file);
-        $observer2 = new zcObserverLogEventListener();
+        new zcObserverLogEventListener();
 
         zen_record_admin_activity($message, $severity);
 
@@ -298,16 +297,15 @@ class AdminLoggingTest extends zcUnitTestCase
         $line = sizeof($var) - 1;
 
         $this->assertGreaterThan(1, sizeof($var));
-        $this->assertEquals(substr($var[$line], 0, strlen($severity)),
-            $severity); // test that the specified severity passes through
+        $this->assertEquals(
+            substr($var[$line], 0, strlen($severity)),
+            $severity
+        ); // test that the specified severity passes through
         $this->assertStringContainsString($message, $var[$line]); // should find the message
     }
 
-
-    /* ********************************************************* */
-
     /** db writer unit tests (note: other methods are tested using functional db tests **/
-    public function testDbLogWriterInstantiation()
+    public function testDbLogWriterInstantiation(): void
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet. Must update the mock.'
@@ -316,18 +314,18 @@ class AdminLoggingTest extends zcUnitTestCase
         $this->assertInstanceOf('zcObserverLogWriterDatabase', $observer);
     }
 
-    public function testDbPrepareLogData()
+    public function testDbPrepareLogData(): void
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet. Must update the mock.'
         );
         $specific_message = 'test1\ntest2';
         $severity = 'warning';
-        $postdata = json_encode(array('name' => 'x', 'desc' => 'y'));
+        $postdata = json_encode(['name' => 'x', 'desc' => 'y']);
         $flagged = false;
         $notes = false;
 
-        $log_data = array(
+        $log_data = [
             'event_epoch_time' => time(),
             'admin_id' => 0,
             'page_accessed' => 'testpage',
@@ -338,7 +336,7 @@ class AdminLoggingTest extends zcUnitTestCase
             'flagged' => $flagged,
             'attention' => ($notes === false ? '' : $notes),
             'severity' => $severity,
-        );
+        ];
 
         $observer = new zcObserverLogWriterDatabase();
         $result = $observer->dbPrepareLogData($log_data);

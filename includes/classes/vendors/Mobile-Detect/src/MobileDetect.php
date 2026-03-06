@@ -231,15 +231,6 @@ use Psr\SimpleCache\InvalidArgumentException as PsrInvalidArgumentException;
 class MobileDetect
 {
     /**
-     * A cache for resolved matches
-     *  Implementation of PSR-16: Common Interface for Caching Libraries
-     *  https://www.php-fig.org/psr/psr-16/
-     *
-     * Replace this with your own implementation.
-     */
-    protected CacheInterface $cache;
-
-    /**
      * Stores the version number of the current release.
      */
     protected string $VERSION = '4.8.10';
@@ -278,43 +269,37 @@ class MobileDetect
 
     /**
      * The User-Agent HTTP header is stored in here.
-     * @var string|null
      */
     protected ?string $userAgent = null;
 
     /**
      * HTTP headers in the PHP-flavor. So HTTP_USER_AGENT and SERVER_SOFTWARE.
-     * @var array
      */
     protected array $httpHeaders = [];
 
     /**
      * CloudFront headers. E.g. CloudFront-Is-Desktop-Viewer, CloudFront-Is-Mobile-Viewer & CloudFront-Is-Tablet-Viewer.
-     * @var array
      */
     protected static array $knownCloudFrontHeaders = [
         'HTTP_CLOUDFRONT_IS_MOBILE_VIEWER',
         'HTTP_CLOUDFRONT_IS_TABLET_VIEWER',
-        'HTTP_CLOUDFRONT_IS_DESKTOP_VIEWER'
+        'HTTP_CLOUDFRONT_IS_DESKTOP_VIEWER',
     ];
 
     protected static string $cloudFrontUA = 'Amazon CloudFront';
 
     /**
      * The matching regex string. Used only for debugging.
-     * @var string
      */
-    protected string $matchingRegex = "";
+    protected string $matchingRegex = '';
 
     /**
      * The matches extracted from the regex expression. Used only for debugging.
-     * @var array
      */
     protected array $matchesArray = [];
 
     /**
      * HTTP headers that trigger the 'isMobile' detection to be true.
-     * @var array
      */
     protected static array $knownMobilePositiveHeaders = [
         'HTTP_ACCEPT'                  => [
@@ -325,7 +310,7 @@ class MobileDetect
                 // BlackBerry devices.
                 'application/vnd.rim.html',
                 'text/vnd.wap.wml',
-                'application/vnd.wap.xhtml+xml'
+                'application/vnd.wap.xhtml+xml',
             ]],
         'HTTP_X_WAP_PROFILE'           => null,
         'HTTP_X_WAP_CLIENTID'          => null,
@@ -352,7 +337,6 @@ class MobileDetect
 
     /**
      * List of mobile devices (phones).
-     * @var array
      */
     protected static array $phoneDevices = [
         'iPhone'        => '\biPhone\b|\biPod\b', // |\biTunes
@@ -361,7 +345,7 @@ class MobileDetect
         'HTC'           => [
             'HTC|HTC.*(Sensation|Evo|Vision|Explorer|6800|8100|8900|A7272|S510e|C110e|Legend|Desire|T8282)',
             'APX515CKT|Qtek9090|APA9292KT|HD_mini|Sensation.*Z710e|PG86100|Z715e|Desire.*(A8181|HD)|ADR6200',
-            'ADR6400L|ADR6425|001HT|Inspire 4G|Android.*\bEVO\b|T-Mobile G1|Z520m|Android [0-9.]+; Pixel'
+            'ADR6400L|ADR6425|001HT|Inspire 4G|Android.*\bEVO\b|T-Mobile G1|Z520m|Android [0-9.]+; Pixel',
         ],
         'Nexus'         => 'Nexus One|Nexus S|Galaxy.*Nexus|Android.*Nexus.*Mobile|Nexus 4|Nexus 5|Nexus 5X|Nexus 6',
         // @todo: Is 'Dell Streak' a tablet or a phone? ;)
@@ -466,7 +450,7 @@ class MobileDetect
         // http://fr.wikomobile.com
         'Wiko'  => [
             'KITE 4G|HIGHWAY|GETAWAY|STAIRWAY|DARKSIDE|DARKFULL|DARKNIGHT|DARKMOON|SLIDE|WAX 4G|RAINBOW|BLOOM|SUNSET|GOA(?!nna)|LENNY',
-            'BARRY|IGGY|OZZY|CINK FIVE|CINK PEAX|CINK PEAX 2|CINK SLIM|CINK SLIM 2|CINK +|CINK KING|CINK PEAX|CINK SLIM|SUBLIM'
+            'BARRY|IGGY|OZZY|CINK FIVE|CINK PEAX|CINK PEAX 2|CINK SLIM|CINK SLIM 2|CINK +|CINK KING|CINK PEAX|CINK SLIM|SUBLIM',
         ],
         'iMobile'   => 'i-mobile (IQ|i-STYLE|idea|ZAA|Hitz)',
         // Added simvalley mobile just for fun. They have some interesting devices.
@@ -489,7 +473,6 @@ class MobileDetect
 
     /**
      * List of tablet devices.
-     * @var array
      */
     protected static array $tabletDevices = [
         // @todo: check for mobile friendly emails topic.
@@ -542,7 +525,7 @@ class MobileDetect
         // Can conflict with Micromax and Motorola phones codes.
         'AcerTablet'        => [
             'Android.*; \b(A100|A101|A110|A200|A210|A211|A500|A501|A510|A511|A700|A701|W500|W500P|W501|W501P|W510|W511|W700|G100|G100W|B1-A71|B1-710|B1-711|A1-810|A1-811|A1-830)\b',
-            'W3-810|\bA3-A10\b|\bA3-A11\b|\bA3-A20\b|\bA3-A30|A3-A40'
+            'W3-810|\bA3-A10\b|\bA3-A11\b|\bA3-A20\b|\bA3-A30|A3-A40',
         ],
         // http://eu.computers.toshiba-europe.com/innovation/family/Tablets/1098744/banner_id/tablet_footerlink/
         // http://us.toshiba.com/tablets/tablet-finder
@@ -863,7 +846,6 @@ class MobileDetect
 
     /**
      * List of mobile Operating Systems.
-     * @var array
      */
     protected static array $operatingSystems = [
         'AndroidOS'         => 'Android',
@@ -903,7 +885,6 @@ class MobileDetect
      * IMPORTANT: This is a list of mobile browsers only.
      * Since Mobile Detect 2.x.x, this list supports mobile browsers only.
      * Mobile Detect was never designed to detect all browsers.
-     * @var array
      */
     protected static array $browsers = [
         //'Vivaldi'         => 'Vivaldi',
@@ -951,7 +932,6 @@ class MobileDetect
     /**
      * All possible HTTP headers that represent the
      * User-Agent string.
-     * @var array
      */
     protected static array $knownUserAgentHttpHeaders = [
         // The default User-Agent string.
@@ -964,13 +944,12 @@ class MobileDetect
         'HTTP_X_SKYFIRE_PHONE',
         'HTTP_X_BOLT_PHONE_UA',
         'HTTP_DEVICE_STOCK_UA',
-        'HTTP_X_UCBROWSER_DEVICE_UA'
+        'HTTP_X_UCBROWSER_DEVICE_UA',
     ];
 
     /**
      * The individual segments that could exist in a User-Agent string. VER refers to the regular
      * expression defined in the constant self::VERSION_REGEX.
-     * @var array
      */
     protected static array $properties = [
 
@@ -1048,11 +1027,9 @@ class MobileDetect
      * Construct an instance of this class.
      */
     public function __construct(
-        ?CacheInterface $cache = null,
+        protected ?CacheInterface $cache = new Cache(),
         array $config = [],
     ) {
-        // If no custom cache provided then use our own.
-        $this->cache = $cache ?? new Cache();
         // Override config from user.
         $this->config = array_merge($this->config, $config);
 
@@ -1077,8 +1054,6 @@ class MobileDetect
     /**
      * On startup Mobile Detect library will auto-initiate from the existing
      * HTTP headers extracted from $_SERVER.
-     *
-     * @return void
      */
     public function autoInitKnownHttpHeaders(): void
     {
@@ -1106,7 +1081,7 @@ class MobileDetect
         // Set the User-Agent even if it's an empty string so that "autoInitOfHttpHeaders" doesn't throw an exception.
         // https://github.com/serbanghita/Mobile-Detect/issues/946#issuecomment-1885675939
         if (!$this->hasUserAgent()) {
-            $this->setUserAgent("");
+            $this->setUserAgent('');
         }
     }
 
@@ -1127,10 +1102,10 @@ class MobileDetect
 
         // Setting new HTTP headers automatically resets the User-Agent.
         // Set current User-Agent from known User-Agent-like HTTP header(s).
-        $userAgent = "";
+        $userAgent = '';
         foreach ($this->getUaHttpHeaders() as $altHeader) {
             if (!empty($this->httpHeaders[$altHeader])) {
-                $userAgent .= $this->httpHeaders[$altHeader] . " ";
+                $userAgent .= $this->httpHeaders[$altHeader] . ' ';
             }
         }
 
@@ -1149,8 +1124,6 @@ class MobileDetect
 
     /**
      * Retrieves the HTTP headers.
-     *
-     * @return array
      */
     public function getHttpHeaders(): array
     {
@@ -1191,11 +1164,9 @@ class MobileDetect
         //Test both the regular and the HTTP_ prefix
         if (isset($this->httpHeaders[$header])) {
             return $this->httpHeaders[$header];
-        } elseif (isset($this->httpHeaders[$altHeader])) {
-            return $this->httpHeaders[$altHeader];
         }
 
-        return null;
+        return $this->httpHeaders[$altHeader] ?? null;
     }
 
     public function getMobileHeaders(): array
@@ -1217,8 +1188,6 @@ class MobileDetect
     /**
      * Retrieves the HTTP CloudFront headers
      * that trigger a mobile detection.
-     *
-     * @return array
      */
     public function getCloudFrontHttpHeaders(): array
     {
@@ -1229,7 +1198,6 @@ class MobileDetect
      * Prepare the User-Agent string for matching phase.
      *
      * @param string $userAgent The User-Agent string.
-     * @return string
      */
     private function prepareUserAgent(string $userAgent): string
     {
@@ -1241,7 +1209,6 @@ class MobileDetect
      * Set the User-Agent to be used.
      *
      * @param string $userAgent The User-Agent string.
-     * @return string
      */
     public function setUserAgent(string $userAgent): string
     {
@@ -1313,8 +1280,6 @@ class MobileDetect
      * Method gets the mobile detection rules.
      * This method is used for the magic methods $detect->is*().
      * Retrieve the current set of rules.
-     *
-     * @return array
      */
     public function getRules(): array
     {
@@ -1346,8 +1311,6 @@ class MobileDetect
      * Check the HTTP headers for signs of mobile.
      * This is the fastest mobile check possible; it's used
      * inside isMobile() method.
-     *
-     * @return bool
      */
     public function checkHttpHeadersForMobile(): bool
     {
@@ -1355,15 +1318,14 @@ class MobileDetect
             if (isset($this->httpHeaders[$mobileHeader])) {
                 if (isset($matchType['matches']) && is_array($matchType['matches'])) {
                     foreach ($matchType['matches'] as $_match) {
-                        if (str_contains($this->httpHeaders[$mobileHeader], $_match)) {
+                        if (str_contains($this->httpHeaders[$mobileHeader], (string) $_match)) {
                             return true;
                         }
                     }
 
                     return false;
-                } else {
-                    return true;
                 }
+                return true;
             }
         }
 
@@ -1373,8 +1335,6 @@ class MobileDetect
     /**
      * Magic overloading method.
      *
-     * @param string $name
-     * @param array $arguments
      * @return bool
      * @throws BadMethodCallException when the method doesn't exist and doesn't start with 'is'
      * @throws \Exception
@@ -1394,7 +1354,6 @@ class MobileDetect
     /**
      * Check if the device is mobile.
      * Returns true if any type of mobile device detected, including special ones
-     * @return bool
      * @throws MobileDetectException
      */
     public function isMobile(): bool
@@ -1409,7 +1368,7 @@ class MobileDetect
 
         // Cache check.
         try {
-            $cacheKey = $this->createCacheKey("mobile");
+            $cacheKey = $this->createCacheKey('mobile');
             $cacheItem = $this->cache->get($cacheKey);
             if ($cacheItem !== null) {
                 return $cacheItem;
@@ -1427,11 +1386,10 @@ class MobileDetect
             if ($this->hasHttpHeaders() && $this->checkHttpHeadersForMobile()) {
                 $this->cache->set($cacheKey, true, $this->config['cacheTtl']);
                 return true;
-            } else {
-                $result = $this->matchUserAgentWithFirstFoundMatchingRule();
-                $this->cache->set($cacheKey, $result, $this->config['cacheTtl']);
-                return $result;
             }
+            $result = $this->matchUserAgentWithFirstFoundMatchingRule();
+            $this->cache->set($cacheKey, $result, $this->config['cacheTtl']);
+            return $result;
         } catch (CacheInvalidArgumentException | CacheException | PsrInvalidArgumentException $e) {
             throw new MobileDetectException("Cache problem in isMobile(): {$e->getMessage()}", MobileDetectExceptionCode::IS_MOBILE_ERR, $e);
         }
@@ -1440,7 +1398,6 @@ class MobileDetect
     /**
      * Check if the device is a tablet.
      * Return true if any type of tablet device is detected.
-     * @return bool
      * @throws MobileDetectException
      */
     public function isTablet(): bool
@@ -1455,7 +1412,7 @@ class MobileDetect
 
         // Cache check.
         try {
-            $cacheKey = $this->createCacheKey("tablet");
+            $cacheKey = $this->createCacheKey('tablet');
             $cacheItem = $this->cache->get($cacheKey);
             if ($cacheItem !== null) {
                 return $cacheItem;
@@ -1474,7 +1431,7 @@ class MobileDetect
                 $regexString = $_regex;
                 // "regex" is array of "strings"
                 if (is_array($_regex)) {
-                    $regexString = implode("|", $_regex);
+                    $regexString = implode('|', $_regex);
                 }
                 if ($this->match($regexString, $this->getUserAgent())) {
                     $this->cache->set($cacheKey, true, $this->config['cacheTtl']);
@@ -1508,8 +1465,6 @@ class MobileDetect
     /**
      * Checks if a rule (e.g. isIphone, isIOS, etc.) matches its regex against the User-Agent.
      *
-     * @param string $ruleName
-     * @return bool
      * @throws MobileDetectException
      */
     public function is(string $ruleName): bool
@@ -1549,9 +1504,6 @@ class MobileDetect
      * This method will be used to check custom regexes against
      * the User-Agent string.
      *
-     * @param string $regex
-     * @param string $userAgent
-     * @return bool
      *
      * @todo: search in the HTTP headers too.
      */
@@ -1569,7 +1521,6 @@ class MobileDetect
 
     /**
      * Find a detection rule that matches the current User-agent.
-     * @return bool
      */
     protected function matchUserAgentWithFirstFoundMatchingRule(): bool
     {
@@ -1601,9 +1552,6 @@ class MobileDetect
      * Search for a certain key in the rules array.
      * If the key is found then try to match the corresponding
      * regex against the User-Agent.
-     *
-     * @param string $ruleName
-     * @return bool
      */
     protected function matchUserAgentWithRule(string $ruleName): bool
     {
@@ -1616,7 +1564,7 @@ class MobileDetect
         if (false === empty($_rules[$ruleName])) {
             $regexString = $_rules[$ruleName];
             if (is_array($_rules[$ruleName])) {
-                $regexString = implode("|", $_rules[$ruleName]);
+                $regexString = implode('|', $_rules[$ruleName]);
             }
             $result = $this->match($regexString, $this->getUserAgent());
             //            if (is_array($_rules[$ruleName])) {
@@ -1639,7 +1587,6 @@ class MobileDetect
      * @todo Remove the error suppression from str_replace() call.
      *
      * @param string $ver The string version, like "2.6.21.2152";
-     * @return float
      */
     public function prepareVersionNo(string $ver): float
     {
@@ -1689,7 +1636,7 @@ class MobileDetect
                 $propertyPattern = str_replace('[VER]', self::VERSION_REGEX, $propertyMatchString);
 
                 // Identify and extract the version.
-                preg_match(sprintf('#%s#is', $propertyPattern), $this->userAgent, $match);
+                preg_match(sprintf('#%s#is', $propertyPattern), (string) $this->userAgent, $match);
 
                 if (false === empty($match[1])) {
                     return ($type == self::VERSION_TYPE_FLOAT ? $this->prepareVersionNo($match[1]) : $match[1]);
@@ -1738,8 +1685,6 @@ class MobileDetect
 
     /**
      * Get the properties array.
-     *
-     * @return array
      */
     public static function getProperties(): array
     {

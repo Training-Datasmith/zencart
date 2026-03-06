@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -24,27 +26,26 @@ $db_password_fallback = $configReader->getDefine('DB_SERVER_PASSWORD');
 $db_name_fallback = $configReader->getDefine('DB_DATABASE');
 $install_demo_data = false;
 
-
 if (defined('DEVELOPER_MODE') && DEVELOPER_MODE === true) {
     if (empty($db_user_fallback)) {
         $db_user_fallback = (defined('DEVELOPER_DBUSER_DEFAULT') ? DEVELOPER_DBUSER_DEFAULT : 'zencart');
     }
-    $db_user = $db_user ?? $db_user_fallback;
+    $db_user ??= $db_user_fallback;
 
     if (empty($db_password_fallback)) {
         $db_password_fallback = (defined('DEVELOPER_DBPASSWORD_DEFAULT') ? DEVELOPER_DBPASSWORD_DEFAULT : 'zencart');
     }
-    $db_password = $db_password ?? $db_password_fallback;
+    $db_password ??= $db_password_fallback;
 
     if (empty($db_name_fallback)) {
         $db_name_fallback = (defined('DEVELOPER_DBNAME_DEFAULT') ? DEVELOPER_DBNAME_DEFAULT : 'zencart');
     }
-    $db_name = $db_name ?? $db_name_fallback;
+    $db_name ??= $db_name_fallback;
 
     if (empty($db_host_fallback)) {
         $db_host_fallback = (defined('DEVELOPER_DBHOST_DEFAULT') ? DEVELOPER_DBHOST_DEFAULT : 'localhost');
     }
-    $db_host = $db_host ?? $db_host_fallback;
+    $db_host ??= $db_host_fallback;
 
     if (defined('DEVELOPER_INSTALL_DEMO_DATA')) {
         $install_demo_data = !empty(DEVELOPER_INSTALL_DEMO_DATA);
@@ -61,14 +62,13 @@ if (defined('DEVELOPER_MODE') && DEVELOPER_MODE === true) {
     }
     $db_user = $db_user_fallback;
     $db_password = $db_password_fallback;
-    $db_name = $db_name ?? $db_name_fallback;
+    $db_name ??= $db_name_fallback;
 }
 
-$db_user = $db_user ?? '';
-$db_password = $db_password ?? '';
-$db_host = $db_host ?? 'localhost';
-$db_prefix = $db_prefix ?? '';
-
+$db_user ??= '';
+$db_password ??= '';
+$db_host ??= 'localhost';
+$db_prefix ??= '';
 
 // attempt to intelligently manage user-adjusted subdirectory values if they are different from detected defaults
 if (!isset($_POST['detected_http_server_catalog'])) {

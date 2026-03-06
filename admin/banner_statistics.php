@@ -12,58 +12,58 @@ require 'includes/application_top.php';
 require 'includes/functions/functions_banner_graphs.php';
 
 $banner_id = (isset($_GET['bID'])) ? (int)$_GET['bID'] : 0;
-$type = (isset($_GET['type']) ? preg_replace('/[^a-z]/', '', $_GET['type']) : '');
+$type = (isset($_GET['type']) ? preg_replace('/[^a-z]/', '', (string) $_GET['type']) : '');
 $years_array = [];
 $months_array = [];
 for ($i = 1; $i < 13; $i++) {
-  $months_array[] = [
-    'id' => $i,
-    'text' => $zcDate->output('%B', mktime(0, 0, 0, $i, 1)),
-  ];
+    $months_array[] = [
+      'id' => $i,
+      'text' => $zcDate->output('%B', mktime(0, 0, 0, $i, 1)),
+    ];
 }
 $type_array = [
     [
     'id' => 'daily',
-    'text' => STATISTICS_TYPE_DAILY
+    'text' => STATISTICS_TYPE_DAILY,
     ],
   [
     'id' => 'monthly',
-    'text' => STATISTICS_TYPE_MONTHLY
+    'text' => STATISTICS_TYPE_MONTHLY,
   ],
   [
     'id' => 'yearly',
-    'text' => STATISTICS_TYPE_YEARLY
-  ]
+    'text' => STATISTICS_TYPE_YEARLY,
+  ],
 ];
 
 if ($banner_id) {
-  $banner = $db->Execute("SELECT *
-                          FROM " . TABLE_BANNERS . "
-                          WHERE banners_id = " . (int)$banner_id);
+    $banner = $db->Execute('SELECT *
+                          FROM ' . TABLE_BANNERS . '
+                          WHERE banners_id = ' . (int)$banner_id);
 
-  $years = $db->Execute("SELECT DISTINCT year(banners_history_date) AS banner_year
-                         FROM " . TABLE_BANNERS_HISTORY . "
-                         WHERE banners_id = " . (int)$banner_id . "
-                         ORDER BY banner_year");
-  foreach ($years as $year) {
-    $years_array[] = [
-      'id' => $year['banner_year'],
-      'text' => $year['banner_year']
-    ];
-  }
+    $years = $db->Execute('SELECT DISTINCT year(banners_history_date) AS banner_year
+                         FROM ' . TABLE_BANNERS_HISTORY . '
+                         WHERE banners_id = ' . (int)$banner_id . '
+                         ORDER BY banner_year');
+    foreach ($years as $year) {
+        $years_array[] = [
+          'id' => $year['banner_year'],
+          'text' => $year['banner_year'],
+        ];
+    }
 }
 if (!isset($banner)) {
-  $banner = new stdClass();
+    $banner = new stdClass();
 }
 
 // default options for the graphs
 $opts = [
   'series' => [
     'lines' => ['show' => 'true'],
-    'points' => ['show' => 'true']
+    'points' => ['show' => 'true'],
   ],
   'yaxis' => ['tickDecimals' => 0],
-  'colors' => ['blue', 'red']
+  'colors' => ['blue', 'red'],
 ];
 ?>
 <!doctype html>
@@ -215,11 +215,11 @@ $opts = [
 
       <!-- body_text //-->
       <?php
-      echo zen_draw_form('form_type', FILENAME_BANNER_STATISTICS, '', 'get', 'class="form-horizontal"');
-      echo zen_hide_session_id();
-      echo zen_draw_hidden_field('page', (int)$_GET['page']);
-      echo zen_draw_hidden_field('bID', $banner_id);
-      ?>
+      echo zen_draw_form('form_type', FILENAME_BANNER_STATISTICS, '', 'get');
+echo zen_hide_session_id();
+echo zen_draw_hidden_field('page', (int)$_GET['page']);
+echo zen_draw_hidden_field('bID', $banner_id);
+?>
       <div class="form-group">
           <?= zen_draw_label(TITLE_TYPE, 'type', 'class="control-label col-sm-3"') ?>
         <div class="col-sm-9 col-md-6">
@@ -228,10 +228,10 @@ $opts = [
         </div>
       </div>
       <?php
-      switch ($type) {
-        case 'yearly': break;
-        case 'monthly':
-          ?>
+switch ($type) {
+    case 'yearly': break;
+    case 'monthly':
+        ?>
           <div class="form-group">
               <?= zen_draw_label(TITLE_YEAR, 'year', 'class="control-label col-sm-3"') ?>
             <div class="col-sm-9 col-md-6">
@@ -240,28 +240,28 @@ $opts = [
             </div>
           </div>
           <?php
-          break;
-        default:
-        case 'daily':
-          ?>
+        break;
+    default:
+    case 'daily':
+        ?>
           <div class="form-group">
-              <?= zen_draw_label(TITLE_MONTH, 'month','class="control-label col-sm-3"') ?>
+              <?= zen_draw_label(TITLE_MONTH, 'month', 'class="control-label col-sm-3"') ?>
             <div class="col-sm-9 col-md-6">
                   <?= zen_draw_pull_down_menu('month', $months_array, (isset($_GET['month']) ? (int)$_GET['month'] : date('n')), 'onChange="this.form.submit();" class="form-control" id="month"') ?>
               <noscript><input type="submit" value="GO"></noscript>
             </div>
           </div>
           <div class="form-group">
-              <?= zen_draw_label(TITLE_YEAR, 'year','class="control-label col-sm-3"') ?>
+              <?= zen_draw_label(TITLE_YEAR, 'year', 'class="control-label col-sm-3"') ?>
             <div class="col-sm-9 col-md-6">
                   <?= zen_draw_pull_down_menu('year', $years_array, (isset($_GET['year']) ? (int)$_GET['year'] : date('Y')), 'onChange="this.form.submit();" class="form-control" id="year"') ?>
               <noscript><input type="submit" value="GO"></noscript>
             </div>
           </div>
       <?php
-          break;
-      }
-      echo '</form>'; ?>
+        break;
+}
+echo '</form>'; ?>
 
       <div class="row text-right">
         <a href="<?= zen_href_link(FILENAME_BANNER_MANAGER, 'page=' . (int)$_GET['page'] . '&bID=' . $banner_id) ?>" class="btn btn-default" role="button"><?= IMAGE_BACK ?></a>
@@ -269,18 +269,18 @@ $opts = [
 
 
       <?php
-      $stats = zen_get_banner_data_yearly($banner_id);
-      $data = [
-          [
-        'label' => TEXT_BANNERS_BANNER_VIEWS,
-        'data' => $stats[0]
-          ], [
-          'label' => TEXT_BANNERS_BANNER_CLICKS,
-          'data' => $stats[1]
-          ]
-      ];
-      $title = sprintf(TEXT_BANNERS_YEARLY_STATISTICS, $banner->fields['banners_title']);
-      ?>
+$stats = zen_get_banner_data_yearly($banner_id);
+$data = [
+    [
+  'label' => TEXT_BANNERS_BANNER_VIEWS,
+  'data' => $stats[0],
+    ], [
+    'label' => TEXT_BANNERS_BANNER_CLICKS,
+    'data' => $stats[1],
+    ],
+];
+$title = sprintf(TEXT_BANNERS_YEARLY_STATISTICS, $banner->fields['banners_title']);
+?>
 
       <div class="row">
         <h4><?= $title ?></h4>
@@ -294,8 +294,8 @@ $opts = [
 
 <?php
   $stats = zen_get_banner_data_monthly($banner_id, (isset($_GET['year']) ? (int)$_GET['year'] : ''));
-  $data = [['label'=>TEXT_BANNERS_BANNER_VIEWS, 'data'=>$stats[0]], ['label'=>TEXT_BANNERS_BANNER_CLICKS, 'data'=>$stats[1]]];
-  $title = sprintf(TEXT_BANNERS_MONTHLY_STATISTICS, $banner->fields['banners_title'], (isset($_GET['year']) ? (int)$_GET['year'] : date('Y')));
+$data = [['label' => TEXT_BANNERS_BANNER_VIEWS, 'data' => $stats[0]], ['label' => TEXT_BANNERS_BANNER_CLICKS, 'data' => $stats[1]]];
+$title = sprintf(TEXT_BANNERS_MONTHLY_STATISTICS, $banner->fields['banners_title'], (isset($_GET['year']) ? (int)$_GET['year'] : date('Y')));
 ?>
 
       <div class="row">
@@ -303,19 +303,20 @@ $opts = [
         <div id="banner-monthly" class="col-sm-offset-3 col-sm-9 col-md-6 flot_chart" style="height:350px;"></div>
         <script>
           var mData = <?= json_encode($data) ?> ;
-          var mOptions = <?= json_encode(array_merge($opts, ['xaxis'=> ['ticks'=>$stats[3]]])) ?> ;
+          var mOptions = <?= json_encode(array_merge($opts, ['xaxis' => ['ticks' => $stats[3]]])) ?> ;
           var plot = $("#banner-monthly").plot(mData, mOptions).data("plot");
         </script>
       </div>
 
 <?php
   $stats = zen_get_banner_data_daily($banner_id, (isset($_GET['year']) ? (int)$_GET['year'] : ''), (isset($_GET['month']) ? (int)$_GET['month'] : ''));
-  $data = [['label'=>TEXT_BANNERS_BANNER_VIEWS, 'data'=>$stats[0]], ['label'=>TEXT_BANNERS_BANNER_CLICKS, 'data'=>$stats[1]]];
-  $title = sprintf(
-      TEXT_BANNERS_DAILY_STATISTICS, $banner->fields['banners_title'],
-      $zcDate->output('%B', mktime(0,0,0, (isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n')), 1)),
-      (isset($_GET['year']) ? (int)$_GET['year'] : date('Y'))
-  );
+$data = [['label' => TEXT_BANNERS_BANNER_VIEWS, 'data' => $stats[0]], ['label' => TEXT_BANNERS_BANNER_CLICKS, 'data' => $stats[1]]];
+$title = sprintf(
+    TEXT_BANNERS_DAILY_STATISTICS,
+    $banner->fields['banners_title'],
+    $zcDate->output('%B', mktime(0, 0, 0, (isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n')), 1)),
+    (isset($_GET['year']) ? (int)$_GET['year'] : date('Y'))
+);
 ?>
 
       <div class="row">
@@ -323,7 +324,7 @@ $opts = [
         <div id="banner-daily" class="col-sm-offset-3 col-sm-9 col-md-6 flot_chart" style="height:350px;"></div>
         <script>
           var dData = <?= json_encode($data) ?> ;
-          var dOptions = <?= json_encode(array_merge($opts, ['xaxis'=> ['ticks'=>sizeof($stats[0]),'tickDecimals' => 0]])) ?> ;
+          var dOptions = <?= json_encode(array_merge($opts, ['xaxis' => ['ticks' => sizeof($stats[0]),'tickDecimals' => 0]])) ?> ;
           var plot = $("#banner-daily").plot(dData, dOptions).data("plot");
         </script>
       </div>

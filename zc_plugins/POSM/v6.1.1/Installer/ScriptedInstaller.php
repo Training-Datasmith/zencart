@@ -1,14 +1,16 @@
 <?php
+
+declare(strict_types=1);
 use Zencart\PluginSupport\ScriptedInstaller as ScriptedInstallBase;
 
 class ScriptedInstaller extends ScriptedInstallBase
 {
     private string $configGroupTitle = 'Products\\\' Options\\\' Stock Manager';
 
-    protected function executeInstall()
+    protected function executeInstall(): bool
     {
         if (defined('POSMPW_MODULE_VERSION')) {
-            $posmpw_module_version = explode(',', POSMPW_MODULE_VERSION);
+            $posmpw_module_version = explode(',', (string) POSMPW_MODULE_VERSION);
             if (version_compare($posmpw_module_version[0], '2.3.1', '<')) {
                 $this->errorContainer->addError('error', ZC_PLUGIN_POSM_INSTALL_UPDATE_PW, true);
                 return false;
@@ -28,7 +30,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         );
 
         $sql =
-            "INSERT IGNORE INTO " . TABLE_CONFIGURATION . " 
+            'INSERT IGNORE INTO ' . TABLE_CONFIGURATION . " 
                 (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added, use_function, set_function)
              VALUES
                 ('General: Enable Products\' Options\' Stock Manager?', 'POSM_ENABLE', 'true', 'Enable the <em>Products\' Options\' Stock</em> processing for the storefront?', $cgi, 20, now(), NULL, 'zen_cfg_select_option([\'true\', \'false\'],'),
@@ -91,7 +93,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         define('TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES', DB_PREFIX . 'products_options_stock_attributes');
         define('TABLE_PRODUCTS_OPTIONS_STOCK_NAMES', DB_PREFIX . 'products_options_stock_names');
 
-        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK . " (
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . TABLE_PRODUCTS_OPTIONS_STOCK . " (
             pos_id int(11) NOT NULL auto_increment,
             products_id int(11) NOT NULL default 0,
             pos_name_id int(11) NOT NULL default 1,
@@ -106,7 +108,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         ) ENGINE=MyISAM";
         $this->executeInstallerSql($sql);
 
-        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " (
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . ' (
             pos_attribute_id int(11) NOT NULL auto_increment,
             pos_id int(11) NOT NULL default 0,
             products_id int(11) NOT NULL default 0,
@@ -116,10 +118,10 @@ class ScriptedInstaller extends ScriptedInstallBase
             KEY `posm_option_id` (`options_id`),
             KEY posm_options_values_id (options_values_id),
             KEY `posm_pos_id` (`pos_id`)
-        ) ENGINE=MyISAM";
+        ) ENGINE=MyISAM';
         $this->executeInstallerSql($sql);
 
-        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " (
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " (
             pos_name_id int(11) NOT NULL default 0,
             language_id int(11) NOT NULL default 1,
             pos_name varchar(64) NOT NULL default '',
@@ -130,10 +132,10 @@ class ScriptedInstaller extends ScriptedInstallBase
         $languages = zen_get_languages();
         foreach ($languages as $current_language) {
             $this->executeInstallerSql(
-                "INSERT IGNORE INTO " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
+                'INSERT IGNORE INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
                     (pos_name_id, language_id, pos_name)
                  VALUES
-                    (1, " . $current_language['id'] . ", 'Back-ordered')"
+                    (1, ' . $current_language['id'] . ", 'Back-ordered')"
             );
         }
 
@@ -165,7 +167,7 @@ class ScriptedInstaller extends ScriptedInstallBase
             $this->updateFromNonEncapsulatedVersion();
 
             $this->executeInstallerSql(
-                "DELETE FROM " . TABLE_CONFIGURATION . "
+                'DELETE FROM ' . TABLE_CONFIGURATION . "
                   WHERE configuration_key IN (
                     'PRODUCTS_OPTIONS_STOCK_REORDER_LEVEL',
                     'POSM_OOS_DATE_REMINDER',
@@ -187,12 +189,12 @@ class ScriptedInstaller extends ScriptedInstallBase
     // be present in the base code or a PHP Fatal error is generated due to the
     // function signature difference.
     //
-    protected function executeUpgrade($oldVersion)
+    protected function executeUpgrade($oldVersion): bool
     {
         parent::executeUpgrade($oldVersion);
     }
 
-    protected function executeUninstall()
+    protected function executeUninstall(): bool
     {
         zen_deregister_admin_pages([
             'configOptionsStock',
@@ -208,23 +210,23 @@ class ScriptedInstaller extends ScriptedInstallBase
             $this->configGroupTitle,
             $this->configGroupTitle . ' Settings'
         );
-        $sql = "DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_group_id = $cgi";
+        $sql = 'DELETE FROM ' . TABLE_CONFIGURATION . " WHERE configuration_group_id = $cgi";
         $this->executeInstallerSql($sql);
-        $sql = "DELETE FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_id = $cgi LIMIT 1";
+        $sql = 'DELETE FROM ' . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_id = $cgi LIMIT 1";
         $this->executeInstallerSql($sql);
 
         // -----
         // Uncomment these lines if you want to remove the plugin's added
         // database tables as well.
         //
-//        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK);
-//        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES);
-//        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES);
+        //        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK);
+        //        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES);
+        //        $this->executeInstallerSql("DROP TABLE IF EXISTS " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES);
 
         parent::executeUninstall();
     }
 
-    protected function executeInstallerSelectSql(string $sql)
+    protected function executeInstallerSelectSql(string $sql): false|\queryFactoryResult
     {
         $this->dbConn->dieOnErrors = false;
         $result = $this->dbConn->Execute($sql);
@@ -239,8 +241,8 @@ class ScriptedInstaller extends ScriptedInstallBase
     protected function getConfigGroupId(string $config_group_title, string $config_group_description): int
     {
         $sql =
-            "SELECT configuration_group_id
-               FROM " . TABLE_CONFIGURATION_GROUP . "
+            'SELECT configuration_group_id
+               FROM ' . TABLE_CONFIGURATION_GROUP . "
               WHERE configuration_group_title = '$config_group_title'
               LIMIT 1";
         $check = $this->executeInstallerSelectSql($sql);
@@ -249,15 +251,15 @@ class ScriptedInstaller extends ScriptedInstallBase
         }
 
         $sql =
-            "INSERT INTO " . TABLE_CONFIGURATION_GROUP . "
+            'INSERT INTO ' . TABLE_CONFIGURATION_GROUP . "
                 (configuration_group_title, configuration_group_description, sort_order, visible)
              VALUES
                 ('$config_group_title', '$config_group_description', 1, 1)";
         $this->executeInstallerSql($sql);
-        $sql = "SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = '$config_group_title' LIMIT 1";
+        $sql = 'SELECT configuration_group_id FROM ' . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = '$config_group_title' LIMIT 1";
         $config_group = $this->executeInstallerSelectSql($sql);
-        $cgi = (int)$config_group->fields['configuration_group_id']; 
-        $sql = "UPDATE " . TABLE_CONFIGURATION_GROUP . " SET sort_order = $cgi WHERE configuration_group_id = $cgi LIMIT 1";
+        $cgi = (int)$config_group->fields['configuration_group_id'];
+        $sql = 'UPDATE ' . TABLE_CONFIGURATION_GROUP . " SET sort_order = $cgi WHERE configuration_group_id = $cgi LIMIT 1";
         $this->executeInstallerSql($sql);
         return $cgi;
     }
@@ -283,7 +285,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         }
         return false;
     }
-    
+
     protected function updateFromNonEncapsulatedVersion()
     {
         switch (true) {
@@ -292,22 +294,23 @@ class ScriptedInstaller extends ScriptedInstallBase
             //
             case version_compare(POSM_MODULE_VERSION, '1.6.0', '<'):
                 $index_check = $this->executeInstallerSelectSql(
-                    "SHOW KEYS FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'SHOW KEYS FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                     WHERE key_name='idx_posm_pid'"
                 );
                 if ($index_check->EOF) {
                     $this->executeInstallerSql(
-                        "ALTER TABLE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                           ADD INDEX idx_posm_pid (products_id)"
+                        'ALTER TABLE ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                           ADD INDEX idx_posm_pid (products_id)'
                     );
                 }
-                                                                        //-Fall through from above to continue with updates
-            // -----
-            // v1.6.1: Various updates to descriptions, titles and sort-orders for configuration settings.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v1.6.1: Various updates to descriptions, titles and sort-orders for configuration settings.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '1.6.1', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'Stock Status Display: Include In-Stock Status?',
                             sort_order = 46,
                             configuration_description = 'Choose whether to include the display of the &quot;in-stock&quot; product status, <em>wherever</em> that status-display is enabled.  If set to <b>false</b>, only out-of-stock messages will be displayed.'
@@ -315,100 +318,104 @@ class ScriptedInstaller extends ScriptedInstallBase
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'Dependent Attributes: Stock Status Display',
                             configuration_description = 'Identify whether or not the plugin\'s dependent-attributes processing should include the in-/out-of-stock status for each attribute value on the final, selectable attribute\'s option.<br><br><strong>Note:</strong> In-stock status is included <em>only</em> if <em>Stock Status Display: Include In-Stock Status?</em> is set to <b>true</b>.'
                       WHERE configuration_key = 'POSM_DEPENDENT_ATTRS_STOCK_STATUS'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_description = 'When <em>Dependent Attributes: Stock Status Display</em> and <em>Stock Status Display: Include In-Stock Status?</em> are both <b>true</b>, should the in-stock quantity be displayed when the option-combination is <em>In Stock</em>?'
                       WHERE configuration_key = 'POSM_DEPENDENT_ATTRS_STOCK_STATUS_QTY'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET sort_order = 499,
                             configuration_description = 'If enabled, the <em>POSM</em> processing will write debug information to either a myDEBUG-POSM-*.log (for store-side actions) or a myDEBUG-POSM-adm-*.log (for admin-side actions) file in your store\'s \logs directory.'
                       WHERE configuration_key = 'POSM_ENABLE_DEBUG'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET sort_order = 20,
                             configuration_title = 'General: Enable Products\' Options\' Stock Manager?'
                       WHERE configuration_key = 'POSM_ENABLE'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET sort_order = 25,
                             configuration_title = 'General: Divider Color', configuration_description = 'Enter the background color to be used for the divider in <em>Catalog->Manage Options\' Stock</em>.'
                       WHERE configuration_key = 'POSM_DIVIDER_COLOR'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'General: Option Types to Manage?'
                       WHERE configuration_key = 'POSM_OPTIONS_TYPES_TO_MANAGE'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'General: Optional <em>Option Types</em> List'
                       WHERE configuration_key = 'POSM_OPTIONAL_OPTION_TYPES_LIST'
                       LIMIT 1"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'General: Optional <em>Option Names</em> List'
                       WHERE configuration_key = 'POSM_OPTIONAL_OPTION_NAMES_LIST'
                       LIMIT 1"
                 );
-                                                                        //-Fall through from above to continue with updates
-             // -----
-            // v2.1.0: Updates 'View All' tool to display on menu.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v2.1.0: Updates 'View All' tool to display on menu.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '2.1.0', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_ADMIN_PAGES . "
+                    'UPDATE ' . TABLE_ADMIN_PAGES . "
                         SET display_on_menu = 'Y'
                       WHERE page_key = 'catalogOptionsStockViewAll'
                       LIMIT 1"
                 );
-                                                                      //-Fall through from above to continue with updates
-            // -----
-            // v2.1.8: Update description for 'Please Choose' setting
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v2.1.8: Update description for 'Please Choose' setting
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '2.1.8', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_description = 'Identify whether or not the plugin\'s dependent-attributes processing should insert a &quot;Please Choose&quot; selection into a product\'s drop-down options.  If <em>false</em>, the first option value for each attribute is <em>assumed</em> to be a &quot;Please choose &hellip;&quot; type value.<br><br><b>Note:</b> This setting <b><i>does not</i></b> apply when a product has a single drop-down option.'
                       WHERE configuration_key = 'POSM_DEPENDENT_ATTRS_PLEASE_CHOOSE'
                       LIMIT 1"
                 );
-                                                                     //-Fall through from above to continue with updates
-            // -----
-            // v4.2.0: Renames 'Dependent Attributes: CSS Selector' to 'Dependent Attributes: Inner Selector'.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v4.2.0: Renames 'Dependent Attributes: CSS Selector' to 'Dependent Attributes: Inner Selector'.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '4.2.0', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_title = 'Dependent Attributes: Inner Selector',
                             configuration_description = 'Identify the <em>inner</em> CSS selector (default: <em>.wrapperAttribsOptions</em>) that contains, at a minimum, each option\'s name. <b>Note:</b> This value should be changed <em>only</em> if your custom template has modified the attributes\' display formatting.'
                       WHERE configuration_key = 'POSM_ATTRIBUTE_SELECTOR'
                       LIMIT 1"
                 );
-                                                                   //-Fall through from above to continue with updates
-            // -----
-            // v4.2.1: Additional indices added to the 'products_options_stock_attributes' table, helping with
-            // performance/time-out issues for sites with large numbers of option-combinations.  In addition to the
-            // auto-increment index, there are now also indices on the 'pos_id', 'options_id' and 'options_values_id' fields.
-            //
-            // In a similar vein, add an index on products_options_stock::pos_model; the duplicate-model checks get bogged
-            // down, otherwise.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v4.2.1: Additional indices added to the 'products_options_stock_attributes' table, helping with
+                // performance/time-out issues for sites with large numbers of option-combinations.  In addition to the
+                // auto-increment index, there are now also indices on the 'pos_id', 'options_id' and 'options_values_id' fields.
+                //
+                // In a similar vein, add an index on products_options_stock::pos_model; the duplicate-model checks get bogged
+                // down, otherwise.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '4.2.1', '<'):
                 $new_indices = [
                     'options_id' => 'ADD INDEX `posm_option_id` (`options_id`)',
@@ -421,7 +428,7 @@ class ScriptedInstaller extends ScriptedInstallBase
                 // 'whittle down' the list of new indices to be created.
                 //
                 $indices = $this->executeInstallerSelectSql(
-                    "SHOW INDEX FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES
+                    'SHOW INDEX FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES
                 );
                 foreach ($indices as $value) {
                     unset($new_indices[$value['Column_name']]);
@@ -429,12 +436,12 @@ class ScriptedInstaller extends ScriptedInstallBase
                 if (count($new_indices) != 0) {
                     $add_indices = implode(',', array_values($new_indices));
                     $this->executeInstallerSql(
-                        "ALTER TABLE " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " $add_indices"
+                        'ALTER TABLE ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . " $add_indices"
                     );
                 }
 
                 $indices = $this->executeInstallerSelectSql(
-                    "SHOW INDEX FROM " . TABLE_PRODUCTS_OPTIONS_STOCK
+                    'SHOW INDEX FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK
                 );
                 $model_index_present = false;
                 foreach ($indices as $value) {
@@ -445,82 +452,86 @@ class ScriptedInstaller extends ScriptedInstallBase
                 }
                 if ($model_index_present === false) {
                     $this->executeInstallerSql(
-                        "ALTER TABLE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                            ADD INDEX `posm_model` (`pos_model`)"
+                        'ALTER TABLE ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                            ADD INDEX `posm_model` (`pos_model`)'
                     );
                 }
-                                                                   //-Fall through from above to continue with updates
-            // -----
-            // v4.3.0: Update description of POSM_ADMIN_MODEL_WIDTH to indicate that it can be left blank, in
-            // which case the Model field's width will be based on the database-field's length.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v4.3.0: Update description of POSM_ADMIN_MODEL_WIDTH to indicate that it can be left blank, in
+                // which case the Model field's width will be based on the database-field's length.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '4.3.0', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_description = 'Use this setting to control the width of the <em>Option Model/SKU</em> field displayed by <em>Catalog-&gt;Manage Options\' Stock</em> and <em>Catalog-&gt;Options\' Stock &mdash; View All</em> pages.  Enter a valid CSS &quot;width&quot; value, e.g. 9em (default) or 9px.<br><br><b>Note:</b> Leave the setting blank to use the database-defined field width.<br>'
                       WHERE configuration_key = 'POSM_ADMIN_MODEL_WIDTH'
                       LIMIT 1"
                 );
-                                                                   //-Fall through from above to continue with updates
-            // -----
-            // v4.3.1:
-            //
-            // - Update set_function of POSM_MODULE_VERSION and POSM_MODULE_RELEASE_DATE to use 'zen_cfg_read_only('.
-            // - Update description of POSM_ENABLE to indicate that it's disabling *storefront* operations only.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v4.3.1:
+                //
+                // - Update set_function of POSM_MODULE_VERSION and POSM_MODULE_RELEASE_DATE to use 'zen_cfg_read_only('.
+                // - Update description of POSM_ENABLE to indicate that it's disabling *storefront* operations only.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '4.3.1', '<'):
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET set_function = 'zen_cfg_read_only('
                       WHERE configuration_key = 'POSM_MODULE_RELEASE_DATE'
                          OR configuration_key = 'POSM_MODULE_VERSION'"
                 );
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_description = 'Enable the <em>Products\' Options\' Stock</em> processing for the storefront?'
                       WHERE configuration_key = 'POSM_ENABLE'
                       LIMIT 1"
                 );
-                                                                   //-Fall through from above to continue with updates
-            // -----
-            // v4.4.0:
-            //
-            // - Ensure that all POSM-managed products' quantities accurately reflect the sum of their
-            //   variants' quantities.
-            // - Update the description of the "Dependent Attributes: Outer Selector" to indicate the
-            //   required values for Zen Cart's built-in and the Bootstrap template.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // v4.4.0:
+                //
+                // - Ensure that all POSM-managed products' quantities accurately reflect the sum of their
+                //   variants' quantities.
+                // - Update the description of the "Dependent Attributes: Outer Selector" to indicate the
+                //   required values for Zen Cart's built-in and the Bootstrap template.
+                //
+                // no break
             case version_compare(POSM_MODULE_VERSION, '4.4.0', '<'):
                 $posm_managed_products = $this->executeInstallerSelectSql(
-                    "SELECT DISTINCT products_id
-                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK
+                    'SELECT DISTINCT products_id
+                       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK
                 );
                 foreach ($posm_managed_products as $posm_product) {
                     $quantity_sum = $this->executeInstallerSelectSql(
-                        "SELECT SUM(products_quantity) as quantity
-                           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                          WHERE products_id = " . $posm_product['products_id']
+                        'SELECT SUM(products_quantity) as quantity
+                           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                          WHERE products_id = ' . $posm_product['products_id']
                     );
                     if ($quantity_sum->fields['quantity'] === null) {
                         continue;
                     }
                     $this->executeInstallerSql(
-                        "UPDATE " . TABLE_PRODUCTS . "
-                            SET products_quantity = " . $products_quantity . "
+                        'UPDATE ' . TABLE_PRODUCTS . '
+                            SET products_quantity = ' . $products_quantity . "
                           WHERE products_id = $pID
                           LIMIT 1"
                     );
                 }
                 $this->executeInstallerSql(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_description = 'Identify the <em>outer</em> CSS selector (default: an empty string) that wraps <b>all</b> elements associated with a single option.<br><br><b>Notes:</b><ol><li>For Zen Cart\'s built-in <code>responsive_classic</code> and <code>template_default</code> templates (and clones thereof), this value should be set to <em>.attribBlock</em>.</li><li>For the <code>bootstrap</code> template (and clones thereof), this value should be set to an empty string.</li></ul>'
                       WHERE configuration_key = 'POSM_ATTRIBUTE_WRAPPER_SELECTOR'
                       LIMIT 1"
                 );
-                                                                   //-Fall through from above to continue with updates
-            // -----
-            // END version-specific updates.
-            //
+                //-Fall through from above to continue with updates
+                // -----
+                // END version-specific updates.
+                //
+                // no break
             default:
                 break;
         }

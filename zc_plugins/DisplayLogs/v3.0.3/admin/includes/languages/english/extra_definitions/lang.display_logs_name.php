@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2023 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -16,12 +18,9 @@ use Zencart\Traits\NotifierManager;
 abstract class DataTableDataSource
 {
     use NotifierManager;
-    
-    protected $tableDefinition;
 
-    public function __construct(TableViewDefinition $tableViewDefinition)
+    public function __construct(protected \Zencart\ViewBuilders\TableViewDefinition $tableDefinition)
     {
-        $this->tableDefinition = $tableViewDefinition;
         $this->notify('NOTIFY_DATASOURCE_CONSTRUCTOR_END');
     }
 
@@ -83,7 +82,7 @@ abstract class DataTableDataSource
     /**
      * @since ZC v1.5.8
      */
-    public function setTableDefinition(TableViewDefinition $tableDefinition)
+    public function setTableDefinition(TableViewDefinition $tableDefinition): void
     {
         $this->tableDefinition = $tableDefinition;
     }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $define = [
     'MODULE_PAYMENT_AUTHORIZENET_TEXT_ADMIN_TITLE' => 'Authorize.net (SIM)',
     'MODULE_PAYMENT_AUTHORIZENET_TEXT_CATALOG_TITLE' => 'Credit Card',

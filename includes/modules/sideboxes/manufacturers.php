@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * manufacturers sidebox - displays a list of manufacturers so customer can choose to filter on their products only
  *
@@ -10,16 +12,16 @@
 // only check products if requested - this may slow down the processing of the manufacturers sidebox
 if ((int)PRODUCTS_MANUFACTURERS_STATUS === 1) {
     $manufacturer_sidebox_query =
-        "SELECT DISTINCT m.manufacturers_id, m.manufacturers_name
-                    FROM " . TABLE_MANUFACTURERS . " m
-                            LEFT JOIN " . TABLE_PRODUCTS . " p ON m.manufacturers_id = p.manufacturers_id
+        'SELECT DISTINCT m.manufacturers_id, m.manufacturers_name
+                    FROM ' . TABLE_MANUFACTURERS . ' m
+                            LEFT JOIN ' . TABLE_PRODUCTS . ' p ON m.manufacturers_id = p.manufacturers_id
                    WHERE p.products_status = 1
-                   ORDER BY manufacturers_name";
+                   ORDER BY manufacturers_name';
 } else {
     $manufacturer_sidebox_query =
-        "SELECT m.manufacturers_id, m.manufacturers_name
-           FROM " . TABLE_MANUFACTURERS . " m
-           ORDER BY manufacturers_name";
+        'SELECT m.manufacturers_id, m.manufacturers_name
+           FROM ' . TABLE_MANUFACTURERS . ' m
+           ORDER BY manufacturers_name';
 }
 
 $manufacturer_sidebox = $db->Execute($manufacturer_sidebox_query);
@@ -31,7 +33,7 @@ if (!$manufacturer_sidebox->EOF) {
     //
     $manufacturer_sidebox_array = [];
     $default_selection = (isset($_GET['manufacturers_id'])) ? (int)$_GET['manufacturers_id'] : '';
-    if (!isset($_GET['manufacturers_id']) || $_GET['manufacturers_id'] === '' ) {
+    if (!isset($_GET['manufacturers_id']) || $_GET['manufacturers_id'] === '') {
         $required = ' required';
         $manufacturer_sidebox_array[] = ['id' => '', 'text' => PULL_DOWN_ALL];
     } else {
@@ -41,8 +43,8 @@ if (!$manufacturer_sidebox->EOF) {
 
     foreach ($manufacturer_sidebox as $sidebox_element) {
         $manufacturer_sidebox_name = $sidebox_element['manufacturers_name'];
-        if (mb_strlen($manufacturer_sidebox_name) > (int)MAX_DISPLAY_MANUFACTURER_NAME_LEN) {
-            $manufacturer_sidebox_name = mb_substr($manufacturer_sidebox_name, 0, (int)MAX_DISPLAY_MANUFACTURER_NAME_LEN) . '..';
+        if (mb_strlen((string) $manufacturer_sidebox_name) > (int)MAX_DISPLAY_MANUFACTURER_NAME_LEN) {
+            $manufacturer_sidebox_name = mb_substr((string) $manufacturer_sidebox_name, 0, (int)MAX_DISPLAY_MANUFACTURER_NAME_LEN) . '..';
         }
         $manufacturer_sidebox_array[] = [
             'id' => $sidebox_element['manufacturers_id'],

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @author ZCAdditions.com, ZCA Responsive Template Default
@@ -9,7 +11,7 @@
 /**
  * @since ZC v1.5.5
  */
-function layoutTypes()
+function layoutTypes(): array
 {
     return ['default', 'mobile', 'tablet', 'full'];
 }
@@ -20,15 +22,17 @@ function layoutTypes()
 function initLayoutType()
 {
     // Safety check.
-    if (!class_exists('MobileDetect')) { return 'default'; }
+    if (!class_exists('MobileDetect')) {
+        return 'default';
+    }
 
-    $detect = new Detection\MobileDetect;
+    $detect = new Detection\MobileDetect();
     $isMobile = $detect->isMobile();
     $isTablet = $detect->isTablet();
 
     $layoutTypes = layoutTypes();
 
-    if ( isset($_GET['layoutType']) ) {
+    if (isset($_GET['layoutType'])) {
         $layoutType = $_GET['layoutType'];
     } else {
         if (empty($_SESSION['layoutType'])) {
@@ -38,7 +42,7 @@ function initLayoutType()
         }
     }
 
-    if ( !in_array($layoutType, $layoutTypes) ) {
+    if (!in_array($layoutType, $layoutTypes)) {
         $layoutType = 'default';
     }
 

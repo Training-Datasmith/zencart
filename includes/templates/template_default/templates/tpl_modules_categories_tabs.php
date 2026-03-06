@@ -13,18 +13,18 @@
 include DIR_WS_MODULES . zen_get_module_directory(FILENAME_CATEGORIES_TABS);
 
 if (CATEGORIES_TABS_STATUS === '1' && (!empty($links_list) || !empty($links_list_by_category))) {
-?>
+    ?>
 
 <div id="navCatTabsWrapper">
 <div id="navCatTabs">
 <ul>
-<?php foreach (($links_list_by_category ?? $links_list) as $link_key => $link_val) { ?>
+<?php foreach (($links_list_by_category ?? $links_list) as $link_val) { ?>
     <?php
-    // Since v2.1.0, if $links_list_by_category is not empty,
-    // then $link_key is the category_id prefixed by the letter 'c'.
-    // So, $category_id = ltrim($link_key, 'c')
-    // ... which can then be used to query alternate details about the category or its products
-    // ... and therefore can be used inside this loop to do more things with this menu
+        // Since v2.1.0, if $links_list_by_category is not empty,
+        // then $link_key is the category_id prefixed by the letter 'c'.
+        // So, $category_id = ltrim($link_key, 'c')
+        // ... which can then be used to query alternate details about the category or its products
+        // ... and therefore can be used inside this loop to do more things with this menu
     ?>
     <li><?php echo $link_val;?></li>
 <?php } ?>

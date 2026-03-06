@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * html_output.php
  * HTML-generating functions used throughout the core
@@ -14,11 +16,14 @@
  *
  * @since ZC v1.0.3
  */
-  function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) {
+function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true)
+{
     global $request_type, $session_started, $http_domain, $https_domain, $zco_notifier;
     $link = null;
-    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT', array(), $link, $page, $parameters, $connection, $add_session_id, $static, $use_dir_ws_catalog);
-    if($link !== null) return $link;
+    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT', [], $link, $page, $parameters, $connection, $add_session_id, $static, $use_dir_ws_catalog);
+    if ($link !== null) {
+        return $link;
+    }
 
     if (empty($page)) {
         trigger_error("zen_href_link($page, $parameters, $connection), unable to determine the page link.");
@@ -26,81 +31,90 @@
     }
 
     if ($connection == 'NONSSL') {
-      $link = HTTP_SERVER;
-    } elseif ($connection == 'SSL' || $connection == '') {
-      if (ENABLE_SSL == 'true') {
-        $link = HTTPS_SERVER ;
-      } else {
         $link = HTTP_SERVER;
-      }
+    } elseif ($connection == 'SSL' || $connection == '') {
+        if (ENABLE_SSL == 'true') {
+            $link = HTTPS_SERVER ;
+        } else {
+            $link = HTTP_SERVER;
+        }
     } else {
-      trigger_error("zen_href_link($page, $parameters, $connection), Unable to determine connection method on a link! Known methods: NONSSL SSL");
-      $link = HTTP_SERVER;
+        trigger_error("zen_href_link($page, $parameters, $connection), Unable to determine connection method on a link! Known methods: NONSSL SSL");
+        $link = HTTP_SERVER;
     }
 
     if ($use_dir_ws_catalog) {
-      if ($connection == 'SSL' && ENABLE_SSL == 'true') {
-        $link .= DIR_WS_HTTPS_CATALOG;
-      } else {
-        $link .= DIR_WS_CATALOG;
-      }
+        if ($connection == 'SSL' && ENABLE_SSL == 'true') {
+            $link .= DIR_WS_HTTPS_CATALOG;
+        } else {
+            $link .= DIR_WS_CATALOG;
+        }
     }
 
     if (!$static) {
-      if (!empty($parameters)) {
-        $link .= 'index.php?main_page='. $page . "&" . zen_output_string($parameters);
-      } else {
-        $link .= 'index.php?main_page=' . $page;
-      }
+        if (!empty($parameters)) {
+            $link .= 'index.php?main_page='. $page . '&' . zen_output_string($parameters);
+        } else {
+            $link .= 'index.php?main_page=' . $page;
+        }
     } else {
-      if (!empty($parameters)) {
-        $link .= $page . "?" . zen_output_string($parameters);
-      } else {
-        $link .= $page;
-      }
+        if (!empty($parameters)) {
+            $link .= $page . '?' . zen_output_string($parameters);
+        } else {
+            $link .= $page;
+        }
     }
 
     $separator = '&';
 
-    while (substr($link, -1) == '&' || substr($link, -1) == '?') $link = substr($link, 0, -1);
+    while (str_ends_with($link, '&') || str_ends_with($link, '?')) {
+        $link = substr($link, 0, -1);
+    }
 
     // Add the session ID when moving from different HTTP and HTTPS servers, or when SID is defined
     if ($add_session_id === true && $session_started === true && SESSION_FORCE_COOKIE_USE === 'False') {
         if (PHP_VERSION_ID < 80401 && defined('SID') && !empty(constant('SID'))) {
             $sid = constant('SID');
-        } elseif ( ($request_type === 'NONSSL' && $connection === 'SSL' && ENABLE_SSL === 'true') || ($request_type === 'SSL' && $connection === 'NONSSL') ) {
+        } elseif (($request_type === 'NONSSL' && $connection === 'SSL' && ENABLE_SSL === 'true') || ($request_type === 'SSL' && $connection === 'NONSSL')) {
             if ($http_domain !== $https_domain) {
                 $sid = zen_session_name() . '=' . zen_session_id();
             }
         }
     }
 
-// clean up the link before processing
-    while (strstr($link, '&&')) $link = str_replace('&&', '&', $link);
-    while (strstr($link, '&amp;&amp;')) $link = str_replace('&amp;&amp;', '&amp;', $link);
+    // clean up the link before processing
+    while (strstr($link, '&&')) {
+        $link = str_replace('&&', '&', $link);
+    }
+    while (strstr($link, '&amp;&amp;')) {
+        $link = str_replace('&amp;&amp;', '&amp;', $link);
+    }
 
     if (SEARCH_ENGINE_FRIENDLY_URLS == 'true' && $search_engine_safe == true) {
-      while (strstr($link, '&&')) $link = str_replace('&&', '&', $link);
+        while (strstr($link, '&&')) {
+            $link = str_replace('&&', '&', $link);
+        }
 
-      $link = str_replace('&amp;', '/', $link);
-      $link = str_replace('?', '/', $link);
-      $link = str_replace('&', '/', $link);
-      $link = str_replace('=', '/', $link);
+        $link = str_replace('&amp;', '/', $link);
+        $link = str_replace('?', '/', $link);
+        $link = str_replace('&', '/', $link);
+        $link = str_replace('=', '/', $link);
 
-      $separator = '?';
+        $separator = '?';
     }
 
     if (!empty($sid)) {
-      $link .= $separator . zen_output_string($sid);
+        $link .= $separator . zen_output_string($sid);
     }
 
-// clean up the link after processing
-    while (strstr($link, '&amp;&amp;')) $link = str_replace('&amp;&amp;', '&amp;', $link);
+    // clean up the link after processing
+    while (strstr($link, '&amp;&amp;')) {
+        $link = str_replace('&amp;&amp;', '&amp;', $link);
+    }
 
     $link = preg_replace('/&/', '&amp;', $link);
-    $link = preg_replace('~//$~', '/', $link);
-    return $link;
-  }
+    return preg_replace('~//$~', '/', (string) $link);
+}
 
 /**
  * This function, added to the storefront in zc1.5.6, provides a common method for
@@ -118,7 +132,7 @@ function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONS
  * used when "proportional images" is turned off or if calling from a template directory
  * @since ZC v1.2.4
  */
-function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters = '')
+function zen_image_OLD($src, $title = '', $width = '', $height = '', ?string $parameters = ''): false|string
 {
     global $template_dir;
 
@@ -161,8 +175,8 @@ function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters
                 return false;
             }
         } elseif ($width === 0 && $height === 0) {
-            $width = (int)$image_size[0];
-            $height = (int)$image_size[1];
+            $width = $image_size[0];
+            $height = $image_size[1];
         } elseif ($width === 0) {
             $ratio = $height / $image_size[1];
             $width = (int)($image_size[0] * $ratio);
@@ -180,16 +194,14 @@ function zen_image_OLD($src, $title = '', $width = '', $height = '', $parameters
         $image .= ' ' . $parameters;
     }
 
-    $image .= '>';
-
-    return $image;
+    return $image . '>';
 }
 
 /**
  * HTML image wrapper function
  * @since ZC v1.0.3
  */
-function zen_image($src, $title = '', $width = '', $height = '', $parameters = '')
+function zen_image($src, $title = '', $width = '', $height = '', ?string $parameters = '')
 {
     global $template_dir, $zco_notifier;
 
@@ -197,7 +209,7 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
     $title = zen_clean_html($title);
 
     // use old method on template images
-    if (strpos($src, 'includes/templates') !== false || strpos($src, 'includes/languages') !== false || PROPORTIONAL_IMAGES_STATUS === '0') {
+    if (str_contains((string) $src, 'includes/templates') || str_contains((string) $src, 'includes/languages') || PROPORTIONAL_IMAGES_STATUS === '0') {
         return zen_image_OLD($src, $title, $width, $height, $parameters);
     }
 
@@ -218,7 +230,7 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
     // hook for handle_image() function such as Image Handler etc
     if (function_exists('handle_image')) {
         $newimg = handle_image($src, $title, $width, $height, $parameters);
-        list($src, $title, $width, $height, $parameters) = $newimg;
+        [$src, $title, $width, $height, $parameters] = $newimg;
         $zco_notifier->notify('NOTIFY_HANDLE_IMAGE', [$newimg]);
     }
 
@@ -283,7 +295,7 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
         } else {
             $image .= ' width="' . (int)round($width) . '" height="' . (int)round($height) . '"';
         }
-    } elseif (strpos($src, 'http') !== 0) {
+    } elseif (!str_starts_with((string) $src, 'http')) {
         $image .= ' width="' . (int)SMALL_IMAGE_WIDTH . '" height="' . (int)SMALL_IMAGE_HEIGHT . '"';
     }
 
@@ -296,9 +308,7 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
         $image .= ' ' . $parameters;
     }
 
-    $image .= '>';
-
-    return $image;
+    return $image . '>';
 }
 
 /**
@@ -306,56 +316,60 @@ function zen_image($src, $title = '', $width = '', $height = '', $parameters = '
  * Outputs a "submit" button in the selected language
  * @since ZC v1.0.3
  */
-  function zen_image_submit($image, $alt = '', $parameters = '', $sec_class = '') {
+function zen_image_submit(string $image, $alt = '', ?string $parameters = '', $sec_class = '')
+{
     global $template, $current_page_base, $zco_notifier;
-    if ((strtolower(IMAGE_USE_CSS_BUTTONS) === 'yes' || (strtolower(IMAGE_USE_CSS_BUTTONS) === 'found' && !file_exists(DIR_FS_CATALOG . DIR_WS_TEMPLATE . 'buttons/' . $_SESSION['language'] . '/' . $image))) && mb_strlen($alt)<30) return zenCssButton($image, $alt, 'submit', $sec_class, $parameters);
+    if ((strtolower(IMAGE_USE_CSS_BUTTONS) === 'yes' || (strtolower(IMAGE_USE_CSS_BUTTONS) === 'found' && !file_exists(DIR_FS_CATALOG . DIR_WS_TEMPLATE . 'buttons/' . $_SESSION['language'] . '/' . $image))) && mb_strlen((string) $alt) < 30) {
+        return zenCssButton($image, $alt, 'submit', $sec_class, $parameters);
+    }
     $zco_notifier->notify('PAGE_OUTPUT_IMAGE_SUBMIT');
 
     $image_submit = '<input type="image" src="' . zen_output_string($template->get_template_dir($image, DIR_WS_TEMPLATE, $current_page_base, 'buttons/' . $_SESSION['language'] . '/') . $image) . '" alt="' . zen_output_string($alt) . '"';
 
-    if (!empty($alt)) $image_submit .= ' title="' . zen_output_string($alt) . '"';
+    if (!empty($alt)) {
+        $image_submit .= ' title="' . zen_output_string($alt) . '"';
+    }
 
-    if (!empty($parameters)) $image_submit .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $image_submit .= ' ' . $parameters;
+    }
 
-    $image_submit .= '>';
-
-    return $image_submit;
-  }
+    return $image_submit . '>';
+}
 
 /**
  * Output a function button in the selected language
  */
-  function zen_image_button($image, $alt = '', $parameters = '', $sec_class = '') {
+function zen_image_button(string $image, $alt = '', string $parameters = '', $sec_class = '')
+{
     global $template, $current_page_base, $zco_notifier;
 
     // inject rollover class if one is defined. NOTE: This could end up with 2 "class" elements if $parameters contains "class" already.
     if (defined('IMAGE_ROLLOVER_CLASS') && IMAGE_ROLLOVER_CLASS != '') {
-      $parameters .= (!empty($parameters) ? ' ' : '') . 'class="rollover"';
+        $parameters .= (!empty($parameters) ? ' ' : '') . 'class="rollover"';
     }
 
     $zco_notifier->notify('PAGE_OUTPUT_IMAGE_BUTTON');
     if (strtolower(IMAGE_USE_CSS_BUTTONS) === 'yes' || (strtolower(IMAGE_USE_CSS_BUTTONS) === 'found' && !file_exists(DIR_FS_CATALOG . DIR_WS_TEMPLATE . 'buttons/' . $_SESSION['language'] . '/' . $image))) {
         if (preg_match('/\.(png|gif|jpe?g|webp)/i', $image)) {
             return zenCssButton($image, $alt, 'button', $sec_class, $parameters);
-        } else {
-            return zen_draw_button($image, $sec_class, '', $parameters, $alt, 'button');
         }
+        return zen_draw_button($image, $sec_class, '', $parameters, $alt, 'button');
     }
     return zen_image($template->get_template_dir($image, DIR_WS_TEMPLATE, $current_page_base, 'buttons/' . $_SESSION['language'] . '/') . $image, $alt, '', '', $parameters);
-  }
-
+}
 
 /**
  * Draw a <button> element
  * @since ZC v1.5.8
  **/
-function zen_draw_button($text = '', $added_classes = '', $id = '', $parameters = '', $title = '', $type = 'button')
+function zen_draw_button($text = '', ?string $added_classes = '', ?string $id = '', ?string $parameters = '', ?string $title = '', string $type = 'button'): string
 {
     global $zco_notifier;
 
     // legacy support
     // remove .gif etc suffix if any
-    $text = preg_replace('/\.(png|gif|jpe?g|webp)$/', '', $text);
+    $text = preg_replace('/\.(png|gif|jpe?g|webp)$/', '', (string) $text);
     $text = str_replace('_', ' ', ucwords((string)$text));
 
     $classes = '';
@@ -367,36 +381,27 @@ function zen_draw_button($text = '', $added_classes = '', $id = '', $parameters 
     $the_button = '';
 
     $zco_notifier->notify('NOTIFY_ZEN_DRAW_BUTTON', null, $text, $classes, $added_classes, $id, $parameters, $title, $type, $the_button);
-
-    if (empty($the_button)) {
-        $the_button = '<button class="' . $classes;
-        if (!empty($added_classes)) {
-            $the_button .= (empty($classes) ? '' : ' ') . $added_classes;
-        }
-        $the_button .= '"';
-
-        if (!empty($id)) {
-            $the_button .= ' id="' . $id . '"';
-        }
-
-        if ($type != 'button') {
-            $the_button .= ' type="' . $type . '"';
-        }
-
-        if (!empty($parameters)) {
-            $the_button .= ' ' . $parameters;
-        }
-
-        if (!empty($title)) {
-            $the_button .= ' title="' . $title . '"';
-        }
-
-        $the_button .= '>';
-        $the_button .= $text;
-        $the_button .= '</button>';
+    $the_button = '<button class="' . $classes;
+    if (!empty($added_classes)) {
+        $the_button .= (empty($classes) ? '' : ' ') . $added_classes;
     }
+    $the_button .= '"';
+    if (!empty($id)) {
+        $the_button .= ' id="' . $id . '"';
+    }
+    if ($type != 'button') {
+        $the_button .= ' type="' . $type . '"';
+    }
+    if (!empty($parameters)) {
+        $the_button .= ' ' . $parameters;
+    }
+    if (!empty($title)) {
+        $the_button .= ' title="' . $title . '"';
+    }
+    $the_button .= '>';
+    $the_button .= $text;
 
-    return $the_button;
+    return $the_button . '</button>';
 }
 
 /**
@@ -405,16 +410,23 @@ function zen_draw_button($text = '', $added_classes = '', $id = '', $parameters 
  * note: any hard-coded buttons will not be able to use this function
  * @since ZC v1.3.0
  */
-  function zenCssButton($image = '', $text = '', $type = 'button', $sec_class = '', $parameters = '') {
-   global $css_button_text, $css_button_opts, $template, $current_page_base, $language;
+function zenCssButton($image = '', string $text = '', $type = 'button', $sec_class = '', $parameters = ''): string
+{
+    global $css_button_text, $css_button_opts, $template, $current_page_base, $language;
 
-   $button_name = basename($image);
-   $button_name = preg_replace('/\.(png|gif|jpe?g|webp)$/', '', $button_name);
+    $button_name = basename((string) $image);
+    $button_name = preg_replace('/\.(png|gif|jpe?g|webp)$/', '', $button_name);
 
     // if no secondary class is set use the image name for the sec_class
-    if (empty($sec_class)) $sec_class = $button_name;
-    if(!empty($sec_class)) $sec_class = ' ' . $sec_class;
-    if(!empty($parameters))$parameters = ' ' . $parameters;
+    if (empty($sec_class)) {
+        $sec_class = $button_name;
+    }
+    if (!empty($sec_class)) {
+        $sec_class = ' ' . $sec_class;
+    }
+    if (!empty($parameters)) {
+        $parameters = ' ' . $parameters;
+    }
     $mouse_out_class  = 'cssButton ' . (($type == 'submit') ? 'submit_button button ' : 'normal_button button ') . $sec_class;
     $mouse_over_class = 'cssButtonHover ' . (($type == 'button') ? 'normal_button button ' : '') . $sec_class . $sec_class . 'Hover';
     // javascript to set different classes on mouseover and mouseout: enables hover effect on the buttons
@@ -422,85 +434,82 @@ function zen_draw_button($text = '', $added_classes = '', $id = '', $parameters 
     $css_button_js =  'onmouseover="this.className=\''. $mouse_over_class . '\'" onmouseout="this.className=\'' . $mouse_out_class . '\'"';
 
     if (defined('CSS_BUTTON_POPUPS_IS_ARRAY') && CSS_BUTTON_POPUPS_IS_ARRAY == 'true') {
-      $popuptext = (!empty($css_button_text[$button_name])) ? $css_button_text[$button_name] : ($button_name . CSSBUTTONS_CATALOG_POPUPS_SHOW_BUTTON_NAMES_TEXT);
-      $tooltip = ' title="' . $popuptext . '"';
+        $popuptext = (!empty($css_button_text[$button_name])) ? $css_button_text[$button_name] : ($button_name . CSSBUTTONS_CATALOG_POPUPS_SHOW_BUTTON_NAMES_TEXT);
+        $tooltip = ' title="' . $popuptext . '"';
     } else {
-      $tooltip = '';
+        $tooltip = '';
     }
     $css_button = '';
 
-    if ($type == 'submit'){
-      // form input button
-      if ($parameters != '') {
-        // If the input parameters include a "name" attribute, need to emulate an <input type="image"> return value by adding a _x to the name parameter (creds to paulm)
-        if (preg_match('/name="([a-zA-Z0-9\-_]+)"/', $parameters, $matches)) {
-          $parameters = str_replace('name="' . $matches[1], 'name="' . $matches[1] . '_x', $parameters);
+    if ($type == 'submit') {
+        // form input button
+        if ($parameters != '') {
+            // If the input parameters include a "name" attribute, need to emulate an <input type="image"> return value by adding a _x to the name parameter (creds to paulm)
+            if (preg_match('/name="([a-zA-Z0-9\-_]+)"/', $parameters, $matches)) {
+                $parameters = str_replace('name="' . $matches[1], 'name="' . $matches[1] . '_x', $parameters);
+            }
+            // If the input parameters include a "value" attribute, remove it since that attribute will be set to the input text string.
+            if (preg_match('/(value="[a-zA-Z0=9\-_]+")/', $parameters, $matches)) {
+                $parameters = str_replace($matches[1], '', $parameters);
+            }
         }
-        // If the input parameters include a "value" attribute, remove it since that attribute will be set to the input text string.
-        if (preg_match('/(value="[a-zA-Z0=9\-_]+")/', $parameters, $matches)) {
-          $parameters = str_replace($matches[1], '', $parameters);
-        }
-      }
 
-      // Give an observer the chance to provide alternate formatting for the button (it's set to an empty
-      // string above).  If the value is still empty after the notification, create the standard-format
-      // of the button.
-      $GLOBALS['zco_notifier']->notify(
+        // Give an observer the chance to provide alternate formatting for the button (it's set to an empty
+        // string above).  If the value is still empty after the notification, create the standard-format
+        // of the button.
+        $GLOBALS['zco_notifier']->notify(
             'NOTIFY_ZEN_CSS_BUTTON_SUBMIT',
-            array(
-                'button_name' => $button_name,
-                'text' => $text,
-                'sec_class' => $sec_class,
-                'parameters' => $parameters,
-            ),
+            [
+                  'button_name' => $button_name,
+                  'text' => $text,
+                  'sec_class' => $sec_class,
+                  'parameters' => $parameters,
+              ],
             $css_button
-      );
-      if ($css_button == '') {
+        );
         $css_button = '<input class="' . $mouse_out_class . '" ' . $css_button_js . ' type="submit" value="' . $text . '"' . $tooltip . $parameters . '>';
-      }
     }
 
-    if ($type=='button') {
-      // link button
-      // -----
-      // Give an observer the chance to provide alternate formatting for the button (it's set to an empty string
-      // above).  If the value is still empty after the notification, create the standard-format
-      // of the button.
-      $GLOBALS['zco_notifier']->notify(
+    if ($type == 'button') {
+        // link button
+        // -----
+        // Give an observer the chance to provide alternate formatting for the button (it's set to an empty string
+        // above).  If the value is still empty after the notification, create the standard-format
+        // of the button.
+        $GLOBALS['zco_notifier']->notify(
             'NOTIFY_ZEN_CSS_BUTTON_BUTTON',
-            array(
-                'button_name' => $button_name,
-                'text' => $text,
-                'sec_class' => $sec_class,
-                'parameters' => $parameters,
-            ),
+            [
+                  'button_name' => $button_name,
+                  'text' => $text,
+                  'sec_class' => $sec_class,
+                  'parameters' => $parameters,
+              ],
             $css_button
-      );
-      if ($css_button == '') {
-        $css_button = '<span class="' . $mouse_out_class . '" ' . $css_button_js . $tooltip . $parameters . '>&nbsp;' . $text . '&nbsp;</span>';
-      }
+        );
+        if ($css_button == '') {
+            $css_button = '<span class="' . $mouse_out_class . '" ' . $css_button_js . $tooltip . $parameters . '>&nbsp;' . $text . '&nbsp;</span>';
+        }
     }
     return $css_button;
-  }
-
+}
 
 /**
  * Output a separator either through whitespace, or with an image
  * @since ZC v1.0.3
  */
-function zen_draw_separator($image = 'true', $width = '100%', $height = '1') {
+function zen_draw_separator($image = 'true', $width = '100%', $height = '1')
+{
 
     // set default to use from template - zen_image will translate if not found in current template
     if ($image == 'true') {
-      $image = DIR_WS_TEMPLATE_IMAGES . OTHER_IMAGE_BLACK_SEPARATOR;
+        $image = DIR_WS_TEMPLATE_IMAGES . OTHER_IMAGE_BLACK_SEPARATOR;
     } else {
-      if (!strstr($image, DIR_WS_TEMPLATE_IMAGES)) {
-        $image = DIR_WS_TEMPLATE_IMAGES . $image;
-      }
+        if (!strstr((string) $image, DIR_WS_TEMPLATE_IMAGES)) {
+            $image = DIR_WS_TEMPLATE_IMAGES . $image;
+        }
     }
     return zen_image($image, '', $width, $height);
 }
-
 
 /**
  * generates javascript for dynamically updating the states/provinces list when the country is changed
@@ -511,11 +520,12 @@ function zen_draw_separator($image = 'true', $width = '100%', $height = '1') {
  * @return string javascript segment
  * @since ZC v1.0.3
  */
-function zen_js_zone_list(string $country, string $form, string $field) {
+function zen_js_zone_list(string $country, string $form, string $field): string
+{
     global $db;
-    $sql = "SELECT DISTINCT zone_country_id
-            FROM " . TABLE_ZONES . "
-            ORDER BY zone_country_id";
+    $sql = 'SELECT DISTINCT zone_country_id
+            FROM ' . TABLE_ZONES . '
+            ORDER BY zone_country_id';
     $countries = $db->Execute($sql);
     $num_country = 1;
     $output_string = '';
@@ -526,14 +536,16 @@ function zen_js_zone_list(string $country, string $form, string $field) {
             $output_string .= '  } else if (' . $country . ' == "' . $countries->fields['zone_country_id'] . '") {' . "\n";
         }
 
-        $sql = "SELECT zone_name, zone_id
-                FROM " . TABLE_ZONES . "
-                WHERE zone_country_id = " . (int)$countries->fields['zone_country_id'] . "
-                ORDER BY zone_name";
+        $sql = 'SELECT zone_name, zone_id
+                FROM ' . TABLE_ZONES . '
+                WHERE zone_country_id = ' . (int)$countries->fields['zone_country_id'] . '
+                ORDER BY zone_name';
         $results = $db->Execute($sql);
         $num_state = 1;
         foreach ($results as $state) {
-            if ($num_state == 1) $output_string .= '    ' . $form . '.' . $field . '.options[0] = new Option("' . PLEASE_SELECT . '", "");' . "\n";
+            if ($num_state == 1) {
+                $output_string .= '    ' . $form . '.' . $field . '.options[0] = new Option("' . PLEASE_SELECT . '", "");' . "\n";
+            }
             $output_string .= '    ' . $form . '.' . $field . '.options[' . $num_state . '] = new Option("' . $state['zone_name'] . '", "' . $state['zone_id'] . '");' . "\n";
             $num_state++;
         }
@@ -541,25 +553,25 @@ function zen_js_zone_list(string $country, string $form, string $field) {
         $countries->MoveNext();
         $output_string .= '    hideStateField(' . $form . ');' . "\n" ;
     }
-    $output_string .= '  } else {' . "\n" .
-        '    ' . $form . '.' . $field . '.options[0] = new Option("' . TYPE_BELOW . '", "");' . "\n" .
-        '    showStateField(' . $form . ');' . "\n" .
-        '  }' . "\n";
-    return $output_string;
+    return $output_string . ('  } else {' . "\n" . '    ' . $form . '.' . $field . '.options[0] = new Option("' . TYPE_BELOW . '", "");' . "\n" . '    showStateField(' . $form . ');' . "\n" . '  }' . "\n");
 }
-
 
 /**
  * Output a form
  * @since ZC v1.0.3
  */
-function zen_draw_form($name, $action, $method = 'post', $parameters = '') {
+function zen_draw_form(?string $name, ?string $action, $method = 'post', ?string $parameters = ''): string
+{
     $form = '<form name="' . zen_output_string($name) . '" action="' . zen_output_string($action) . '" method="' . zen_output_string($method) . '"';
 
-    if (!empty($parameters)) $form .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $form .= ' ' . $parameters;
+    }
 
     $form .= '>';
-    if (strtolower($method) == 'post') $form .= '<input type="hidden" name="securityToken" value="' . $_SESSION['securityToken'] . '">';
+    if (strtolower((string) $method) == 'post') {
+        $form .= '<input type="hidden" name="securityToken" value="' . $_SESSION['securityToken'] . '">';
+    }
     return $form;
 }
 
@@ -567,21 +579,22 @@ function zen_draw_form($name, $action, $method = 'post', $parameters = '') {
  * Output a form input field
  * @since ZC v1.0.3
  */
-function zen_draw_input_field($name, $value = '', $parameters = '', $type = 'text', $reinsert_value = true, $required = false) {
+function zen_draw_input_field($name, $value = '', ?string $parameters = '', ?string $type = 'text', $reinsert_value = true, $required = false)
+{
     // -----
     // Give an observer the opportunity to **totally** override this function's operation.
     //
     $field = false;
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_INPUT_FIELD_OVERRIDE',
-        array(
+        [
             'name' => $name,
             'value' => $value,
             'parameters' => $parameters,
             'type' => $type,
             'reinsert_value' => $reinsert_value,
             'required' => $required,
-        ),
+        ],
         $field
     );
     if ($field !== false) {
@@ -590,12 +603,14 @@ function zen_draw_input_field($name, $value = '', $parameters = '', $type = 'tex
 
     $field = '<input type="' . zen_output_string($type) . '" name="' . zen_sanitize_string(zen_output_string($name)) . '"';
     if (isset($GLOBALS[$name]) && is_string($GLOBALS[$name]) && $reinsert_value == true) {
-      $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
+        $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
     } elseif (zen_not_null($value)) {
-      $field .= ' value="' . zen_output_string($value) . '"';
+        $field .= ' value="' . zen_output_string($value) . '"';
     }
 
-    if (!empty($parameters)) $field .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
     $field .= '>';
 
@@ -604,19 +619,19 @@ function zen_draw_input_field($name, $value = '', $parameters = '', $type = 'tex
     //
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_INPUT_FIELD',
-        array(
+        [
             'name' => $name,
             'value' => $value,
             'parameters' => $parameters,
             'type' => $type,
             'reinsert_value' => $reinsert_value,
             'required' => $required,
-        ),
+        ],
         $field
     );
 
     if ($required == true && !empty(TEXT_FIELD_REQUIRED)) {
-      $field .= TEXT_FIELD_REQUIRED;
+        $field .= TEXT_FIELD_REQUIRED;
     }
 
     return $field;
@@ -626,7 +641,8 @@ function zen_draw_input_field($name, $value = '', $parameters = '', $type = 'tex
  * Output a form password field
  * @since ZC v1.0.3
  */
-function zen_draw_password_field($name, $value = '', $parameters = 'maxlength="40"') {
+function zen_draw_password_field($name, $value = '', $parameters = 'maxlength="40"')
+{
     return zen_draw_input_field($name, $value, $parameters, 'password', false);
 }
 
@@ -634,20 +650,21 @@ function zen_draw_password_field($name, $value = '', $parameters = 'maxlength="4
  * Output a selection field - alias function for zen_draw_checkbox_field() and zen_draw_radio_field()
  * @since ZC v1.0.3
  */
-function zen_draw_selection_field($name, $type, $value = '', $checked = false, $parameters = '') {
+function zen_draw_selection_field($name, ?string $type, $value = '', $checked = false, ?string $parameters = '')
+{
     // -----
     // Give an observer the opportunity to **totally** override this function's operation.
     //
     $selection = false;
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_SELECTION_FIELD_OVERRIDE',
-        array(
+        [
             'name' => $name,
             'value' => $value,
             'parameters' => $parameters,
             'type' => $type,
-            'checked' => $checked
-        ),
+            'checked' => $checked,
+        ],
         $selection
     );
     if ($selection !== false) {
@@ -656,18 +673,23 @@ function zen_draw_selection_field($name, $type, $value = '', $checked = false, $
 
     $selection = '<input type="' . zen_output_string($type) . '" name="' . zen_output_string($name) . '"';
 
-    if (zen_not_null($value)) $selection .= ' value="' . zen_output_string($value) . '"';
+    if (zen_not_null($value)) {
+        $selection .= ' value="' . zen_output_string($value) . '"';
+    }
 
     if (
         ($checked == true) ||
-        (isset($GLOBALS[$name]) && is_string($GLOBALS[$name]) &&
+        (
+            isset($GLOBALS[$name]) && is_string($GLOBALS[$name]) &&
             ($GLOBALS[$name] == 'on' || (isset($value) && stripslashes($GLOBALS[$name]) == $value))
         )
     ) {
-      $selection .= ' checked="checked"';
+        $selection .= ' checked="checked"';
     }
 
-    if (!empty($parameters)) $selection .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $selection .= ' ' . $parameters;
+    }
 
     $selection .= '>';
 
@@ -676,13 +698,13 @@ function zen_draw_selection_field($name, $type, $value = '', $checked = false, $
     //
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_SELECTION_FIELD',
-        array(
+        [
             'name' => $name,
             'value' => $value,
             'parameters' => $parameters,
             'type' => $type,
-            'checked' => $checked
-        ),
+            'checked' => $checked,
+        ],
         $selection
     );
     return $selection;
@@ -692,7 +714,8 @@ function zen_draw_selection_field($name, $type, $value = '', $checked = false, $
  * Output a form checkbox field
  * @since ZC v1.0.3
  */
-function zen_draw_checkbox_field($name, $value = '', $checked = false, $parameters = '') {
+function zen_draw_checkbox_field($name, $value = '', $checked = false, $parameters = '')
+{
     return zen_draw_selection_field($name, 'checkbox', $value, $checked, $parameters);
 }
 
@@ -700,7 +723,8 @@ function zen_draw_checkbox_field($name, $value = '', $checked = false, $paramete
  * Output a form radio field
  * @since ZC v1.0.3
  */
-function zen_draw_radio_field($name, $value = '', $checked = false, $parameters = '') {
+function zen_draw_radio_field($name, $value = '', $checked = false, $parameters = '')
+{
     return zen_draw_selection_field($name, 'radio', $value, $checked, $parameters);
 }
 
@@ -708,21 +732,22 @@ function zen_draw_radio_field($name, $value = '', $checked = false, $parameters 
  * Output a form textarea field
  * @since ZC v1.0.3
  */
-function zen_draw_textarea_field($name, $width, $height, $text = '~*~*#', $parameters = '', $reinsert_value = true) {
+function zen_draw_textarea_field($name, ?string $width, ?string $height, string $text = '~*~*#', ?string $parameters = '', $reinsert_value = true)
+{
     // -----
     // Give an observer the opportunity to **totally** override this function's operation.
     //
     $field = false;
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_TEXTAREA_FIELD_OVERRIDE',
-        array(
+        [
             'name' => $name,
             'width' => $width,
             'height' => $height,
             'text' => $text,
             'parameters' => $parameters,
             'reinsert_value' => $reinsert_value,
-        ),
+        ],
         $field
     );
     if ($field !== false) {
@@ -731,14 +756,16 @@ function zen_draw_textarea_field($name, $width, $height, $text = '~*~*#', $param
 
     $field = '<textarea name="' . zen_output_string($name) . '" cols="' . zen_output_string($width) . '" rows="' . zen_output_string($height) . '"';
 
-    if (!empty($parameters)) $field .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
     $field .= '>';
 
-    if ($text == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true) ) {
-      $field .= stripslashes($GLOBALS[$name]);
+    if ($text == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true)) {
+        $field .= stripslashes($GLOBALS[$name]);
     } elseif ($text != '~*~*#' && zen_not_null($text)) {
-      $field .= $text;
+        $field .= $text;
     }
 
     $field .= '</textarea>';
@@ -748,14 +775,14 @@ function zen_draw_textarea_field($name, $width, $height, $text = '~*~*#', $param
     //
     $GLOBALS['zco_notifier']->notify(
         'NOTIFY_ZEN_DRAW_TEXTAREA_FIELD',
-        array(
+        [
             'name' => $name,
             'width' => $width,
             'height' => $height,
             'text' => $text,
             'parameters' => $parameters,
             'reinsert_value' => $reinsert_value,
-        ),
+        ],
         $field
     );
     return $field;
@@ -765,20 +792,21 @@ function zen_draw_textarea_field($name, $width, $height, $text = '~*~*#', $param
  * Output a form hidden field
  * @since ZC v1.0.3
  */
-function zen_draw_hidden_field($name, $value = '~*~*#', $parameters = '') {
+function zen_draw_hidden_field(?string $name, $value = '~*~*#', ?string $parameters = ''): string
+{
     $field = '<input type="hidden" name="' . zen_sanitize_string(zen_output_string($name)) . '"';
 
     if (zen_not_null($value) && $value != '~*~*#') {
-      $field .= ' value="' . zen_output_string($value) . '"';
+        $field .= ' value="' . zen_output_string($value) . '"';
     } elseif (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
-      $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
+        $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
     }
 
-    if (!empty($parameters)) $field .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
-    $field .= '>';
-
-    return $field;
+    return $field . '>';
 }
 
 /**
@@ -788,12 +816,10 @@ function zen_draw_hidden_field($name, $value = '~*~*#', $parameters = '') {
  * @return string
  * @since ZC v1.0.3
  */
-function zen_draw_file_field($name, $required = false) {
-    $field = zen_draw_input_field($name, '', ' size="50" ', 'file', false, $required);
-
-    return $field;
+function zen_draw_file_field($name, $required = false)
+{
+    return zen_draw_input_field($name, '', ' size="50" ', 'file', false, $required);
 }
-
 
 /**
  * Hide form elements while including session id info
@@ -822,73 +848,73 @@ function zen_hide_session_id(): string
  * @return string
  * @since ZC v1.0.3
  */
-function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false)
+function zen_draw_pull_down_menu($name, $values, $default = '', ?string $parameters = '', $required = false)
 {
-  // -----
-  // Give an observer the opportunity to **totally** override this function's operation.
-  //
-  $field = false;
-  $GLOBALS['zco_notifier']->notify(
-      'NOTIFY_ZEN_DRAW_PULL_DOWN_MENU_OVERRIDE',
-      array(
-        'name' => $name,
-        'values' => $values,
-        'default' => $default,
-        'parameters' => $parameters,
-        'required' => $required,
-      ),
-      $field
-  );
-  if ($field !== false) {
-    return $field;
-  }
-
-  $field = '<select ';
-
-  if (strpos($parameters, 'id=') === false) {
-    $field .= ' id="select-' . zen_output_string($name) . '"';
-  }
-
-  $field .= ' name="' . zen_output_string($name) . '"';
-
-  if (!empty($parameters)) {
-    $field .= ' ' . $parameters;
-  }
-
-  $field .= '>' . "\n";
-
-  if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
-    $default = stripslashes($GLOBALS[$name]);
-  }
-
-  foreach ($values as $value) {
-    $field .= '  <option value="' . zen_output_string($value['id']) . '"';
-    if ($default == $value['id']) {
-      $field .= ' selected="selected"';
+    // -----
+    // Give an observer the opportunity to **totally** override this function's operation.
+    //
+    $field = false;
+    $GLOBALS['zco_notifier']->notify(
+        'NOTIFY_ZEN_DRAW_PULL_DOWN_MENU_OVERRIDE',
+        [
+          'name' => $name,
+          'values' => $values,
+          'default' => $default,
+          'parameters' => $parameters,
+          'required' => $required,
+        ],
+        $field
+    );
+    if ($field !== false) {
+        return $field;
     }
 
-    $field .= '>' . zen_output_string($value['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>' . "\n";
-  }
-  $field .= '</select>' . "\n";
+    $field = '<select ';
 
-  if ($required == true) {
-     $field .= TEXT_FIELD_REQUIRED;
-   }
-  // -----
-  // Give an observer the chance to make modifications to the just-rendered field.
-  //
-  $GLOBALS['zco_notifier']->notify(
-      'NOTIFY_ZEN_DRAW_PULL_DOWN_MENU',
-      array(
-        'name' => $name,
-        'values' => $values,
-        'default' => $default,
-        'parameters' => $parameters,
-        'required' => $required,
-      ),
-      $field
-  );
-  return $field;
+    if (!str_contains((string) $parameters, 'id=')) {
+        $field .= ' id="select-' . zen_output_string($name) . '"';
+    }
+
+    $field .= ' name="' . zen_output_string($name) . '"';
+
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
+
+    $field .= '>' . "\n";
+
+    if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
+        $default = stripslashes($GLOBALS[$name]);
+    }
+
+    foreach ($values as $value) {
+        $field .= '  <option value="' . zen_output_string($value['id']) . '"';
+        if ($default == $value['id']) {
+            $field .= ' selected="selected"';
+        }
+
+        $field .= '>' . zen_output_string($value['text'], ['"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;']) . '</option>' . "\n";
+    }
+    $field .= '</select>' . "\n";
+
+    if ($required == true) {
+        $field .= TEXT_FIELD_REQUIRED;
+    }
+    // -----
+    // Give an observer the chance to make modifications to the just-rendered field.
+    //
+    $GLOBALS['zco_notifier']->notify(
+        'NOTIFY_ZEN_DRAW_PULL_DOWN_MENU',
+        [
+          'name' => $name,
+          'values' => $values,
+          'default' => $default,
+          'parameters' => $parameters,
+          'required' => $required,
+        ],
+        $field
+    );
+    return $field;
 }
 
 /**
@@ -897,12 +923,14 @@ function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = ''
  */
 function zen_get_country_list($name, $selected = '', $parameters = '')
 {
-    $countriesAtTopOfList = array();
-    $countries_array = array(array('id' => '', 'text' => PULL_DOWN_DEFAULT));
+    $countriesAtTopOfList = [];
+    $countries_array = [['id' => '', 'text' => PULL_DOWN_DEFAULT]];
     $countries = zen_get_countries();
 
     // Set some default entries at top of list:
-    if (SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY !== '' && STORE_COUNTRY !== SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY) $countriesAtTopOfList[] = SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY;
+    if (SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY !== '' && STORE_COUNTRY !== SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY) {
+        $countriesAtTopOfList[] = SHOW_CREATE_ACCOUNT_DEFAULT_COUNTRY;
+    }
     $countriesAtTopOfList[] = STORE_COUNTRY;
     // IF YOU WANT TO ADD MORE DEFAULTS TO THE TOP OF THIS LIST, SIMPLY ENTER THEIR NUMBERS HERE.
     // Duplicate more lines as needed
@@ -912,30 +940,31 @@ function zen_get_country_list($name, $selected = '', $parameters = '')
     //$countriesAtTopOfList[] = 222;
 
     //process array of top-of-list entries:
-    foreach ($countriesAtTopOfList as $key=>$val) {
-      // -----
-      // Account for the possibility that one of the top-of-list countries has been disabled.  If
-      // that's the case, issue a PHP notice since the condition really shouldn't happen!
-      //
-      $country_name = zen_get_country_name($val);
-      if ($country_name === '') {
-        trigger_error('Country with countries_id = ' . $val . ' is either disabled or does not exist.', E_USER_NOTICE);
-      } else {
-        $countries_array[] = array('id' => $val, 'text' => $country_name);
-      }
+    foreach ($countriesAtTopOfList as $val) {
+        // -----
+        // Account for the possibility that one of the top-of-list countries has been disabled.  If
+        // that's the case, issue a PHP notice since the condition really shouldn't happen!
+        //
+        $country_name = zen_get_country_name($val);
+        if ($country_name === '') {
+            trigger_error('Country with countries_id = ' . $val . ' is either disabled or does not exist.', E_USER_NOTICE);
+        } else {
+            $countries_array[] = ['id' => $val, 'text' => $country_name];
+        }
     }
     // now add anything not in the defaults list:
-    for ($i=0, $n=count($countries); $i<$n; $i++) {
-      $alreadyInList = FALSE;
-      foreach($countriesAtTopOfList as $key=>$val) {
-        if ($countries[$i]['countries_id'] == $val)
-        {
-          // If you don't want to exclude entries already at the top of the list, comment out this next line:
-          $alreadyInList = TRUE;
-          break; // found the duplicate, no further need to process this loop
+    for ($i = 0, $n = count($countries); $i < $n; $i++) {
+        $alreadyInList = false;
+        foreach ($countriesAtTopOfList as $val) {
+            if ($countries[$i]['countries_id'] == $val) {
+                // If you don't want to exclude entries already at the top of the list, comment out this next line:
+                $alreadyInList = true;
+                break; // found the duplicate, no further need to process this loop
+            }
         }
-      }
-      if (!$alreadyInList) $countries_array[] = array('id' => $countries[$i]['countries_id'], 'text' => $countries[$i]['countries_name']);
+        if (!$alreadyInList) {
+            $countries_array[] = ['id' => $countries[$i]['countries_id'], 'text' => $countries[$i]['countries_name']];
+        }
     }
 
     return zen_draw_pull_down_menu($name, $countries_array, $selected, $parameters);
@@ -945,27 +974,28 @@ function zen_get_country_list($name, $selected = '', $parameters = '')
  * Assesses suitability for additional parameters such as rel=nofollow etc
  * @since ZC v1.3.8
  */
-  function zen_href_params($page = '', $parameters = '') {
+function zen_href_params($page = '', ?string $parameters = ''): ?string
+{
     global $current_page_base;
     $addparms = '';
     // if nofollow has already been set, ignore this function
-    if (stristr($parameters, 'nofollow')) return $parameters;
+    if (stristr((string) $parameters, 'nofollow')) {
+        return $parameters;
+    }
     // if list of skippable pages has been set in meta_tags.php lang file (is by default), use that to add rel=nofollow params
-    if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($page, explode(",", constant('ROBOTS_PAGES_TO_SKIP')))
-        || $current_page_base=='down_for_maintenance') $addparms = 'rel="nofollow"';
+    if (defined('ROBOTS_PAGES_TO_SKIP') && in_array($page, explode(',', constant('ROBOTS_PAGES_TO_SKIP')))
+        || $current_page_base == 'down_for_maintenance') {
+        $addparms = 'rel="nofollow"';
+    }
     return ($parameters == '' ? $addparms : $parameters . ' ' . $addparms);
-  }
+}
 
 /**
  * output label for input fields
- * @param string $text
- * @param string $for
  * @param string $parameters
- * @return string
  * @since ZC v1.5.5
  */
-function zen_draw_label($text, $for, $parameters = '')
+function zen_draw_label(string $text, string $for, ?string $parameters = ''): string
 {
-    $label = '<label for="' . $for . '"' . (!empty($parameters) ? ' ' . $parameters : '') . '>' . $text . '</label>';
-    return $label;
+    return '<label for="' . $for . '"' . (!empty($parameters) ? ' ' . $parameters : '') . '>' . $text . '</label>';
 }

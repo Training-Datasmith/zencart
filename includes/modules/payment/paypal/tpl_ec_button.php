@@ -11,38 +11,40 @@
 require_once DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/paypal/paypal_currency_check.php';
 $paypalec_enabled = (defined('MODULE_PAYMENT_PAYPALWPP_STATUS') && MODULE_PAYMENT_PAYPALWPP_STATUS == 'True'  && paypalUSDCheck($_SESSION['cart']->total) === true);
 $ecs_off = (defined('MODULE_PAYMENT_PAYPALWPP_ECS_BUTTON') && MODULE_PAYMENT_PAYPALWPP_ECS_BUTTON == 'Off');
-if ($ecs_off) $paypalec_enabled = FALSE;
+if ($ecs_off) {
+    $paypalec_enabled = false;
+}
 
 if ($paypalec_enabled) {
-  // check if logged-in customer's address is in an acceptable zone
-  if ((int)MODULE_PAYMENT_PAYPALWPP_ZONE > 0 && zen_is_logged_in()) {
-    $custCountryCheck = (isset($order)) ? $order->billing['country']['id'] : $_SESSION['customer_country_id'];
-    $custZoneCheck = (isset($order)) ? $order->billing['zone_id'] : $_SESSION['customer_zone_id'];
-    $check_flag = false;
-    $sql = "SELECT zone_id
-            FROM " . TABLE_ZONES_TO_GEO_ZONES . "
+    // check if logged-in customer's address is in an acceptable zone
+    if ((int)MODULE_PAYMENT_PAYPALWPP_ZONE > 0 && zen_is_logged_in()) {
+        $custCountryCheck = (isset($order)) ? $order->billing['country']['id'] : $_SESSION['customer_country_id'];
+        $custZoneCheck = (isset($order)) ? $order->billing['zone_id'] : $_SESSION['customer_zone_id'];
+        $check_flag = false;
+        $sql = 'SELECT zone_id
+            FROM ' . TABLE_ZONES_TO_GEO_ZONES . '
             WHERE geo_zone_id = :zoneId
             AND zone_country_id = :countryId
-            ORDER BY zone_id";
-    $sql = $db->bindVars($sql, ':zoneId', (int)MODULE_PAYMENT_PAYPALWPP_ZONE, 'integer');
-    $sql = $db->bindVars($sql, ':countryId', $custCountryCheck, 'integer');
-    $result = $db->Execute($sql);
-    while (!$result->EOF) {
-      if ($result->fields['zone_id'] < 1 || $result->fields['zone_id'] == $custZoneCheck) {
-        $check_flag = true;
-        break;
-      }
-      $result->MoveNext();
+            ORDER BY zone_id';
+        $sql = $db->bindVars($sql, ':zoneId', (int)MODULE_PAYMENT_PAYPALWPP_ZONE, 'integer');
+        $sql = $db->bindVars($sql, ':countryId', $custCountryCheck, 'integer');
+        $result = $db->Execute($sql);
+        while (!$result->EOF) {
+            if ($result->fields['zone_id'] < 1 || $result->fields['zone_id'] == $custZoneCheck) {
+                $check_flag = true;
+                break;
+            }
+            $result->MoveNext();
+        }
+        if (!$check_flag) {
+            $paypalec_enabled = false;
+        }
     }
-    if (!$check_flag) {
-      $paypalec_enabled = false;
-    }
-  }
 
-  // cart contents qty must be >0 and value >0
-  if ($_SESSION['cart']->count_contents() <= 0 || $_SESSION['cart']->total == 0) {
-    $paypalec_enabled = false;
-  }
+    // cart contents qty must be >0 and value >0
+    if ($_SESSION['cart']->count_contents() <= 0 || $_SESSION['cart']->total == 0) {
+        $paypalec_enabled = false;
+    }
 
 }
 // if all is okay, display the button
@@ -55,8 +57,8 @@ if ($paypalec_enabled) {
     unset($_SESSION['paypal_ec_payer_info']);
     unset($_SESSION['paypal_ec_markflow']);
 
-    zen_include_language_file('paypalwpp.php', '/modules/payment/', 'inline'); 
-?>
+    zen_include_language_file('paypalwpp.php', '/modules/payment/', 'inline');
+    ?>
 <div id="PPECbutton" class="buttonRow">
   <a href="<?php echo zen_href_link('ipn_main_handler.php', 'type=ec', 'SSL', true, true, true); ?>"><img src="<?php echo MODULE_PAYMENT_PAYPALWPP_EC_BUTTON_IMG ?>" alt="<?php echo MODULE_PAYMENT_PAYPALWPP_TEXT_BUTTON_ALTTEXT; ?>" id="ecButton"></a>
 </div>

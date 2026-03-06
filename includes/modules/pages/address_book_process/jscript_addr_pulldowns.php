@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * jscript_addr_pulldowns
  *
@@ -10,4 +12,3 @@
  * @version $Id: lat9 2022 May 02 Modified in v1.5.8-alpha $
  */
 require $template->get_template_dir('zen_addr_pulldowns.php', DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/zen_addr_pulldowns.php';
-

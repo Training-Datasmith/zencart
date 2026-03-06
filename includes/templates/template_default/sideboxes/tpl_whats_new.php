@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Side Box Template
  *
@@ -8,7 +10,7 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2024 May 24 Modified in v2.1.0-alpha1 $
  */
-$content = "";
+$content = '';
 $content .= '<div class="sideBoxContent centeredContent">';
 $whats_new_box_counter = 0;
 while (!$random_whats_new_sidebox_product->EOF) {

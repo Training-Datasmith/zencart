@@ -17,7 +17,7 @@ $adjustWarnIssues = false;
         <div class="alert alert-danger">
             <?php
             $alert_message = $selectedAdminDir !== '' ? TEXT_ERROR_MULTIPLE_ADMINS_SELECTED : TEXT_ERROR_MULTIPLE_ADMINS_NONE_SELECTED;
-            ?>
+        ?>
             <?= $alert_message ?>
 
             <div class="row">
@@ -38,26 +38,26 @@ $adjustWarnIssues = false;
         <input type="hidden" name="adminDir" value="<?= $selectedAdminDir ?>">
     <?php
     }
-    ?>
+?>
     <?php
-    if ($selectedAdminDir !== '') { ?>
+if ($selectedAdminDir !== '') { ?>
     <?php
 
-    if ($hasSaneConfigFile && !$otherConfigErrors && $hasUpdatedConfigFile) {
-        if (!$isCurrentDb) {
-            $adjustWarnIssues = true;
+if ($hasSaneConfigFile && !$otherConfigErrors && $hasUpdatedConfigFile) {
+    if (!$isCurrentDb) {
+        $adjustWarnIssues = true;
         ?>
         <div class="alert alert-success">
             <?= TEXT_ERROR_SUCCESS_EXISTING_CONFIGURE ?>
         </div>
         <?php
-        } else { ?>
+    } else { ?>
         <div class="alert alert-warning">
             <?= TEXT_ERROR_SUCCESS_EXISTING_CONFIGURE_NO_UPDATE ?>
         </div>
         <?php
-        }
     }
+}
     ?>
     <?php
     if (!$hasUpdatedConfigFile && $hasSaneConfigFile) { ?>
@@ -90,11 +90,11 @@ $adjustWarnIssues = false;
                     <?php
                         }
                     }
-                    ?>
+                ?>
                 </div>
             <?php
             }
-            ?>
+        ?>
         </div>
     <?php
     }
@@ -119,111 +119,110 @@ $adjustWarnIssues = false;
                         <?php
                         }
                     }
-                    ?>
+                ?>
                 </div>
             <?php
             }
-            ?>
+        ?>
         </div>
     <?php
     }
 
     if ($hasWarnErrors) {
-    if (empty($errorHeadingFlag)) {
-        $errorHeadingFlag = false;
-    }
-
-    foreach ($listWarnErrors as $error) {
-        if (!str_contains($error['mainErrorText'], 'PRO TIP:')) {
-            $errorHeadingFlag = true;
-            break;
+        if (empty($errorHeadingFlag)) {
+            $errorHeadingFlag = false;
         }
-    }
-    ?>
+
+        foreach ($listWarnErrors as $error) {
+            if (!str_contains((string) $error['mainErrorText'], 'PRO TIP:')) {
+                $errorHeadingFlag = true;
+                break;
+            }
+        }
+        ?>
 
     <div id="warnErrors" class="errorList">
         <?php
-        if ($errorHeadingFlag) { ?>
+            if ($errorHeadingFlag) { ?>
             <h3><?= $adjustWarnIssues ? TEXT_INDEX_WARN_ERRORS : TEXT_INDEX_WARN_ERRORS_ALT ?></h3>
         <?php
-        }
+            }
         foreach ($listWarnErrors as $error) {
 
-    if (str_contains($error['mainErrorText'], 'PRO TIP:')) { ?>
+            if (str_contains((string) $error['mainErrorText'], 'PRO TIP:')) { ?>
         <div class="alert alert-danger">
             <?= ($error['mainErrorText']) ?>
             <?php
             } else {
-        ?>
+                ?>
             <div class="alert alert-secondary">
                 <a href="" <?= (isset($error['mainErrorTextHelpId'])) ? 'class="hasHelpText" id="' . $error['mainErrorTextHelpId'] . '"' : 'class="hasNoHelpText link-dark text-decoration-none"' ?>>
                     <?= ($error['mainErrorText']) ?>
                     <?= (isset($error['mainErrorTextHelpId'])) ? '<i class="bi-question-circle"></i>' : '' ?>
                 </a>
                 <?php
-                } ?>
+            } ?>
                 <?php
-                if (isset($error['extraErrors'])) { ?>
+            if (isset($error['extraErrors'])) { ?>
                     <?php
-                    foreach ($error['extraErrors'] as $detailError) { ?>
+                foreach ($error['extraErrors'] as $detailError) { ?>
                         <br><?= $detailError ?>
                     <?php
-                    }
-                } ?>
+                }
+            } ?>
             </div>
             <?php
-            } ?>
+        } ?>
         </div>
         <?php
-        }
+    }
 
-
-        if (!$hasFatalErrors && !$hasWarnErrors && ($hasUpdatedConfigFile || $hasSaneConfigFile || $configFilePresent)) { ?>
+    if (!$hasFatalErrors && !$hasWarnErrors && ($hasUpdatedConfigFile || $hasSaneConfigFile || $configFilePresent)) { ?>
             <div class="alert alert-success">
                 <?= TEXT_ERROR_SUCCESS_NO_ERRORS ?>
             </div>
         <?php
-        } ?>
+    } ?>
         <?php
-        if (!$hasFatalErrors && !$hasSaneConfigFile) { ?>
+    if (!$hasFatalErrors && !$hasSaneConfigFile) { ?>
             <input type="submit" class="zc-full btn btn-primary" id="btnsubmit" name="btnsubmit" value="<?= TEXT_CONTINUE ?>" <?= ($hasMultipleAdmins) ? '' : 'autofocus="autofocus"' ?> tabindex="1">
         <?php
-        } ?>
+    } ?>
         <?php
-        if (!$hasFatalErrors && $hasSaneConfigFile && !$hasUpgradeErrors && !$isCurrentDb && $hasUpdatedConfigFile && $hasTables) { ?>
+    if (!$hasFatalErrors && $hasSaneConfigFile && !$hasUpgradeErrors && !$isCurrentDb && $hasUpdatedConfigFile && $hasTables) { ?>
             <input type="submit" class="zc-upg btn btn-primary" id="btnsubmit" name="btnsubmit" value="<?= TEXT_UPGRADE ?>" tabindex="2" title="<?= TEXT_UPGRADE_INFO ?>">
         <?php
-        } ?>
+    } ?>
         <?php
-        if (!$hasFatalErrors && $hasSaneConfigFile && !$hasUpgradeErrors && $hasUpdatedConfigFile) { ?>
+    if (!$hasFatalErrors && $hasSaneConfigFile && !$hasUpgradeErrors && $hasUpdatedConfigFile) { ?>
             <input type="submit" class="zc-full btn btn-primary" id="btnsubmit1" name="btnsubmit" value="<?= TEXT_CLEAN_INSTALL ?>" tabindex="3" title="<?= TEXT_CLEAN_INSTALL_INFO ?>">
         <?php
-        } ?>
+    } ?>
         <?php
-        if ($hasUpgradeErrors && $hasSaneConfigFile && $hasUpdatedConfigFile) { ?>
+    if ($hasUpgradeErrors && $hasSaneConfigFile && $hasUpdatedConfigFile) { ?>
             <input type="submit" class="zc-full btn btn-primary" id="btnsubmit2" name="btnsubmit" value="<?= TEXT_CLEAN_INSTALL ?>" tabindex="4" title="<?= TEXT_CLEAN_INSTALL_INFO ?>">
         <?php
-        } ?>
+    } ?>
         <?php
-        } ?>
+} ?>
         <?php
-        if (!$hasUpdatedConfigFile && $hasSaneConfigFile) { ?>
+if (!$hasUpdatedConfigFile && $hasSaneConfigFile) { ?>
             <input type="hidden" name="updateConfigure" value="true">
             <input type="submit" class="zc-admin btn btn-primary" id="btnsubmit2" name="btnsubmit" value="<?= TEXT_UPDATE_CONFIGURE ?>" tabindex="4">
         <?php
-        } ?>
+} ?>
         <?php
-        if ($hasMultipleAdmins) { ?>
+if ($hasMultipleAdmins) { ?>
             <input type="submit" class="zc-admin btn btn-primary" id="btnsubmit" name="btnsubmit" value="<?= TEXT_REFRESH ?>" autofocus="autofocus" tabindex="5">
         <?php
-        } else { ?>
+} else { ?>
             <?php
-            if ($hasFatalErrors || $hasWarnErrors) { ?>
+    if ($hasFatalErrors || $hasWarnErrors) { ?>
                 <a href="" class="btn btn-secondary"><?= TEXT_REFRESH ?></a>
             <?php
-            } ?>
+    } ?>
         <?php
-        } ?>
+} ?>
         <br style="clear:both">
 </form>
 

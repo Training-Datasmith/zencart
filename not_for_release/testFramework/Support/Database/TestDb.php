@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Database;
 
 use PDO;
@@ -14,26 +16,7 @@ class TestDb
         if (self::$pdo instanceof PDO) {
             return self::$pdo;
         }
-
-        $driver = DB_TYPE === 'mysqli' ? 'mysql' : DB_TYPE;
-        if ($driver !== 'mysql') {
-            throw new RuntimeException('Unsupported DB_TYPE for test framework: ' . DB_TYPE);
-        }
-
-        $dsn = sprintf(
-            '%s:host=%s;dbname=%s;charset=%s',
-            $driver,
-            DB_SERVER,
-            DB_DATABASE,
-            DB_CHARSET
-        );
-
-        self::$pdo = new PDO($dsn, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-
-        return self::$pdo;
+        throw new RuntimeException('Unsupported DB_TYPE for test framework: ' . DB_TYPE);
     }
 
     public static function resetConnection(): void
@@ -49,8 +32,8 @@ class TestDb
     public static function insert(string $table, array $values): int
     {
         $columns = array_keys($values);
-        $columnSql = implode(', ', array_map([self::class, 'quoteIdentifier'], $columns));
-        $placeholders = implode(', ', array_map(static fn ($column) => ':' . $column, $columns));
+        $columnSql = implode(', ', array_map(self::quoteIdentifier(...), $columns));
+        $placeholders = implode(', ', array_map(static fn (int|string $column): string => ':' . $column, $columns));
         $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             self::quoteIdentifier($table),

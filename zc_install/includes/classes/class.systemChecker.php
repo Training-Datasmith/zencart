@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * file contains systemChecker Class
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -14,7 +16,7 @@ class systemChecker
     protected array $adminDirectoryList = [];
     protected array $errorList = [];
     protected array $extraRunLevels = [];
-    protected ?string $localErrors;
+    protected ?string $localErrors = null;
     protected string $selectedAdminDir;
     protected zcConfigureFileReader $serverConfig;
     protected array $systemChecks;
@@ -76,9 +78,9 @@ class systemChecker
     {
         $runLevels = array_merge([$runLevel], $this->extraRunLevels);
         $this->errorList = [];
-//echo print_r($this->systemChecks);
+        //echo print_r($this->systemChecks);
         foreach ($this->systemChecks as $systemCheckName => $systemCheck) {
-//echo print_r($systemCheck);
+            //echo print_r($systemCheck);
 
             $server = strtolower($_SERVER['SERVER_SOFTWARE'] ?? 'unknown');
 
@@ -150,21 +152,21 @@ class systemChecker
         return $this->errorList;
     }
 
-    public function log($result, $methodName, $methodDetail): void
+    public function log($result, string $methodName, array $methodDetail): void
     {
         $status = $result;
         if (is_bool($result)) {
             $status = ($result === true) ? 'PASSED' : 'FAILED';
         }
         if (VERBOSE_SYSTEMCHECKER === 'screen' || VERBOSE_SYSTEMCHECKER === true || VERBOSE_SYSTEMCHECKER === 'TRUE') {
-            echo $methodName . "<br>";
+            echo $methodName . '<br>';
             if (is_array($methodDetail['parameters'])) {
                 foreach ($methodDetail['parameters'] as $key => $value) {
-                    echo $key . " : " . $value . "<br>";
+                    echo $key . ' : ' . $value . '<br>';
                 }
             }
-            echo $status . "<br>";
-            echo "------------------<br><br>";
+            echo $status . '<br>';
+            echo '------------------<br><br>';
         }
         if (!in_array(VERBOSE_SYSTEMCHECKER, ['silent', 'none', 'off', 'OFF', 'NONE', 'SILENT'])) {
             $loggedString = isset($methodDetail['parameters']) ? substr(print_r($methodDetail['parameters'], true), 5) : '';
@@ -269,13 +271,13 @@ class systemChecker
         }
         $valid = true;
         foreach ($parameters as $parameter) {
-            $method = 'dbVersionCheck' . ucfirst($parameter['checkType']);
+            $method = 'dbVersionCheck' . ucfirst((string) $parameter['checkType']);
             $result = $this->$method($db, $dbPrefixVal, $parameter);
-//echo ($parameter['tableName'] ? $parameter['tableName'] . '-' : '') . $parameter['checkType'] . ': ' . var_export($result, true) . '<br>' . "\n";
+            //echo ($parameter['tableName'] ? $parameter['tableName'] . '-' : '') . $parameter['checkType'] . ': ' . var_export($result, true) . '<br>' . "\n";
             $valid = $valid && $result;
         }
 
-//echo 'Valid: ' . var_export($valid, true) . '<br>' . "\n";
+        //echo 'Valid: ' . var_export($valid, true) . '<br>' . "\n";
         return $valid;
     }
 
@@ -295,11 +297,16 @@ class systemChecker
     {
         $listFatalErrors = [];
         foreach ($this->errorList as $key => $value) {
-            if ($key !== 'checkStoreConfigureFile' && $key !== 'checkAdminConfigureFile') {
-                if ($value['errorLevel'] === 'FAIL') {
-                    $listFatalErrors[$key] = $value;
-                }
+            if (!($key !== 'checkStoreConfigureFile')) {
+                continue;
             }
+            if (!($key !== 'checkAdminConfigureFile')) {
+                continue;
+            }
+            if ($value['errorLevel'] !== 'FAIL') {
+                continue;
+            }
+            $listFatalErrors[$key] = $value;
         }
         $hasFatalErrors = count($listFatalErrors) > 0;
         return ([$hasFatalErrors, $listFatalErrors]);
@@ -329,7 +336,7 @@ class systemChecker
     public function findCurrentDbVersion(): ?string
     {
         $version = null;
-        foreach ($this->systemChecks as $systemCheckName => $systemCheck) {
+        foreach ($this->systemChecks as $systemCheck) {
             $version = null;
             if ($systemCheck['runLevel'] === 'dbVersion') {
                 $resultCombined = true;
@@ -362,13 +369,13 @@ class systemChecker
 
         $this->log((!empty($version) ? $version : 'Cannot Be Determined'), __METHOD__, []);
 
-//echo print_r($this->errorList);
+        //echo print_r($this->errorList);
         return $version;
     }
 
-    public function dbVersionCheckFieldSchema($db, $dbPrefix, $parameters): bool
+    public function dbVersionCheckFieldSchema($db, string $dbPrefix, array $parameters): bool
     {
-        $sql = "SHOW FIELDS FROM " . $dbPrefix . $parameters['tableName'];
+        $sql = 'SHOW FIELDS FROM ' . $dbPrefix . $parameters['tableName'];
         $result = $db->Execute($sql);
         while (!$result->EOF) {
             // if found the specified field ...
@@ -379,12 +386,12 @@ class systemChecker
                 }
 
                 // else check that the field's type matches the fieldCheck test
-                $expected = strtoupper($parameters['expectedResult']);
-                if (strtoupper($result->fields[$parameters['fieldCheck']]) === $expected) {
+                $expected = strtoupper((string) $parameters['expectedResult']);
+                if (strtoupper((string) $result->fields[$parameters['fieldCheck']]) === $expected) {
                     return true;
                 }
                 // Accommodate MySQL 8.0.17+ case where "INT(11)" only returns "INT", except for TINYINT(1)
-                $found = preg_replace('~INT\([\d]*\)~', 'INT', strtoupper($result->fields[$parameters['fieldCheck']]));
+                $found = preg_replace('~INT\([\d]*\)~', 'INT', strtoupper((string) $result->fields[$parameters['fieldCheck']]));
                 $expected = preg_replace('~INT\([\d]*\)~', 'INT', $expected);
                 if ($expected !== 'TINYINT(1)' && $found === $expected) {
                     return true;
@@ -395,17 +402,17 @@ class systemChecker
         return false;
     }
 
-    public function dbVersionCheckConfigKeyExists($db, $dbPrefix, $parameters): bool
+    public function dbVersionCheckConfigKeyExists($db, string $dbPrefix, array $parameters): bool
     {
-        $sql = "SELECT configuration_key FROM " . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['keyName'] . "'";
+        $sql = 'SELECT configuration_key FROM ' . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['keyName'] . "'";
         $result = $db->Execute($sql, 1);
 
         return $result->RecordCount() > 0;
     }
 
-    public function dbVersionCheckConfigValue($db, $dbPrefix, $parameters): bool
+    public function dbVersionCheckConfigValue($db, string $dbPrefix, array $parameters): bool
     {
-        $sql = "SELECT configuration_title FROM " . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['fieldName'] . "'";
+        $sql = 'SELECT configuration_title FROM ' . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['fieldName'] . "'";
         $result = $db->Execute($sql);
         if ($result && isset($result->fields['configuration_title'])) {
             return $result->fields['configuration_title'] === $parameters['expectedResult'];
@@ -413,9 +420,9 @@ class systemChecker
         return false;
     }
 
-    public function dbVersionCheckConfigDescription($db, $dbPrefix, $parameters): bool
+    public function dbVersionCheckConfigDescription($db, string $dbPrefix, array $parameters): bool
     {
-        $sql = "SELECT configuration_description FROM " . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['fieldName'] . "'";
+        $sql = 'SELECT configuration_description FROM ' . $dbPrefix . "configuration WHERE configuration_key = '" . $parameters['fieldName'] . "'";
         $result = $db->Execute($sql);
         if ($result && isset($result->fields['configuration_description'])) {
             // intentionally using == here
@@ -424,30 +431,30 @@ class systemChecker
         return false;
     }
 
-    public function checkFileExists($parameters): bool
+    public function checkFileExists(array $parameters): bool
     {
         return file_exists($parameters['fileDir']);
     }
 
-    public function checkWriteableDir($parameters): bool
+    public function checkWriteableDir(array $parameters): bool
     {
         return is_writable($parameters['fileDir']);
     }
 
-    public function checkWriteableFile($parameters): bool
+    public function checkWriteableFile(array $parameters): bool
     {
         if (isset($parameters['changePerms']) && $parameters['changePerms'] !== false) {
             if (file_exists($parameters['fileDir'])) {
-                @chmod($parameters['fileDir'], octdec($parameters['changePerms']));
+                @chmod($parameters['fileDir'], octdec((string) $parameters['changePerms']));
             } elseif ($fp = @fopen($parameters['fileDir'], 'c')) {
                 fclose($fp);
-                chmod($parameters['fileDir'], octdec($parameters['changePerms']));
+                chmod($parameters['fileDir'], octdec((string) $parameters['changePerms']));
             }
         }
         return is_writable($parameters['fileDir']);
     }
 
-    public function checkWriteableAdminFile($parameters): bool
+    public function checkWriteableAdminFile(array $parameters): bool
     {
         $file = DIR_FS_ROOT . $this->selectedAdminDir . '/' . $parameters['fileDir'];
         if (is_writable($file)) {
@@ -458,7 +465,7 @@ class systemChecker
         }
         if (file_exists($file)) {
             if (isset($parameters['changePerms']) && $parameters['changePerms'] !== false) {
-                @chmod($file, octdec($parameters['changePerms']));
+                @chmod($file, octdec((string) $parameters['changePerms']));
             }
             if (is_writable($file)) {
                 return true;
@@ -468,20 +475,20 @@ class systemChecker
         return false;
     }
 
-    public function checkExtension($parameters): bool
+    public function checkExtension(array $parameters): bool
     {
         return extension_loaded($parameters['extension']);
     }
 
-    public function checkFunctionExists($parameters): bool
+    public function checkFunctionExists(array $parameters): bool
     {
         return function_exists($parameters['functionName']);
     }
 
-    public function checkPhpVersion($parameters): bool|int
+    public function checkPhpVersion(array $parameters): bool|int
     {
         $this->log('Found ' . PHP_VERSION, __METHOD__, []);
-        return version_compare((string)PHP_VERSION, (string)$parameters['version'], (string)$parameters['versionTest']);
+        return version_compare(PHP_VERSION, (string)$parameters['version'], (string)$parameters['versionTest']);
     }
 
     public function checkHtaccessSupport($parameters): bool
@@ -491,7 +498,7 @@ class systemChecker
             return true;
         }
 
-        if (false !== stripos($_SERVER['SERVER_SOFTWARE'], "nginx")) { // not relevant if nginx
+        if (false !== stripos((string) $_SERVER['SERVER_SOFTWARE'], 'nginx')) { // not relevant if nginx
             $this->log('Found Nginx. Aborting .htaccess check.', __METHOD__, []);
             return true;
         }
@@ -526,7 +533,7 @@ class systemChecker
             CURLOPT_RETURNTRANSFER => true, // return web page
             CURLOPT_HEADER => false,        // don't return headers
             CURLOPT_FOLLOWLOCATION => $follow_redirects,    // follow redirects
-            CURLOPT_ENCODING => "",         // handle all encodings
+            CURLOPT_ENCODING => '',         // handle all encodings
             CURLOPT_AUTOREFERER => true,    // set referer on redirect
             CURLOPT_CONNECTTIMEOUT => 3,    // timeout on connect
             CURLOPT_TIMEOUT => 3,           // timeout on response
@@ -549,17 +556,17 @@ class systemChecker
         return $header;
     }
 
-    public function checkInitialSession($parameters): bool
+    public function checkInitialSession(array $parameters): bool
     {
         session_name($parameters['sessionName']);
         $result = @session_start();
         if (!$result) {
             return false;
         }
-//    if (defined('SID') && constant('SID') != "")
-//      return FALSE;
-//    if (session_status() == PHP_SESSION_DISABLED)
-//      return FALSE;
+        //    if (defined('SID') && constant('SID') != "")
+        //      return FALSE;
+        //    if (session_status() == PHP_SESSION_DISABLED)
+        //      return FALSE;
         $_SESSION['testSession'] = 'testSession';
         return true;
     }
@@ -618,7 +625,7 @@ class systemChecker
         }
         $result = $db->selectdb(zcRegistry::getValue('db_name'));
         if (!$result) {
-            $sql = "CREATE DATABASE " . zcRegistry::getValue('db_name') . " CHARACTER SET " . zcRegistry::getValue('db_charset');
+            $sql = 'CREATE DATABASE ' . zcRegistry::getValue('db_name') . ' CHARACTER SET ' . zcRegistry::getValue('db_charset');
             $result = $db->Execute($sql);
             if ($result) { // success
                 return true;
@@ -628,25 +635,24 @@ class systemChecker
         return $result;
     }
 
-    public function checkIniGet($parameters): bool
+    public function checkIniGet(array $parameters): bool
     {
         // NOTE: intentionally using loose comparison here:
         return @ini_get($parameters['inigetName']) == $parameters['expectedValue'];
     }
 
-    public function checkLiveCurl($parameters): bool
+    public function checkLiveCurl(array $parameters): bool
     {
         if (!function_exists('curl_init')) {
             return false;
         }
-        $url = (!preg_match('~^http?s:.*~i', $parameters['testUrl'])) ? 'http://' . $parameters['testUrl'] : $parameters['testUrl'];
-        $data = $parameters['testData'];
+        $url = (!preg_match('~^http?s:.*~i', (string) $parameters['testUrl'])) ? 'http://' . $parameters['testUrl'] : $parameters['testUrl'];
         $ch = curl_init();
-// error_log('CURL Test URL: ' . $url);
+        // error_log('CURL Test URL: ' . $url);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
-//       curl_setopt($ch, CURLOPT_POST, 1);
-//       curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        //       curl_setopt($ch, CURLOPT_POST, 1);
+        //       curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 11);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
@@ -654,11 +660,11 @@ class systemChecker
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // This is intentionally set to FALSE within zc_install since this test is not about whether certificates are good.
 
         $result = curl_exec($ch);
-        $errtext = curl_error($ch);
+        curl_error($ch);
         $errnum = curl_errno($ch);
-        $commInfo = @curl_getinfo($ch);
-// error_log('CURL Connect: ' . $errnum . ' ' . $errtext . "\n" . print_r($commInfo, TRUE));
-// error_log('CURL Response: ' . $result);
+        @curl_getinfo($ch);
+        // error_log('CURL Connect: ' . $errnum . ' ' . $errtext . "\n" . print_r($commInfo, TRUE));
+        // error_log('CURL Response: ' . $result);
 
         return $errnum === 0 && trim($result) === 'PASS';
     }
@@ -696,7 +702,7 @@ class systemChecker
                 'fieldName' => 'admin_profile',
                 'fieldCheck' => 'Type',
                 'expectedResult' => 'INT(11)',
-            ]
+            ],
         ];
         $hasAdminProfiles = $this->dbVersionChecker($parameters);
         $dbServerVal = $this->getServerConfig()->getDefine('DB_SERVER');
@@ -722,9 +728,9 @@ class systemChecker
         $adminUser = $db->prepare_input($adminUser);
         $adminPassword = $db->prepare_input($adminPassword);
 
-//    echo ($hasAdminProfiles) ? 'YES' : 'NO';
+        //    echo ($hasAdminProfiles) ? 'YES' : 'NO';
         if (!$hasAdminProfiles) {
-            $sql = "SELECT admin_id, admin_name, admin_pass FROM " . $dbPrefixVal . "admin WHERE admin_name = '" . $adminUser . "'";
+            $sql = 'SELECT admin_id, admin_name, admin_pass FROM ' . $dbPrefixVal . "admin WHERE admin_name = '" . $adminUser . "'";
             $result = $db->Execute($sql);
             if ($result->EOF || $adminUser !== $result->fields['admin_name'] || !zen_validate_password($adminPassword, $result->fields['admin_pass'])) {
                 return false;
@@ -732,27 +738,27 @@ class systemChecker
             return (int)$result->fields['admin_id'];
         }
 
-// first check if the table has any superusers; if not, verify the user's password and assign them as a superuser
-        $sql = "SELECT DISTINCT(admin_profile)
-                FROM " . $dbPrefixVal . "admin
-                ORDER BY admin_profile";
+        // first check if the table has any superusers; if not, verify the user's password and assign them as a superuser
+        $sql = 'SELECT DISTINCT(admin_profile)
+                FROM ' . $dbPrefixVal . 'admin
+                ORDER BY admin_profile';
         $result = $db->Execute($sql);
         if ($result->EOF || ($result->RecordCount() === 1 && (int)$result->fields['admin_profile'] === 0)) {
-            $sql = "SELECT admin_id, admin_name, admin_pass
-                    FROM " . $dbPrefixVal . "admin
+            $sql = 'SELECT admin_id, admin_name, admin_pass
+                    FROM ' . $dbPrefixVal . "admin
                     WHERE admin_name = '" . $adminUser . "'";
             $result = $db->Execute($sql);
             if (!$result->EOF && zen_validate_password($adminPassword, $result->fields['admin_pass'])) {
-                $sql = "UPDATE " . $dbPrefixVal . "admin
+                $sql = 'UPDATE ' . $dbPrefixVal . 'admin
                         SET admin_profile = 1
-                        WHERE admin_id = " . $result->fields['admin_id'];
+                        WHERE admin_id = ' . $result->fields['admin_id'];
                 $db->Execute($sql);
                 return (int)$result->fields['admin_id'];
             }
         } else {
-            $sql = "SELECT a.admin_id, a.admin_name, a.admin_pass, a.admin_profile
-                    FROM " . $dbPrefixVal . "admin AS a
-                    LEFT JOIN " . $dbPrefixVal . "admin_profiles AS ap ON a.admin_profile = ap.profile_id
+            $sql = 'SELECT a.admin_id, a.admin_name, a.admin_pass, a.admin_profile
+                    FROM ' . $dbPrefixVal . 'admin AS a
+                    LEFT JOIN ' . $dbPrefixVal . "admin_profiles AS ap ON a.admin_profile = ap.profile_id
                     WHERE a.admin_name = '" . $adminUser . "'
                     AND ap.profile_name = 'Superuser'";
             $result = $db->Execute($sql);
@@ -764,17 +770,17 @@ class systemChecker
         return false;
     }
 
-    function backupConfigureFiles($parameters): bool
+    public function backupConfigureFiles($parameters): bool
     {
         return true;
     }
 
-    function checkIsZCVersionCurrent(): bool
+    public function checkIsZCVersionCurrent(): bool
     {
         $new_version = TEXT_VERSION_CHECK_CURRENT; //set to "current" by default
 
         $url = NEW_VERSION_CHECKUP_URL . '?v=' . PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR . '&p=' . PHP_VERSION
-            . '&a=' . $_SERVER['SERVER_SOFTWARE'] . '&r=' . urlencode($_SERVER['HTTP_HOST']) . '&m=zc_install';
+            . '&a=' . $_SERVER['SERVER_SOFTWARE'] . '&r=' . urlencode((string) $_SERVER['HTTP_HOST']) . '&m=zc_install';
         $lines = @file($url);
 
         // silently ignore if online check fails
@@ -833,7 +839,7 @@ class systemChecker
      */
     public function updateAdminIpList(): void
     {
-        if (isset($_SERVER['REMOTE_ADDR']) && strlen($_SERVER['REMOTE_ADDR']) > 4) {
+        if (isset($_SERVER['REMOTE_ADDR']) && strlen((string) $_SERVER['REMOTE_ADDR']) > 4) {
             $checkip = $_SERVER['REMOTE_ADDR'];
 
             $dbServerVal = $this->getServerConfig()->getDefine('DB_SERVER');
@@ -846,11 +852,11 @@ class systemChecker
             $db->simpleConnect($dbServerVal, $dbUserVal, $dbPasswordVal, $dbNameVal);
             $db->selectdb($dbNameVal);
 
-            $sql = "select configuration_value from " . $dbPrefixVal . "configuration where configuration_key = 'EXCLUDE_ADMIN_IP_FOR_MAINTENANCE'";
+            $sql = 'select configuration_value from ' . $dbPrefixVal . "configuration where configuration_key = 'EXCLUDE_ADMIN_IP_FOR_MAINTENANCE'";
             $result = $db->Execute($sql);
-            if (!str_contains($result->fields['configuration_value'], $checkip)) {
+            if (!str_contains((string) $result->fields['configuration_value'], (string) $checkip)) {
                 $newip = $result->fields['configuration_value'] . ',' . $checkip;
-                $sql = "UPDATE " . $dbPrefixVal . "configuration SET configuration_value = '" . $db->prepare_input($newip) . "'
+                $sql = 'UPDATE ' . $dbPrefixVal . "configuration SET configuration_value = '" . $db->prepare_input($newip) . "'
                         WHERE configuration_key = 'EXCLUDE_ADMIN_IP_FOR_MAINTENANCE'";
                 $db->Execute($sql);
             }
@@ -862,7 +868,7 @@ class systemChecker
      * The check is only validated if the information is available.
      * There are other checks that will fail so don't issue spurious error message
      */
-    public function checkMysqlVersion($parameters): bool
+    public function checkMysqlVersion(array $parameters): bool
     {
         if (!function_exists('mysqli_connect')) {
             // mysqli_connect not available don't fail test
@@ -875,7 +881,7 @@ class systemChecker
         $dbUserVal = $this->getServerConfig()->getDefine('DB_SERVER_USERNAME');
 
         $db = new queryFactory();
-        $result = $db->simpleConnect($dbServerVal, $dbUserVal, $dbPasswordVal, $dbNameVal);
+        $db->simpleConnect($dbServerVal, $dbUserVal, $dbPasswordVal, $dbNameVal);
         if ((int)$db->error_number === 2002) {
             // Cannot connect to database; don't fail check
             $this->log('Error 2002, cannot connect to database; aborting MySQL version check.', __METHOD__, []);
@@ -889,13 +895,13 @@ class systemChecker
         }
 
         $this->log('Found ' . $version, __METHOD__, []);
-        if (strripos($version, '-MariaDB') === false) {
+        if (strripos((string) $version, '-MariaDB') === false) {
             // mysql database check version
             $checkVersion = $parameters['mysqlVersion'];
         } else {
             // mariaDb Check version must remove -MariaDB from the version
             // as version compare treats -... as a lower version than N.N.N
-            $version = substr($version, 0, strripos($version, '-MariaDB'));
+            $version = substr((string) $version, 0, strripos((string) $version, '-MariaDB'));
             $checkVersion = $parameters['mariaDBVersion'];
         }
         return version_compare($version, $checkVersion, '>=');

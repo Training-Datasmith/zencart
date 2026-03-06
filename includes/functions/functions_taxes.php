@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * functions_taxes
  *
@@ -34,7 +36,7 @@ function zen_get_tax_rate($class_id, $country_id = -1, $zone_id = -1)
         [
             'class_id' => $class_id,
             'country_id' => $country_id,
-            'zone_id' => $zone_id
+            'zone_id' => $zone_id,
         ],
         $tax_rate
     );
@@ -53,21 +55,23 @@ function zen_get_tax_rate($class_id, $country_id = -1, $zone_id = -1)
     }
 
     if (STORE_PRODUCT_TAX_BASIS == 'Store') {
-        if ($zone_id != STORE_ZONE) return 0;
+        if ($zone_id != STORE_ZONE) {
+            return 0;
+        }
     }
 
-    $tax_query = "SELECT sum(tax_rate) AS tax_rate
-                  FROM " . TABLE_TAX_RATES . " tr
-                  LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za ON (tr.tax_zone_id = za.geo_zone_id)
-                  LEFT JOIN " . TABLE_GEO_ZONES . " tz ON (tz.geo_zone_id = tr.tax_zone_id)
+    $tax_query = 'SELECT sum(tax_rate) AS tax_rate
+                  FROM ' . TABLE_TAX_RATES . ' tr
+                  LEFT JOIN ' . TABLE_ZONES_TO_GEO_ZONES . ' za ON (tr.tax_zone_id = za.geo_zone_id)
+                  LEFT JOIN ' . TABLE_GEO_ZONES . ' tz ON (tz.geo_zone_id = tr.tax_zone_id)
                   WHERE (za.zone_country_id IS null
                         OR za.zone_country_id = 0
-                        OR za.zone_country_id = " . (int)$country_id . ")
+                        OR za.zone_country_id = ' . (int)$country_id . ')
                   AND (za.zone_id IS null
                         OR za.zone_id = 0
-                        OR za.zone_id = " . (int)$zone_id . ")
-                  AND tr.tax_class_id = " . (int)$class_id . "
-                  GROUP BY tr.tax_priority";
+                        OR za.zone_id = ' . (int)$zone_id . ')
+                  AND tr.tax_class_id = ' . (int)$class_id . '
+                  GROUP BY tr.tax_priority';
 
     $tax = $db->Execute($tax_query);
 
@@ -102,7 +106,7 @@ function zen_get_tax_description($class_id, $country_id = -1, $zone_id = -1)
         [
             'class_id' => $class_id,
             'country_id' => $country_id,
-            'zone_id' => $zone_id
+            'zone_id' => $zone_id,
         ],
         $tax_description
     );
@@ -120,19 +124,19 @@ function zen_get_tax_description($class_id, $country_id = -1, $zone_id = -1)
         }
     }
 
-    $tax_query = "SELECT trd.tax_description
-                  FROM " . TABLE_TAX_RATES_DESCRIPTION . " trd
-                  LEFT JOIN " . TABLE_TAX_RATES . " tr ON (trd.tax_rates_id = tr.tax_rates_id)
-                  LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za ON (tr.tax_zone_id = za.geo_zone_id)
-                  LEFT JOIN " . TABLE_GEO_ZONES . " tz ON (tz.geo_zone_id = tr.tax_zone_id)
+    $tax_query = 'SELECT trd.tax_description
+                  FROM ' . TABLE_TAX_RATES_DESCRIPTION . ' trd
+                  LEFT JOIN ' . TABLE_TAX_RATES . ' tr ON (trd.tax_rates_id = tr.tax_rates_id)
+                  LEFT JOIN ' . TABLE_ZONES_TO_GEO_ZONES . ' za ON (tr.tax_zone_id = za.geo_zone_id)
+                  LEFT JOIN ' . TABLE_GEO_ZONES . ' tz ON (tz.geo_zone_id = tr.tax_zone_id)
                   WHERE (za.zone_country_id IS null OR za.zone_country_id = 0
-                        OR za.zone_country_id = " . (int)$country_id . ")
+                        OR za.zone_country_id = ' . (int)$country_id . ')
                   AND (za.zone_id IS null
                         OR za.zone_id = 0
-                        OR za.zone_id = " . (int)$zone_id . ")
-                  AND tr.tax_class_id = " . (int)$class_id . "
-                  AND trd.language_id = " . (int)$_SESSION['languages_id'] . "
-                  ORDER BY tr.tax_priority";
+                        OR za.zone_id = ' . (int)$zone_id . ')
+                  AND tr.tax_class_id = ' . (int)$class_id . '
+                  AND trd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                  ORDER BY tr.tax_priority';
 
     $tax = $db->Execute($tax_query);
 
@@ -141,9 +145,8 @@ function zen_get_tax_description($class_id, $country_id = -1, $zone_id = -1)
         foreach ($tax as $rate) {
             $tax_description .= $rate['tax_description'] . ' + ';
         }
-        $tax_description = substr($tax_description, 0, -3);
 
-        return $tax_description;
+        return substr($tax_description, 0, -3);
     }
 
     return TEXT_UNKNOWN_TAX_RATE;
@@ -171,7 +174,7 @@ function zen_get_multiple_tax_rates($class_id, $country_id = -1, $zone_id = -1, 
             'class_id' => $class_id,
             'country_id' => $country_id,
             'zone_id' => $zone_id,
-            'tax_description' => $tax_description
+            'tax_description' => $tax_description,
         ],
         $rates_array
     );
@@ -196,19 +199,19 @@ function zen_get_multiple_tax_rates($class_id, $country_id = -1, $zone_id = -1, 
         }
     }
 
-    $tax_query = "SELECT trd.tax_description, tr.tax_rate, tr.tax_priority
-                  FROM " . TABLE_TAX_RATES_DESCRIPTION . " trd
-                  LEFT JOIN " . TABLE_TAX_RATES . " tr ON (trd.tax_rates_id = tr.tax_rates_id)
-                  LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za ON (tr.tax_zone_id = za.geo_zone_id)
-                  LEFT JOIN " . TABLE_GEO_ZONES . " tz ON (tz.geo_zone_id = tr.tax_zone_id)
+    $tax_query = 'SELECT trd.tax_description, tr.tax_rate, tr.tax_priority
+                  FROM ' . TABLE_TAX_RATES_DESCRIPTION . ' trd
+                  LEFT JOIN ' . TABLE_TAX_RATES . ' tr ON (trd.tax_rates_id = tr.tax_rates_id)
+                  LEFT JOIN ' . TABLE_ZONES_TO_GEO_ZONES . ' za ON (tr.tax_zone_id = za.geo_zone_id)
+                  LEFT JOIN ' . TABLE_GEO_ZONES . ' tz ON (tz.geo_zone_id = tr.tax_zone_id)
                   WHERE (za.zone_country_id IS null OR za.zone_country_id = 0
-                        OR za.zone_country_id = " . (int)$country_id . ")
+                        OR za.zone_country_id = ' . (int)$country_id . ')
                   AND (za.zone_id IS null
                         OR za.zone_id = 0
-                        OR za.zone_id = " . (int)$zone_id . ")
-                  AND tr.tax_class_id = " . (int)$class_id . "
-                  AND trd.language_id = " . (int)$_SESSION['languages_id'] . "
-                  ORDER BY tr.tax_priority";
+                        OR za.zone_id = ' . (int)$zone_id . ')
+                  AND tr.tax_class_id = ' . (int)$class_id . '
+                  AND trd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                  ORDER BY tr.tax_priority';
     $results = $db->Execute($tax_query);
 
     // calculate appropriate tax rate respecting priorities and compounding
@@ -265,10 +268,9 @@ function zen_add_tax($price, $tax_percentage = 0, $force = false)
  * Calculates Tax
  * @param float|int $price
  * @param float|int $tax_percentage
- * @return float|int
  * @since ZC v1.0.3
  */
-function zen_calculate_tax($price, $tax_percentage = 1)
+function zen_calculate_tax($price, $tax_percentage = 1): int|float
 {
     return $price * $tax_percentage / 100;
 }
@@ -285,11 +287,11 @@ function zen_display_tax_value($value, $padding = TAX_DECIMAL_PLACES)
     if (strpos($value, '.')) {
         $loop = true;
         while ($loop) {
-            if (substr($value, -1) == '0') {
+            if (str_ends_with($value, '0')) {
                 $value = substr($value, 0, -1);
             } else {
                 $loop = false;
-                if (substr($value, -1) == '.') {
+                if (str_ends_with($value, '.')) {
                     $value = substr($value, 0, -1);
                 }
             }
@@ -315,22 +317,20 @@ function zen_display_tax_value($value, $padding = TAX_DECIMAL_PLACES)
 
 /**
  * Get tax rate from tax description
- * @param string $tax_desc
- * @return float
  * @since ZC v1.0.3
  */
-function zen_get_tax_rate_from_desc(string $tax_desc)
+function zen_get_tax_rate_from_desc(string $tax_desc): float
 {
     global $db;
     $tax_rate = 0.00;
 
     $tax_descriptions = explode(' + ', $tax_desc);
     foreach ($tax_descriptions as $tax_description) {
-        $sql = "SELECT tax_rate
-                FROM " . TABLE_TAX_RATES . " tr
-                LEFT JOIN " . TABLE_TAX_RATES_DESCRIPTION . " trd ON (trd.tax_rates_id = tr.tax_rates_id)
+        $sql = 'SELECT tax_rate
+                FROM ' . TABLE_TAX_RATES . ' tr
+                LEFT JOIN ' . TABLE_TAX_RATES_DESCRIPTION . ' trd ON (trd.tax_rates_id = tr.tax_rates_id)
                 WHERE tax_description = :taxDescLookup
-                AND trd.language_id = " . (int)$_SESSION['languages_id'];
+                AND trd.language_id = ' . (int)$_SESSION['languages_id'];
         $sql = $db->bindVars($sql, ':taxDescLookup', $tax_description, 'string');
 
         $result = $db->Execute($sql);
@@ -342,7 +342,6 @@ function zen_get_tax_rate_from_desc(string $tax_desc)
 
     return $tax_rate;
 }
-
 
 /**
  * @param int $tax_class_id
@@ -356,11 +355,13 @@ function zen_get_tax_class_title($tax_class_id = 0)
         return TEXT_NONE;
     }
 
-    $sql = "SELECT tax_class_title
-            FROM " . TABLE_TAX_CLASS . "
-            WHERE tax_class_id = " . (int)$tax_class_id;
+    $sql = 'SELECT tax_class_title
+            FROM ' . TABLE_TAX_CLASS . '
+            WHERE tax_class_id = ' . (int)$tax_class_id;
     $result = $db->Execute($sql);
-    if ($result->EOF) return '';
+    if ($result->EOF) {
+        return '';
+    }
     return $result->fields['tax_class_title'];
 }
 
@@ -377,7 +378,7 @@ function zen_get_tax_locations($store_country = -1, $store_zone = -1)
         'ZEN_GET_TAX_LOCATIONS',
         [
             'country' => $store_country,
-            'zone' => $store_zone
+            'zone' => $store_zone,
         ],
         $tax_address
     );
@@ -389,43 +390,43 @@ function zen_get_tax_locations($store_country = -1, $store_zone = -1)
     // PapPal express processing
     // If we're just starting the checkout process via the PPEC button, there's
     // no customer or shipping-address currently defined.  Use the store values for tax calculation.
-    if (!zen_is_logged_in())  {
+    if (!zen_is_logged_in()) {
         $tax_address['zone_id'] = (int)STORE_ZONE;
         $tax_address['country_id'] = (int)STORE_COUNTRY;
         return $tax_address;
     }
     switch (STORE_PRODUCT_TAX_BASIS) {
         case 'Shipping':
-            $tax_address_query = "SELECT ab.entry_country_id, ab.entry_zone_id
-                                  FROM " . TABLE_ADDRESS_BOOK . " ab
-                                  LEFT JOIN " . TABLE_ZONES . " z ON (ab.entry_zone_id = z.zone_id)
-                                  WHERE ab.customers_id = " . (int)$_SESSION['customer_id'] . "
-                                  AND ab.address_book_id = " . (int)$_SESSION['sendto'];
+            $tax_address_query = 'SELECT ab.entry_country_id, ab.entry_zone_id
+                                  FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                                  LEFT JOIN ' . TABLE_ZONES . ' z ON (ab.entry_zone_id = z.zone_id)
+                                  WHERE ab.customers_id = ' . (int)$_SESSION['customer_id'] . '
+                                  AND ab.address_book_id = ' . (int)$_SESSION['sendto'];
             $tax_address_result = $db->Execute($tax_address_query);
             break;
         case 'Billing':
 
-            $tax_address_query = "SELECT ab.entry_country_id, ab.entry_zone_id
-                                  FROM " . TABLE_ADDRESS_BOOK . " ab
-                                  LEFT JOIN " . TABLE_ZONES . " z ON (ab.entry_zone_id = z.zone_id)
-                                  WHERE ab.customers_id = " . (int)$_SESSION['customer_id'] . "
-                                  AND ab.address_book_id = " . (int)$_SESSION['billto'];
+            $tax_address_query = 'SELECT ab.entry_country_id, ab.entry_zone_id
+                                  FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                                  LEFT JOIN ' . TABLE_ZONES . ' z ON (ab.entry_zone_id = z.zone_id)
+                                  WHERE ab.customers_id = ' . (int)$_SESSION['customer_id'] . '
+                                  AND ab.address_book_id = ' . (int)$_SESSION['billto'];
             $tax_address_result = $db->Execute($tax_address_query);
             break;
         case 'Store':
-            $tax_address_query = "SELECT ab.entry_country_id, ab.entry_zone_id
-                                  FROM " . TABLE_ADDRESS_BOOK . " ab
-                                  LEFT JOIN " . TABLE_ZONES . " z ON (ab.entry_zone_id = z.zone_id)
-                                  WHERE ab.customers_id = " . (int)$_SESSION['customer_id'] . "
-                                  AND ab.address_book_id = " . (int)$_SESSION['billto'];
+            $tax_address_query = 'SELECT ab.entry_country_id, ab.entry_zone_id
+                                  FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                                  LEFT JOIN ' . TABLE_ZONES . ' z ON (ab.entry_zone_id = z.zone_id)
+                                  WHERE ab.customers_id = ' . (int)$_SESSION['customer_id'] . '
+                                  AND ab.address_book_id = ' . (int)$_SESSION['billto'];
             $tax_address_result = $db->Execute($tax_address_query);
 
             if ($tax_address_result->fields['entry_zone_id'] !== STORE_ZONE && (!empty($_SESSION['sendto']))) {
-                $tax_address_query = "SELECT ab.entry_country_id, ab.entry_zone_id
-                                      FROM " . TABLE_ADDRESS_BOOK . " ab
-                                      LEFT JOIN " . TABLE_ZONES . " z ON (ab.entry_zone_id = z.zone_id)
-                                      WHERE ab.customers_id = " . (int)$_SESSION['customer_id'] . "
-                                      AND ab.address_book_id = " . (int)$_SESSION['sendto'];
+                $tax_address_query = 'SELECT ab.entry_country_id, ab.entry_zone_id
+                                      FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                                      LEFT JOIN ' . TABLE_ZONES . ' z ON (ab.entry_zone_id = z.zone_id)
+                                      WHERE ab.customers_id = ' . (int)$_SESSION['customer_id'] . '
+                                      AND ab.address_book_id = ' . (int)$_SESSION['sendto'];
                 $tax_address_result = $db->Execute($tax_address_query);
             }
             break;
@@ -451,7 +452,7 @@ function zen_get_all_tax_descriptions($country_id = -1, $zone_id = -1)
         'NOTIFY_ZEN_GET_ALL_TAX_DESCRIPTIONS_OVERRIDE',
         [
             'country_id' => $country_id,
-            'zone_id' => $zone_id
+            'zone_id' => $zone_id,
         ],
         $tax_descriptions
     );
@@ -474,18 +475,18 @@ function zen_get_all_tax_descriptions($country_id = -1, $zone_id = -1)
         }
     }
 
-    $sql = "SELECT trd.tax_description
-            FROM " . TABLE_TAX_RATES_DESCRIPTION . " trd
-            LEFT JOIN " . TABLE_TAX_RATES . " tr ON (trd.tax_rates_id = tr.tax_rates_id)
-            LEFT JOIN " . TABLE_ZONES_TO_GEO_ZONES . " za ON (tr.tax_zone_id = za.geo_zone_id)
-            LEFT JOIN " . TABLE_GEO_ZONES . " tz ON (tz.geo_zone_id = tr.tax_zone_id)
+    $sql = 'SELECT trd.tax_description
+            FROM ' . TABLE_TAX_RATES_DESCRIPTION . ' trd
+            LEFT JOIN ' . TABLE_TAX_RATES . ' tr ON (trd.tax_rates_id = tr.tax_rates_id)
+            LEFT JOIN ' . TABLE_ZONES_TO_GEO_ZONES . ' za ON (tr.tax_zone_id = za.geo_zone_id)
+            LEFT JOIN ' . TABLE_GEO_ZONES . ' tz ON (tz.geo_zone_id = tr.tax_zone_id)
             WHERE (za.zone_country_id IS null
               OR za.zone_country_id = 0
-              OR za.zone_country_id = " . (int)$country_id . ")
+              OR za.zone_country_id = ' . (int)$country_id . ')
             AND (za.zone_id IS null
               OR za.zone_id = 0
-              OR za.zone_id = " . (int)$zone_id . ")
-            AND trd.language_id = " . $_SESSION['languages_id'];
+              OR za.zone_id = ' . (int)$zone_id . ')
+            AND trd.language_id = ' . $_SESSION['languages_id'];
     $results = $db->Execute($sql);
     $taxDescriptions = [];
     foreach ($results as $result) {
@@ -493,7 +494,6 @@ function zen_get_all_tax_descriptions($country_id = -1, $zone_id = -1)
     }
     return $taxDescriptions;
 }
-
 
 // @todo deprecate unless this is needed for different formatting
 /**
@@ -515,10 +515,10 @@ function zen_get_localized_tax_description(int $tax_rates_id, int $language_id =
     if ($language_id === 0) {
         $language_id = $_SESSION['languages_id'];
     }
-    $tax_query = "SELECT tax_description
-                  FROM " . TABLE_TAX_RATES_DESCRIPTION . "
-                  WHERE tax_rates_id = " . $tax_rates_id . "
-                  AND language_id = " . $language_id . ";";
+    $tax_query = 'SELECT tax_description
+                  FROM ' . TABLE_TAX_RATES_DESCRIPTION . '
+                  WHERE tax_rates_id = ' . $tax_rates_id . '
+                  AND language_id = ' . $language_id . ';';
     $tax_desc = $db->Execute($tax_query);
 
     if ($tax_desc->RecordCount() > 0) {

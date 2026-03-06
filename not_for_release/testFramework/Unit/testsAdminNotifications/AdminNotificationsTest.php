@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -23,7 +25,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => null,
             'end-date'      => null,
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         'square2' => [
             'target'        => 'payment',
@@ -32,7 +34,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => null,
             'end-date'      => null,
             'can-forget'    => false,
-            'countries'     => null
+            'countries'     => null,
         ],
         'html1'   => [
             'target'        => 'payment',
@@ -41,7 +43,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => null,
             'end-date'      => null,
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         'square3' => [
             'target'        => 'payment',
@@ -50,7 +52,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => null,
             'end-date'      => null,
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         'square4' => [
             'target'        => 'payment',
@@ -59,7 +61,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => new DateTime(),
             'end-date'      => null,
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         'square5' => [
             'target'        => 'payment',
@@ -68,7 +70,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => (new DateTime())->add(new DateInterval('P1D')),
             'end-date'      => null,
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         'square6' => [
             'target'        => 'payment',
@@ -77,7 +79,7 @@ class AdminNotificationsTest extends zcUnitTestCase
             'start-date'    => null,
             'end-date'      => (new DateTime())->sub(new DateInterval('P1D')),
             'can-forget'    => true,
-            'countries'     => ['USA', 'CAN']
+            'countries'     => ['USA', 'CAN'],
         ],
         ];
 
@@ -90,8 +92,7 @@ class AdminNotificationsTest extends zcUnitTestCase
 
     }
 
-
-    public function testBasicMock()
+    public function testBasicMock(): void
     {
         $r = $this->an->getNotifications('', 1);
         // no store country will be set as we are not mocking it so result will only return
@@ -99,7 +100,7 @@ class AdminNotificationsTest extends zcUnitTestCase
         $this->assertTrue(count($r) == 0);
     }
 
-    public function testWithSimpleLocationNoCountry()
+    public function testWithSimpleLocationNoCountry(): void
     {
         $r = $this->an->getNotifications('payment', 1);
         // no store country will be set as we are not mocking it so result will only return
@@ -107,25 +108,25 @@ class AdminNotificationsTest extends zcUnitTestCase
         $this->assertTrue(count($r) == 1);
     }
 
-    public function testWithSimpleLocationWithCountry()
+    public function testWithSimpleLocationWithCountry(): void
     {
         $this->an->method('getStoreCountryIso3')->willReturn('USA');
-        $this->an->method('getCurrentDate')->willReturn(new DateTime("now"));
+        $this->an->method('getCurrentDate')->willReturn(new DateTime('now'));
         $r = $this->an->getNotifications('payment', 1);
         $this->assertTrue(count($r) == 5);
     }
 
-    public function testWithComplexLocationWithCountry()
+    public function testWithComplexLocationWithCountry(): void
     {
         $this->an->method('getStoreCountryIso3')->willReturn('USA');
-        $this->an->method('getCurrentDate')->willReturn(new DateTime("now"));
+        $this->an->method('getCurrentDate')->willReturn(new DateTime('now'));
 
         $r = $this->an->getNotifications('payment-square', 1);
 
         $this->assertTrue(count($r) == 1);
     }
 
-    public function testWithDateYesterday()
+    public function testWithDateYesterday(): void
     {
         $datetime = (new DateTime())->sub(new DateInterval('P1D'));
         $this->an->method('getStoreCountryIso3')->willReturn('USA');
@@ -134,7 +135,7 @@ class AdminNotificationsTest extends zcUnitTestCase
         $this->assertTrue(count($r) == 6);
     }
 
-    public function testWithDateTomorrow()
+    public function testWithDateTomorrow(): void
     {
         $datetime = (new DateTime())->add(new DateInterval('P1D'));
         $this->an->method('getStoreCountryIso3')->willReturn('USA');

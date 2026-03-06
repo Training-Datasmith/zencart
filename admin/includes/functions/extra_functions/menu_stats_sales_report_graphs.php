@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package admin
  * @copyright Copyright 2003-2018 Zen Cart Development Team
@@ -8,7 +10,7 @@
  */
 
 if (function_exists('zen_register_admin_page')) {
-    if (!zen_page_key_exists ('reportSalesWithGraphs')) {
+    if (!zen_page_key_exists('reportSalesWithGraphs')) {
         zen_register_admin_page('reportSalesWithGraphs', 'BOX_REPORTS_SALES_REPORT_GRAPHS', 'FILENAME_STATS_SALES_REPORT_GRAPHS', '', 'reports', 'Y', 15);
     }
 }

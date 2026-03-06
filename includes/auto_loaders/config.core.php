@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * autoloader array for catalog application_top.php
  *
@@ -185,7 +187,7 @@ $autoLoadConfig[80][] = [
 //- Zencart\Search\Search loaded via psr4Autoload.php
 $autoLoadConfig[80][] = [
     'autoType' => 'classInstantiate',
-    'className' => 'Zencart\Search\Search',
+    'className' => \Zencart\Search\Search::class,
     'objectName' => 'search',
 ];
 /**
@@ -295,8 +297,8 @@ $autoLoadConfig[135][] = [
  *
  */
 $autoLoadConfig[138][] = [
-  'autoType'=>'init_script',
-  'loadFile'=> 'init_coupons.php'
+  'autoType' => 'init_script',
+  'loadFile' => 'init_coupons.php',
 ];
 /**
  * Breakpoint 140.
@@ -364,7 +366,6 @@ $autoLoadConfig[180][] = [
     'autoType' => 'init_script',
     'loadFile' => 'init_header.php',
 ];
-
 
 /**
  * NOTE: Most plugins should be added from point 200 onward.

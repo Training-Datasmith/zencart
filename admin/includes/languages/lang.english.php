@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -7,8 +9,7 @@
 */
 
 @setlocale(LC_TIME, ['en_US', 'en_US.utf8', 'en', 'English_United States.1252']);
-
-$define = [
+return [
     'ADMIN_NAV_DATE_TIME_FORMAT' => '%A %d %b %Y %X (%z)',
     'ARIA_PAGINATION_' => '',
     'ARIA_PAGINATION_CURRENTLY_ON' => ', now on page %s',
@@ -693,4 +694,3 @@ $define = [
     '_OCTOBER' => 'October',
     '_SEPTEMBER' => 'September',
 ];
-return $define;

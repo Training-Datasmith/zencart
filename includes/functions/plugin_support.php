@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * plugin_support.php
  *
@@ -69,10 +71,10 @@ function plugin_version_check_for_updates(mixed $plugin_file_id = 0, string $ver
     }
 
     if (!is_array($data)) {
-        $data = json_decode($data, true);
+        $data = json_decode((string) $data, true);
     }
 
-    if (strcmp($data[0]['latest_plugin_version'], $version_string_to_compare) > 0) {
+    if (strcmp((string) $data[0]['latest_plugin_version'], $version_string_to_compare) > 0) {
         $new_version_available = true;
     }
     // check whether present ZC version is compatible with the latest available plugin version

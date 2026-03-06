@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * configurationValidation.php
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -21,16 +23,15 @@ class configurationValidation extends base
      * input is other than an empty string, it's validated as a collection (possibly single) of email
      * address(es).
      *
-     * @param string $val
      * @return bool
      * @since ZC v1.5.8
      */
-    static public function sanitizeEmailNullOK(string $val)
+    public static function sanitizeEmailNullOK(string $val)
     {
         if ($val === '') {
             return true;
         }
-        return configurationValidation::sanitizeEmail($val, false); 
+        return configurationValidation::sanitizeEmail($val, false);
     }
 
     /**
@@ -47,12 +48,9 @@ class configurationValidation extends base
      *
      * Side-effect: Sets the global $configuration_value variable to contain the sanitized result.
      *
-     * @param string $val
-     * @param bool $single_email_only
-     * @return bool
      * @since ZC v1.5.7
      */
-    static public function sanitizeEmail(string $val, bool $single_email_only = true)
+    public static function sanitizeEmail(string $val, bool $single_email_only = true): bool
     {
         $final_result = '';
         $options = [
@@ -129,7 +127,7 @@ class configurationValidation extends base
      *    val_function = '{"error":"TEXT_BOOLEAN_VALIDATE","id":"FILTER_CALLBACK","options":{"options":["configurationValidation","sanitizeBoolean"]}}'
      * @since ZC v1.5.7
      **/
-    static public function sanitizeBoolean(string $val)
+    public static function sanitizeBoolean(string $val)
     {
         $options = [
             'options' => [

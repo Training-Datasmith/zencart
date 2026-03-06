@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * init_sanitize
  *
@@ -272,7 +274,7 @@ if (!empty($_GET['cID'])) {
     if (is_array($extra_configs_with_special_characters)) {
         $configs_with_special_characters = $configs_with_special_characters + $extra_configs_with_special_characters;
     }
-    $checks = $db->Execute("SELECT configuration_key, val_function FROM " . TABLE_CONFIGURATION . " WHERE configuration_id = " . (int)$cID);
+    $checks = $db->Execute('SELECT configuration_key, val_function FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_id = ' . $cID);
     if (!$checks->EOF) {
         if (!empty($checks->fields['val_function'])) {
             $group = ['configuration_value' => ['sanitizerType' => 'NULL_ACTION', 'method' => 'post']];

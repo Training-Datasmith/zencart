@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -32,7 +34,6 @@ class PasswordHashTest extends zcUnitTestCase
     public function testPasswordHashResult(): void
     {
         $result = password_hash('testpass1', PASSWORD_DEFAULT);
-        $tmp = explode(':', $result);
         $this->assertSame('$', $result[0]);
     }
 
@@ -48,14 +49,10 @@ class PasswordHashTest extends zcUnitTestCase
         $hash = 'c7d6976483032e03d48c1255cc9714838915e58007952f9f5f9c2af6f81f20d7:4972adcbae0c13a8bf77560479341f0beb2fb200ff21c16fc1ade1d467208751';
         $this->assertTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
         $hash = '$2y$10$XP.PqzC8/M.NbVIRVVael.WU8YxBss.qBUIzXtoIuWPbFHYxjGySC';
-        if (version_compare(PHP_VERSION, '8.3.999', '<')) {
-            $this->assertNotTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
-        } else {
-            // PHP 8.4 hashing "cost" default changed, so must test differently
-            $this->assertTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
-            $hash = '$2y$12$nF06GV6Oi6CQ39vtfdkII.jwqxpLnRbsCNpXpQQ0kLuU.rV5Tnl8G';
-            $this->assertNotTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
-        }
+        // PHP 8.4 hashing "cost" default changed, so must test differently
+        $this->assertTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
+        $hash = '$2y$12$nF06GV6Oi6CQ39vtfdkII.jwqxpLnRbsCNpXpQQ0kLuU.rV5Tnl8G';
+        $this->assertNotTrue(password_needs_rehash($hash, PASSWORD_DEFAULT));
     }
 
     public function testDetectPasswordType(): void
@@ -139,11 +136,10 @@ class PasswordHashTest extends zcUnitTestCase
         // @TODO - add an assertion here, instead of just watching for a failure.
     }
 
-
     public function testExtensions(): void
     {
         $this->assertTrue(function_exists('crypt'));
-        $this->assertTrue(defined("CRYPT_BLOWFISH"));
+        $this->assertTrue(defined('CRYPT_BLOWFISH'));
     }
 
     public function testBlowfishCrypt(): void

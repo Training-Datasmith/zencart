@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * featured_categories module - prepares content for display
  *
@@ -18,13 +20,13 @@ $categories_categories_id_list = [];
 $sql = '';
 $display_limit = '';
 
-$sql = "SELECT c.categories_id, c.categories_image, cd.categories_name
-        FROM " . TABLE_CATEGORIES . " c
-        LEFT JOIN " . TABLE_FEATURED_CATEGORIES . " fc ON c.categories_id = fc.categories_id
-        LEFT JOIN " . TABLE_CATEGORIES_DESCRIPTION . " cd ON c.categories_id = cd.categories_id
-        AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
+$sql = 'SELECT c.categories_id, c.categories_image, cd.categories_name
+        FROM ' . TABLE_CATEGORIES . ' c
+        LEFT JOIN ' . TABLE_FEATURED_CATEGORIES . ' fc ON c.categories_id = fc.categories_id
+        LEFT JOIN ' . TABLE_CATEGORIES_DESCRIPTION . ' cd ON c.categories_id = cd.categories_id
+        AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
         WHERE c.categories_status = 1
-        AND fc.status = 1";
+        AND fc.status = 1';
 $featured_categories = $db->ExecuteRandomMulti($sql, MAX_DISPLAY_SEARCH_RESULTS_FEATURED);
 
 $row = 0;
@@ -49,7 +51,7 @@ if ($num_categories_count > 0) {
             'params' => 'class="centerBoxContentsFeaturedCategories centeredContent back"' . ' ' . 'style="width:' . $col_width . '%;"',
             'text' => (($data['categories_image'] === '' && PRODUCTS_IMAGE_NO_IMAGE_STATUS == 0) ? ''
                     : '<a href="' . zen_href_link(FILENAME_DEFAULT, 'cPath=' .  zen_get_generated_category_path_rev($data['categories_id'])) . '">'
-                        . zen_image(DIR_WS_IMAGES . $data['categories_image'] , $data['categories_name'] , IMAGE_PRODUCT_LISTING_WIDTH , IMAGE_PRODUCT_LISTING_HEIGHT)
+                        . zen_image(DIR_WS_IMAGES . $data['categories_image'], $data['categories_name'], IMAGE_PRODUCT_LISTING_WIDTH, IMAGE_PRODUCT_LISTING_HEIGHT)
                     . '</a><br>')
                 . '<a href="' . zen_href_link(FILENAME_DEFAULT, 'cPath=' .  zen_get_generated_category_path_rev($data['categories_id'])) . '">' . $data['categories_name']
                 . '</a><br>',
@@ -70,4 +72,3 @@ if ($num_categories_count > 0) {
     }
     $zc_show_featured = true;
 }
-

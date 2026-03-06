@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'OSH_EMAIL_SEPARATOR' => '------------------------------------------------------',
     'OSH_EMAIL_TEXT_SUBJECT' => 'Order Update',
     'OSH_EMAIL_TEXT_ORDER_NUMBER' => 'Order Number:',
@@ -13,5 +15,3 @@ $define = [
     'OSH_EMAIL_TEXT_STATUS_PLEASE_REPLY' => 'Please reply to this email if you have any questions.' . "\n",
     'SEND_EXTRA_ORDERS_STATUS_ADMIN_EMAILS_TO_SUBJECT' => '[ORDERS STATUS]',
 ];
-
-return $define;

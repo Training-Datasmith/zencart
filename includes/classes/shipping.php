@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * shipping class
  *
@@ -45,7 +47,7 @@ class shipping
     public function __construct($module = null)
     {
         if (defined('MODULE_SHIPPING_INSTALLED') && !empty(MODULE_SHIPPING_INSTALLED)) {
-            $this->modules = explode(';', MODULE_SHIPPING_INSTALLED);
+            $this->modules = explode(';', (string) MODULE_SHIPPING_INSTALLED);
         }
         $this->notify('NOTIFY_SHIPPING_CLASS_GET_INSTALLED_MODULES', $module);
 
@@ -75,7 +77,7 @@ class shipping
 
         $modules_to_quote = [];
 
-        $module_name = (empty($module)) ? '0' : substr($module['id'], 0, strpos($module['id'], '_'));
+        $module_name = (empty($module)) ? '0' : substr((string) $module['id'], 0, strpos((string) $module['id'], '_'));
         if (!empty($module) && in_array($module_name . '.php', $this->modules) && isset($modules_found[$module_name])) {
             $modules_to_quote[] = [
                 'class' => $module_name,
@@ -83,7 +85,7 @@ class shipping
             ];
         } else {
             foreach ($this->modules as $value) {
-                $class = pathinfo($value, PATHINFO_FILENAME);
+                $class = pathinfo((string) $value, PATHINFO_FILENAME);
                 $modules_to_quote[] = [
                     'class' => $class,
                     'file' => $value,
@@ -167,7 +169,7 @@ class shipping
      * DOES NOT TAKE PACKAGE DIMENSIONS INTO ACCOUNT.
      * @since ZC v1.3.8
      */
-    public function calculate_boxes_weight_and_tare()
+    public function calculate_boxes_weight_and_tare(): void
     {
         global $total_weight, $shipping_weight, $shipping_quoted, $shipping_num_boxes;
 
@@ -182,11 +184,11 @@ class shipping
             $shipping_num_boxes = 1;
             $shipping_weight = $total_weight;
 
-            $za_tare_array = preg_split("/[:,]/", str_replace(' ', '', !empty(SHIPPING_BOX_WEIGHT) ? SHIPPING_BOX_WEIGHT : '0:0'));
+            $za_tare_array = preg_split('/[:,]/', str_replace(' ', '', !empty(SHIPPING_BOX_WEIGHT) ? SHIPPING_BOX_WEIGHT : '0:0'));
             $zc_tare_percent = (float)$za_tare_array[0];
             $zc_tare_weight = (float)$za_tare_array[1];
 
-            $za_large_array = preg_split("/[:,]/", str_replace(' ', '', !empty(SHIPPING_BOX_PADDING) ? SHIPPING_BOX_PADDING : '0:0'));
+            $za_large_array = preg_split('/[:,]/', str_replace(' ', '', !empty(SHIPPING_BOX_PADDING) ? SHIPPING_BOX_PADDING : '0:0'));
             $zc_large_percent = (float)$za_large_array[0];
             $zc_large_weight = (float)$za_large_array[1];
 
@@ -194,17 +196,11 @@ class shipping
             // SHIPPING_BOX_PADDING = Large Box % increase
             // SHIPPING_MAX_WEIGHT = Largest package
 
-            switch (true) {
-                // large box add padding
-                case (SHIPPING_MAX_WEIGHT <= $shipping_weight):
-                    $shipping_weight = $shipping_weight + ($shipping_weight * ($zc_large_percent / 100)) + $zc_large_weight;
-                    break;
-
-                default:
-                    // add tare weight < large
-                    $shipping_weight = $shipping_weight + ($shipping_weight * ($zc_tare_percent / 100)) + $zc_tare_weight;
-                    break;
-            }
+            $shipping_weight = match (true) {
+                SHIPPING_MAX_WEIGHT <= $shipping_weight => $shipping_weight + ($shipping_weight * ($zc_large_percent / 100)) + $zc_large_weight,
+                // add tare weight < large
+                default => $shipping_weight + ($shipping_weight * ($zc_tare_percent / 100)) + $zc_tare_weight,
+            };
 
             // total weight with Tare
             $_SESSION['shipping_weight'] = $shipping_weight;
@@ -224,7 +220,6 @@ class shipping
      * @param $module - If specified, limit to re-quoting for the specified module
      * @param $calc_boxes_weight_tare - Do box/tare calculations?
      * @param $insurance_exclusions - Pass rules for excluding from insurance calculations; requires customization.
-     * @return array
      * @since ZC v1.0.3
      */
     public function quote($method = '', $module = '', $calc_boxes_weight_tare = true, $insurance_exclusions = []): array
@@ -244,7 +239,7 @@ class shipping
             $modules_to_quote = [];
 
             foreach ($this->modules as $value) {
-                $class = pathinfo($value, PATHINFO_FILENAME);
+                $class = pathinfo((string) $value, PATHINFO_FILENAME);
                 if (!empty($module)) {
                     if ($module === $class && isset($GLOBALS[$class]) && $GLOBALS[$class]->enabled) {
                         $modules_to_quote[] = $class;
@@ -291,10 +286,13 @@ class shipping
         $rates = [];
         $exclude_storepickup_module = false;
         foreach ($this->modules as $value) {
-            $class = pathinfo($value, PATHINFO_FILENAME);
+            $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (isset($GLOBALS[$class]) && is_object($GLOBALS[$class]) && $GLOBALS[$class]->enabled) {
                 $quotes = $GLOBALS[$class]->quotes ?? null;
-                if (empty($quotes['methods']) || isset($quotes['error'])) {
+                if (empty($quotes['methods'])) {
+                    continue;
+                }
+                if (isset($quotes['error'])) {
                     continue;
                 }
 

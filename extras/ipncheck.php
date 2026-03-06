@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ipncheck.php diagnostic tool
  *
@@ -40,12 +42,12 @@ $postback_array = [];
 
 //build post string
 foreach ($_POST as $key => $value) {
-    $postdata .= $key . "=" . urlencode(stripslashes($value)) . "&";
-    $postback .= $key . "=" . urlencode(stripslashes($value)) . "&";
+    $postdata .= $key . '=' . urlencode(stripslashes((string) $value)) . '&';
+    $postback .= $key . '=' . urlencode(stripslashes((string) $value)) . '&';
     $postback_array[$key] = $value;
 }
-$postback .= "cmd=_notify-validate";
-$postback_array['cmd'] = "_notify-validate";
+$postback .= 'cmd=_notify-validate';
+$postback_array['cmd'] = '_notify-validate';
 if ($postdata === '=&') {
     die('IPN NOTICE :: No POST data to process -- Bad IPN data<br><pre>' . print_r($_POST, true));
 }
@@ -64,14 +66,13 @@ if (isset($_POST['test_ipn']) && $_POST['test_ipn'] == 1) {
     $web = parse_url($scheme . 'www.sandbox.paypal.com/cgi-bin/webscr');
 }
 //Set the port number
-if ($web['scheme'] === "https") {
-    $web['port'] = "443";
-    $web['protocol'] = "ssl://";
+if ($web['scheme'] === 'https') {
+    $web['port'] = '443';
+    $web['protocol'] = 'ssl://';
 } else {
-    $web['port'] = "80";
-    $web['protocol'] = "";
+    $web['port'] = '80';
+    $web['protocol'] = '';
 }
-
 
 $result = '';
 $data = '';
@@ -99,16 +100,13 @@ if ($defaultMethod !== '') {
 }
 echo '<br><br>Script finished.';
 
-
-/************************************/
-
-function doPayPalIPNFsockopenPostback($web, $postback)
+function doPayPalIPNFsockopenPostback(array $web, string $postback): string
 {
     global $info;
-    $header = "POST " . $web['path'] . " HTTP/1.1\r\n";
-    $header .= "Host: " . $web['host'] . "\r\n";
+    $header = 'POST ' . $web['path'] . " HTTP/1.1\r\n";
+    $header .= 'Host: ' . $web['host'] . "\r\n";
     $header .= "Content-type: application/x-www-form-urlencoded\r\n";
-    $header .= "Content-length: " . strlen($postback) . "\r\n";
+    $header .= 'Content-length: ' . strlen($postback) . "\r\n";
     $header .= "Connection: close\r\n\r\n";
     $errnum = 0;
     $errstr = '';
@@ -163,13 +161,13 @@ function doPayPalIPNFsockopenPostback($web, $postback)
     //close fp - we are done with it
     fclose($fp);
     //break up results into a string
-    $status = (str_contains($info, 'VERIFIED')) ? 'VERIFIED' : (str_contains($info, 'SUCCESS') ? 'SUCCESS' : (str_contains($info, 'INVALID') ? 'FSOCKOPEN() RESPONSE RECEIVED - Communications OKAY' : 'FAILED'));
+    $status = (str_contains((string) $info, 'VERIFIED')) ? 'VERIFIED' : (str_contains((string) $info, 'SUCCESS') ? 'SUCCESS' : (str_contains((string) $info, 'INVALID') ? 'FSOCKOPEN() RESPONSE RECEIVED - Communications OKAY' : 'FAILED'));
     echo "\n\n" . '<!-- IPN INFO - Confirmation/Validation response ' . "\n-------------\n" . $header_data . $info . "\n--------------\n -->";
 
     return $status;
 }
 
-function doPayPalIPNCurlPostback($web, $vars, $verboseMode = false, $headerMode = false): bool|string
+function doPayPalIPNCurlPostback(array $web, $vars, $verboseMode = false, $headerMode = false): bool|string
 {
     $status = 'Attempted connection on: ' . $web['scheme'] . '://' . $web['host'] . $web['path'];
     $ch = curl_init($web['scheme'] . '://' . $web['host'] . $web['path']);
@@ -236,4 +234,3 @@ function doPayPalIPNCurlPostback($web, $vars, $verboseMode = false, $headerMode 
 
     return $response;
 }
-

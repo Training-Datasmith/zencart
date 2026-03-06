@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ajaxGetProgressValues.php
  * @copyright Copyright 2003-2024 Zen Cart Development Team

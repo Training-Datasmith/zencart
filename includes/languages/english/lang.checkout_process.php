@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'EMAIL_TEXT_SUBJECT' => 'Order Confirmation',
     'EMAIL_TEXT_HEADER' => 'Order Confirmation',
     'EMAIL_TEXT_FROM' => ' from ',
@@ -16,5 +18,3 @@ $define = [
     'EMAIL_SEPARATOR' => '------------------------------------------------------',
     'EMAIL_ORDER_NUMBER_SUBJECT' => ' No: ',
 ];
-
-return $define;

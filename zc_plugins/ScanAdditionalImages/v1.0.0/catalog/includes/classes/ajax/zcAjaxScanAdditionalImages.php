@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 zen_define_default('DIR_FS_CATALOG_IMAGES', DIR_FS_CATALOG . 'images/');
@@ -94,10 +95,6 @@ class zcAjaxScanAdditionalImages
         ];
     }
 
-    /**
-     * @param queryFactoryResult $products_query
-     * @return array
-     */
     protected function processProducts(queryFactoryResult $products_query): array
     {
         global $db;
@@ -106,20 +103,22 @@ class zcAjaxScanAdditionalImages
         foreach ($products_query as $product) {
             $products_id = (int)$product['products_id'];
             $products_image = $product['products_image'];
-
             // The query should have filtered these out already.
-            if (empty($products_image) || $products_image === PRODUCTS_IMAGE_NO_IMAGE) {
+            if (empty($products_image)) {
+                continue;
+            }
+            if ($products_image === PRODUCTS_IMAGE_NO_IMAGE) {
                 continue;
             }
 
             // Get base filename without extension
-            $image_extension = substr($products_image, strrpos($products_image, '.'));
-            $image_base = basename($products_image, $image_extension);
+            $image_extension = substr((string) $products_image, strrpos((string) $products_image, '.'));
+            $image_base = basename((string) $products_image, $image_extension);
 
             // Detect subdirectory
             $subdir = '';
-            if (strpos($products_image, '/') !== false) {
-                $subdir = substr($products_image, 0, strrpos($products_image, '/') + 1);
+            if (str_contains((string) $products_image, '/')) {
+                $subdir = substr((string) $products_image, 0, strrpos((string) $products_image, '/') + 1);
             }
             $image_dir = DIR_FS_CATALOG_IMAGES . $subdir;
 
@@ -132,7 +131,7 @@ class zcAjaxScanAdditionalImages
             // Scan directory for matching files using glob iterator, which sorts alphabetically (so sort_order is retained)
             $images = zen_get_files_in_directory($image_dir, $image_extension);
             foreach ($images as $file) {
-                $file = preg_replace('/^' . preg_quote($image_dir, '/') . '/i', '', $file);
+                $file = preg_replace('/^' . preg_quote($image_dir, '/') . '/i', '', (string) $file);
                 if (!is_dir($image_dir . $file)) {
                     if (preg_match('/' . preg_quote($image_base, '/') . '/i', $file) === 1 && $file !== $products_image) {
                         $matches[] = $file;
@@ -148,12 +147,12 @@ class zcAjaxScanAdditionalImages
             foreach ($matches as $sort_order => $additional_image) {
                 // Check if already exists
                 $exists_query = $db->Execute(
-                    "SELECT id FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " WHERE products_id = $products_id AND additional_image = '" . zen_db_input($subdir . $additional_image) . "'"
+                    'SELECT id FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " WHERE products_id = $products_id AND additional_image = '" . zen_db_input($subdir . $additional_image) . "'"
                 );
                 if ($exists_query->EOF) {
                     $result = $db->Execute(
-                        "INSERT INTO " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (products_id, additional_image, sort_order)
-                        VALUES ($products_id, '" . zen_db_input($subdir . $additional_image) . "', " . (int)$sort_order . ")"
+                        'INSERT INTO ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (products_id, additional_image, sort_order)
+                        VALUES ($products_id, '" . zen_db_input($subdir . $additional_image) . "', " . $sort_order . ')'
                     );
                     $inserted += mysqli_affected_rows($result->link);
                 }
@@ -167,12 +166,12 @@ class zcAjaxScanAdditionalImages
     protected function buildQuery(int $start_at, int $batch_size, $count_only = false): string
     {
         // Base query to fetch products with images
-        $sql = "SELECT products_id, products_image";
+        $sql = 'SELECT products_id, products_image';
         if ($count_only && $batch_size > 0) {
-            $sql = "SELECT COUNT(*) AS remaining_rows FROM (SELECT 1 ";
+            $sql = 'SELECT COUNT(*) AS remaining_rows FROM (SELECT 1 ';
         }
 
-        $sql .= " FROM " . TABLE_PRODUCTS . "
+        $sql .= ' FROM ' . TABLE_PRODUCTS . "
                 WHERE products_image IS NOT NULL
                 AND products_image != ''
                 AND products_image != '" . zen_db_input(PRODUCTS_IMAGE_NO_IMAGE) . "'";
@@ -181,15 +180,15 @@ class zcAjaxScanAdditionalImages
             return $sql;
         }
 
-        $sql .= " LIMIT " . $batch_size;
+        $sql .= ' LIMIT ' . $batch_size;
 
         // add starting offset (start_at)
         if ($start_at > 1) {
-            $sql .= " OFFSET " . $start_at;
+            $sql .= ' OFFSET ' . $start_at;
         }
 
         if ($count_only) {
-            $sql .= ") AS temporary_count_table";
+            $sql .= ') AS temporary_count_table';
         }
 
         return $sql;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2025 Vinos de Frutas Tropicales
@@ -45,7 +47,7 @@ class products_options_stock_observer extends base
         }
 
         $this->debug = (POSM_ENABLE_DEBUG === 'true');
-        $this->debug_log_file = DIR_FS_LOGS . '/myDEBUG-POSM-' . time() . '-' . mt_rand(1000,999999) . '.log';
+        $this->debug_log_file = DIR_FS_LOGS . '/myDEBUG-POSM-' . time() . '-' . mt_rand(1000, 999999) . '.log';
 
         $this->show_stock_messages = (POSM_SHOW_STOCK_MESSAGES === 'Both' || POSM_SHOW_STOCK_MESSAGES === 'Store Only');
 
@@ -134,7 +136,7 @@ class products_options_stock_observer extends base
     }
     protected function getSearchFromClause(): string
     {
-        return " LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_STOCK . " posm ON posm.products_id = p.products_id";
+        return ' LEFT JOIN ' . TABLE_PRODUCTS_OPTIONS_STOCK . ' posm ON posm.products_id = p.products_id';
     }
 
     protected function notify_build_keyword_search(&$class, string $e, $not_used, array &$fields): void
@@ -189,7 +191,7 @@ class products_options_stock_observer extends base
             'NOTIFY_POSM_ORDER_STOCK_DECREMENT_BEGIN',
             [
                 'product' => $order->products[$i],
-                'stock' => $stock_record
+                'stock' => $stock_record,
             ],
             $bypass_stock_decrement,
             $decrement_options_stock
@@ -205,15 +207,15 @@ class products_options_stock_observer extends base
         //
         if ($bypass_stock_decrement === true) {
             $result = $db->Execute(
-                "SELECT currencies_id
-                   FROM " . TABLE_CURRENCIES . "
+                'SELECT currencies_id
+                   FROM ' . TABLE_CURRENCIES . '
                   WHERE currencies_id = 0
-                  LIMIT 1"
+                  LIMIT 1'
             );
-        // -----
-        // Otherwise, if this is a managed-stock product and no indication that we should
-        // bypass the stock-decrement, continue processing.
-        //
+            // -----
+            // Otherwise, if this is a managed-stock product and no indication that we should
+            // bypass the stock-decrement, continue processing.
+            //
         } elseif ($decrement_options_stock === true && $stock_record !== false) {
             $result->fields['products_quantity'] = $order->products[$i]['qty'] + STOCK_REORDER_LEVEL + 1;
         }
@@ -278,68 +280,68 @@ class products_options_stock_observer extends base
         //
         if ($decrement_stock !== true) {
             $this->debug_message("$eventID: Stock-adjustment bypassed via observer request.");
-        // -----
-        // If the current product does not have its options' stock managed ... simply make sure that the product quantity doesn't go negative.
-        //
+            // -----
+            // If the current product does not have its options' stock managed ... simply make sure that the product quantity doesn't go negative.
+            //
         } elseif ($pos_record === false) {
             $quantity_record = $db->ExecuteNoCache(
-                "SELECT products_quantity
-                   FROM " . TABLE_PRODUCTS . "
-                  WHERE products_id = " . (int)$prid . "
-                  LIMIT 1"
+                'SELECT products_quantity
+                   FROM ' . TABLE_PRODUCTS . '
+                  WHERE products_id = ' . (int)$prid . '
+                  LIMIT 1'
             );
             if ($quantity_record->fields['products_quantity'] < 0) {
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS . "
+                    'UPDATE ' . TABLE_PRODUCTS . '
                         SET products_quantity = 0
-                      WHERE products_id = " . (int)$prid . "
-                      LIMIT 1"
+                      WHERE products_id = ' . (int)$prid . '
+                      LIMIT 1'
                 );
             }
-        // -----
-        // If the current product's option-combination is not being stock-managed or if an observer has requested
-        // that the 'managed stock' quantity-update be bypassed, recalculate the product's overall quantity.
-        //
+            // -----
+            // If the current product's option-combination is not being stock-managed or if an observer has requested
+            // that the 'managed stock' quantity-update be bypassed, recalculate the product's overall quantity.
+            //
         } elseif ($pos_record->EOF || $decrement_managed_stock !== true) {
             $quantity_info = $db->ExecuteNoCache(
-                "SELECT SUM(products_quantity) as quantity
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                  WHERE products_id = " . (int)$prid
+                'SELECT SUM(products_quantity) as quantity
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                  WHERE products_id = ' . (int)$prid
             );
             $products_quantity = $quantity_info->fields['quantity'] ?? 0;
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS . "
+                'UPDATE ' . TABLE_PRODUCTS . "
                     SET products_quantity = $products_quantity
-                  WHERE products_id = " . (int)$prid . "
-                  LIMIT 1"
+                  WHERE products_id = " . (int)$prid . '
+                  LIMIT 1'
             );
-        // -----
-        // Otherwise, the current product's option-combination IS being stock-managed.  Subtract from the option-specific stock -- the overall product's stock has
-        // previously been reduced by the order class' processing.  Check that the overall product's stock value hasn't gone negative and set it back to 0 if it has.
-        //
+            // -----
+            // Otherwise, the current product's option-combination IS being stock-managed.  Subtract from the option-specific stock -- the overall product's stock has
+            // previously been reduced by the order class' processing.  Check that the overall product's stock value hasn't gone negative and set it back to 0 if it has.
+            //
         } else {
             $new_option_quantity = $pos_record->fields['products_quantity'] - $_SESSION['cart']->contents[$prid]['qty'];
             if ($new_option_quantity < 0) {
                 $new_option_quantity = 0;
             }
             $db->Execute(
-                "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                     SET products_quantity = $new_option_quantity
-                  WHERE pos_id = " . $pos_record->fields['pos_id'] . "
-                  LIMIT 1"
+                  WHERE pos_id = " . $pos_record->fields['pos_id'] . '
+                  LIMIT 1'
             );
 
             $quantity_info = $db->ExecuteNoCache(
-                "SELECT SUM(products_quantity) as quantity
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-                  WHERE products_id = " . (int)$prid
+                'SELECT SUM(products_quantity) as quantity
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+                  WHERE products_id = ' . (int)$prid
             );
             if ($quantity_info->fields['quantity'] !== null) {
                 $db->Execute(
-                    "UPDATE " . TABLE_PRODUCTS . "
-                        SET products_quantity = " . $quantity_info->fields['quantity'] . "
-                      WHERE products_id = " . (int)$prid . "
-                      LIMIT 1"
+                    'UPDATE ' . TABLE_PRODUCTS . '
+                        SET products_quantity = ' . $quantity_info->fields['quantity'] . '
+                      WHERE products_id = ' . (int)$prid . '
+                      LIMIT 1'
                 );
             }
 
@@ -441,7 +443,7 @@ class products_options_stock_observer extends base
                 if ($previous_product_id == $notification['products_id']) {
                     unset($notificationsArray[$notification['counter']]);
                 } else {
-                    if (preg_match ('/(.*)\[(.*)\]$/', $notification['products_name'], $matches)) {
+                    if (preg_match('/(.*)\[(.*)\]$/', (string) $notification['products_name'], $matches)) {
                         $notification['products_name'] = $matches[1];
                     }
                     $previous_product_id = $notification['products_id'];
@@ -555,7 +557,7 @@ class products_options_stock_observer extends base
         global $order;
 
         for ($i = 0, $n = count($order->products); $i < $n; $i++) {
-            if (preg_match('/(.*)\[(.*)\]$/', $order->products[$i]['name'], $matches)) {
+            if (preg_match('/(.*)\[(.*)\]$/', (string) $order->products[$i]['name'], $matches)) {
                 $order->products[$i]['name'] = $matches[1];
                 if ($this->show_stock_messages === false) {
                     continue;
@@ -725,8 +727,8 @@ class products_options_stock_observer extends base
         if ($this->enabled === true) {
             if (is_pos_product($pid)) {
                 $check = $db->ExecuteNoCache(
-                    "SELECT pos_id, products_quantity, pos_model, pos_name_id, pos_date
-                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'SELECT pos_id, products_quantity, pos_model, pos_name_id, pos_date
+                       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                       WHERE products_id = $pid
                         AND pos_hash = '" . generate_pos_option_hash($pid, $attributes) . "'
                       LIMIT 1"
@@ -750,7 +752,7 @@ class products_options_stock_observer extends base
     // Return the quantity available for the specified product/attribute combination, taking into account any of the combination that
     // might currently be in the customer's cart.
     //
-    public function get_product_option_quantity($pid, $attributes)
+    public function get_product_option_quantity($pid, $attributes): float|int|false
     {
         global $db;
 
@@ -759,8 +761,8 @@ class products_options_stock_observer extends base
             if (is_pos_product($pid)) {
                 $hash = generate_pos_option_hash($pid, $attributes);
                 $check = $db->ExecuteNoCache(
-                    "SELECT pos_id, products_quantity, pos_model, pos_name_id, pos_date
-                       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'SELECT pos_id, products_quantity, pos_model, pos_name_id, pos_date
+                       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                       WHERE products_id = $pid
                         AND pos_hash = '$hash'
                       LIMIT 1"
@@ -791,10 +793,10 @@ class products_options_stock_observer extends base
         global $db;
 
         $base = $db->Execute(
-            "SELECT products_model
-               FROM " . TABLE_PRODUCTS . "
-              WHERE products_id = " . (int)$pid . "
-              LIMIT 1"
+            'SELECT products_model
+               FROM ' . TABLE_PRODUCTS . '
+              WHERE products_id = ' . (int)$pid . '
+              LIMIT 1'
         );
         $products_model = ($base->EOF) ? '' : $base->fields['products_model'];
         if ($this->enabled) {
@@ -818,25 +820,23 @@ class products_options_stock_observer extends base
             $posm_options = $_SESSION['cart']->contents[$prid]['attributes'];
         }
         if (!(is_pos_product($pid) && is_array($posm_options))) {
-            $check = false;
-        } else {
-            $hash = generate_pos_option_hash($pid, $posm_options);
-            $check = $db->ExecuteNoCache(
-                "SELECT *
-                   FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            return false;
+        }
+        $hash = generate_pos_option_hash($pid, $posm_options);
+        return $db->ExecuteNoCache(
+            'SELECT *
+                   FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                   WHERE products_id = $pid
                     AND pos_hash = '$hash'
                   LIMIT 1"
-            );
-        }
-        return $check;
+        );
     }
 
     // -----
     // Implements a call to either the PHP strlen or mb_strlen function, using mb_strlen
     // if available and the site's current CHARSET is valid.
     //
-    public function stringLen($string)
+    public function stringLen($string): int
     {
         // -----
         // Return the length of the supplied string, using either strlen or mb_strlen, as determined
@@ -876,9 +876,7 @@ class products_options_stock_observer extends base
         if (!isset($this->use_mb)) {
             $this->use_mb = false;
             if (function_exists('mb_encoding_aliases')) {
-                if (@mb_encoding_aliases(CHARSET) !== false) {
-                    $this->use_mb = true;
-                }
+                $this->use_mb = true;
             }
         }
     }

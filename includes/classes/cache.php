@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * cache Class.
  *
@@ -32,26 +34,19 @@ class cache
                 // like adodb
                 if (file_exists(DIR_FS_SQL_CACHE . '/' . $zp_cache_name . '.sql') && (is_null($zf_cachetime) || !$this->sql_cache_is_expired($zf_query, $zf_cachetime))) {
                     return true;
-                } else {
-                    return false;
                 }
-                break;
+                return false;
             case 'database':
-                $sql = "SELECT * FROM " . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
+                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                 $zp_cache_exists = $db->Execute($sql);
                 if (!$zp_cache_exists->EOF && (is_null($zf_cachetime) || !$this->sql_cache_is_expired($zf_query, $zf_cachetime))) {
                     return true;
-                } else {
-                    return false;
                 }
-                break;
-            case 'memory':
                 return false;
-                break;
+            case 'memory':
             case 'none':
             default:
                 return false;
-                break;
         }
     }
 
@@ -67,12 +62,10 @@ class cache
                 $filename = DIR_FS_SQL_CACHE . '/' . $zp_cache_name . '.sql';
                 if (file_exists($filename) && @filemtime($filename) > (time() - $zf_cachetime)) {
                     return false;
-                } else {
-                    return true;
                 }
-                break;
+                return true;
             case 'database':
-                $sql = "SELECT * FROM " . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name ."'";
+                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name ."'";
                 $cache_result = $db->Execute($sql);
                 if (!$cache_result->EOF) {
                     $start_time = $cache_result->fields['cache_entry_created'];
@@ -80,17 +73,12 @@ class cache
                         return true;
                     }
                     return false;
-                } else {
-                    return true;
                 }
-                break;
-            case 'memory':
                 return true;
-                break;
+            case 'memory':
             case 'none':
             default:
                 return true;
-                break;
         }
     }
 
@@ -110,7 +98,7 @@ class cache
                     }
                     break;
                 case 'database':
-                    $sql = "DELETE FROM " . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
+                    $sql = 'DELETE FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                     $db->Execute($sql);
                     break;
                 case 'memory':
@@ -133,13 +121,13 @@ class cache
                 file_put_contents(DIR_FS_SQL_CACHE . '/' . $zp_cache_name . '.sql', serialize($zf_result_array));
                 break;
             case 'database':
-                $sql = "SELECT * FROM " . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
+                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                 $zp_cache_exists = $db->Execute($sql);
                 if (!$zp_cache_exists->EOF) {
                     break;
                 }
                 $result_serialize = $db->prepare_input(base64_encode(serialize($zf_result_array)));
-                $sql = "INSERT IGNORE INTO " . TABLE_DB_CACHE . " (cache_entry_name, cache_data, cache_entry_created) VALUES (:cachename, :cachedata, unix_timestamp() )";
+                $sql = 'INSERT IGNORE INTO ' . TABLE_DB_CACHE . ' (cache_entry_name, cache_data, cache_entry_created) VALUES (:cachename, :cachedata, unix_timestamp() )';
                 $sql = $db->bindVars($sql, ':cachename', $zp_cache_name, 'string');
                 $sql = $db->bindVars($sql, ':cachedata', $result_serialize, 'string');
                 $db->Execute($sql);
@@ -164,23 +152,18 @@ class cache
                 if ($zp_fa === false) {
                     return false;
                 }
-                $zp_result_array = unserialize(implode('', $zp_fa));
-                return $zp_result_array;
-                break;
+                return unserialize(implode('', $zp_fa));
             case 'database':
-                $sql = "SELECT * FROM " . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
+                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                 $zp_cache_result = $db->Execute($sql);
                 if ($zp_cache_result->EOF) {
                     return false;
                 }
-                $zp_result_array = unserialize(base64_decode($zp_cache_result->fields['cache_data']));
-                return $zp_result_array;
-                break;
+                return unserialize(base64_decode((string) $zp_cache_result->fields['cache_data']));
             case 'memory':
             case 'none':
             default:
                 return true;
-                break;
         }
     }
 
@@ -202,7 +185,7 @@ class cache
                 }
                 break;
             case 'database':
-                $sql = "DELETE FROM " . TABLE_DB_CACHE;
+                $sql = 'DELETE FROM ' . TABLE_DB_CACHE;
                 $db->Execute($sql);
                 break;
             case 'memory':
@@ -217,20 +200,11 @@ class cache
      */
     public function cache_generate_cache_name($zf_query): bool|string
     {
-        switch (SQL_CACHE_METHOD) {
-            case 'file':
-                return 'zc_' . hash('md5', $zf_query);
-                break;
-            case 'database':
-                return 'zc_' . hash('md5', $zf_query);
-                break;
-            case 'memory':
-                return 'zc_' . hash('md5', $zf_query);
-                break;
-            case 'none':
-            default:
-                return true;
-                break;
-        }
+        return match (SQL_CACHE_METHOD) {
+            'file' => 'zc_' . hash('md5', (string) $zf_query),
+            'database' => 'zc_' . hash('md5', (string) $zf_query),
+            'memory' => 'zc_' . hash('md5', (string) $zf_query),
+            default => true,
+        };
     }
 }

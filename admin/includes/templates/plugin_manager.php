@@ -21,7 +21,7 @@ use Zencart\PluginSupport\PluginStatus;
                 $firstheader = 0;
                 $skip = 1;
                 foreach ($formatter->getTableData() as $tableData) {
-                    if ($tableData["status"]["original"] === $i) {
+                    if ($tableData['status']['original'] === $i) {
                         $skip = 0;
                         break;
                     }
@@ -33,40 +33,40 @@ use Zencart\PluginSupport\PluginStatus;
                         <tr class="dataTableHeadingRow">
                             <?php
                             $firstheader = 0;
-                            $colnumb = 0;
-                            foreach ($formatter->getTableHeaders() as $colHeader) {
-                                $colwidth = match (true) {
-                                    $colnumb === 0 => '',
-                                    $colnumb <= 1 => ' w-10',
-                                    $colnumb <= 2 => ' w-15',
-                                    $colnumb <= 3 => ' w-20',
-                                    default => ' w-10',
-                                };
-                                ?>
+                    $colnumb = 0;
+                    foreach ($formatter->getTableHeaders() as $colHeader) {
+                        $colwidth = match (true) {
+                            $colnumb === 0 => '',
+                            $colnumb <= 1 => ' w-10',
+                            $colnumb <= 2 => ' w-15',
+                            $colnumb <= 3 => ' w-20',
+                            default => ' w-10',
+                        };
+                        ?>
                                 <th class="<?= $colHeader['headerClass'] . $colwidth ?>">
                                     <?php
-                                    if ($firstheader === 0) {
-                                        $tabletitle = match ($i) {
-                                            PluginStatus::NOT_INSTALLED => TEXT_NOT_INSTALLED,
-                                            PluginStatus::ENABLED => TEXT_INSTALLED_ENABLED,
-                                            PluginStatus::DISABLED => TEXT_INSTALLED_DISABLED,
-                                        };
-                                        echo $tabletitle;
-                                        $firstheader = 1;
-                                    } else {
-                                        echo $colHeader['title'];
-                                    }
-                                    ?></th>
+                            if ($firstheader === 0) {
+                                $tabletitle = match ($i) {
+                                    PluginStatus::NOT_INSTALLED => TEXT_NOT_INSTALLED,
+                                    PluginStatus::ENABLED => TEXT_INSTALLED_ENABLED,
+                                    PluginStatus::DISABLED => TEXT_INSTALLED_DISABLED,
+                                };
+                                echo $tabletitle;
+                                $firstheader = 1;
+                            } else {
+                                echo $colHeader['title'];
+                            }
+                        ?></th>
                                 <?php
                                 $colnumb += 1;
-                            } ?>
+                    } ?>
                             <th class="dataTableHeadingContent w-5 text-right"><?= TABLE_HEADING_ACTION ?></th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php
                         foreach ($formatter->getTableData() as $tableData) {
-                            if ($tableData["status"]["original"] === $i) {
+                            if ($tableData['status']['original'] === $i) {
                                 if ($formatter->isRowSelected($tableData)) { ?>
                                     <tr id="defaultSelected" class="dataTableRowSelected" onclick="document.location.href='<?= $formatter->getSelectedRowLink($tableData) ?>'">
                                     <?php
@@ -96,7 +96,7 @@ use Zencart\PluginSupport\PluginStatus;
                 $box = new box();
                 echo $box->infoBox($tableController->getBoxHeader(), $tableController->getBoxContent());
             }
-            ?>
+?>
         </div>
     </div>
 </div>

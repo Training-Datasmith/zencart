@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -17,12 +19,12 @@ class SelectWhereFilter extends baseFilter implements RequestFilter
     private $default;
     protected $filterDefinition = [];
     protected $options = [];
-    protected $parameters =[];
-    
+    protected $parameters = [];
+
     /**
      * @since ZC v1.5.8
      */
-    public function make(array $filterDefinition) : void
+    public function make(array $filterDefinition): void
     {
         $this->filterDefinition = $filterDefinition;
         $this->default = $filterDefinition['default'] ?? '';
@@ -33,10 +35,9 @@ class SelectWhereFilter extends baseFilter implements RequestFilter
     /**
      * @since ZC v1.5.8
      */
-    public function output() : string
+    public function output(): string
     {
-        $select = $this->makeSelect($this->options, $this->default, $this->parameters);
-        return $select;
+        return $this->makeSelect($this->options, $this->default, $this->parameters);
     }
 
     /**
@@ -50,7 +51,7 @@ class SelectWhereFilter extends baseFilter implements RequestFilter
         }
 
         if (is_array($query)) {
-            return array_values(array_filter($query, function ($row) {
+            return array_values(array_filter($query, function (array $row): bool {
                 $field = $this->filterDefinition['field'];
                 return (string)($row[$field] ?? '') === (string)$this->default;
             }));
@@ -66,7 +67,7 @@ class SelectWhereFilter extends baseFilter implements RequestFilter
     /**
      * @since ZC v1.5.8
      */
-    private function getOptionsForSelect(array $filterDefinition) : array
+    private function getOptionsForSelect(array $filterDefinition): array
     {
         return $filterDefinition['options'];
     }
@@ -74,7 +75,7 @@ class SelectWhereFilter extends baseFilter implements RequestFilter
     /**
      * @since ZC v1.5.8
      */
-    private function setParameters($filterDefinition) : array
+    private function setParameters(array $filterDefinition): array
     {
         $parameters['label'] = $filterDefinition['label'];
         $parameters['name'] = $filterDefinition['selectName'];

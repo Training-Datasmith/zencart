@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Initializes non-database constants that were previously set in language modules,
  * overridable via site-specific /init_includes processing.

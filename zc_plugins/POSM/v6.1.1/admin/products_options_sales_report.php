@@ -71,7 +71,7 @@ if (!isset($_GET['startdate_year'])) {
     $custom_start_ts = mktime(0, 0, 0, (int)$_GET['startdate_month'], (int)$_GET['startdate_day'], (int)$_GET['startdate_year']);
 }
 
-if (!isset ($_GET['enddate_year'])) {
+if (!isset($_GET['enddate_year'])) {
     $custom_end_ts = time();
 } else {
     $custom_end_ts = mktime(23, 59, 59, (int)$_GET['enddate_month'], (int)$_GET['enddate_day'], (int)$_GET['enddate_year']);
@@ -90,11 +90,11 @@ $pID = (int)($_GET['pID'] ?? 0);
 $action = $_GET['action'] ?? '';
 
 $products_list = $db->Execute(
-    "SELECT DISTINCT op.products_id, op.products_name
-       FROM " . TABLE_ORDERS_PRODUCTS . " op
-            INNER JOIN " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " opa
+    'SELECT DISTINCT op.products_id, op.products_name
+       FROM ' . TABLE_ORDERS_PRODUCTS . ' op
+            INNER JOIN ' . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . ' opa
                 ON opa.orders_products_id = op.orders_products_id
-   ORDER BY op.products_name"
+   ORDER BY op.products_name'
 );
 $products_select = [];
 $products_found = [];
@@ -105,17 +105,17 @@ foreach ($products_list as $product) {
         $pID = $product['products_id'];
     }
     if ($pID == $product['products_id']) {
-        $products_name = $products_name ?? $current_name;
+        $products_name ??= $current_name;
     }
     if (count($products_found[$product['products_id']]) === 1) {
         $products_select[] = [
             'id' => $product['products_id'],
-            'text' => trim(pos_extract_stock_type($product['products_name'], true))
+            'text' => trim(pos_extract_stock_type($product['products_name'], true)),
         ];
     }
 }
 unset($products_list);
-$products_name = $products_name ?? '** Unknown **';
+$products_name ??= '** Unknown **';
 
 if ($timeframe_type === 'preset') {
     $pos_report = new PosmSalesReport($pID, $start_ts, $end_ts);
@@ -152,7 +152,7 @@ if ($timeframe_type === 'preset') {
     <h1><?= HEADING_TITLE ?></h1>
     <p><?= TEXT_INSTRUCTIONS ?></p>
 
-    <?= zen_draw_form('report', FILENAME_PRODUCTS_OPTIONS_STOCK_REPORT, 'action=generate', 'get', 'class="form-horizontal"') ?>
+    <?= zen_draw_form('report', FILENAME_PRODUCTS_OPTIONS_STOCK_REPORT, 'action=generate', 'get') ?>
         <?= zen_draw_hidden_field('timeframe_type', $timeframe_type, 'id="timeframe_type"') ?>
         <div class="table-responsive">
             <table class="table">
@@ -195,7 +195,7 @@ if ($timeframe_type === 'preset') {
 
 <?php
 if ($pos_report->get_order_count() === 0) {
-?>
+    ?>
         <tr>
             <td class="text-center sr-heading"><?= sprintf(NO_PRODUCTS_ORDERED_TIMEFRAME, $products_name, $timeframe) ?></td>
         </tr>
@@ -228,7 +228,7 @@ if ($pos_report->get_order_count() === 0) {
         );
         $products_name .= sprintf($popover_template, $additional_names);
     }
-?>
+    ?>
         <tr>
             <td class="text-center sr-heading" colspan="<?= $option_columns ?>">
                 <?= sprintf(PRODUCTS_ORDERED_TIMEFRAME, $total_quantity, $products_name, $timeframe, $pos_report->get_order_count(), $pos_report->get_product_total_price()) ?>
@@ -238,7 +238,7 @@ if ($pos_report->get_order_count() === 0) {
         <tr class="name-list">
             <td>&nbsp;</td>
 <?php
-    $option_names_found = [];
+        $option_names_found = [];
     foreach ($pos_report->getOptionNames() as $options_id => $option_names) {
         $option_name = array_shift($option_names); //- Grab the first name, removing it from the array.
         if (count($option_names) !== 0) {
@@ -250,20 +250,20 @@ if ($pos_report->get_order_count() === 0) {
             $option_name .= sprintf($popover_template, $additional_names);
         }
         $option_names_found[$options_id] = $option_name;
-?>
+        ?>
             <td><?= $option_name ?></td>
 <?php
     }
-?>
+    ?>
             <td colspan="2">&nbsp;</td>
         </tr>
 
         <tr>
             <td>&nbsp;</td>
 <?php
-    $option_values_names_found = [];
+        $option_values_names_found = [];
     foreach ($pos_report->getOptions() as $options_id => $info) {
-?>
+        ?>
             <td class="align-top"><table class="table table-condensed breakdown">
                 <tr>
                     <th class="text-center"><?= TEXT_QTY ?></th>
@@ -272,19 +272,19 @@ if ($pos_report->get_order_count() === 0) {
                     <th class="text-right"><?= TEXT_PERCENT_PRICE ?></th>
                 </tr>
 <?php
-        foreach ($info['values'] as $options_values_id => $value_info) {
-            $values_names = $value_info['names'];
-            $option_value_name = array_shift($values_names); //- Grab the first name, removing it from the array.
-            if (count($values_names) !== 0) {
-                $additional_names = implode("\n", $values_names);
-                $additional_names = zen_output_string(
-                    nl2br($additional_names, false),
-                    ['"' => '&quot;', "'" => '&#39;', '<br />' => '<br>']
-                );
-                $option_value_name .= sprintf($popover_template, $additional_names);
-            }
-            $option_values_names_found[$options_values_id] = $option_value_name;
-?>
+                foreach ($info['values'] as $options_values_id => $value_info) {
+                    $values_names = $value_info['names'];
+                    $option_value_name = array_shift($values_names); //- Grab the first name, removing it from the array.
+                    if (count($values_names) !== 0) {
+                        $additional_names = implode("\n", $values_names);
+                        $additional_names = zen_output_string(
+                            nl2br($additional_names, false),
+                            ['"' => '&quot;', "'" => '&#39;', '<br />' => '<br>']
+                        );
+                        $option_value_name .= sprintf($popover_template, $additional_names);
+                    }
+                    $option_values_names_found[$options_values_id] = $option_value_name;
+                    ?>
                 <tr>
                     <td class="text-center"><?= $value_info['quantity'] ?></td>
                     <td class="the-name"><?= $option_value_name ?></td>
@@ -296,48 +296,48 @@ if ($pos_report->get_order_count() === 0) {
                     </td>
                 </tr>
 <?php
-        }
-?>
+                }
+        ?>
             </table></td>
 <?php
     }
-?>
+    ?>
             <td colspan="2">&nbsp;</td>
         </tr>
 
         <tr class="name-list">
             <td class="text-center"><?= TEXT_QTY ?></td>
 <?php
-    foreach ($option_names_found as $option_id => $option_name) {
-?>
+        foreach ($option_names_found as $option_name) {
+            ?>
             <td><?= $option_name ?></td>
 <?php
-    }
-?>
+        }
+    ?>
             <td class="text-right"><?= TEXT_PERCENT_QTY ?></td>
             <td class="text-right"><?= TEXT_PERCENT_PRICE ?></td>
         </tr>
 <?php
-    foreach ($pos_report->getOrders() as $order_key => $order_info) {
-?>
+        foreach ($pos_report->getOrders() as $order_info) {
+            ?>
         <tr>
             <td class="text-center"><?= $order_info['quantity'] ?></td>
 <?php
-        foreach ($order_info['options'] as $options_id => $options_values_id) {
-            $current_name = null;
-            foreach ($option_values_names_found as $opt_val_id => $options_values_name) {
-                if ($opt_val_id == $options_values_id) {
-                    $current_name = $options_values_name;
-                    break;
-                }
-            }
-?>
+                    foreach ($order_info['options'] as $options_values_id) {
+                        $current_name = null;
+                        foreach ($option_values_names_found as $opt_val_id => $options_values_name) {
+                            if ($opt_val_id == $options_values_id) {
+                                $current_name = $options_values_name;
+                                break;
+                            }
+                        }
+                        ?>
             <td class="the-name">
                 <?= $current_name ?? '&mdash;' ?>
             </td>
 <?php
-        }
-?>
+                    }
+            ?>
             <td class="text-right">
                 <?= sprintf(TEXT_QUANTITY_PERCENTAGE, $order_info['quantity'] / $total_quantity * 100) ?>
             </td>
@@ -346,7 +346,7 @@ if ($pos_report->get_order_count() === 0) {
             </td>
         </tr>
 <?php
-    }
+        }
 }
 ?>
     </table>

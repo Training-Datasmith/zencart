@@ -28,7 +28,7 @@ if (!isset($lng)) {
     if (!class_exists('language')) {
         include(DIR_FS_CATALOG . DIR_WS_CLASSES . 'language.php');
     }
-    $lng = new language;
+    $lng = new language();
 }
 // Get an array of languages: [1=>'en', 2=>'fr', etc] to match up textarea ID suffix to know which language the editor should use for that field.
 if (method_exists($lng, 'get_language_list')) {
@@ -123,15 +123,15 @@ if (method_exists($lng, 'get_language_list')) {
     <?php
     // import translations needed
     foreach ($langArray as $langCode) {
-        echo "import " . $langCode . "Translation from 'ckeditor5/translations/" . $langCode . ".js';\n";
+        echo 'import ' . $langCode . "Translation from 'ckeditor5/translations/" . $langCode . ".js';\n";
     }
-    ?>
+?>
     const uiLanguages = {
         <?php
-    foreach ($langArray as $langCode) {
-        echo '"' . $langCode . '": ' . $langCode . 'Translation,';
-    }
-    ?>
+foreach ($langArray as $langCode) {
+    echo '"' . $langCode . '": ' . $langCode . 'Translation,';
+}
+?>
     };
 
 

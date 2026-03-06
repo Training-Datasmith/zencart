@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * products_all  header_php.php
  *
@@ -37,7 +39,7 @@ foreach ($define_list as $key => $value) {
         $column_list[] = $key;
     }
 }
-$select_column_list = " pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,";
+$select_column_list = ' pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,';
 $sql_joins = '';
 $and = ' '; // is a space, not an empty string, to prevent clash with fallback category filter
 
@@ -47,7 +49,6 @@ $disp_order_default = PRODUCT_ALL_LIST_SORT_DEFAULT;
 // set the product filters according to selected product type
 $typefilter = $_GET['typefilter'] ?? 'default';
 require(zen_get_index_filters_directory($typefilter . '_filter.php'));
-
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_PRODUCTS_ALL', null);

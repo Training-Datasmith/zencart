@@ -18,7 +18,7 @@
  * require the html_define for the privacy page
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 

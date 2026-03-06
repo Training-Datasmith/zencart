@@ -9,7 +9,7 @@
 
 <?php echo zen_draw_form('ask_a_question', zen_href_link(FILENAME_ASK_A_QUESTION, 'action=send&pID=' . (int)$pid, 'SSL')); ?>
 
-<?php if (CONTACT_US_STORE_NAME_ADDRESS== '1') { ?>
+<?php if (CONTACT_US_STORE_NAME_ADDRESS == '1') { ?>
 <address><?php echo nl2br(STORE_NAME_ADDRESS); ?></address>
 <?php } ?>
 <h1><?php echo $heading_title . $product_details['products_name']; ?></h1>
@@ -17,7 +17,7 @@
 
 <?php
   if (isset($_GET['action']) && ($_GET['action'] == 'success')) {
-?>
+      ?>
 
 <div class="mainContent success"><?php echo TEXT_SUCCESS; ?></div>
 
@@ -25,20 +25,22 @@
 
 <?php
   } else {
-?>
+      ?>
 
 <?php echo '<a href="' . zen_href_link(zen_get_info_page((int)$pid), 'products_id=' . (int)$pid, 'SSL') . '">' . zen_image(DIR_WS_IMAGES . $product_details['products_image'], $product_details['products_name'], IMAGE_PRODUCT_LISTING_WIDTH, IMAGE_PRODUCT_LISTING_HEIGHT) . '</a>'; ?>
 
 <div id="contactUsNoticeContent" class="content">
 <?php
-/**
+      /**
  * require html_define for the contact_us page
  */
-  require($define_page);
-?>
+        require($define_page);
+      ?>
 </div>
 
-<?php if ($messageStack->size('contact') > 0) echo $messageStack->output('contact'); ?>
+<?php if ($messageStack->size('contact') > 0) {
+    echo $messageStack->output('contact');
+} ?>
 
 <fieldset id="contactUsForm">
 <legend><?php echo $form_title; ?></legend>
@@ -47,14 +49,14 @@
 
 <?php
 // show dropdown if set
-    if (!empty(CONTACT_US_LIST)){
-?>
+    if (!empty(CONTACT_US_LIST)) {
+        ?>
 <label class="inputLabel" for="send-to"><?php echo SEND_TO_TEXT; ?></label>
-<?php echo zen_draw_pull_down_menu('send_to',  $send_to_array, 0, 'id="send-to"') . '<span class="alert">' . ENTRY_REQUIRED_SYMBOL . '</span>'; ?>
+<?php echo zen_draw_pull_down_menu('send_to', $send_to_array, 0, 'id="send-to"') . '<span class="alert">' . ENTRY_REQUIRED_SYMBOL . '</span>'; ?>
 <br class="clearBoth">
 <?php
     }
-?>
+      ?>
 
 <label class="inputLabel" for="contactname"><?php echo ENTRY_NAME; ?></label>
 <?php echo zen_draw_input_field('contactname', $name, ' size="40" id="contactname" placeholder="' . ENTRY_REQUIRED_SYMBOL . '" autofocus required'); ?>

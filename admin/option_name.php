@@ -9,8 +9,8 @@ require 'includes/application_top.php';
 
 // verify option names and values
 $chk_option_names = $db->Execute(
-    "SELECT DISTINCT language_id
-       FROM " . TABLE_PRODUCTS_OPTIONS . "
+    'SELECT DISTINCT language_id
+       FROM ' . TABLE_PRODUCTS_OPTIONS . "
       WHERE language_id = '" . (int)$_SESSION['languages_id'] . "'"
 );
 if ($chk_option_names->EOF) {
@@ -29,9 +29,9 @@ if ($action === 'update_sort_order') {
     }
     foreach ($_POST['products_options_sort_order'] as $id => $new_sort_order) {
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS_OPTIONS . "
-                SET products_options_sort_order = " . (int)$_POST['products_options_sort_order'][$id] . "
-              WHERE products_options_id = " . (int)$id . "
+            'UPDATE ' . TABLE_PRODUCTS_OPTIONS . '
+                SET products_options_sort_order = ' . (int)$_POST['products_options_sort_order'][$id] . '
+              WHERE products_options_id = ' . (int)$id . "
                 AND language_id = $lng_id"
         );
     }
@@ -100,7 +100,7 @@ if ($lng_exists === false) {
 <?php
 $using_session_language = ($lng_id === (int)$_SESSION['languages_id']);
 if ($using_session_language === false) {
-?>
+    ?>
                       <th class="dataTableHeadingContent">&nbsp;</th>
                       <th class="dataTableHeadingContent"><?= TEXT_CURRENT_NAME ?></th>
                       <th class="dataTableHeadingContent text-right"><?= TEXT_SORT_ORDER ?></th>
@@ -116,32 +116,32 @@ if ($using_session_language === false) {
                   </thead>
                   <tbody>
 <?php
-$options_types = $db->Execute("SELECT * FROM " . TABLE_PRODUCTS_OPTIONS_TYPES);
+$options_types = $db->Execute('SELECT * FROM ' . TABLE_PRODUCTS_OPTIONS_TYPES);
 $options_types_names = [];
 foreach ($options_types as $options_type) {
-    $options_types_names[$options_type['products_options_types_id']] = ' (' . strtoupper($options_type['products_options_types_name']) . ')';
+    $options_types_names[$options_type['products_options_types_id']] = ' (' . strtoupper((string) $options_type['products_options_types_name']) . ')';
 }
 
 $rows = $db->Execute(
-    "SELECT *
-       FROM " . TABLE_PRODUCTS_OPTIONS . "
+    'SELECT *
+       FROM ' . TABLE_PRODUCTS_OPTIONS . "
       WHERE language_id = $lng_id
       ORDER BY products_options_sort_order, products_options_id"
 );
 foreach ($rows as $row) {
     $option_type = $row['products_options_type'];
     $the_attributes_type = $options_types_names[$option_type] ?? " (UNKNOWN: $option_type)";
-?>
+    ?>
                     <tr>
 <?php
-    if ($using_session_language === false) {
-?>
+        if ($using_session_language === false) {
+            ?>
                       <td class="dataTableContent text-center"><?= zen_get_language_icon($_SESSION['languages_id']) ?></td>
                       <td class="dataTableContent"><?= zen_get_option_name_language($row['products_options_id'], $_SESSION['languages_id']) ?></td>
                       <td class="dataTableContent text-right"><?= zen_get_option_name_language_sort_order($row['products_options_id'], $_SESSION['languages_id']) ?></td>
 <?php
-    }
-?>
+        }
+    ?>
                       <td class="dataTableContent text-center"><?= zen_get_language_icon($lng_id) ?></td>
                       <td class="dataTableContent"><?= $row['products_options_id'] ?></td>
                       <td class="dataTableContent"><?= $the_attributes_type ?></td>

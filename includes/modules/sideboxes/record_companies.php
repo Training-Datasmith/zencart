@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * record_companies sidebox - displays list of record companies for customer to filter products on
  *
@@ -8,16 +10,16 @@
  * @version $Id: piloujp 2025 May 16 Modified in v2.2.0 $
  */
 $record_company = $db->Execute(
-    "SELECT record_company_id, record_company_name
-      FROM " . TABLE_RECORD_COMPANY . "
-      ORDER BY record_company_name"
+    'SELECT record_company_id, record_company_name
+      FROM ' . TABLE_RECORD_COMPANY . '
+      ORDER BY record_company_name'
 );
 
 if (!$record_company->EOF) {
-// Display a list
+    // Display a list
     $record_company_array = [];
     $default_selection = (isset($_GET['record_company_id'])) ? (int)$_GET['record_company_id'] : '';
-    if (!isset($_GET['record_company_id']) || $_GET['record_company_id'] === '' ) {
+    if (!isset($_GET['record_company_id']) || $_GET['record_company_id'] === '') {
         $required = ' required';
         $record_company_array[] = ['id' => '', 'text' => PULL_DOWN_ALL];
     } else {
@@ -27,12 +29,12 @@ if (!$record_company->EOF) {
 
     foreach ($record_company as $next_company) {
         $record_company_name = $next_company['record_company_name'];
-        if (mb_strlen($record_company_name) > (int)MAX_DISPLAY_RECORD_COMPANY_NAME_LEN) {
-            $record_company_name = mb_substr($record_company_name, 0, (int)MAX_DISPLAY_RECORD_COMPANY_NAME_LEN) . '..';
+        if (mb_strlen((string) $record_company_name) > (int)MAX_DISPLAY_RECORD_COMPANY_NAME_LEN) {
+            $record_company_name = mb_substr((string) $record_company_name, 0, (int)MAX_DISPLAY_RECORD_COMPANY_NAME_LEN) . '..';
         }
         $record_company_array[] = [
             'id' => $next_company['record_company_id'],
-            'text' => $record_company_name
+            'text' => $record_company_name,
         ];
     }
     require $template->get_template_dir('tpl_record_company_select.php', DIR_WS_TEMPLATE, $current_page_base, 'sideboxes') . '/tpl_record_company_select.php';

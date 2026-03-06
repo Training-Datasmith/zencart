@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Ask a Question Page (based on Contact Us Page)
  *
@@ -33,13 +35,13 @@ if ($bypass_redirect === false && $call_for_price === false && (!defined($show_i
     zen_redirect(zen_href_link($info_page, 'products_id=' . $pid));
 }
 
-$sql = "SELECT pd.products_name, p.products_image, p.products_model
-        FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+$sql = 'SELECT pd.products_name, p.products_image, p.products_model
+        FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
         WHERE p.products_id = pd.products_id
-        AND p.products_id = " . (int)$pid . "
-        AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+        AND p.products_id = ' . $pid . '
+        AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
         AND p.products_status = 1
-        LIMIT 1";
+        LIMIT 1';
 
 $result = $db->Execute($sql);
 
@@ -65,7 +67,7 @@ if ($call_for_price !== false) {
 }
 $error = false;
 $enquiry = '';
-$antiSpamFieldName = isset($_SESSION['antispam_fieldname']) ? $_SESSION['antispam_fieldname'] : 'should_be_empty';
+$antiSpamFieldName = $_SESSION['antispam_fieldname'] ?? 'should_be_empty';
 $name = '';
 $email_address = '';
 $telephone = '';
@@ -76,7 +78,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
     $telephone = zen_db_prepare_input($_POST['telephone'] ?? '');
     $enquiry = zen_db_prepare_input(strip_tags($_POST['enquiry'] ?? ''));
     $antiSpam = !empty($_POST[$antiSpamFieldName]) ? 'spam' : '';
-    if (!empty($_POST['contactname']) && preg_match('~https?://?~', $_POST['contactname'])) {
+    if (!empty($_POST['contactname']) && preg_match('~https?://?~', (string) $_POST['contactname'])) {
         $antiSpam = 'spam';
     }
 
@@ -84,7 +86,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
 
     $zc_validate_email = zen_validate_email($email_address);
 
-    if ($zc_validate_email && !empty($enquiry) && !empty($name) && $error == FALSE) {
+    if ($zc_validate_email && !empty($enquiry) && !empty($name) && $error == false) {
         // if anti-spam is not triggered, prepare and send email:
         if ($antiSpam != '') {
             $zco_notifier->notify('NOTIFY_SPAM_DETECTED_USING_CONTACT_US', $_POST);
@@ -92,9 +94,9 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
 
             // auto complete when logged in
             if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-                $sql = "SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone
-                        FROM " . TABLE_CUSTOMERS . "
-                        WHERE customers_id = :customersID";
+                $sql = 'SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone
+                        FROM ' . TABLE_CUSTOMERS . '
+                        WHERE customers_id = :customersID';
 
                 $sql = $db->bindVars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
                 $check_customer = $db->Execute($sql);
@@ -107,14 +109,14 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
                 $customer_telephone = NOT_LOGGED_IN_TEXT;
             }
 
-            $zco_notifier->notify('NOTIFY_ASK_A_QUESTION_ACTION', (isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : 0), $customer_email, $customer_name, $email_address, $name, $enquiry, $telephone);
+            $zco_notifier->notify('NOTIFY_ASK_A_QUESTION_ACTION', ($_SESSION['customer_id'] ?? 0), $customer_email, $customer_name, $email_address, $name, $enquiry, $telephone);
 
             // declare variable
             $send_to_array = [];
 
             // use contact us dropdown if defined and if a destination is provided
-            if (CONTACT_US_LIST != '' && isset($_POST['send_to'])){
-                $send_to_array = explode(",", CONTACT_US_LIST);
+            if (CONTACT_US_LIST != '' && isset($_POST['send_to'])) {
+                $send_to_array = explode(',', CONTACT_US_LIST);
 
                 if (isset($send_to_array[$_POST['send_to']])) {
                     preg_match('/\<[^>]+\>/', $send_to_array[$_POST['send_to']], $send_email_array);
@@ -126,9 +128,9 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
 
             // Assign email destination from array
             if (!empty($send_email_array)) {
-                $send_to_email= preg_replace ("/>/", "", $send_email_array[0]);
-                $send_to_email= trim(preg_replace("/</", "", $send_to_email));
-                $send_to_name = trim(preg_replace('/\<[^*]*/', '', $send_to_array[$_POST['send_to']]));
+                $send_to_email = preg_replace('/>/', '', (string) $send_email_array[0]);
+                $send_to_email = trim(preg_replace('/</', '', $send_to_email));
+                $send_to_name = trim((string) preg_replace('/\<[^*]*/', '', $send_to_array[$_POST['send_to']]));
             }
 
             // Prepare extra-info details
@@ -140,22 +142,22 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
                 $text_message .= OFFICE_LOGIN_PHONE . "\t" . $telephone . "\n";
             }
             $text_message .= TEXT_PRODUCT_NAME . "\t" . $product_details['products_name'] . "\n" .
-            zen_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . (int)$pid) .
+            zen_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $pid) .
             "\n";
             $text_message .= "\n" .
             '------------------------------------------------------' . "\n\n" .
-            strip_tags($_POST['enquiry']) .  "\n\n" .
+            strip_tags((string) $_POST['enquiry']) .  "\n\n" .
             '------------------------------------------------------' . "\n\n" .
             $extra_info['TEXT'];
             // Prepare HTML-portion of message
-            $html_msg['EMAIL_MESSAGE_HTML'] = '<b>' . TEXT_PRODUCT_NAME . '</b> <a href="' . zen_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . (int)$pid) . '">' . $product_details['products_name'] . '</a><br>' . strip_tags($_POST['enquiry']);
+            $html_msg['EMAIL_MESSAGE_HTML'] = '<b>' . TEXT_PRODUCT_NAME . '</b> <a href="' . zen_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $pid) . '">' . $product_details['products_name'] . '</a><br>' . strip_tags((string) $_POST['enquiry']);
             $html_msg['CONTACT_US_OFFICE_FROM'] = OFFICE_FROM . ' ' . $name . '<br>' . OFFICE_EMAIL . ' ' . $email_address .
                 (!empty($telephone) ? '<br>' . OFFICE_LOGIN_PHONE . ' ' . $telephone : '');
             $html_msg['EXTRA_INFO'] = $extra_info['HTML'];
             // Send message
-            zen_mail($send_to_name, $send_to_email, $email_subject, $text_message, $name, $email_address, $html_msg,'ask_a_question');
+            zen_mail($send_to_name, $send_to_email, $email_subject, $text_message, $name, $email_address, $html_msg, 'ask_a_question');
         }
-        zen_redirect(zen_href_link(FILENAME_ASK_A_QUESTION, 'action=success&pID=' . (int)$pid, 'SSL'));
+        zen_redirect(zen_href_link(FILENAME_ASK_A_QUESTION, 'action=success&pID=' . $pid, 'SSL'));
     } else {
         $error = true;
         if (empty($name)) {
@@ -170,19 +172,18 @@ if (isset($_GET['action']) && ($_GET['action'] == 'send')) {
     }
 } // end action==send
 
-
 if (ENABLE_SSL == 'true' && $request_type != 'SSL') {
     zen_redirect(zen_href_link(FILENAME_ASK_A_QUESTION, zen_get_all_get_params(), 'SSL'));
 }
 
-$name = $name ?? '';
-$email_address = $email_address ?? '';
+$name ??= '';
+$email_address ??= '';
 
 // default email and name if customer is logged in
 if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-    $sql = "SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone
-            FROM " . TABLE_CUSTOMERS . "
-            WHERE customers_id = :customersID";
+    $sql = 'SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone
+            FROM ' . TABLE_CUSTOMERS . '
+            WHERE customers_id = :customersID';
 
     $sql = $db->bindVars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
     $check_customer = $db->Execute($sql);
@@ -191,10 +192,10 @@ if (zen_is_logged_in() && !zen_in_guest_checkout()) {
     $telephone = zen_sanitize_string($check_customer->fields['customers_telephone']);
 }
 
-$send_to_array = array();
-if (CONTACT_US_LIST !=''){
-    foreach(explode(",", CONTACT_US_LIST) as $k => $v) {
-        $send_to_array[] = array('id' => $k, 'text' => preg_replace('/\<[^*]*/', '', $v));
+$send_to_array = [];
+if (CONTACT_US_LIST != '') {
+    foreach (explode(',', CONTACT_US_LIST) as $k => $v) {
+        $send_to_array[] = ['id' => $k, 'text' => preg_replace('/\<[^*]*/', '', $v)];
     }
 }
 

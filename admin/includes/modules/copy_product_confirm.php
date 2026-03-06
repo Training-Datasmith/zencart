@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -24,12 +26,12 @@ if ($_POST['copy_as'] === 'link') {
         $messageStack->add_session(ERROR_CANNOT_LINK_TO_SAME_CATEGORY, 'error');
     }
 } elseif ($_POST['copy_as'] === 'duplicate') {
-    $product = (new Product((int)$products_id))->withDefaultLanguage();
+    $product = (new Product($products_id))->withDefaultLanguage();
 
     // fix Product copy from if Unit is 0
     if ($product->fields['products_quantity_order_units'] == 0) {
         $sql =
-            "UPDATE " . TABLE_PRODUCTS . "
+            'UPDATE ' . TABLE_PRODUCTS . "
                 SET products_quantity_order_units = 1
               WHERE products_id = $products_id";
         $results = $db->Execute($sql, 1);
@@ -38,7 +40,7 @@ if ($_POST['copy_as'] === 'link') {
     // fix Product copy from if Minimum is 0
     if ($product->fields['products_quantity_order_min'] == 0) {
         $sql =
-            "UPDATE " . TABLE_PRODUCTS . "
+            'UPDATE ' . TABLE_PRODUCTS . "
                 SET products_quantity_order_min = 1
               WHERE products_id = $products_id";
         $results = $db->Execute($sql, 1);
@@ -80,7 +82,7 @@ if ($_POST['copy_as'] === 'link') {
 
     foreach ($product->fields as $key => $value) {
         // only prepare fields that are part of TABLE_PRODUCTS
-        if (!array_key_exists(strtoupper($key), $db_fields)) {
+        if (!array_key_exists(strtoupper((string) $key), $db_fields)) {
             continue;
         }
 
@@ -132,13 +134,13 @@ if ($_POST['copy_as'] === 'link') {
     $dup_products_id = (int)$db->insert_ID();
 
     $descriptions = $db->Execute(
-        "SELECT language_id, products_name, products_description, products_url
-           FROM " . TABLE_PRODUCTS_DESCRIPTION . "
+        'SELECT language_id, products_name, products_description, products_url
+           FROM ' . TABLE_PRODUCTS_DESCRIPTION . "
           WHERE products_id = $products_id"
     );
     $maxlen = zen_field_length(TABLE_PRODUCTS_DESCRIPTION, 'products_name');
     foreach ($descriptions as $description) {
-        $name = TEXT_DUPLICATE_IDENTIFIER . " " . $description['products_name'];
+        $name = TEXT_DUPLICATE_IDENTIFIER . ' ' . $description['products_name'];
         if (mb_strlen($name) > $maxlen) {
             $name = mb_substr($name, 0, $maxlen - 1);
         }
@@ -154,10 +156,10 @@ if ($_POST['copy_as'] === 'link') {
 
     zen_link_product_to_category($dup_products_id, $categories_id);
 
-// FIX HERE
-/////////////////////////////////////////////////////////////////////////////////////////////
+    // FIX HERE
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
-// copy attributes to Duplicate
+    // copy attributes to Duplicate
     if (!empty($_POST['copy_attributes']) && $_POST['copy_attributes'] === 'copy_attributes_yes') {
         if (DOWNLOAD_ENABLED === 'true') {
             $copy_attributes_include_downloads = '1';
@@ -173,17 +175,17 @@ if ($_POST['copy_as'] === 'link') {
         }
     }
 
-// copy meta tags to Duplicate
+    // copy meta tags to Duplicate
     if (!empty($_POST['copy_metatags']) && $_POST['copy_metatags'] === 'copy_metatags_yes') {
         $metatags_status = $db->Execute(
-            "SELECT metatags_title_status, metatags_products_name_status, metatags_model_status, metatags_price_status, metatags_title_tagline_status
-               FROM " . TABLE_PRODUCTS . "
+            'SELECT metatags_title_status, metatags_products_name_status, metatags_model_status, metatags_price_status, metatags_title_tagline_status
+               FROM ' . TABLE_PRODUCTS . "
               WHERE products_id = $products_id",
             1
         );
 
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS . "
+            'UPDATE ' . TABLE_PRODUCTS . "
                 SET metatags_title_status = '" . zen_db_input($metatags_status->fields['metatags_title_status']) . "',
                     metatags_products_name_status = '" . zen_db_input($metatags_status->fields['metatags_products_name_status']) . "',
                     metatags_model_status = '" . zen_db_input($metatags_status->fields['metatags_model_status']) . "',
@@ -194,14 +196,14 @@ if ($_POST['copy_as'] === 'link') {
         );
 
         $metatags_descriptions = $db->Execute(
-            "SELECT language_id, metatags_title, metatags_keywords, metatags_description
-               FROM " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . "
+            'SELECT language_id, metatags_title, metatags_keywords, metatags_description
+               FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . "
               WHERE products_id = $products_id"
         );
 
         foreach ($metatags_descriptions as $next_description) {//one row per language
             $db->Execute(
-                "INSERT INTO " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . "
+                'INSERT INTO ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . "
                     (products_id, language_id, metatags_title, metatags_keywords, metatags_description)
                  VALUES (
                     $dup_products_id, " .
@@ -216,7 +218,7 @@ if ($_POST['copy_as'] === 'link') {
         }
     }
 
-// copy linked categories to Duplicate
+    // copy linked categories to Duplicate
     if (!empty($_POST['copy_linked_categories']) && $_POST['copy_linked_categories'] === 'copy_linked_categories_yes') {
         $categories_from = zen_get_linked_categories_for_product($products_id);
 
@@ -226,14 +228,14 @@ if ($_POST['copy_as'] === 'link') {
         }
     }
 
-// copy specials to Duplicate
+    // copy specials to Duplicate
     if (!empty($_POST['copy_specials']) && $_POST['copy_specials'] === 'copy_specials_yes') {
         if (zen_copy_specials_to_product($products_id, $dup_products_id)) {
             $messageStack->add_session(sprintf(TEXT_COPY_AS_DUPLICATE_SPECIALS, $products_id, $dup_products_id), 'success');
         }
     }
 
-// copy product discounts to Duplicate
+    // copy product discounts to Duplicate
     if (!empty($_POST['copy_discounts']) && $_POST['copy_discounts'] === 'copy_discounts_yes') {
         zen_copy_discounts_to_product($products_id, $dup_products_id);
         $messageStack->add_session(sprintf(TEXT_COPY_AS_DUPLICATE_DISCOUNTS, $products_id, $dup_products_id), 'success');

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * products_quantity_discounts module
  *
@@ -33,11 +35,7 @@ switch (true) {
         $zc_hidden_discounts_on = true;
         $zc_hidden_discounts_text = TEXT_LOGIN_FOR_PRICE_PRICE_SHOWROOM;
         break;
-    case (CUSTOMERS_APPROVAL_AUTHORIZATION !== '0' && !zen_is_logged_in()):
-        // customer must be logged in to browse
-        $zc_hidden_discounts_on = true;
-        $zc_hidden_discounts_text = TEXT_AUTHORIZATION_PENDING_PRICE;
-        break;
+    case CUSTOMERS_APPROVAL_AUTHORIZATION !== '0' && !zen_is_logged_in():
     case (CUSTOMERS_APPROVAL_AUTHORIZATION !== '0' && CUSTOMERS_APPROVAL_AUTHORIZATION !== '3' && $_SESSION['customers_authorization'] > '0'):
         // customer must be logged in to browse
         $zc_hidden_discounts_on = true;
@@ -55,11 +53,11 @@ $products_quantity_order_min = $products_min_query->fields['products_quantity_or
 
 // retrieve the list of discount levels for this product
 $products_discounts_query = $db->Execute(
-    "SELECT *
-       FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . "
-      WHERE products_id = " . (int)$products_id_current . "
+    'SELECT *
+       FROM ' . TABLE_PRODUCTS_DISCOUNT_QUANTITY . '
+      WHERE products_id = ' . (int)$products_id_current . '
         AND discount_qty != 0
-      ORDER BY discount_qty"
+      ORDER BY discount_qty'
 );
 
 $discount_col_cnt = (int)DISCOUNT_QUANTITY_PRICES_COLUMN;
@@ -71,17 +69,11 @@ $display_specials_price = zen_get_products_special_price($products_id_current, f
 // Set the first column's discount price ($show_price) and discount quantity ($show_quantity)
 //
 $show_price = ($display_specials_price === false) ? $display_price : $display_specials_price;
-switch (true) {
-    case ($products_discounts_query->EOF || $products_discounts_query->fields['discount_qty'] <= 2):
-        $show_qty = '1';
-        break;
-    case ($products_quantity_order_min == ($products_discounts_query->fields['discount_qty'] - 1) || $products_quantity_order_min == ($products_discounts_query->fields['discount_qty'])):
-        $show_qty = $products_quantity_order_min;
-        break;
-    default:
-        $show_qty = $products_quantity_order_min . '-' . number_format($products_discounts_query->fields['discount_qty'] - 1);
-        break;
-}
+$show_qty = match (true) {
+    $products_discounts_query->EOF || $products_discounts_query->fields['discount_qty'] <= 2 => '1',
+    $products_quantity_order_min == ($products_discounts_query->fields['discount_qty'] - 1) || $products_quantity_order_min == ($products_discounts_query->fields['discount_qty']) => $products_quantity_order_min,
+    default => $products_quantity_order_min . '-' . number_format($products_discounts_query->fields['discount_qty'] - 1),
+};
 
 $display_price = zen_get_products_base_price($products_id_current);
 $display_specials_price = zen_get_products_special_price($products_id_current, false);
@@ -118,17 +110,17 @@ foreach ($products_discounts_query as $next_discount) {
             $discounted_price = 0;
             break;
 
-        // percentage discount
+            // percentage discount
         case '1':
             $discounted_price = $discount_price_basis - ($discount_price_basis * ($next_discount_price / 100));
             break;
 
-        // actual price
+            // actual price
         case '2':
             $discounted_price = $next_discount_price;
             break;
 
-        // amount offprice
+            // amount offprice
         case '3':
             $discounted_price = $discount_price_basis - $next_discount_price;
             break;

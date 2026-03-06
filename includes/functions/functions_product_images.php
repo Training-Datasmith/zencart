@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Functions related to product images
  *
@@ -6,7 +8,6 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Oct 10 New in v2.2.0 $
  */
-
 
 /**
  * Parse the product image (from product record) into its components
@@ -20,7 +21,6 @@ function zen_get_image_lookup_filename_components(string $products_image, bool $
     $image_info = pathinfo($products_image);
     $products_image_extension = '.' . $image_info['extension'];
     $products_image_base = $image_info['filename'];
-    $name_including_ext = $image_info['basename'];
     $image_directory = $image_info['dirname'];
 
     $products_image_directory = DIR_WS_IMAGES;
@@ -78,11 +78,11 @@ function zen_lookup_additional_images_from_filesystem(string $products_image): a
                 );
 
                 // extension match check
-                if ($current_image_match || str_ends_with($file, $file_extension)) {
+                if (str_ends_with($file, $file_extension)) {
                     // base name match check
-                    if ($current_image_match || preg_match('/' . preg_quote($products_image_base, '/') . '/i', $file) === 1) {
+                    if (preg_match('/' . preg_quote($products_image_base, '/') . '/i', $file) === 1) {
                         // Exclude the main product image itself from the list
-                        if ($current_image_match || $file !== $products_image) {
+                        if ($file !== $products_image) {
                             // Ensure that the match is in the correct directory
                             if ($products_image_base . str_replace($products_image_base, '', $file) === $file) {
                                 //  echo 'I AM A MATCH ' . $file . '<br>';
@@ -102,4 +102,3 @@ function zen_lookup_additional_images_from_filesystem(string $products_image): a
     }
     return ['imgs' => $images_array, 'dir' => $products_image_directory];
 }
-

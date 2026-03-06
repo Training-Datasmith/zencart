@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -23,8 +25,8 @@ $define = [
     'TEXT_INFO_MAX_COUNT' => 'Max Downloads: ',
     'TEXT_INFO_FILENAME_MISSING' => 'Missing filename',
     'TEXT_INFO_FILENAME_GOOD' => 'Valid filename',
-    'TEXT_WARNING_PRODUCT_MISCONFIGURED_SHORT' => 'Downloadable Product is misconfigured', 
-    'TEXT_WARNING_PRODUCT_MISCONFIGURED' => 'Product should not be free shipping or virtual.  See <a href="https://docs.zen-cart.com/user/products/downloadable/#additional-notes-about-downloads-and-shipping-costs">shipping cost documentation</a>.',  
+    'TEXT_WARNING_PRODUCT_MISCONFIGURED_SHORT' => 'Downloadable Product is misconfigured',
+    'TEXT_WARNING_PRODUCT_MISCONFIGURED' => 'Product should not be free shipping or virtual.  See <a href="https://docs.zen-cart.com/user/products/downloadable/#additional-notes-about-downloads-and-shipping-costs">shipping cost documentation</a>.',
 ];
 
 return $define;

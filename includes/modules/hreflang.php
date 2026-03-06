@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * hreflang module
  *
@@ -9,11 +11,11 @@
  * @var notifier $zco_notifier
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 // BOF hreflang for multilingual sites
 if (!isset($lng) || !$lng instanceof language) {
-    $lng = new language;
+    $lng = new language();
 }
 if (method_exists($lng, 'get_language_list')) {
     $languages = $lng->get_language_list();
@@ -37,14 +39,13 @@ if (empty($canonicalLink)) {
     return;
 }
 
-foreach($languages as $key) {
+foreach ($languages as $key) {
     if ($this_is_home_page) {
         $link = zen_href_link(FILENAME_DEFAULT, 'language=' . $key, $request_type, false);
     } else {
-        $link = $canonicalLink . (str_contains($canonicalLink, '?') ? '&amp;' : '?') . 'language=' . $key;
+        $link = $canonicalLink . (str_contains((string) $canonicalLink, '?') ? '&amp;' : '?') . 'language=' . $key;
     }
     echo '<link rel="alternate" hreflang="' . $key . '" href="' . $link . '"/>' . "\n";
 }
 // include x-default
 echo '<link rel="alternate" hreflang="x-default" href="' . $canonicalLink . '"/>' . "\n";
-

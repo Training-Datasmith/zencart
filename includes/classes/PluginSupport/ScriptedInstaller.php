@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -20,7 +22,7 @@ class ScriptedInstaller
     protected string $pluginDir;
     protected string $pluginKey;
     protected string $version;
-    protected ?string $oldVersion; // null if not in upgrade mode
+    protected ?string $oldVersion = null; // null if not in upgrade mode
 
     public function __construct(protected queryFactory $dbConn, protected PluginErrorContainer $errorContainer)
     {
@@ -28,30 +30,26 @@ class ScriptedInstaller
 
     /***** THESE ARE THE 3 METHODS FOR IMPLEMENTATION IN EXTENDED CLASSES *********/
     /***** There is no need to implement any other methods in extended classes ****/
-
     /**
-     * @return bool
      * @since ZC v1.5.7
      */
-    protected function executeInstall()
+    protected function executeInstall(): bool
     {
         return true;
     }
 
     /**
-     * @return bool
      * @since ZC v1.5.7
      */
-    protected function executeUninstall()
+    protected function executeUninstall(): bool
     {
         return true;
     }
 
     /**
-     * @return bool
      * @since ZC v1.5.8
      */
-    protected function executeUpgrade($oldVersion)
+    protected function executeUpgrade($oldVersion): bool
     {
         return true;
     }
@@ -73,8 +71,7 @@ class ScriptedInstaller
      */
     public function doInstall(): ?bool
     {
-        $installed = $this->executeInstall();
-        return $installed;
+        return $this->executeInstall();
     }
 
     /**
@@ -100,7 +97,7 @@ class ScriptedInstaller
     /**
      * @since ZC v1.5.7
      */
-    protected function executeInstallerSql($sql): bool
+    protected function executeInstallerSql(string $sql): bool
     {
         $this->dbConn->dieOnErrors = false;
         $this->dbConn->Execute($sql);

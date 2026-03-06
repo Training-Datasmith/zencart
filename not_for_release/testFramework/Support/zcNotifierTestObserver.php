@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support;
+
 use base;
 
 /**
@@ -9,24 +12,24 @@ use base;
  */
 class zcNotifierTestObserver extends base
 {
-    function __construct()
+    public function __construct()
     {
-        $this->attach($this, array('NOTIFY_TEST_SNAKE_CASE'));
-        $this->attach($this, array('NOTIFY_TEST_CAMEL_CASE'));
-        $this->attach($this, array('NOTIFY_TEST_UPDATE'));
+        $this->attach($this, ['NOTIFY_TEST_SNAKE_CASE']);
+        $this->attach($this, ['NOTIFY_TEST_CAMEL_CASE']);
+        $this->attach($this, ['NOTIFY_TEST_UPDATE']);
     }
 
-    public function notify_test_snake_case(&$class, $eventID, $param1, &$param2)
+    public function notify_test_snake_case(&$class, $eventID, $param1, &$param2): void
     {
         $param2 = 'snake';
     }
 
-    public function updateNotifyTestCamelCase(&$class, $eventID, $param1, &$param2)
+    public function updateNotifyTestCamelCase(&$class, $eventID, $param1, &$param2): void
     {
         $param2 = 'camel';
     }
 
-    public function update(&$class, $eventID, $param1, &$param2)
+    public function update(&$class, $eventID, $param1, &$param2): void
     {
         $param2 = 'update';
     }

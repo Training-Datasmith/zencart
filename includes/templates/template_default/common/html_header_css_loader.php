@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Common Template
  *
@@ -51,7 +53,7 @@ foreach ($sheets_array as $value) {
 /**
  *  custom category handling for a parent and all its children ... works for any c_XX_XX_children.css  where XX_XX is any parent category
  */
-$tmp_cats = explode('_', $cPath);
+$tmp_cats = explode('_', (string) $cPath);
 $value = '';
 foreach ($tmp_cats as $val) {
     $value .= $val;

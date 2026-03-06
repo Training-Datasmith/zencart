@@ -44,7 +44,6 @@ foreach ($widgets as $key => $widget) {
     }
 }
 
-
 ?>
 <!doctype html>
 <html <?php echo HTML_PARAMS; ?>>
@@ -68,35 +67,35 @@ foreach ($widgets as $key => $widget) {
 
     <?php
     $notifications = new AdminNotifications();
-    $availableNotifications = $notifications->getNotifications('index', $_SESSION['admin_id']);
-    require_once(DIR_WS_MODULES . 'notificationsDisplay.php');
-    ?>
+$availableNotifications = $notifications->getNotifications('index', $_SESSION['admin_id']);
+require_once(DIR_WS_MODULES . 'notificationsDisplay.php');
+?>
 
     <div id="colone" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <?php
-    foreach ($widgets as $widget) {
-        if ($widget['column'] === 1 && !empty($widget['visible'])) {
-            include $widget['path'];
-        }
+foreach ($widgets as $widget) {
+    if ($widget['column'] === 1 && !empty($widget['visible'])) {
+        include $widget['path'];
     }
-    ?>
+}
+?>
     </div>
     <div id="coltwo" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <?php
-    foreach ($widgets as $widget) {
-        if ($widget['column'] === 2 && !empty($widget['visible'])) {
-            include $widget['path'];
-        }
+foreach ($widgets as $widget) {
+    if ($widget['column'] === 2 && !empty($widget['visible'])) {
+        include $widget['path'];
     }
-    ?>
+}
+?>
     </div>
     <div id="colthree" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <?php
-    foreach ($widgets as $widget) {
-        if ($widget['column'] === 3 && !empty($widget['visible'])) {
-            include $widget['path'];
-        }
+foreach ($widgets as $widget) {
+    if ($widget['column'] === 3 && !empty($widget['visible'])) {
+        include $widget['path'];
     }
-    ?>
+}
+?>
     </div>
 

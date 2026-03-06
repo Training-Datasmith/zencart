@@ -1,11 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * File Built by %%_INSTALLER_METHOD_%% on %%_DATE_NOW_%%
  */
-
 
 /*************** NOTE: This file is VERY similar to, but DIFFERENT from the "store" version of configure.php. ***********/
 /***************       The 2 files should be kept separate and not used to overwrite each other.              ***********/

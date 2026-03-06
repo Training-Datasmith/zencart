@@ -84,12 +84,9 @@ if (isset($_POST['http_server_catalog'])) {
     $result = new zcConfigureFileWriter($_POST);
 }
 
-
 require DIR_FS_INSTALL . 'includes/classes/class.zcDatabaseInstaller.php';
-if ($isUpgrade === false) {
-    $options = $_POST;
-    $dbInstaller = new zcDatabaseInstaller($options);
-    $result = $dbInstaller->getConnection();
-    $extendedOptions = [];
-    $dbInstaller->doCompletion($options);
-}
+$options = $_POST;
+$dbInstaller = new zcDatabaseInstaller($options);
+$result = $dbInstaller->getConnection();
+$extendedOptions = [];
+$dbInstaller->doCompletion($options);

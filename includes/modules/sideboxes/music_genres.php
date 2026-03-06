@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * music_genres sidebox - displays list of available music genres to filter on
  *
@@ -8,16 +10,16 @@
  * @version $Id: piloujp 2025 May 16 Modified in v2.2.0 $
  */
 $music_genres = $db->Execute(
-    "SELECT music_genre_id, music_genre_name
-       FROM " . TABLE_MUSIC_GENRE . "
-      ORDER BY music_genre_name"
+    'SELECT music_genre_id, music_genre_name
+       FROM ' . TABLE_MUSIC_GENRE . '
+      ORDER BY music_genre_name'
 );
 
 if (!$music_genres->EOF) {
-// Display a list
+    // Display a list
     $music_genres_array = [];
     $default_selection = (isset($_GET['music_genre_id'])) ? (int)$_GET['music_genre_id'] : '';
-    if (!isset($_GET['music_genre_id']) || $_GET['music_genre_id'] === '' ) {
+    if (!isset($_GET['music_genre_id']) || $_GET['music_genre_id'] === '') {
         $required = ' required';
         $music_genres_array[] = ['id' => '', 'text' => PULL_DOWN_ALL];
     } else {
@@ -27,8 +29,8 @@ if (!$music_genres->EOF) {
 
     foreach ($music_genres as $next_genre) {
         $music_genre_name = $next_genre['music_genre_name'];
-        if (mb_strlen($music_genre_name) > (int)MAX_DISPLAY_MUSIC_GENRES_NAME_LEN) {
-            $music_genre_name = mb_substr($music_genre_name, 0, (int)MAX_DISPLAY_MUSIC_GENRES_NAME_LEN) . '..';
+        if (mb_strlen((string) $music_genre_name) > (int)MAX_DISPLAY_MUSIC_GENRES_NAME_LEN) {
+            $music_genre_name = mb_substr((string) $music_genre_name, 0, (int)MAX_DISPLAY_MUSIC_GENRES_NAME_LEN) . '..';
         }
         $music_genres_array[] = [
             'id' => $next_genre['music_genre_id'],

@@ -9,8 +9,8 @@ declare(strict_types=1);
 require 'includes/application_top.php';
 
 $products_query = $db->Execute(
-    "SELECT count(products_id) AS total
-        FROM " . TABLE_PRODUCTS . "
+    'SELECT count(products_id) AS total
+        FROM ' . TABLE_PRODUCTS . "
         WHERE products_image IS NOT NULL AND products_image != ''
         AND products_image != '" . zen_db_input(PRODUCTS_IMAGE_NO_IMAGE) . "'"
 );
@@ -49,7 +49,7 @@ $totalProducts = ($products_query->EOF) ? 0 : (int)$products_query->fields['tota
     </style>
 
     <script title="Total Products With Images">
-        const totalProducts = <?= (int)$totalProducts ?>;
+        const totalProducts = <?= $totalProducts ?>;
     </script>
 </head>
 <body>

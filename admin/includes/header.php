@@ -10,7 +10,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
-  $messageStack->add('STRICT ERROR REPORTING IS ON', 'error');
+    $messageStack->add('STRICT ERROR REPORTING IS ON', 'error');
 }
 /*
  * pull in any necessary JS for the page
@@ -34,17 +34,17 @@ if (empty($action)) {
                 $count++;
                 $languages_array[] = [
                   'id' => $languages[$i]['code'],
-                  'text' => $languages[$i]['name']
+                  'text' => $languages[$i]['name'],
                 ];
                 if ($languages[$i]['directory'] == $_SESSION['language']) {
                     $languages_selected = $languages[$i]['code'];
                 }
             } else {
-                $missing_languages .= ' ' . ucfirst($languages[$i]['directory']) . ' ' . $languages[$i]['name'];
+                $missing_languages .= ' ' . ucfirst((string) $languages[$i]['directory']) . ' ' . $languages[$i]['name'];
             }
         }
 
-// if languages in table do not match valid languages show error message
+        // if languages in table do not match valid languages show error message
         if ($count != count($languages)) {
             $messageStack->add('MISSING LANGUAGE FILES OR DIRECTORIES ...' . $missing_languages, 'caution');
         }
@@ -75,14 +75,14 @@ if ($messageStack->size > 0) {
     <div class="messageStack-header noprint">
         <?php
         echo $messageStack->output();
-        ?>
+    ?>
     </div>
     <?php
 }
 
 // check GV release queue and alert store owner
 if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN == 'true') {
-    $new_gv_queue = $db->Execute("SELECT * FROM " . TABLE_COUPON_GV_QUEUE . " WHERE release_flag='N'");
+    $new_gv_queue = $db->Execute('SELECT * FROM ' . TABLE_COUPON_GV_QUEUE . " WHERE release_flag='N'");
     $new_gv_queue_cnt = 0;
     if ($new_gv_queue->RecordCount() > 0) {
         $new_gv_queue_cnt = $new_gv_queue->RecordCount();
@@ -105,16 +105,18 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
     <div class="clearfix visible-xs-block"></div>
     <div class="col-xs-6 col-sm-3 col-sm-pull-3 noprint adminHeaderAlerts" id="ActivityLogAlert">
         <?php
-        if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename($PHP_SELF) == FILENAME_DEFAULT . '.php'))) {
-        ?>
+        if (isset($_SESSION['reset_admin_activity_log']) && ($_SESSION['reset_admin_activity_log'] == true && (basename((string) $PHP_SELF) == FILENAME_DEFAULT . '.php'))) {
+            ?>
         <a class="btn btn-warning" role="button" href="<?php echo zen_href_link(FILENAME_ADMIN_ACTIVITY); ?>"><?php echo TEXT_BUTTON_RESET_ACTIVITY_LOG;?></a><p class="hidden-xs"><br><?php echo RESET_ADMIN_ACTIVITY_LOG; ?></p>
         <?php
         }
-        ?>
+?>
     </div>
 
     <div class="col-xs-6 col-sm-3 col-sm-pull-3 noprint adminHeaderAlerts" id="gvQueueAlert">
-        <?php if (!empty($new_gv_queue_cnt)) echo $goto_gv . '<br>' . sprintf(TEXT_SHOW_GV_QUEUE, $new_gv_queue_cnt); ?>
+        <?php if (!empty($new_gv_queue_cnt)) {
+            echo $goto_gv . '<br>' . sprintf(TEXT_SHOW_GV_QUEUE, $new_gv_queue_cnt);
+        } ?>
     </div>
 
   </div>
@@ -122,7 +124,7 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 noprint">
         <?php
         if (!$hide_languages) {
-            echo zen_draw_form('languages', basename($PHP_SELF), '', 'get', 'class="form-inline"');
+            echo zen_draw_form('languages', basename((string) $PHP_SELF), '', 'get');
             echo DEFINE_LANGUAGE . '&nbsp;&nbsp;' . (count($languages) > 1 ? zen_draw_pull_down_menu('language', $languages_array, $languages_selected, 'onChange="this.form.submit();"') : '');
             echo zen_hide_session_id();
             echo zen_post_all_get_params(['language']);
@@ -130,67 +132,69 @@ if (defined('MODULE_ORDER_TOTAL_GV_SHOW_QUEUE_IN_ADMIN') && MODULE_ORDER_TOTAL_G
         } else {
             echo '&nbsp;';
         }
-        ?>
+?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
         <?php
-        /** @var zcDate $zcDate */
-        $date = $zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time());
-        echo (function_exists('mb_convert_encoding')) ? mb_convert_encoding($date, 'UTF-8') : $date;
-        echo '&nbsp;[' . $_SERVER['REMOTE_ADDR'] . ']'; // current admin user's IP address
-        echo '<br>';
-        echo gethostname();
-        echo ' - ' . date_default_timezone_get(); //what is the PHP timezone set to?
-        $loc = setlocale(LC_TIME, '0');
-        if ($loc !== FALSE) echo ' - ' . $loc; //what is the locale in use?
-        ?>
+/** @var zcDate $zcDate */
+$date = $zcDate->output(ADMIN_NAV_DATE_TIME_FORMAT, time());
+echo (function_exists('mb_convert_encoding')) ? mb_convert_encoding($date, 'UTF-8') : $date;
+echo '&nbsp;[' . $_SERVER['REMOTE_ADDR'] . ']'; // current admin user's IP address
+echo '<br>';
+echo gethostname();
+echo ' - ' . date_default_timezone_get(); //what is the PHP timezone set to?
+$loc = setlocale(LC_TIME, '0');
+if ($loc !== false) {
+    echo ' - ' . $loc;
+} //what is the locale in use?
+?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 noprint">
         <ul class="nav nav-pills upperMenu">
         <?php
-        $upperMenuArray = [
-            [
-                'a' => zen_href_link(FILENAME_DEFAULT),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_TOP,
-            ],
-            [
-                'a' => zen_catalog_href_link(FILENAME_DEFAULT),
-                'params' => 'class="headerLink" rel="noopener" target="_blank"',
-                'title' => HEADER_TITLE_ONLINE_CATALOG,
-            ],
-            [
-                'a' => 'https://www.zen-cart.com/forum',
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_SUPPORT_SITE,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_SERVER_INFO),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_VERSION,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_ADMIN_ACCOUNT),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_ACCOUNT,
-            ],
-            [
-                'a' => zen_href_link(FILENAME_LOGOFF),
-                'params' => 'class="headerLink"',
-                'title' => HEADER_TITLE_LOGOFF,
-            ],
-        ];
-        $upperMenuOverrideArray = '';
-        $zco_notifier->notify('NOTIFY_ADMIN_HEADER_UPPERMENU', $upperMenuArray, $upperMenuOverrideArray);
-        if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
-            $upperMenuArray = $upperMenuOverrideArray;
-        }
-        foreach ($upperMenuArray as $upperMenu) {
-        ?>
+$upperMenuArray = [
+    [
+        'a' => zen_href_link(FILENAME_DEFAULT),
+        'params' => 'class="headerLink"',
+        'title' => HEADER_TITLE_TOP,
+    ],
+    [
+        'a' => zen_catalog_href_link(FILENAME_DEFAULT),
+        'params' => 'class="headerLink" rel="noopener" target="_blank"',
+        'title' => HEADER_TITLE_ONLINE_CATALOG,
+    ],
+    [
+        'a' => 'https://www.zen-cart.com/forum',
+        'params' => 'class="headerLink"',
+        'title' => HEADER_TITLE_SUPPORT_SITE,
+    ],
+    [
+        'a' => zen_href_link(FILENAME_SERVER_INFO),
+        'params' => 'class="headerLink"',
+        'title' => HEADER_TITLE_VERSION,
+    ],
+    [
+        'a' => zen_href_link(FILENAME_ADMIN_ACCOUNT),
+        'params' => 'class="headerLink"',
+        'title' => HEADER_TITLE_ACCOUNT,
+    ],
+    [
+        'a' => zen_href_link(FILENAME_LOGOFF),
+        'params' => 'class="headerLink"',
+        'title' => HEADER_TITLE_LOGOFF,
+    ],
+];
+$upperMenuOverrideArray = '';
+$zco_notifier->notify('NOTIFY_ADMIN_HEADER_UPPERMENU', $upperMenuArray, $upperMenuOverrideArray);
+if (!empty($upperMenuOverrideArray) && is_array($upperMenuOverrideArray)) {
+    $upperMenuArray = $upperMenuOverrideArray;
+}
+foreach ($upperMenuArray as $upperMenu) {
+    ?>
             <li><a href="<?= $upperMenu['a'] . '" ' . ($upperMenu['params'] ?? 'class="headerLink"') . '>' . $upperMenu['title'] ?></a></li>
             <?php
-                }
-                ?>
+}
+?>
         </ul>
     </div>
   </div>

@@ -1,5 +1,7 @@
 <?php
-/** 
+
+declare(strict_types=1);
+/**
  * File contains just the notifier class
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -15,8 +17,8 @@
  * @since ZC v1.3.0
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
-class notifier extends base {
+class notifier extends base
+{
 }
-?>

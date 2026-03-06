@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Time out page
  *
@@ -12,7 +14,6 @@
 $zco_notifier->notify('NOTIFY_HEADER_START_LOGIN_TIMEOUT');
 
 require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
-
 
 $breadcrumb->add(NAVBAR_TITLE);
 // This should be last line of the script:

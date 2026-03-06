@@ -13,25 +13,25 @@ $maxRows = 15;
 $i = 0;
 $visit_history = [];
 //  Get the visitor history data
-$visits_query = "SELECT startdate, counter, session_counter FROM " . TABLE_COUNTER_HISTORY . " ORDER BY startdate DESC";
-$visits = $db->Execute($visits_query, (int)$maxRows, true, 1800);
+$visits_query = 'SELECT startdate, counter, session_counter FROM ' . TABLE_COUNTER_HISTORY . ' ORDER BY startdate DESC';
+$visits = $db->Execute($visits_query, $maxRows, true, 1800);
 $counterData = '';
 foreach ($visits as $data) {
     // table
     $countdate = $data['startdate'];
-    $visit_date = $zcDate->output(DATE_FORMAT_SHORT, mktime(0, 0, 0, (int)substr($countdate, 4, 2), (int)substr($countdate, -2), (int)substr($countdate, 0, 4)));
+    $visit_date = $zcDate->output(DATE_FORMAT_SHORT, mktime(0, 0, 0, (int)substr((string) $countdate, 4, 2), (int)substr((string) $countdate, -2), (int)substr((string) $countdate, 0, 4)));
     $visit_history[] = ['date' => $visit_date, 'sessions' => $data['session_counter'], 'count' => $data['counter']];
     // graph
     if ($i > 0) {
         $counterData = ',' . $counterData;
     }
-    $date = $zcDate->output('%a %d', mktime(0, 0, 0, (int)substr($data['startdate'], 4, 2), (int)substr($data['startdate'], -2)));
-    $counterData = "['$date'," . $data['session_counter'] . "," . $data['counter'] . "]" . $counterData;
+    $date = $zcDate->output('%a %d', mktime(0, 0, 0, (int)substr((string) $data['startdate'], 4, 2), (int)substr((string) $data['startdate'], -2)));
+    $counterData = "['$date'," . $data['session_counter'] . ',' . $data['counter'] . ']' . $counterData;
     $i++;
 }
 ?>
   <div class="panel panel-default reportBox">
-    <div class="panel-heading header"><?php echo sprintf(TEXT_COUNTER_HISTORY_TITLE, (int)$maxRows); ?></div>
+    <div class="panel-heading header"><?php echo sprintf(TEXT_COUNTER_HISTORY_TITLE, $maxRows); ?></div>
     <?php if (count($visit_history)) { ?>
       <div class="panel-body">
         <div id="trafficgraph"></div>
@@ -44,7 +44,7 @@ foreach ($visits as $data) {
         <?php
         // table
         foreach ($visit_history as $row) {
-          ?>
+            ?>
           <tr>
             <td class="indented"><?php echo $row['date']; ?></td>
             <td class="text-right indented"> <?php echo $row['sessions']; ?> - <?php echo $row['count']; ?></td>

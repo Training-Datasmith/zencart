@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Very simple error logging to file
  *

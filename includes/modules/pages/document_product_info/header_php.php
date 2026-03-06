@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * document_product header_php.php
  *

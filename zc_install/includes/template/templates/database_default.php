@@ -5,7 +5,6 @@
  * @version $Id: DrByte 2024 Aug 11 Modified in v2.1.0-alpha2 $
  */
 
-
 require DIR_FS_INSTALL . DIR_WS_INSTALL_TEMPLATE . 'partials/partial_modal_progress_bar.php';
 require DIR_FS_INSTALL . DIR_WS_INSTALL_TEMPLATE . 'partials/partial_modal_connection_errors.php';
 require DIR_FS_INSTALL . DIR_WS_INSTALL_TEMPLATE . 'partials/partial_modal_install_errors.php';
@@ -22,7 +21,7 @@ require DIR_FS_INSTALL . DIR_WS_INSTALL_TEMPLATE . 'partials/partial_modal_help.
         <?php
         }
     }
-    ?>
+?>
     <fieldset class="border rounded p-3 mt-2">
         <legend><?= TEXT_DATABASE_SETUP_SETTINGS ?></legend>
         <div class="row mb-2">

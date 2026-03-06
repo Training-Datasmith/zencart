@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Contact Us Page
  *
@@ -40,9 +42,9 @@ if (isset($_GET['action']) && ($_GET['action'] === 'send')) {
 
             // auto complete when logged in
             if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-                $sql = "SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone 
-                      FROM " . TABLE_CUSTOMERS . "
-                      WHERE customers_id = :customersID";
+                $sql = 'SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone 
+                      FROM ' . TABLE_CUSTOMERS . '
+                      WHERE customers_id = :customersID';
 
                 $sql = $db->bindVars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
                 $check_customer = $db->Execute($sql);
@@ -61,7 +63,7 @@ if (isset($_GET['action']) && ($_GET['action'] === 'send')) {
             $send_to_array = [];
 
             // use contact us dropdown if defined and if a destination is provided
-            if (CONTACT_US_LIST !== '' && isset($_POST['send_to'])){
+            if (CONTACT_US_LIST !== '' && isset($_POST['send_to'])) {
                 $send_to_array = explode(',', CONTACT_US_LIST);
 
                 if (isset($send_to_array[$_POST['send_to']])) {
@@ -74,9 +76,9 @@ if (isset($_GET['action']) && ($_GET['action'] === 'send')) {
 
             // Assign email destination from array
             if (!empty($send_email_array)) {
-                $send_to_email = preg_replace ("/>/", "", $send_email_array[0]);
-                $send_to_email = trim(preg_replace("/</", "", $send_to_email));
-                $send_to_name  = trim(preg_replace('/\<[^*]*/', '', $send_to_array[$_POST['send_to']]));
+                $send_to_email = preg_replace('/>/', '', (string) $send_email_array[0]);
+                $send_to_email = trim(preg_replace('/</', '', $send_to_email));
+                $send_to_name  = trim((string) preg_replace('/\<[^*]*/', '', $send_to_array[$_POST['send_to']]));
             }
 
             // Prepare extra-info details
@@ -115,19 +117,18 @@ if (isset($_GET['action']) && ($_GET['action'] === 'send')) {
     }
 } // end action==send
 
-
 if (ENABLE_SSL === 'true' && $request_type !== 'SSL') {
     zen_redirect(zen_href_link(FILENAME_CONTACT_US, '', 'SSL'));
 }
 
-$name = $name ?? '';
-$email_address = $email_address ?? '';
+$name ??= '';
+$email_address ??= '';
 
 // default email and name if customer is logged in
 if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-    $sql = "SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone 
-            FROM " . TABLE_CUSTOMERS . "
-            WHERE customers_id = :customersID";
+    $sql = 'SELECT customers_id, customers_firstname, customers_lastname, customers_password, customers_email_address, customers_default_address_id, customers_telephone 
+            FROM ' . TABLE_CUSTOMERS . '
+            WHERE customers_id = :customersID';
 
     $sql = $db->bindVars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
     $check_customer = $db->Execute($sql);
@@ -142,7 +143,7 @@ if (zen_is_logged_in() && !zen_in_guest_checkout()) {
 // Otherwise, it's possible to submit the form without actually selecting a name!
 //
 $send_to_array = [];
-if (CONTACT_US_LIST !== ''){
+if (CONTACT_US_LIST !== '') {
     $send_to_array[] = ['id' => '', 'text' => PLEASE_SELECT];
     foreach (explode(',', CONTACT_US_LIST) as $k => $v) {
         $send_to_array[] = ['id' => (string)$k, 'text' => preg_replace('/\<[^*]*/', '', $v)];

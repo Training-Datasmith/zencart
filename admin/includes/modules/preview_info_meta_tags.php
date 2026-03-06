@@ -6,43 +6,43 @@
  * @version $Id: Scott C Wilson 2022 Oct 16 Modified in v1.5.8a $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 $languages = zen_get_languages();
 
 if (!empty($_POST)) {
-  $pInfo = new objectInfo($_POST);
-  $metatags_title = $_POST['metatags_title'];
-  $metatags_keywords = $_POST['metatags_keywords'];
-  $metatags_description = $_POST['metatags_description'];
+    $pInfo = new objectInfo($_POST);
+    $metatags_title = $_POST['metatags_title'];
+    $metatags_keywords = $_POST['metatags_keywords'];
+    $metatags_description = $_POST['metatags_description'];
 } else {
-  $product = $db->Execute("SELECT pd.products_name, p.products_model,
+    $product = $db->Execute('SELECT pd.products_name, p.products_model,
                                   p.metatags_title_status, p.metatags_products_name_status, p.metatags_model_status,
                                   p.products_id, p.metatags_price_status, p.metatags_title_tagline_status,
                                   mtpd.metatags_title, mtpd.metatags_keywords, mtpd.metatags_description
-                           FROM " . TABLE_PRODUCTS . " p,
-                                " . TABLE_PRODUCTS_DESCRIPTION . " pd,
-                                " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " mtpd
-                           WHERE p.products_id = " . (int)$_GET['pID'] . "
+                           FROM ' . TABLE_PRODUCTS . ' p,
+                                ' . TABLE_PRODUCTS_DESCRIPTION . ' pd,
+                                ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' mtpd
+                           WHERE p.products_id = ' . (int)$_GET['pID'] . '
                            AND p.products_id = pd.products_id
-                           AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
+                           AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
                            AND p.products_id = mtpd.products_id
-                           AND mtpd.language_id = " . (int)$_SESSION['languages_id']);
+                           AND mtpd.language_id = ' . (int)$_SESSION['languages_id']);
 
-  $pInfo = new objectInfo($product->fields);
+    $pInfo = new objectInfo($product->fields);
 }
 
 $form_action = (isset($_GET['pID'])) ? 'update_product_meta_tags' : 'insert_product_meta_tags';
 ?>
 <div class="container-fluid">
     <?php
-    echo zen_draw_form($form_action, FILENAME_PRODUCT, 'cPath=' . $cPath . (isset($_GET['product_type']) ? '&product_type=' . $_GET['product_type'] : '') . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : '') . '&action=' . $form_action . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post', 'enctype="multipart/form-data" class="form-horizontal"');
+    echo zen_draw_form($form_action, FILENAME_PRODUCT, 'cPath=' . $cPath . (isset($_GET['product_type']) ? '&product_type=' . $_GET['product_type'] : '') . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : '') . '&action=' . $form_action . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post');
 
-    for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-      $pInfo->metatags_title = zen_db_prepare_input($metatags_title[$languages[$i]['id']]);
-      $pInfo->metatags_keywords = zen_db_prepare_input($metatags_keywords[$languages[$i]['id']]);
-      $pInfo->metatags_description = zen_db_prepare_input($metatags_description[$languages[$i]['id']]);
-      ?>
+for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+    $pInfo->metatags_title = zen_db_prepare_input($metatags_title[$languages[$i]['id']]);
+    $pInfo->metatags_keywords = zen_db_prepare_input($metatags_keywords[$languages[$i]['id']]);
+    $pInfo->metatags_description = zen_db_prepare_input($metatags_description[$languages[$i]['id']]);
+    ?>
 
     <table class="table table-bordered">
       <tr>
@@ -61,7 +61,7 @@ $form_action = (isset($_GET['pID'])) ? 'update_product_meta_tags' : 'insert_prod
       </tr>
       <tr>
         <td class="main align-top"><?php echo TEXT_META_TAGS_TITLE; ?>&nbsp;</td>
-        <td class="main" colspan="3"><?php echo ($pInfo->metatags_title_status == '1' ? $pInfo->metatags_title : TEXT_META_EXCLUDED); ?></td>
+        <td class="main" colspan="3"><?php echo($pInfo->metatags_title_status == '1' ? $pInfo->metatags_title : TEXT_META_EXCLUDED); ?></td>
       </tr>
       <tr>
         <td class="main align-top"><?php echo TEXT_META_TAGS_KEYWORDS; ?>&nbsp;</td>
@@ -73,25 +73,25 @@ $form_action = (isset($_GET['pID'])) ? 'update_product_meta_tags' : 'insert_prod
       </tr>
     </table>
     <?php
-  }
-  ?>
+}
+?>
   <div class="row text-right">
     <?php
-    /* Re-Post all POST'ed variables */
-    foreach ($_POST as $key => $value) {
+  /* Re-Post all POST'ed variables */
+  foreach ($_POST as $key => $value) {
       if (!is_array($_POST[$key])) {
-        echo zen_draw_hidden_field($key, htmlspecialchars(stripslashes($value), ENT_COMPAT, CHARSET, TRUE));
+          echo zen_draw_hidden_field($key, htmlspecialchars(stripslashes((string) $value), ENT_COMPAT, CHARSET, true));
       }
-    }
+  }
 
-    for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-      echo zen_draw_hidden_field('metatags_title[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes($metatags_title[$languages[$i]['id']]), ENT_COMPAT, CHARSET, TRUE));
-      echo zen_draw_hidden_field('metatags_keywords[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes($metatags_keywords[$languages[$i]['id']]), ENT_COMPAT, CHARSET, TRUE));
-      echo zen_draw_hidden_field('metatags_description[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes($metatags_description[$languages[$i]['id']]), ENT_COMPAT, CHARSET, TRUE));
-    }
+for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+    echo zen_draw_hidden_field('metatags_title[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes((string) $metatags_title[$languages[$i]['id']]), ENT_COMPAT, CHARSET, true));
+    echo zen_draw_hidden_field('metatags_keywords[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes((string) $metatags_keywords[$languages[$i]['id']]), ENT_COMPAT, CHARSET, true));
+    echo zen_draw_hidden_field('metatags_description[' . $languages[$i]['id'] . ']', htmlspecialchars(stripslashes((string) $metatags_description[$languages[$i]['id']]), ENT_COMPAT, CHARSET, true));
+}
 ?>
     <button type="submit" name="edit" value="edit" class="btn btn-default"><?php echo IMAGE_BACK; ?></button>
-    <button type="submit" class="btn btn-primary"><?php echo (isset($_GET['pID']) ? IMAGE_UPDATE : IMAGE_INSERT); ?></button>
+    <button type="submit" class="btn btn-primary"><?php echo(isset($_GET['pID']) ? IMAGE_UPDATE : IMAGE_INSERT); ?></button>
     <a href="<?php echo zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $cPath . (isset($_GET['pID']) ? '&pID=' . $_GET['pID'] : '') . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')); ?>" class="btn btn-default" role="button"><?php echo IMAGE_CANCEL; ?></a>
   </div>
   <?php echo '</form>'; ?>

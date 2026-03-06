@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * LaravelPaginator Class.
  *
@@ -19,14 +21,13 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
 class LaravelPaginator extends \splitPageResults
 {
-
     protected $cmd;
     protected $page_name;
 
     /* class constructor */
-    function __construct($paginatorResults, $letterGroupColumn = '', $letterGroupLength = 0)
+    public function __construct($paginatorResults)
     {
-        $this->cmd = isset($_GET['cmd']) ? $_GET['cmd'] : 'home';
+        $this->cmd = $_GET['cmd'] ?? 'home';
         $this->page_name = $paginatorResults->getPageName();
         $this->current_page_number = $paginatorResults->currentPage();
         $this->number_of_rows_per_page = $paginatorResults->perPage();
@@ -41,7 +42,11 @@ class LaravelPaginator extends \splitPageResults
         for ($i = 1; $i <= $this->num_pages; $i++) {
             $this->pages_array[] = ['id' => $i, 'text' => $i];
         }
-        if ($this->current_page_number > 1) $this->previousPage = $this->current_page_number - 1;
-        if ($this->current_page_number < $this->num_pages) $this->nextPage = $this->current_page_number + 1;
+        if ($this->current_page_number > 1) {
+            $this->previousPage = $this->current_page_number - 1;
+        }
+        if ($this->current_page_number < $this->num_pages) {
+            $this->nextPage = $this->current_page_number + 1;
+        }
     }
 }

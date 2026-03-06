@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ot_shipping order-total module
  *
@@ -24,7 +26,7 @@ class ot_shipping extends base
     public $code;
     /**
      * $description is a soft name for this order total method
-     * @var string 
+     * @var string
      */
     public $description;
     /**
@@ -51,7 +53,7 @@ class ot_shipping extends base
         $this->description = MODULE_ORDER_TOTAL_SHIPPING_DESCRIPTION;
         $this->sort_order = defined('MODULE_ORDER_TOTAL_SHIPPING_SORT_ORDER') ? (int)MODULE_ORDER_TOTAL_SHIPPING_SORT_ORDER : null;
         if (null === $this->sort_order) {
-            return false;
+            return;
         }
         $this->output = [];
     }
@@ -59,30 +61,30 @@ class ot_shipping extends base
     /**
      * @since ZC v1.0.3
      */
-    public function process()
+    public function process(): void
     {
         global $order, $currencies;
- 
+
         $this->output = [];
         unset($_SESSION['shipping_tax_description']);
-        
+
         if (MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING === 'true') {
             $pass = false;
             switch (MODULE_ORDER_TOTAL_SHIPPING_DESTINATION) {
                 case 'national':
                     if ($order->delivery['country_id'] == STORE_COUNTRY) {
-                        $pass = true; 
+                        $pass = true;
                     }
                     break;
-              case 'international':
+                case 'international':
                     if ($order->delivery['country_id'] != STORE_COUNTRY) {
-                        $pass = true; 
+                        $pass = true;
                     }
                     break;
-              case 'both':
-                    $pass = true; 
+                case 'both':
+                    $pass = true;
                     break;
-              default:
+                default:
                     break;
             }
 
@@ -92,7 +94,7 @@ class ot_shipping extends base
                 $order->info['shipping_cost'] = 0;
             }
         }
-        $module = (isset($_SESSION['shipping']['id'])) ? substr($_SESSION['shipping']['id'], 0, strpos($_SESSION['shipping']['id'], '_')) : '';
+        $module = (isset($_SESSION['shipping']['id'])) ? substr((string) $_SESSION['shipping']['id'], 0, strpos((string) $_SESSION['shipping']['id'], '_')) : '';
         if (is_object($order) && !empty($order->info['shipping_method'])) {
             // -----
             // Give an external tax-handler to make modifications to the shipping tax.
@@ -101,10 +103,10 @@ class ot_shipping extends base
             $shipping_tax = 0;
             $shipping_tax_description = '';
             $this->notify(
-                'NOTIFY_OT_SHIPPING_TAX_CALCS', 
-                [], 
-                $external_shipping_tax_handler, 
-                $shipping_tax, 
+                'NOTIFY_OT_SHIPPING_TAX_CALCS',
+                [],
+                $external_shipping_tax_handler,
+                $shipping_tax,
                 $shipping_tax_description
             );
 
@@ -159,7 +161,7 @@ class ot_shipping extends base
             $this->output[] = [
                 'title' => $order->info['shipping_method'] . ':',
                 'text' => $currencies->format($order->info['shipping_cost'], true, $order->info['currency'], $order->info['currency_value']),
-                'value' => $order->info['shipping_cost']
+                'value' => $order->info['shipping_cost'],
             ];
         }
     }
@@ -171,7 +173,7 @@ class ot_shipping extends base
     {
         global $db;
         if (!isset($this->_check)) {
-            $check_query = $db->Execute("SELECT configuration_value FROM " . TABLE_CONFIGURATION . " WHERE configuration_key = 'MODULE_ORDER_TOTAL_SHIPPING_STATUS' LIMIT 1");
+            $check_query = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . " WHERE configuration_key = 'MODULE_ORDER_TOTAL_SHIPPING_STATUS' LIMIT 1");
             $this->_check = $check_query->RecordCount();
         }
         return $this->_check;
@@ -180,36 +182,36 @@ class ot_shipping extends base
     /**
      * @since ZC v1.0.3
      */
-    public function keys()
+    public function keys(): array
     {
         return [
             'MODULE_ORDER_TOTAL_SHIPPING_STATUS',
             'MODULE_ORDER_TOTAL_SHIPPING_SORT_ORDER',
             'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING',
             'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER',
-            'MODULE_ORDER_TOTAL_SHIPPING_DESTINATION'
+            'MODULE_ORDER_TOTAL_SHIPPING_DESTINATION',
         ];
     }
 
     /**
      * @since ZC v1.0.3
      */
-    public function install()
+    public function install(): void
     {
         global $db;
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('This module is installed', 'MODULE_ORDER_TOTAL_SHIPPING_STATUS', 'true', '', 6, 1,'zen_cfg_select_option(array(\'true\'), ', now())");
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) VALUES ('Sort Order', 'MODULE_ORDER_TOTAL_SHIPPING_SORT_ORDER', '200', 'Sort order of display.', 6, 2, now())");
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('Allow Free Shipping', 'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING', 'false', 'Do you want to allow free shipping?', 6, 3, 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) VALUES ('Free Shipping For Orders Over', 'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER', '50', 'Provide free shipping for orders over the set amount.', 6, 4, 'currencies->format', now())");
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('Provide Free Shipping For Orders Made', 'MODULE_ORDER_TOTAL_SHIPPING_DESTINATION', 'national', 'Provide free shipping for orders sent to the set destination.', 6, 5, 'zen_cfg_select_option([\'national\', \'international\', \'both\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('This module is installed', 'MODULE_ORDER_TOTAL_SHIPPING_STATUS', 'true', '', 6, 1,'zen_cfg_select_option(array(\'true\'), ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) VALUES ('Sort Order', 'MODULE_ORDER_TOTAL_SHIPPING_SORT_ORDER', '200', 'Sort order of display.', 6, 2, now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('Allow Free Shipping', 'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING', 'false', 'Do you want to allow free shipping?', 6, 3, 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) VALUES ('Free Shipping For Orders Over', 'MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER', '50', 'Provide free shipping for orders over the set amount.', 6, 4, 'currencies->format', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) VALUES ('Provide Free Shipping For Orders Made', 'MODULE_ORDER_TOTAL_SHIPPING_DESTINATION', 'national', 'Provide free shipping for orders sent to the set destination.', 6, 5, 'zen_cfg_select_option([\'national\', \'international\', \'both\'], ', now())");
     }
 
     /**
      * @since ZC v1.0.3
      */
-    public function remove()
+    public function remove(): void
     {
         global $db;
-        $db->Execute("DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
+        $db->Execute('DELETE FROM ' . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
     }
 }

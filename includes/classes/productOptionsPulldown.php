@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Class productOptionsPulldown 
+ * Class productOptionsPulldown
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -9,64 +11,62 @@
  * @since ZC v1.5.8
  */
 
-    class productOptionsPulldown extends pulldown
+class productOptionsPulldown extends pulldown
+{
+    /**
+     *
+     */
+    public function __construct()
     {
-        /**
-         *
-         */
-        public function __construct()
-        {
-            parent::__construct();
+        parent::__construct();
 
-            $this->sort = " ORDER BY products_options_name";
+        $this->sort = ' ORDER BY products_options_name';
 
-            $this->keyword_search_fields = [
-                'products_options_name',
-            ];
-        }
+        $this->keyword_search_fields = [
+            'products_options_name',
+        ];
+    }
 
-        /**
-         * @return mixed|void
-         * @since ZC v1.5.8
-         */
-        protected function setSQL()
-        {
-            $this->sql = "SELECT products_options_id, products_options_name
-                                    FROM " . TABLE_PRODUCTS_OPTIONS . "
-                                    WHERE language_id = " . $_SESSION['languages_id'];
-        }
+    /**
+     * @return mixed|void
+     * @since ZC v1.5.8
+     */
+    protected function setSQL()
+    {
+        $this->sql = 'SELECT products_options_id, products_options_name
+                                    FROM ' . TABLE_PRODUCTS_OPTIONS . '
+                                    WHERE language_id = ' . $_SESSION['languages_id'];
+    }
 
-        /**
-         * @return mixed|void
-         * @since ZC v1.5.8
-         */
-        protected function processSQL()
-        {
-            $this->setSQL();
-            $this->runSQL();
+    /**
+     * @return mixed|void
+     * @since ZC v1.5.8
+     */
+    protected function processSQL()
+    {
+        $this->setSQL();
+        $this->runSQL();
 
+        $this->values[] = [
+            'id' => '',
+            'text' => PLEASE_SELECT,
+        ];
+
+        foreach ($this->results as $result) {
             $this->values[] = [
-                'id' => '',
-                'text' => PLEASE_SELECT
+                'id' => $result['products_options_id'],
+                'text' => $this->optionText($result),
             ];
-
-            foreach ($this->results as $result) {
-                $this->values[] = [
-                    'id' => $result['products_options_id'],
-                    'text' => $this->optionText($result),
-                ];
-            }
-        }
-
-        /**
-         * @param $optionValue
-         *
-         * @return string
-         * @since ZC v1.5.8
-         */
-        private function optionText($optionValue)
-        {
-            $return = "(" . $optionValue['products_options_id'] . ") " . $optionValue['products_options_name'];
-            return $return;
         }
     }
+
+    /**
+     * @param $optionValue
+     *
+     * @since ZC v1.5.8
+     */
+    private function optionText(array $optionValue): string
+    {
+        return '(' . $optionValue['products_options_id'] . ') ' . $optionValue['products_options_name'];
+    }
+}

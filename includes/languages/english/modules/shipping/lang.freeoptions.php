@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'MODULE_SHIPPING_FREEOPTIONS_TEXT_TITLE' => 'Free Shipping Options',
     'MODULE_SHIPPING_FREEOPTIONS_TEXT_DESCRIPTION' => '
 Free Options is used to display a Free Shipping option when other Shipping Modules are displayed.
@@ -12,5 +14,3 @@ See: freeshipper
 ',
     'MODULE_SHIPPING_FREEOPTIONS_TEXT_WAY' => 'Free Shipping',
 ];
-
-return $define;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -63,7 +65,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'status') {
 
     if ($error === false) {
         $customeremail = $db->Execute(
-            "SELECT orders_id FROM " . TABLE_ORDERS . "
+            'SELECT orders_id FROM ' . TABLE_ORDERS . "
               WHERE customers_email_address = '" . zen_db_input($query_email_address) . "'
                 AND orders_id = $orderID
               LIMIT 1"
@@ -93,21 +95,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'status') {
 
         $slamming_threshold = (((int)ORDER_STATUS_SLAM_COUNT) > 0) ? (int)ORDER_STATUS_SLAM_COUNT : 3;
         $zco_notifier->notify('NOTIFY_ORDER_STATUS_SLAMMING_ALERT', $_SESSION['os_errors'], $slamming_threshold);
-        if ($_SESSION['os_errors'] > (int)$slamming_threshold) {
+        if ($_SESSION['os_errors'] > $slamming_threshold) {
             $zco_notifier->notify('NOTIFY_ORDER_STATUS_SLAMMING_LOCKOUT');
             zen_session_destroy();
             zen_redirect(zen_href_link(FILENAME_TIME_OUT, '', 'SSL'));
         }
     } else {
         $statuses_query =
-            "SELECT os.orders_status_name, osh.date_added, osh.comments
-               FROM " . TABLE_ORDERS_STATUS . " os
-                    INNER JOIN " . TABLE_ORDERS_STATUS_HISTORY . " osh
+            'SELECT os.orders_status_name, osh.date_added, osh.comments
+               FROM ' . TABLE_ORDERS_STATUS . ' os
+                    INNER JOIN ' . TABLE_ORDERS_STATUS_HISTORY . ' osh
                         ON osh.orders_status_id = os.orders_status_id
                        AND osh.orders_id = :ordersID
                        AND osh.customer_notified >= 0
               WHERE os.language_id = :languagesID
-           ORDER BY osh.date_added";
+           ORDER BY osh.date_added';
 
         $statuses_query = $db->bindVars($statuses_query, ':ordersID', $orderID, 'integer');
         $statuses_query = $db->bindVars($statuses_query, ':languagesID', $_SESSION['languages_id'], 'integer');

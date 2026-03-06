@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Header code file for the Address Book page
  *
@@ -11,8 +13,8 @@
 $zco_notifier->notify('NOTIFY_HEADER_START_ADDRESS_BOOK');
 
 if (!zen_is_logged_in()) {
-  $_SESSION['navigation']->set_snapshot();
-  zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
+    $_SESSION['navigation']->set_snapshot();
+    zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
 require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
 $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_ACCOUNT, '', 'SSL'));

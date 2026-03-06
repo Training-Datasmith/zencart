@@ -8,27 +8,49 @@
  * @version $Id: torvista 2025 Mar 16 Modified in v2.2.0 $
  */
 
-if (!defined('TEXT_TIMEOUT_WARNING')) define('TEXT_TIMEOUT_WARNING', '**WARNING**');
-if (!defined('TEXT_TIMEOUT_TIME_REMAINING')) define('TEXT_TIMEOUT_TIME_REMAINING', ' Time remaining:');
-if (!defined('TEXT_TIMEOUT_SECONDS')) define('TEXT_TIMEOUT_SECONDS', 'seconds!');
-if (!defined('TEXT_TIMEOUT_ARE_YOU_STILL_THERE')) define('TEXT_TIMEOUT_ARE_YOU_STILL_THERE', 'Are you still there?');
-if (!defined('TEXT_TIMEOUT_WILL_LOGOUT_SOON')) define('TEXT_TIMEOUT_WILL_LOGOUT_SOON', 'You have been inactive, and will soon be logged out automatically.');
-if (!defined('TEXT_TIMEOUT_STAY_LOGGED_IN')) define('TEXT_TIMEOUT_STAY_LOGGED_IN', 'Continue Longer');
-if (!defined('TEXT_TIMEOUT_LOGOUT_NOW')) define('TEXT_TIMEOUT_LOGOUT_NOW', 'Logout Now');
-if (!defined('TEXT_TIMEOUT_TIMED_OUT_TITLE')) define('TEXT_TIMEOUT_TIMED_OUT_TITLE', 'Logged Out.');
-if (!defined('TEXT_TIMEOUT_LOGIN_AGAIN')) define('TEXT_TIMEOUT_LOGIN_AGAIN', 'Login Again');
-if (!defined('TEXT_TIMEOUT_TIMED_OUT_MESSAGE')) define('TEXT_TIMEOUT_TIMED_OUT_MESSAGE', 'Your session has timed out. You were inactive, so we logged you out automatically.');
+if (!defined('TEXT_TIMEOUT_WARNING')) {
+    define('TEXT_TIMEOUT_WARNING', '**WARNING**');
+}
+if (!defined('TEXT_TIMEOUT_TIME_REMAINING')) {
+    define('TEXT_TIMEOUT_TIME_REMAINING', ' Time remaining:');
+}
+if (!defined('TEXT_TIMEOUT_SECONDS')) {
+    define('TEXT_TIMEOUT_SECONDS', 'seconds!');
+}
+if (!defined('TEXT_TIMEOUT_ARE_YOU_STILL_THERE')) {
+    define('TEXT_TIMEOUT_ARE_YOU_STILL_THERE', 'Are you still there?');
+}
+if (!defined('TEXT_TIMEOUT_WILL_LOGOUT_SOON')) {
+    define('TEXT_TIMEOUT_WILL_LOGOUT_SOON', 'You have been inactive, and will soon be logged out automatically.');
+}
+if (!defined('TEXT_TIMEOUT_STAY_LOGGED_IN')) {
+    define('TEXT_TIMEOUT_STAY_LOGGED_IN', 'Continue Longer');
+}
+if (!defined('TEXT_TIMEOUT_LOGOUT_NOW')) {
+    define('TEXT_TIMEOUT_LOGOUT_NOW', 'Logout Now');
+}
+if (!defined('TEXT_TIMEOUT_TIMED_OUT_TITLE')) {
+    define('TEXT_TIMEOUT_TIMED_OUT_TITLE', 'Logged Out.');
+}
+if (!defined('TEXT_TIMEOUT_LOGIN_AGAIN')) {
+    define('TEXT_TIMEOUT_LOGIN_AGAIN', 'Login Again');
+}
+if (!defined('TEXT_TIMEOUT_TIMED_OUT_MESSAGE')) {
+    define('TEXT_TIMEOUT_TIMED_OUT_MESSAGE', 'Your session has timed out. You were inactive, so we logged you out automatically.');
+}
 
 if (in_array(($PHP_SELF ?? ''), ['login.php', 'login', 'password_forgotten.php', 'password_forgotten'], true)) {
     return;
 }
 
-$camefrom = 'index.php?cmd=' . basename($PHP_SELF, '.php') . (empty($params = zen_get_all_get_params()) ? '' : '&' . trim($params, '&'));
+$camefrom = 'index.php?cmd=' . basename((string) $PHP_SELF, '.php') . (empty($params = zen_get_all_get_params()) ? '' : '&' . trim($params, '&'));
 $mouseDebounce = 120;
 
 // Read default timeout value from the site's configuration:
 $timeoutAfter = ini_get('session.gc_maxlifetime');
-if ((int)$timeoutAfter < 30) $timeoutAfter = 1440;
+if ((int)$timeoutAfter < 30) {
+    $timeoutAfter = 1440;
+}
 
 // dev testing only:
 //$timeoutAfter = 15;
@@ -49,11 +71,11 @@ jQuery(function(){
     'flashingTitleText': '<?php echo addslashes(TEXT_TIMEOUT_WARNING); ?>', //what to show in the tab/title bar when about to timeout, or after timing out
     'timeoutAfter': <?php echo (int)$timeoutAfter; ?>, //passed from server side so it matches. 1440 is the usual default timeout in PHP
     'extendOnMouseMove': true, //Whether or not to extend the session when the mouse is moved
-    'mouseDebounce': <?php echo (int)$mouseDebounce; ?>, //How many seconds between extending the session when the mouse is moved (instead of extending a billion times within 5 seconds)
+    'mouseDebounce': <?php echo $mouseDebounce; ?>, //How many seconds between extending the session when the mouse is moved (instead of extending a billion times within 5 seconds)
     'extendUrl': 'keepalive.php', // admin URL to request in order to extend the session.
     'logoutUrl': 'logoff.php', // admin URL to request in order to force a logout after the timeout.
     'loginUrl': '<?php echo $camefrom; ?>', // admin URL to send the user to when they want to log back in
-    'secondsPrior': <?php echo round((int)$timeoutAfter/3); ?>, //how many seconds before timing out to run the next callback (onPriorCallback)
+    'secondsPrior': <?php echo round((int)$timeoutAfter / 3); ?>, //how many seconds before timing out to run the next callback (onPriorCallback)
     'onPriorCallback': function(timeout, seconds){
         jQuery.jAlert({
             'id': 'jTimeoutAlert',

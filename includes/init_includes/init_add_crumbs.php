@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * create the breadcrumb trail
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -16,16 +18,16 @@ $breadcrumb->add(HEADER_TITLE_CATALOG, zen_href_link(FILENAME_DEFAULT));
 /**
  * add category names or the manufacturer name to the breadcrumb trail
  */
-$robotsNoIndex = $robotsNoIndex ?? false;
+$robotsNoIndex ??= false;
 
 // might need isset($_GET['cPath']) later ... right now need $cPath or breaks breadcrumb from sidebox etc.
 if (isset($cPath_array, $cPath)) {
     for ($i = 0, $n = count($cPath_array); $i < $n; $i++) {
         $categories_query =
-            "SELECT categories_name
-               FROM " . TABLE_CATEGORIES_DESCRIPTION . "
-              WHERE categories_id = " . (int)$cPath_array[$i] . "
-                AND language_id = " . (int)$_SESSION['languages_id'];
+            'SELECT categories_name
+               FROM ' . TABLE_CATEGORIES_DESCRIPTION . '
+              WHERE categories_id = ' . (int)$cPath_array[$i] . '
+                AND language_id = ' . (int)$_SESSION['languages_id'];
         $categories = $db->Execute($categories_query, 1);
 
         if (!$categories->EOF) {
@@ -42,16 +44,16 @@ if (isset($cPath_array, $cPath)) {
  * add get terms (e.g manufacturer, music genre, record company or other user defined selector) to breadcrumb
  */
 $sql =
-    "SELECT *
-       FROM " . TABLE_GET_TERMS_TO_FILTER;
+    'SELECT *
+       FROM ' . TABLE_GET_TERMS_TO_FILTER;
 $get_terms = $db->Execute($sql);
 foreach ($get_terms as $next_get_term) {
     $next_get_term_name = $next_get_term['get_term_name'];
     if (isset($_GET[$next_get_term_name])) {
         $sql =
-            "SELECT " . $next_get_term['get_term_name_field'] . "
-               FROM " . constant($next_get_term['get_term_table']) . "
-              WHERE " . $next_get_term_name . " = " . (int)$_GET[$next_get_term_name];
+            'SELECT ' . $next_get_term['get_term_name_field'] . '
+               FROM ' . constant($next_get_term['get_term_table']) . '
+              WHERE ' . $next_get_term_name . ' = ' . (int)$_GET[$next_get_term_name];
         $get_term_breadcrumb = $db->Execute($sql, 1);
 
         if (!$get_term_breadcrumb->EOF) {

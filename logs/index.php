@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -7,6 +9,6 @@
  */
 
 // send to domain root
-    session_write_close();
-    header('Location: ' . 'http://' . $_SERVER['HTTP_HOST']);
-    exit();
+session_write_close();
+header('Location: ' . 'http://' . $_SERVER['HTTP_HOST']);
+exit();

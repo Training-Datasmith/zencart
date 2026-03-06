@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -26,17 +28,11 @@ if (!defined('DIR_WS_CATALOG')) {
  */
 class BreadcrumbTest extends zcUnitTestCase
 {
-    /**
-     * @var Breadcrumb
-     */
-    private $breadcrumb;
+    private ?\Breadcrumb $breadcrumb = null;
 
-    /**
-     * @var array
-     */
-    private $links = array(
-        'Zen Cart' => 'https://zen-cart.com'
-    );
+    private array $links = [
+        'Zen Cart' => 'https://zen-cart.com',
+    ];
 
     public function setup(): void
     {
@@ -44,13 +40,13 @@ class BreadcrumbTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/classes/breadcrumb.php';
     }
 
-    public function testAddThrowsExceptionIfEmptyDataPassed()
+    public function testAddThrowsExceptionIfEmptyDataPassed(): void
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet. Relates to future feature.'
         );
 
-        $this->breadcrumb = new Breadcrumb;
+        $this->breadcrumb = new Breadcrumb();
         $this->setExpectedException(
             'InvalidArgumentException',
             'Both title and link must not be empty.'
@@ -58,7 +54,7 @@ class BreadcrumbTest extends zcUnitTestCase
         $this->breadcrumb->add('');
     }
 
-    public function testTrailGeneratesHtml()
+    public function testTrailGeneratesHtml(): void
     {
         $this->markTestSkipped();
         $expected = '<nav class="breadcrumb">';
@@ -74,7 +70,7 @@ class BreadcrumbTest extends zcUnitTestCase
         $this->assertEquals($expected, $this->breadcrumb->trail());
     }
 
-    public function testCatalogTitleReplaced()
+    public function testCatalogTitleReplaced(): void
     {
         $this->breadcrumb = new Breadcrumb();
         foreach ($this->links as $title => $link) {
@@ -84,7 +80,7 @@ class BreadcrumbTest extends zcUnitTestCase
         $this->assertStringNotContainsString('foo', $this->breadcrumb->trail());
     }
 
-    public function testStringCastEqualsTrail()
+    public function testStringCastEqualsTrail(): void
     {
         $this->markTestSkipped();
 
@@ -95,7 +91,7 @@ class BreadcrumbTest extends zcUnitTestCase
         $this->assertSame((string)$this->breadcrumb, $this->breadcrumb->trail());
     }
 
-    public function testLastReturnsString()
+    public function testLastReturnsString(): void
     {
         $this->breadcrumb = new Breadcrumb();
         foreach ($this->links as $title => $link) {

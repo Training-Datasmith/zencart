@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2024 Vinos de Frutas Tropicales
@@ -15,9 +17,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 // quantity is greater than either individual quantity.
 //
 $db->Execute(
-    "UPDATE " . TABLE_PRODUCTS . " p, (SELECT DISTINCT products_id FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . ") posm_pids
+    'UPDATE ' . TABLE_PRODUCTS . ' p, (SELECT DISTINCT products_id FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . ') posm_pids
         SET p.products_quantity_mixed = 0
-      WHERE p.products_id = posm_pids.products_id"
+      WHERE p.products_id = posm_pids.products_id'
 );
 
 // -----
@@ -33,14 +35,14 @@ if (defined('EO_VERSION') && version_compare(EO_VERSION, '4.2.0', '<')) {
 // Starting with v2.3.0 of POSM, check (if enabled) to see if any back-in-stock dates are within the expiration period.
 //
 if (((int)POSM_BIS_DATE_REMINDER) !== 0) {
-    $posm_check = $db->Execute (
-        "SELECT pos.pos_id
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
-             LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " posn
+    $posm_check = $db->Execute(
+        'SELECT pos.pos_id
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . ' pos
+             LEFT JOIN ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . " posn
                 ON posn.pos_name_id = pos.pos_name_id
           WHERE posn.pos_name LIKE '%[date]%'
-            AND pos.pos_date < DATE_SUB(now(), INTERVAL " . (int)POSM_BIS_DATE_REMINDER . " DAY)
-          LIMIT 1"
+            AND pos.pos_date < DATE_SUB(now(), INTERVAL " . (int)POSM_BIS_DATE_REMINDER . ' DAY)
+          LIMIT 1'
     );
     if (!$posm_check->EOF) {
         $messageStack->add(sprintf(POSM_BIS_DATES_EXPIRED, (int)POSM_BIS_DATE_REMINDER, zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK)), 'warning');
@@ -53,12 +55,12 @@ if (((int)POSM_BIS_DATE_REMINDER) !== 0) {
 // - Subtract stock ............................... true
 //
 $configuration_array = [
-    'STOCK_LIMITED' => 'true'
+    'STOCK_LIMITED' => 'true',
 ];
 foreach ($configuration_array as $key => $value) {
     if (constant($key) !== $value) {
         $db->Execute(
-            "UPDATE " . TABLE_CONFIGURATION . "
+            'UPDATE ' . TABLE_CONFIGURATION . "
                 SET configuration_value = '$value'
               WHERE configuration_key = '$key'
               LIMIT 1"

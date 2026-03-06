@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * redirect handler
  *
@@ -11,7 +13,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-$_GET['action'] = $_GET['action'] ?? '';
+$_GET['action'] ??= '';
 
 // -----
 // Grab the currently-configured **default** language's id value.  Used
@@ -38,7 +40,7 @@ switch ($_GET['action']) {
             } elseif ($default_language_id !== $_SESSION['languages_id']) {
                 $sql = 'SELECT products_url FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = :productId: AND language_id = :languageId: LIMIT 1';
                 $sql = $db->bindVars($sql, ':productId:', $_GET['products_id'], 'integer');
-               $sql = $db->bindVars($sql, ':languageId:', $default_language_id, 'integer');
+                $sql = $db->bindVars($sql, ':languageId:', $default_language_id, 'integer');
                 $result = $db->Execute($sql);
                 if (!$result->EOF && $result->fields['products_url'] !== '') {
                     $zco_notifier->notify('NOTIFY_BEFORE_REDIRECT_ACTION_PRODUCT', [], $_GET['products_id'], $default_language_id);

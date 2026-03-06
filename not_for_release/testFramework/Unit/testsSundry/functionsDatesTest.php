@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Tests\Support\zcUnitTestCase;
 
 class functionDatesTest extends zcUnitTestCase
@@ -10,7 +12,7 @@ class functionDatesTest extends zcUnitTestCase
         require_once DIR_FS_CATALOG . 'includes/functions/functions_dates.php';
     }
 
-    public function testIsLeapYear()
+    public function testIsLeapYear(): void
     {
         $result = zen_is_leap_year(2000);
         $this->assertTrue($result);

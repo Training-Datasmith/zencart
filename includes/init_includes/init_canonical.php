@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * canonical link handling
  *
@@ -104,7 +106,7 @@ $zco_notifier->notify('NOTIFY_INIT_CANONICAL_PARAM_WHITELIST', $current_page, $e
 
 // Go thru all GET params and prepare list of potentially-rogue keys to not include in generated canonical URL
 $rogues = [];
-foreach($_GET as $key => $val) {
+foreach ($_GET as $key => $val) {
     if (in_array($key, $excludeParams)) {
         continue; // these will already be stripped, so skip
     }
@@ -122,58 +124,56 @@ switch (true) {
     /**
      * for products (esp those linked to multiple categories):
      */
-    case ($current_page !== FILENAME_PRODUCT_REVIEWS_INFO && str_ends_with($current_page, '_info') && isset($_GET['products_id'])):
+    case ($current_page !== FILENAME_PRODUCT_REVIEWS_INFO && str_ends_with((string) $current_page, '_info') && isset($_GET['products_id'])):
         $canonicalLink = zen_href_link($current_page, ($includeCPath ? 'cPath=' . zen_get_generated_category_path_rev(zen_get_products_category_id($_GET['products_id'])) . '&' : '') . 'products_id=' . $_GET['products_id'], 'NONSSL', false);
         break;
-    /**
-     * for product listings (ie: "categories"):
-     */
-    case ($current_page === FILENAME_DEFAULT && isset($_GET['cPath'])):
+        /**
+         * for product listings (ie: "categories"):
+         */
+    case $current_page === FILENAME_DEFAULT && isset($_GET['cPath']):
+        /**
+         * for all/new/special/featured listings:
+         */
+        // no break
+    case (in_array($current_page, [FILENAME_FEATURED_PRODUCTS, FILENAME_SPECIALS, FILENAME_PRODUCTS_NEW, FILENAME_PRODUCTS_ALL])):
+        /**
+         * for manufacturer listings:
+         */
+        // no break
+    case ($current_page === FILENAME_DEFAULT && isset($_GET['manufacturers_id'])):
+        /**
+         * for ez-pages:
+         */
+        // no break
+    case ($current_page === FILENAME_EZPAGES && isset($_GET['id'])):
         $canonicalLink = zen_href_link($current_page, zen_get_all_get_params($excludeParams), 'NONSSL', false);
         // alternate way, depending on specialized site needs:
         //    $canonicalLink = zen_href_link($current_page,'cPath=' . zen_get_generated_category_path_rev($current_category_id) , 'NONSSL', false);
         break;
-    /**
-     * For specific product reviews
-     */
+        /**
+         * For specific product reviews
+         */
     case ($current_page === FILENAME_PRODUCT_REVIEWS_INFO && !empty($_GET['products_id']) && !empty($_GET['reviews_id'])):
         $canonicalLink = zen_href_link($current_page, 'products_id=' . $_GET['products_id'] . '&reviews_id=' . $_GET['reviews_id'], 'NONSSL', false);
         break;
-    /**
-     * for music filters:
-     */
+        /**
+         * for music filters:
+         */
     case ($current_page === FILENAME_DEFAULT && !empty($_GET['typefilter']) && (!empty($_GET['music_genre_id']) || !empty($_GET['record_company_id']))):
         unset($excludeParams[array_search('typefilter', $excludeParams)]);
         $canonicalLink = zen_href_link($current_page, zen_get_all_get_params($excludeParams), 'NONSSL', false);
         break;
-    /**
-     * home page
-     * this translates index.php?main_page=index to just index.php (or whatever zen_href_link is doing)
-     */
-    case ($this_is_home_page):
-        $canonicalLink = preg_replace('/(index.php)(\?)(main_page=)(' . FILENAME_DEFAULT . ')$/', '', zen_href_link(FILENAME_DEFAULT, '', 'NONSSL', false));
-        break;
-    /**
-     * for all/new/special/featured listings:
-     */
-    case (in_array($current_page, [FILENAME_FEATURED_PRODUCTS, FILENAME_SPECIALS, FILENAME_PRODUCTS_NEW, FILENAME_PRODUCTS_ALL])):
-    /**
-     * for manufacturer listings:
-     */
-    case ($current_page === FILENAME_DEFAULT && isset($_GET['manufacturers_id'])):
-    /**
-     * for ez-pages:
-     */
-    case ($current_page === FILENAME_EZPAGES && isset($_GET['id'])):
         /**
-         * all the above cases get treated here:
+         * home page
+         * this translates index.php?main_page=index to just index.php (or whatever zen_href_link is doing)
          */
-        $canonicalLink = zen_href_link($current_page, zen_get_all_get_params($excludeParams), 'NONSSL', false);
+    case ($this_is_home_page):
+        $canonicalLink = preg_replace('/(index.php)(\?)(main_page=)(' . FILENAME_DEFAULT . ')$/', '', (string) zen_href_link(FILENAME_DEFAULT, '', 'NONSSL', false));
         break;
-    /**
-     * All others
-     * uncomment the $canonicalLink = ''; line if you want no special handling for other pages
-     */
+        /**
+         * All others
+         * uncomment the $canonicalLink = ''; line if you want no special handling for other pages
+         */
     default:
         $canonicalLink = zen_href_link($current_page, zen_get_all_get_params($excludeParams), 'NONSSL', false);
         //$canonicalLink = '';

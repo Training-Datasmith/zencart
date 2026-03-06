@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $define = [
     'MODULE_PAYMENT_PAYPALDP_TEXT_ADMIN_TITLE_WPP' => 'PayPal Payments Pro',
     'MODULE_PAYMENT_PAYPALDP_TEXT_ADMIN_TITLE_NONUSA' => 'PayPal Website Payments Pro',

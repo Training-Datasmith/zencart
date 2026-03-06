@@ -7,98 +7,99 @@
  */
 require('includes/application_top.php');
 
-$action = (isset($_GET['action']) ? $_GET['action'] : '');
+$action = ($_GET['action'] ?? '');
 $languages = zen_get_languages();
 
 if (!empty($action)) {
-  switch ($action) {
-    case 'insert':
-    case 'save':
-      if (isset($_GET['oSID']))
-        $orders_status_id = zen_db_prepare_input($_GET['oSID']);
+    switch ($action) {
+        case 'insert':
+        case 'save':
+            if (isset($_GET['oSID'])) {
+                $orders_status_id = zen_db_prepare_input($_GET['oSID']);
+            }
 
-      for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-        $orders_status_name_array = $_POST['orders_status_name'];
-        $language_id = $languages[$i]['id'];
+            for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+                $orders_status_name_array = $_POST['orders_status_name'];
+                $language_id = $languages[$i]['id'];
 
-        $sql_data_array = array(
-            'orders_status_name' => zen_db_prepare_input($orders_status_name_array[$language_id]),
-            'orders_status_color_code' => zen_db_prepare_input($_POST['orders_status_color_code']),
-            'sort_order' => (int)$_POST['sort_order'],
-        );
+                $sql_data_array = [
+                    'orders_status_name' => zen_db_prepare_input($orders_status_name_array[$language_id]),
+                    'orders_status_color_code' => zen_db_prepare_input($_POST['orders_status_color_code']),
+                    'sort_order' => (int)$_POST['sort_order'],
+                ];
 
-        if ($action == 'insert') {
-          if (empty($orders_status_id)) {
-            $next_id = $db->Execute("SELECT MAX(orders_status_id) AS orders_status_id
-                                     FROM " . TABLE_ORDERS_STATUS);
+                if ($action == 'insert') {
+                    if (empty($orders_status_id)) {
+                        $next_id = $db->Execute('SELECT MAX(orders_status_id) AS orders_status_id
+                                     FROM ' . TABLE_ORDERS_STATUS);
 
-            $orders_status_id = $next_id->fields['orders_status_id'] + 1;
-          }
+                        $orders_status_id = $next_id->fields['orders_status_id'] + 1;
+                    }
 
-          $insert_sql_data = array(
-            'orders_status_id' => $orders_status_id,
-            'language_id' => $language_id);
+                    $insert_sql_data = [
+                      'orders_status_id' => $orders_status_id,
+                      'language_id' => $language_id];
 
-          $sql_data_array = array_merge($sql_data_array, $insert_sql_data);
+                    $sql_data_array = array_merge($sql_data_array, $insert_sql_data);
 
-          zen_db_perform(TABLE_ORDERS_STATUS, $sql_data_array);
-        } elseif ($action == 'save') {
-          zen_db_perform(TABLE_ORDERS_STATUS, $sql_data_array, 'update', "orders_status_id = '" . (int)$orders_status_id . "' and language_id = '" . (int)$language_id . "'");
-        }
-      }
+                    zen_db_perform(TABLE_ORDERS_STATUS, $sql_data_array);
+                } elseif ($action == 'save') {
+                    zen_db_perform(TABLE_ORDERS_STATUS, $sql_data_array, 'update', "orders_status_id = '" . (int)$orders_status_id . "' and language_id = '" . (int)$language_id . "'");
+                }
+            }
 
-      if (isset($_POST['default']) && ($_POST['default'] == 'on')) {
-        $db->Execute("UPDATE " . TABLE_CONFIGURATION . "
-                      SET configuration_value = " . zen_db_input($orders_status_id) . "
+            if (isset($_POST['default']) && ($_POST['default'] == 'on')) {
+                $db->Execute('UPDATE ' . TABLE_CONFIGURATION . '
+                      SET configuration_value = ' . zen_db_input($orders_status_id) . "
                       WHERE configuration_key = 'DEFAULT_ORDERS_STATUS_ID'");
-      }
+            }
 
-      zen_redirect(zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $orders_status_id));
-      break;
-    case 'deleteconfirm':
-      $oSID = zen_db_prepare_input($_POST['oSID']);
+            zen_redirect(zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $orders_status_id));
+            break;
+        case 'deleteconfirm':
+            $oSID = zen_db_prepare_input($_POST['oSID']);
 
-      $orders_status = $db->Execute("SELECT configuration_value
-                                     FROM " . TABLE_CONFIGURATION . "
+            $orders_status = $db->Execute('SELECT configuration_value
+                                     FROM ' . TABLE_CONFIGURATION . "
                                      WHERE configuration_key = 'DEFAULT_ORDERS_STATUS_ID'");
 
-      if ($orders_status->fields['configuration_value'] == $oSID) {
-        $db->Execute("UPDATE " . TABLE_CONFIGURATION . "
+            if ($orders_status->fields['configuration_value'] == $oSID) {
+                $db->Execute('UPDATE ' . TABLE_CONFIGURATION . "
                       SET configuration_value = ''
                       WHERE configuration_key = 'DEFAULT_ORDERS_STATUS_ID'");
-      }
+            }
 
-      $db->Execute("DELETE FROM " . TABLE_ORDERS_STATUS . "
-                    WHERE orders_status_id = " . zen_db_input($oSID));
+            $db->Execute('DELETE FROM ' . TABLE_ORDERS_STATUS . '
+                    WHERE orders_status_id = ' . zen_db_input($oSID));
 
-      zen_redirect(zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page']));
-      break;
-    case 'delete':
-      $oSID = zen_db_prepare_input($_GET['oSID']);
+            zen_redirect(zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page']));
+            break;
+        case 'delete':
+            $oSID = zen_db_prepare_input($_GET['oSID']);
 
-      $status = $db->Execute("SELECT COUNT(*) AS count
-                              FROM " . TABLE_ORDERS . "
-                              WHERE orders_status = " . (int)$oSID);
+            $status = $db->Execute('SELECT COUNT(*) AS count
+                              FROM ' . TABLE_ORDERS . '
+                              WHERE orders_status = ' . (int)$oSID);
 
-      $remove_status = true;
-      if ($oSID == DEFAULT_ORDERS_STATUS_ID) {
-        $remove_status = false;
-        $messageStack->add($error_message = ERROR_REMOVE_DEFAULT_ORDER_STATUS, 'error');
-      } elseif ($status->fields['count'] > 0) {
-        $remove_status = false;
-        $messageStack->add($error_message = ERROR_STATUS_USED_IN_ORDERS, 'error');
-      } else {
-        $history = $db->Execute("SELECT COUNT(*) AS count
-                                 FROM " . TABLE_ORDERS_STATUS_HISTORY . "
-                                 WHERE orders_status_id = " . (int)$oSID);
+            $remove_status = true;
+            if ($oSID == DEFAULT_ORDERS_STATUS_ID) {
+                $remove_status = false;
+                $messageStack->add($error_message = ERROR_REMOVE_DEFAULT_ORDER_STATUS, 'error');
+            } elseif ($status->fields['count'] > 0) {
+                $remove_status = false;
+                $messageStack->add($error_message = ERROR_STATUS_USED_IN_ORDERS, 'error');
+            } else {
+                $history = $db->Execute('SELECT COUNT(*) AS count
+                                 FROM ' . TABLE_ORDERS_STATUS_HISTORY . '
+                                 WHERE orders_status_id = ' . (int)$oSID);
 
-        if ($history->fields['count'] > 0) {
-          $remove_status = false;
-          $messageStack->add($error_message = ERROR_STATUS_USED_IN_HISTORY, 'error');
-        }
-      }
-      break;
-  }
+                if ($history->fields['count'] > 0) {
+                    $remove_status = false;
+                    $messageStack->add($error_message = ERROR_STATUS_USED_IN_HISTORY, 'error');
+                }
+            }
+            break;
+    }
 }
 ?>
 <!doctype html>
@@ -128,61 +129,62 @@ if (!empty($action)) {
             </thead>
             <tbody>
                 <?php
-                $orders_status_query_raw = "SELECT *
-                                            FROM " . TABLE_ORDERS_STATUS . "
-                                            WHERE language_id = " . (int)$_SESSION['languages_id'] . "
-                                            ORDER BY sort_order ASC, orders_status_id ASC";
-                $orders_status_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $orders_status_query_raw, $orders_status_query_numrows);
-                $orders_status = $db->Execute($orders_status_query_raw);
-                foreach ($orders_status as $status) {
-                  if ((!isset($_GET['oSID']) || (isset($_GET['oSID']) && ($_GET['oSID'] == $status['orders_status_id']))) && !isset($oInfo) && (substr($action, 0, 3) != 'new')) {
-                    $oInfo = new objectInfo($status);
-                  }
+                $orders_status_query_raw = 'SELECT *
+                                            FROM ' . TABLE_ORDERS_STATUS . '
+                                            WHERE language_id = ' . (int)$_SESSION['languages_id'] . '
+                                            ORDER BY sort_order ASC, orders_status_id ASC';
+$orders_status_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $orders_status_query_raw, $orders_status_query_numrows);
+$orders_status = $db->Execute($orders_status_query_raw);
+foreach ($orders_status as $status) {
+    if ((!isset($_GET['oSID']) || (isset($_GET['oSID']) && ($_GET['oSID'] == $status['orders_status_id']))) && !isset($oInfo) && (!str_starts_with((string) $action, 'new'))) {
+        $oInfo = new objectInfo($status);
+    }
 
-                  if (isset($oInfo) && is_object($oInfo) && ($status['orders_status_id'] == $oInfo->orders_status_id)) {
-                    echo '                  <tr id="defaultSelected" class="dataTableRowSelected" onclick="document.location.href=\'' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=edit') . '\'" role="option" aria-selected="true">' . "\n";
-                  } else {
-                    echo '                  <tr class="dataTableRow" onclick="document.location.href=\'' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $status['orders_status_id']) . '\'" role="option" aria-selected="false">' . "\n";
-                  }
-                  echo '                    <td class="dataTableContent">' . $status['orders_status_id'] . '</td>';
+    if (isset($oInfo) && is_object($oInfo) && ($status['orders_status_id'] == $oInfo->orders_status_id)) {
+        echo '                  <tr id="defaultSelected" class="dataTableRowSelected" onclick="document.location.href=\'' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=edit') . '\'" role="option" aria-selected="true">' . "\n";
+    } else {
+        echo '                  <tr class="dataTableRow" onclick="document.location.href=\'' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $status['orders_status_id']) . '\'" role="option" aria-selected="false">' . "\n";
+    }
+    echo '                    <td class="dataTableContent">' . $status['orders_status_id'] . '</td>';
 
-                        $color = $status['orders_status_color_code'];
-                        if (!empty($color)) {
-                            $status_display = '<span class="label" style="background-color:' . $color . '; border-color:' . $color . '; color:#fff; font-size: 100%;">' . $status['orders_status_name'] . '</span>';
-                        } else {
-                            $status_display = $status['orders_status_name'];
-                        }
-                  if (DEFAULT_ORDERS_STATUS_ID == $status['orders_status_id']) {
-                            echo '                <td class="dataTableContent">' . $status_display . ' <strong>(' . TEXT_DEFAULT . ')</strong></td>' . "\n";
-                  } else {
-                            echo '                <td class="dataTableContent">' . $status_display . '</td>' . "\n";
-                  }
-                  echo '                    <td class="dataTableContent">' . $status['sort_order'] . '</td>';
-                  ?>
+    $color = $status['orders_status_color_code'];
+    if (!empty($color)) {
+        $status_display = '<span class="label" style="background-color:' . $color . '; border-color:' . $color . '; color:#fff; font-size: 100%;">' . $status['orders_status_name'] . '</span>';
+    } else {
+        $status_display = $status['orders_status_name'];
+    }
+    if (DEFAULT_ORDERS_STATUS_ID == $status['orders_status_id']) {
+        echo '                <td class="dataTableContent">' . $status_display . ' <strong>(' . TEXT_DEFAULT . ')</strong></td>' . "\n";
+    } else {
+        echo '                <td class="dataTableContent">' . $status_display . '</td>' . "\n";
+    }
+    echo '                    <td class="dataTableContent">' . $status['sort_order'] . '</td>';
+    ?>
               <td class="dataTableContent text-right"><?php
-                  if (isset($oInfo) && is_object($oInfo) && ($status['orders_status_id'] == $oInfo->orders_status_id)) {
-                    echo zen_icon('caret-right', '', '2x', true);
-                  } else {
-                    echo '<a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $status['orders_status_id']) . '" data-toggle="tooltip" title="' . IMAGE_ICON_INFO . '" role="button">' . zen_icon('circle-info', '', '2x', true, false) . '</a>';
-                  }
-                  ?>&nbsp;</td>
+    if (isset($oInfo) && is_object($oInfo) && ($status['orders_status_id'] == $oInfo->orders_status_id)) {
+        echo zen_icon('caret-right', '', '2x', true);
+    } else {
+        echo '<a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $status['orders_status_id']) . '" data-toggle="tooltip" title="' . IMAGE_ICON_INFO . '" role="button">' . zen_icon('circle-info', '', '2x', true, false) . '</a>';
+    }
+    ?>&nbsp;</td>
               </tr>
               <?php
-            }
-            ?>
+}
+?>
             </tbody>
           </table>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 configurationColumnRight">
             <?php
-            $heading = array();
-            $contents = array();
+$heading = [];
+$contents = [];
 
-                // Helper to get picker val (fallback to black)
-                function getPickerVal($val) {
-                    return (empty($val)) ? '#000000' : $val;
-                }
-                $colorSyncScript = '
+// Helper to get picker val (fallback to black)
+function getPickerVal($val)
+{
+    return (empty($val)) ? '#000000' : $val;
+}
+$colorSyncScript = '
             <script>
             $(document).ready(function(){
                 $("#cp-picker").on("input change", function(){
@@ -196,106 +198,106 @@ if (!empty($action)) {
                 });
             });
             </script>';
-            switch ($action) {
-              case 'new':
-                $heading[] = array('text' => '<h4>' . TEXT_INFO_HEADING_NEW_ORDERS_STATUS . '</h4>');
+switch ($action) {
+    case 'new':
+        $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_NEW_ORDERS_STATUS . '</h4>'];
 
-                $contents = array('form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&action=insert', 'post', 'class="form-horizontal"'));
-                $contents[] = array('text' => TEXT_INFO_INSERT_INTRO);
+        $contents = ['form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&action=insert', 'post')];
+        $contents[] = ['text' => TEXT_INFO_INSERT_INTRO];
 
-                $orders_status_inputs_string = '';
-                for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-                  $orders_status_inputs_string .= '<br>' . zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_draw_input_field('orders_status_name[' . $languages[$i]['id'] . ']', '', 'class="form-control"');
-                }
+        $orders_status_inputs_string = '';
+        for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+            $orders_status_inputs_string .= '<br>' . zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_draw_input_field('orders_status_name[' . $languages[$i]['id'] . ']', '', 'class="form-control"');
+        }
 
-                $contents[] = array('text' => '<br>' . TEXT_INFO_ORDERS_STATUS_NAME . $orders_status_inputs_string);
-                        $contents[] = array('text' => '<br><strong>' . TEXT_INFO_HEADING_COLOR_CODE . '</strong><br>' .
-                            '<div class="input-group status-color-code-input">' .
-                            zen_draw_input_field('orders_status_color_code', '', 'class="form-control" id="cp-hex" placeholder="' . TEXT_INFO_COLOR_BOX_PLACEHOLDER . '"') .
-                            '<span class="input-group-addon">' .
-                            '<input type="color" id="cp-picker" value="#000000">' .
-                            '</span>' .
-                            '</div>' .
-                            '<small class="text-muted">' . TEXT_INFO_COLOR_CODE .'</small><br>' . TEXT_INFO_COLOR_CODE_WARNING . $colorSyncScript);
-                $contents[] = array('text' => '<br>' . zen_draw_checkbox_field('default') . ' ' . TEXT_SET_DEFAULT);
-                $contents[] = array('text' => '<br>' . TEXT_INFO_SORT_ORDER . '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . zen_draw_input_field('sort_order', '0', 'class="form-control"'));
-                $contents[] = array('align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-primary">' . IMAGE_INSERT . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page']) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>');
-                break;
-              case 'edit':
-                $heading[] = array('text' => '<h4>' . TEXT_INFO_HEADING_EDIT_ORDERS_STATUS . '</h4>');
+        $contents[] = ['text' => '<br>' . TEXT_INFO_ORDERS_STATUS_NAME . $orders_status_inputs_string];
+        $contents[] = ['text' => '<br><strong>' . TEXT_INFO_HEADING_COLOR_CODE . '</strong><br>' .
+            '<div class="input-group status-color-code-input">' .
+            zen_draw_input_field('orders_status_color_code', '', 'class="form-control" id="cp-hex" placeholder="' . TEXT_INFO_COLOR_BOX_PLACEHOLDER . '"') .
+            '<span class="input-group-addon">' .
+            '<input type="color" id="cp-picker" value="#000000">' .
+            '</span>' .
+            '</div>' .
+            '<small class="text-muted">' . TEXT_INFO_COLOR_CODE .'</small><br>' . TEXT_INFO_COLOR_CODE_WARNING . $colorSyncScript];
+        $contents[] = ['text' => '<br>' . zen_draw_checkbox_field('default') . ' ' . TEXT_SET_DEFAULT];
+        $contents[] = ['text' => '<br>' . TEXT_INFO_SORT_ORDER . '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . zen_draw_input_field('sort_order', '0', 'class="form-control"')];
+        $contents[] = ['align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-primary">' . IMAGE_INSERT . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page']) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'];
+        break;
+    case 'edit':
+        $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_EDIT_ORDERS_STATUS . '</h4>'];
 
-                $contents = array('form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=save', 'post', 'class="form-horizontal"'));
-                $contents[] = array('text' => TEXT_INFO_EDIT_INTRO);
+        $contents = ['form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=save', 'post')];
+        $contents[] = ['text' => TEXT_INFO_EDIT_INTRO];
 
-                $orders_status_inputs_string = '';
-                for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-                  $orders_status_inputs_string .= '<br>' . zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_draw_input_field('orders_status_name[' . $languages[$i]['id'] . ']', htmlspecialchars(zen_get_orders_status_name($oInfo->orders_status_id, $languages[$i]['id']), ENT_COMPAT, CHARSET, TRUE), 'class="form-control"');
-                }
+        $orders_status_inputs_string = '';
+        for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+            $orders_status_inputs_string .= '<br>' . zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_draw_input_field('orders_status_name[' . $languages[$i]['id'] . ']', htmlspecialchars(zen_get_orders_status_name($oInfo->orders_status_id, $languages[$i]['id']), ENT_COMPAT, CHARSET, true), 'class="form-control"');
+        }
 
-                $contents[] = array('text' => '<br>' . TEXT_INFO_ORDERS_STATUS_NAME . $orders_status_inputs_string);
-                        $textVal = $oInfo->orders_status_color_code;
-                        $pickerVal = getPickerVal($oInfo->orders_status_color_code);
-                        $contents[] = array('text' => '<br>' . TEXT_INFO_HEADING_COLOR_CODE . '<br>' .
-                            '<div class="input-group">' .
-                            zen_draw_input_field('orders_status_color_code', $textVal, 'class="form-control" id="cp-hex" placeholder="' . TEXT_INFO_COLOR_BOX_PLACEHOLDER . '"') .
-                            '<span class="input-group-addon" style="padding:0; border:none; width:40px; background:none;">' .
-                            '<input type="color" id="cp-picker" value="' . $pickerVal . '" style="height:34px; width:100%; padding:0; border:none; cursor:pointer;">' .
-                            '</span>' .
-                            '</div>' .
-                            '<small class="text-muted">' . TEXT_INFO_COLOR_CODE .'</small><br>' . TEXT_INFO_COLOR_CODE_WARNING . $colorSyncScript);
-                if (DEFAULT_ORDERS_STATUS_ID != $oInfo->orders_status_id) {
-                  $contents[] = array('text' => '<br>' . zen_draw_checkbox_field('default') . ' ' . TEXT_SET_DEFAULT);
-                }
-                $contents[] = array('text' => '<br>' . TEXT_INFO_SORT_ORDER . '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . zen_draw_input_field('sort_order', $oInfo->sort_order, 'class="form-control"'));
-                $contents[] = array('align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-primary">' . IMAGE_UPDATE . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>');
-                break;
-              case 'delete':
-                $heading[] = array('text' => '<h4>' . TEXT_INFO_HEADING_DELETE_ORDERS_STATUS . '</h4>');
+        $contents[] = ['text' => '<br>' . TEXT_INFO_ORDERS_STATUS_NAME . $orders_status_inputs_string];
+        $textVal = $oInfo->orders_status_color_code;
+        $pickerVal = getPickerVal($oInfo->orders_status_color_code);
+        $contents[] = ['text' => '<br>' . TEXT_INFO_HEADING_COLOR_CODE . '<br>' .
+            '<div class="input-group">' .
+            zen_draw_input_field('orders_status_color_code', $textVal, 'class="form-control" id="cp-hex" placeholder="' . TEXT_INFO_COLOR_BOX_PLACEHOLDER . '"') .
+            '<span class="input-group-addon" style="padding:0; border:none; width:40px; background:none;">' .
+            '<input type="color" id="cp-picker" value="' . $pickerVal . '" style="height:34px; width:100%; padding:0; border:none; cursor:pointer;">' .
+            '</span>' .
+            '</div>' .
+            '<small class="text-muted">' . TEXT_INFO_COLOR_CODE .'</small><br>' . TEXT_INFO_COLOR_CODE_WARNING . $colorSyncScript];
+        if (DEFAULT_ORDERS_STATUS_ID != $oInfo->orders_status_id) {
+            $contents[] = ['text' => '<br>' . zen_draw_checkbox_field('default') . ' ' . TEXT_SET_DEFAULT];
+        }
+        $contents[] = ['text' => '<br>' . TEXT_INFO_SORT_ORDER . '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . zen_draw_input_field('sort_order', $oInfo->sort_order, 'class="form-control"')];
+        $contents[] = ['align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-primary">' . IMAGE_UPDATE . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'];
+        break;
+    case 'delete':
+        $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_DELETE_ORDERS_STATUS . '</h4>'];
 
-                $contents = array('form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&action=deleteconfirm') . zen_draw_hidden_field('oSID', $oInfo->orders_status_id));
-                $contents[] = array('text' => TEXT_INFO_DELETE_INTRO);
-                $contents[] = array('text' => '<br><b>' . $oInfo->orders_status_name . '</b>');
-                if ($remove_status) {
-                  $contents[] = array('align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-danger">' . IMAGE_DELETE . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>');
-                } elseif (!empty($error_message)) {
-                    $contents[] = array('text' => '<br><b class="alert-danger">' . $error_message . '</b>');
-                }
-                break;
-              default:
-                if (isset($oInfo) && is_object($oInfo)) {
-                  $heading[] = array('text' => '<h4>' . $oInfo->orders_status_name . '</h4>');
+        $contents = ['form' => zen_draw_form('status', FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&action=deleteconfirm') . zen_draw_hidden_field('oSID', $oInfo->orders_status_id)];
+        $contents[] = ['text' => TEXT_INFO_DELETE_INTRO];
+        $contents[] = ['text' => '<br><b>' . $oInfo->orders_status_name . '</b>'];
+        if ($remove_status) {
+            $contents[] = ['align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-danger">' . IMAGE_DELETE . '</button> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'];
+        } elseif (!empty($error_message)) {
+            $contents[] = ['text' => '<br><b class="alert-danger">' . $error_message . '</b>'];
+        }
+        break;
+    default:
+        if (isset($oInfo) && is_object($oInfo)) {
+            $heading[] = ['text' => '<h4>' . $oInfo->orders_status_name . '</h4>'];
 
-                  $contents[] = array('align' => 'text-center', 'text' => '<a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=edit') . '" class="btn btn-primary" role="button">' . IMAGE_EDIT . '</a> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>');
+            $contents[] = ['align' => 'text-center', 'text' => '<a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=edit') . '" class="btn btn-primary" role="button">' . IMAGE_EDIT . '</a> <a href="' . zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&oSID=' . $oInfo->orders_status_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>'];
 
-                  for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
-                    $contents[] = array('text' => zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_get_orders_status_name($oInfo->orders_status_id, $languages[$i]['id']));
-                  }
-                }
-                break;
+            for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
+                $contents[] = ['text' => zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']) . '&nbsp;' . zen_get_orders_status_name($oInfo->orders_status_id, $languages[$i]['id'])];
             }
+        }
+        break;
+}
 
-            if (!empty($heading) && !empty($contents)) {
-              $box = new box;
-              echo $box->infoBox($heading, $contents);
-            }
-            ?>
+if (!empty($heading) && !empty($contents)) {
+    $box = new box();
+    echo $box->infoBox($heading, $contents);
+}
+?>
         </div>
       </div>
       <div class="row">
         <table class="table">
           <tr>
-            <td><?php echo $orders_status_split->display_count($orders_status_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_ORDERS_STATUS); ?></td>
+            <td><?php echo $orders_status_split->display_count($orders_status_query_numrows); ?></td>
             <td class="text-right"><?php echo $orders_status_split->display_links($orders_status_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
           </tr>
           <?php
           if (empty($action)) {
-            ?>
+              ?>
             <tr>
               <td colspan="2" class="text-right"><a href="<?php echo zen_href_link(FILENAME_ORDERS_STATUS, 'page=' . $_GET['page'] . '&action=new'); ?>" class="btn btn-primary" role="button"><?php echo IMAGE_INSERT; ?></a></td>
             </tr>
             <?php
           }
-          ?>
+?>
         </table>
       </div>
       <!-- body_text_eof //-->

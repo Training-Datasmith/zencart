@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\FeatureStore\CreateAccount;
 
 use Tests\Support\Database\TestDb;
@@ -9,7 +11,7 @@ use Tests\Support\zcFeatureTestCaseStore;
 class CreateAccountTest extends zcFeatureTestCaseStore
 {
     use CustomerAccountConcerns;
-    public function testCreateAccountNoDropdown()
+    public function testCreateAccountNoDropdown(): void
     {
         $profile = $this->createCustomerAccountOrLogin('florida-basic1');
         $customer = TestDb::selectOne(
@@ -28,7 +30,7 @@ class CreateAccountTest extends zcFeatureTestCaseStore
         $this->assertEquals(18, (int) $address['entry_zone_id']);
     }
 
-    public function testCreateAccountWithDropdown()
+    public function testCreateAccountWithDropdown(): void
     {
         $profile = $this->createCustomerAccountOrLogin('florida-basic2');
         $customer = TestDb::selectOne(

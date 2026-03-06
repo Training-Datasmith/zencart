@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Side Box Template
  *
@@ -10,7 +12,7 @@
 $content = '';
 $content .= '<div id="' . str_replace('_', '-', $box_id . 'Content') . '" class="sideBoxContent centeredContent">';
 $content .= zen_draw_label(PLEASE_SELECT, 'select-currency', 'class="sr-only"');
-$content .= zen_draw_form('currencies_form', zen_href_link(basename(preg_replace('/.php/','', $PHP_SELF)), '', $request_type, false), 'get');
+$content .= zen_draw_form('currencies_form', zen_href_link(basename((string) preg_replace('/.php/', '', (string) $PHP_SELF)), '', $request_type, false), 'get');
 $content .= zen_draw_pull_down_menu('currency', $currencies_array, $_SESSION['currency']) . $hidden_get_variables . zen_hide_session_id();
 $content .= zen_image_submit(BUTTON_IMAGE_SUBMIT, BUTTON_SUBMIT_GO_ALT);
 $content .= '</form>';

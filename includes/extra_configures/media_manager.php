@@ -1,5 +1,7 @@
 <?php
-/** 
+
+declare(strict_types=1);
+/**
  * sundry defines for the music product type
  *
  * @copyright Copyright 2003-2022 Zen Cart Development Team
@@ -9,5 +11,4 @@
 /**
  * The directory where media (mp3's etc) are stored - relative to catalog dir.
  */
-  define('DIR_WS_MEDIA', 'media/');
-?>
+define('DIR_WS_MEDIA', 'media/');

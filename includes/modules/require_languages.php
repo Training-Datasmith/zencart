@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * loads template- and page-specific language override files
  *

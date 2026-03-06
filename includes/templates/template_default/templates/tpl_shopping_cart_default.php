@@ -102,12 +102,12 @@
   if (isset($product['attributes']) && is_array($product['attributes'])) {
     echo '<div class="cartAttribsList">';
     echo '<ul>';
-    foreach ($product['attributes'] as $option => $value) {
+    foreach ($product['attributes'] as $value) {
 ?>
 
 <li>
     <?php
-    echo $value['products_options_name'] . TEXT_OPTION_DIVIDER . nl2br($value['products_options_values_name']);
+    echo $value['products_options_name'] . TEXT_OPTION_DIVIDER . nl2br((string) $value['products_options_values_name']);
     ?>
 </li>
 

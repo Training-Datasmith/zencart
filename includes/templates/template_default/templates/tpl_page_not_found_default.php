@@ -25,7 +25,7 @@
 
     <div id="siteMapList"><?php echo $zen_SiteMapTree->buildTree(); ?>
      <ul>
-<?php if (SHOW_ACCOUNT_LINKS_ON_SITE_MAP=='Yes') { ?>
+<?php if (SHOW_ACCOUNT_LINKS_ON_SITE_MAP == 'Yes') { ?>
        <li><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . PAGE_ACCOUNT . '</a>'; ?>
        <ul>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT_EDIT, '', 'SSL') . '">' . PAGE_ACCOUNT_EDIT . '</a>'; ?></li>
@@ -35,7 +35,7 @@
        </ul></li>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_SHOPPING_CART) . '">' . PAGE_SHOPPING_CART . '</a>'; ?></li>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL') . '">' . PAGE_CHECKOUT_SHIPPING . '</a>'; ?></li>
-<?php } //endif ?>
+<?php } //endif?>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_SEARCH) . '">' . PAGE_ADVANCED_SEARCH . '</a>'; ?></li>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_PRODUCTS_NEW) . '">' . PAGE_PRODUCTS_NEW . '</a>'; ?></li>
          <li><?php echo '<a href="' . zen_href_link(FILENAME_SPECIALS) . '">' . PAGE_SPECIALS . '</a>'; ?></li>

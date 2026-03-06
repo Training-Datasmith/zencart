@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * database functions and aliases into the $db queryFactory class
  *
@@ -32,20 +34,18 @@ function zen_db_input($string)
 
 /**
  * @deprecated use zen_output_string_protected() instead
- * @param string $string
- * @return string
  * @since ZC v1.0.3
  */
-function zen_db_output(string $string)
+function zen_db_output(string $string): string
 {
     trigger_error('Call to deprecated function zen_db_output. Use zen_output_string_protected() ' . (IS_ADMIN_FLAG ? 'for single encoding or consider htmlspecialchars() to support original double encoding ' : '') . 'instead', E_USER_DEPRECATED);
 
     if (IS_ADMIN_FLAG) {
-      return htmlspecialchars($string, ENT_COMPAT, CHARSET, true);
+        return htmlspecialchars($string, ENT_COMPAT, CHARSET, true);
     }
 
     return zen_output_string_protected($string);
-  }
+}
 
 /**
  * Rudimentary input sanitizer
@@ -55,7 +55,7 @@ function zen_db_output(string $string)
  */
 function zen_db_prepare_input(array|string|int|float|null $input, bool $trimspace = true): array|string|int|float|null
 {
-    if (!IS_ADMIN_FLAG && is_string($input)) {
+    if (is_string($input)) {
         $input = zen_sanitize_string($input);
     }
     if (is_string($input)) {
@@ -83,7 +83,6 @@ function zen_db_prepare_input(array|string|int|float|null $input, bool $trimspac
  * @param array $tableData key-value pairs -- all will be treated as strings, and will be escaped
  * @param string $performType INSERT or UPDATE
  * @param string $whereCondition condition for UPDATE (exclude the word "WHERE")
- * @return queryFactoryResult
  * @since ZC v1.0.3
  */
 function zen_db_perform(string $tableName, array $tableData, $performType = 'INSERT', string $whereCondition = ''): queryFactoryResult
@@ -97,36 +96,22 @@ function zen_db_perform(string $tableName, array $tableData, $performType = 'INS
         $query = substr($query, 0, -2) . ') VALUES (';
         foreach ($tableData as $value) {
             $value = (string)$value;
-            switch ($value) {
-                case 'now()':
-                    $query .= 'now(), ';
-                    break;
-                case 'NULL':
-                case 'null':
-                    $query .= 'null, ';
-                    break;
-                default:
-                    $query .= '\'' . $db->prepare_input($value) . '\', ';
-                    break;
-            }
+            match ($value) {
+                'now()' => $query .= 'now(), ',
+                'NULL', 'null' => $query .= 'null, ',
+                default => $query .= '\'' . $db->prepare_input($value) . '\', ',
+            };
         }
         $query = substr($query, 0, -2) . ')';
     } elseif (strtolower($performType) === 'update') {
         $query = 'UPDATE ' . $tableName . ' SET ';
         foreach ($tableData as $columns => $value) {
             $value = (string)$value;
-            switch ($value) {
-                case 'now()':
-                    $query .= $columns . ' = now(), ';
-                    break;
-                case 'NULL':
-                case 'null':
-                    $query .= $columns . ' = null, ';
-                    break;
-                default:
-                    $query .= $columns . ' = \'' . $db->prepare_input($value) . '\', ';
-                    break;
-            }
+            match ($value) {
+                'now()' => $query .= $columns . ' = now(), ',
+                'NULL', 'null' => $query .= $columns . ' = null, ',
+                default => $query .= $columns . ' = \'' . $db->prepare_input($value) . '\', ',
+            };
         }
         $query = substr($query, 0, -2) . ' WHERE ' . $whereCondition;
     }
@@ -137,60 +122,43 @@ function zen_db_perform(string $tableName, array $tableData, $performType = 'INS
 /**
  * zen_db_perform equiv for language-specific inserts
  *
- * @param string $tableName
- * @param array $tableData
- * @param string $keyIdName
- * @param int $keyId
- * @param int $languageId
  * @return queryFactoryResult
  * @since ZC v1.5.3
  */
 function zen_db_perform_language(string $tableName, array $tableData, string $keyIdName, int $keyId, int $languageId)
 {
     global $db;
-    $sql = "INSERT INTO " . $tableName . "(" . $db->prepare_input($keyIdName) . ", languages_id, ";
+    $sql = 'INSERT INTO ' . $tableName . '(' . $db->prepare_input($keyIdName) . ', languages_id, ';
     foreach ($tableData as $columns => $value) {
         $sql .= $columns . ', ';
     }
-    $sql = substr($sql, 0, -2) . ') values (' . (int)$keyId . ", " . (int)$languageId . ", ";
+    $sql = substr($sql, 0, -2) . ') values (' . $keyId . ', ' . $languageId . ', ';
     foreach ($tableData as $value) {
-        switch ((string)$value) {
-            case 'now()':
-                $sql .= 'now(), ';
-                break;
-            case 'null':
-                $sql .= 'null, ';
-                break;
-            default:
-                $sql .= '\'' . $db->prepare_input($value) . '\', ';
-                break;
-        }
+        match ((string)$value) {
+            'now()' => $sql .= 'now(), ',
+            'null' => $sql .= 'null, ',
+            default => $sql .= '\'' . $db->prepare_input($value) . '\', ',
+        };
     }
     $sql = substr($sql, 0, -2) . ')';
     $sql .= ' ON DUPLICATE KEY UPDATE ';
     foreach ($tableData as $columns => $value) {
-        switch ((string)$value) {
-            case 'now()':
-                $sql .= $columns . ' = now(), ';
-                break;
-            case 'null':
-                $sql .= $columns .= ' = null, ';
-                break;
-            default:
-                $sql .= $columns . ' = \'' . $db->prepare_input($value) . '\', ';
-                break;
-        }
+        match ((string)$value) {
+            'now()' => $sql .= $columns . ' = now(), ',
+            'null' => $sql .= $columns .= ' = null, ',
+            default => $sql .= $columns . ' = \'' . $db->prepare_input($value) . '\', ',
+        };
     }
     $sql = substr($sql, 0, -2);
     return $db->Execute($sql);
 }
 
-
 /** @deprecated
  * Return a random row from a database query
  * @since ZC v1.0.3
  */
-function zen_random_select($query) {
+function zen_random_select($query)
+{
     trigger_error('Call to deprecated function zen_random_select. Use $db->ExecuteRandomMulti() instead', E_USER_DEPRECATED);
 
     global $db;

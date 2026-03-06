@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ot_total order-total module
  *
@@ -10,8 +12,8 @@
 /**
  * @since ZC v1.0.3
  */
-class ot_subtotal {
-
+class ot_subtotal
+{
     /**
      * $_check is used to check the configuration key set up
      * @var int
@@ -24,7 +26,7 @@ class ot_subtotal {
     public $code;
     /**
      * $description is a soft name for this order total method
-     * @var string 
+     * @var string
      */
     public $description;
     /**
@@ -43,62 +45,69 @@ class ot_subtotal {
      */
     public $output = [];
 
-    function __construct() {
-      $this->code = 'ot_subtotal';
-      $this->title = MODULE_ORDER_TOTAL_SUBTOTAL_TITLE;
-      $this->description = MODULE_ORDER_TOTAL_SUBTOTAL_DESCRIPTION;
-      $this->sort_order = defined('MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER') ? MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER : null;
-      if (null === $this->sort_order) return false;
+    public function __construct()
+    {
+        $this->code = 'ot_subtotal';
+        $this->title = MODULE_ORDER_TOTAL_SUBTOTAL_TITLE;
+        $this->description = MODULE_ORDER_TOTAL_SUBTOTAL_DESCRIPTION;
+        $this->sort_order = defined('MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER') ? MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER : null;
+        if (null === $this->sort_order) {
+            return;
+        }
 
-      $this->output = array();
+        $this->output = [];
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function process() {
-      global $order, $currencies;
+    public function process(): void
+    {
+        global $order, $currencies;
 
-      $this->output[] = array('title' => $this->title . ':',
-                              'text' => $currencies->format($order->info['subtotal'], true, $order->info['currency'], $order->info['currency_value']),
-                              'value' => $order->info['subtotal']);
+        $this->output[] = ['title' => $this->title . ':',
+                                'text' => $currencies->format($order->info['subtotal'], true, $order->info['currency'], $order->info['currency_value']),
+                                'value' => $order->info['subtotal']];
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function check() {
-	  global $db;
-      if (!isset($this->_check)) {
-        $check_query = $db->Execute("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_ORDER_TOTAL_SUBTOTAL_STATUS'");
-        $this->_check = $check_query->RecordCount();
-      }
+    public function check()
+    {
+        global $db;
+        if (!isset($this->_check)) {
+            $check_query = $db->Execute('select configuration_value from ' . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_ORDER_TOTAL_SUBTOTAL_STATUS'");
+            $this->_check = $check_query->RecordCount();
+        }
 
-      return $this->_check;
+        return $this->_check;
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function keys() {
-      return array('MODULE_ORDER_TOTAL_SUBTOTAL_STATUS', 'MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER');
+    public function keys(): array
+    {
+        return ['MODULE_ORDER_TOTAL_SUBTOTAL_STATUS', 'MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER'];
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function install() {
-	  global $db;
-      $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_SUBTOTAL_STATUS', 'true', '', '6', '1','zen_cfg_select_option(array(\'true\'), ', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER', '100', 'Sort order of display.', '6', '2', now())");
+    public function install(): void
+    {
+        global $db;
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_SUBTOTAL_STATUS', 'true', '', '6', '1','zen_cfg_select_option(array(\'true\'), ', now())");
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER', '100', 'Sort order of display.', '6', '2', now())");
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function remove() {
-	  global $db;
-      $db->Execute("delete from " . TABLE_CONFIGURATION . " where configuration_key in ('" . implode("', '", $this->keys()) . "')");
+    public function remove(): void
+    {
+        global $db;
+        $db->Execute('delete from ' . TABLE_CONFIGURATION . " where configuration_key in ('" . implode("', '", $this->keys()) . "')");
     }
 }
-

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * database_tables.php
  * Defines the database table names used in the project
@@ -10,7 +12,9 @@
  * @private
  */
 
-if (!defined('DB_PREFIX')) define('DB_PREFIX', '');
+if (!defined('DB_PREFIX')) {
+    define('DB_PREFIX', '');
+}
 define('TABLE_ADDRESS_BOOK', DB_PREFIX . 'address_book');
 define('TABLE_ADDRESS_FORMAT', DB_PREFIX . 'address_format');
 define('TABLE_ADMIN', DB_PREFIX . 'admin');

@@ -26,7 +26,7 @@ function zen_display_files(): array
     $directory_array = [];
 
     foreach ($check_directory as $dir_check) {
-        $dir = glob(rtrim($dir_check, '/') . '/*.php') ?? [];
+        $dir = glob(rtrim((string) $dir_check, '/') . '/*.php') ?? [];
         foreach ($dir as $file) {
             $directory_array[] = basename($file);
         }
@@ -56,7 +56,7 @@ if ($action === 'new_page') {
         $za_lookup[] = ['id' => $i, 'text' => $directory_files[$i]];
     }
 
-// This will cause it to look for 'define_conditions.php'
+    // This will cause it to look for 'define_conditions.php'
     $_GET['filename'] = $za_lookup[$page]['text'];
     $_GET['box_name'] = BOX_TOOLS_DEFINE_CONDITIONS;
 }
@@ -78,7 +78,7 @@ switch ($action) {
                 }
                 @rename($file, 'bak' . $file);
                 $new_file = fopen($file, 'w');
-                $file_contents = stripslashes($_POST['file_contents']);
+                $file_contents = stripslashes((string) $_POST['file_contents']);
                 fwrite($new_file, $file_contents, strlen($file_contents));
                 fclose($new_file);
             }
@@ -132,34 +132,34 @@ require(DIR_WS_INCLUDES . 'header.php'); ?>
         <div class="col-sm-4 col-md-4">
             <?php
             $check_directory = [];
-            $check_directory[] = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/';
-            $directory_files = zen_display_files();
+$check_directory[] = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/';
+$directory_files = zen_display_files();
 
-            $za_lookup = [];
-            $za_lookup[] = ['id' => -1, 'text' => TEXT_INFO_SELECT_FILE];
+$za_lookup = [];
+$za_lookup[] = ['id' => -1, 'text' => TEXT_INFO_SELECT_FILE];
 
-            for ($i = 0, $n = count($directory_files); $i < $n; $i++) {
-                $za_lookup[] = ['id' => $i, 'text' => $directory_files[$i]];
-            }
+for ($i = 0, $n = count($directory_files); $i < $n; $i++) {
+    $za_lookup[] = ['id' => $i, 'text' => $directory_files[$i]];
+}
 
-            echo zen_draw_form('new_page', FILENAME_DEFINE_PAGES_EDITOR, '', 'get');
-            echo zen_draw_pull_down_menu('define_it', $za_lookup, '-1', 'onChange="this.form.submit();" class="form-control"');
-            echo zen_hide_session_id();
-            echo zen_draw_hidden_field('action', 'new_page');
-            echo '</form>';
-            ?>
+echo zen_draw_form('new_page', FILENAME_DEFINE_PAGES_EDITOR, '', 'get');
+echo zen_draw_pull_down_menu('define_it', $za_lookup, '-1', 'onChange="this.form.submit();" class="form-control"');
+echo zen_hide_session_id();
+echo zen_draw_hidden_field('action', 'new_page');
+echo '</form>';
+?>
         </div>
         <div class="col-sm-5 col-md-6">&nbsp;</div>
         <div class="col-sm-3 col-md-2">
             <?php
-            // toggle switch for editor
-            echo zen_draw_form('set_editor_form', FILENAME_DEFINE_PAGES_EDITOR, '', 'get', 'class="form-horizontal"');
-            echo zen_draw_label(TEXT_EDITOR_INFO, 'reset_editor', 'class="control-label"');
-            echo zen_draw_pull_down_menu('reset_editor', $editors_pulldown, $current_editor_key, 'onChange="this.form.submit();" class="form-control"');
-            echo zen_draw_hidden_field('action', 'set_editor');
-            echo zen_hide_session_id();
-            echo '</form>';
-            ?>
+// toggle switch for editor
+echo zen_draw_form('set_editor_form', FILENAME_DEFINE_PAGES_EDITOR, '', 'get');
+echo zen_draw_label(TEXT_EDITOR_INFO, 'reset_editor', 'class="control-label"');
+echo zen_draw_pull_down_menu('reset_editor', $editors_pulldown, $current_editor_key, 'onChange="this.form.submit();" class="form-control"');
+echo zen_draw_hidden_field('action', 'set_editor');
+echo zen_hide_session_id();
+echo '</form>';
+?>
         </div>
     </div>
     <?php
@@ -188,17 +188,17 @@ require(DIR_WS_INCLUDES . 'header.php'); ?>
                 <div class="row">
                     <?= zen_draw_form('language', FILENAME_DEFINE_PAGES_EDITOR, 'lngdir=' . $_SESSION['language'] . '&filename=' . $_GET['filename'] . '&action=save') ?>
                     <div class="col-sm-6"><?= zen_draw_textarea_field('file_contents', 'soft', '', '30',
-                            htmlspecialchars($file_contents, ENT_COMPAT, CHARSET, true),
-                            (($file_writeable) ? '' : 'readonly')
-                            . ' class="' . $editorCSSClass . ' form-control"'
-                        ); ?>
+                        htmlspecialchars($file_contents, ENT_COMPAT, CHARSET, true),
+                        (($file_writeable) ? '' : 'readonly')
+                        . ' class="' . $editorCSSClass . ' form-control"'
+                    ); ?>
                     </div>
                     <div class="col-sm-6">&nbsp;</div>
                     <div class="col-sm-12"><?= zen_draw_separator('pixel_trans.gif', '1', '10') ?></div>
                     <div class="col-sm-6 text-right">
                         <?php
-                        if ($file_writeable) {
-                            ?>
+                    if ($file_writeable) {
+                        ?>
                             <button type="submit" class="btn btn-primary"><?= IMAGE_SAVE ?></button>
                             <a href="<?= zen_href_link(FILENAME_DEFINE_PAGES_EDITOR, 'define_it=' . $_GET['define_it'] . '&action=new_page') ?>" class="btn btn-primary" role="button">
                                 <?= IMAGE_RESET ?>
@@ -206,14 +206,14 @@ require(DIR_WS_INCLUDES . 'header.php'); ?>
                             <a href="<?= zen_href_link(FILENAME_DEFINE_PAGES_EDITOR . '.php') ?>" class="btn btn-default">
                                 <?= IMAGE_CANCEL ?></a>
                             <?php
-                        } else {
-                            ?>
+                    } else {
+                        ?>
                             <a href="<?= zen_href_link(FILENAME_DEFINE_PAGES_EDITOR, 'lngdir=' . $_SESSION['language']) ?>" class="btn btn-default" role="button">
                                 <?= IMAGE_BACK; ?>
                             </a>
                             <?php
-                        }
-                        ?>
+                    }
+                ?>
                     </div>
                     <div class="col-sm-6">&nbsp;</div>
                     <?= '</form>' ?>
@@ -239,21 +239,21 @@ require(DIR_WS_INCLUDES . 'header.php'); ?>
                         </td>
                         <?php
                         $dir = dir(DIR_FS_CATALOG_LANGUAGES . $_SESSION['language']);
-                        $left = false;
-                        if ($dir) {
-                            while ($file = $dir->read()) {
-                                if (preg_match('~^[^\._].*\.php$~i', $file) > 0) {
-                                    echo '                <td class="smallText"><a href="' . zen_href_link($_GET['filename'], 'lngdir=' . $_SESSION['language'] . '&filename=' . $file) . '">' . $file . '</a></td>' . "\n";
-                                    if (!$left) {
-                                        echo '              </tr>' . "\n" .
-                                            '              <tr>' . "\n";
-                                    }
-                                    $left = !$left;
-                                }
-                            }
-                            $dir->close();
+            $left = false;
+            if ($dir) {
+                while ($file = $dir->read()) {
+                    if (preg_match('~^[^\._].*\.php$~i', $file) > 0) {
+                        echo '                <td class="smallText"><a href="' . zen_href_link($_GET['filename'], 'lngdir=' . $_SESSION['language'] . '&filename=' . $file) . '">' . $file . '</a></td>' . "\n";
+                        if (!$left) {
+                            echo '              </tr>' . "\n" .
+                                '              <tr>' . "\n";
                         }
-                        ?>
+                        $left = !$left;
+                    }
+                }
+                $dir->close();
+            }
+            ?>
                     </tr>
                 </table>
             </div>
@@ -261,7 +261,7 @@ require(DIR_WS_INCLUDES . 'header.php'); ?>
         }
         ?>
     <?php
-    } // filename   ?>
+    } // filename?>
     <!-- body_text_eof //-->
 </div>
 <!-- body_eof //-->

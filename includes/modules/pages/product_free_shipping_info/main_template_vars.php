@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *  product_free_shipping_info main_template_vars.php
  *
@@ -14,7 +16,7 @@
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_START_PRODUCT_FREE_SHIPPING_INFO');
 
-if (!isset($product_info) || get_class($product_info) !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
+if (!isset($product_info) || $product_info::class !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
     $product_info = new Product((int)$_GET['products_id']);
 }
 
@@ -56,11 +58,11 @@ if ($product_not_found) {
     require DIR_WS_MODULES . zen_get_module_directory(FILENAME_ATTRIBUTES);
 
     $reviews_query =
-        "SELECT COUNT(*) AS count FROM " . TABLE_REVIEWS . " r, " . TABLE_REVIEWS_DESCRIPTION . " rd
-          WHERE r.products_id = " . $products_id_current . "
+        'SELECT COUNT(*) AS count FROM ' . TABLE_REVIEWS . ' r, ' . TABLE_REVIEWS_DESCRIPTION . ' rd
+          WHERE r.products_id = ' . $products_id_current . '
             AND r.reviews_id = rd.reviews_id
-            AND rd.languages_id = " . (int)$_SESSION['languages_id'] . "
-            AND r.status = 1";
+            AND rd.languages_id = ' . (int)$_SESSION['languages_id'] . '
+            AND r.status = 1';
 
     $reviews = $db->Execute($reviews_query);
 
@@ -107,7 +109,7 @@ if ($product_not_found) {
         include_once $prod_type_specific_vars_info;
     }
     $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_PRODUCT_TYPE_VARS_PRODUCT_FREE_SHIPPING_INFO');
-  
+
     /**
      * Load all *.PHP files from the /includes/templates/MYTEMPLATE/PAGENAME/extra_main_template_vars
      */

@@ -59,14 +59,14 @@ switch ($action) {
             foreach ($languages as $current_language) {
                 $language_id = $current_language['id'];
                 $sql_data_array = [
-                    'pos_name' => $pos_names[$language_id]
+                    'pos_name' => $pos_names[$language_id],
                 ];
 
                 if ($action === 'insert' || get_pos_oos_name($nID, $language_id) === false) {
                     if ($nID === 0) {
                         $next_id = $db->Execute(
-                            "SELECT MAX(pos_name_id) AS pos_name_id
-                               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES
+                            'SELECT MAX(pos_name_id) AS pos_name_id
+                               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES
                         );
                         $nID = $next_id->fields['pos_name_id'] + 1;
                     }
@@ -83,7 +83,7 @@ switch ($action) {
 
     case 'deleteconfirm':
         $db->Execute(
-            "DELETE FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
+            'DELETE FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
               WHERE pos_name_id = $nID"
         );
         zen_redirect(zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES));
@@ -91,8 +91,8 @@ switch ($action) {
 
     case 'delete':
         $status = $db->Execute(
-            "SELECT pos_name_id
-               FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'SELECT pos_name_id
+               FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
               WHERE pos_name_id = $nID
               LIMIT 1"
         );
@@ -146,14 +146,14 @@ $body_onload = ($admin_html_head_supported === true) ? '' : ' onload="init();"';
                 <tbody>
 <?php
 $names_list = $db->Execute(
-    "SELECT pos_name_id, pos_name
-       FROM " . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . "
-      WHERE language_id = " . (int)$_SESSION['languages_id'] . "
-      ORDER BY pos_name_id"
+    'SELECT pos_name_id, pos_name
+       FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_NAMES . '
+      WHERE language_id = ' . (int)$_SESSION['languages_id'] . '
+      ORDER BY pos_name_id'
 );
 foreach ($names_list as $name) {
     $pos_name_id = $name['pos_name_id'];
-    if ((!isset($_GET['nID']) || $_GET['nID'] == $pos_name_id) && !isset($nInfo) && strpos($action, 'new') !== 0) {
+    if ((!isset($_GET['nID']) || $_GET['nID'] == $pos_name_id) && !isset($nInfo) && !str_starts_with($action, 'new')) {
         $nInfo = new objectInfo($names_list->fields);
     }
     if (isset($nInfo) && is_object($nInfo) && $pos_name_id === $nInfo->pos_name_id) {
@@ -161,7 +161,7 @@ foreach ($names_list as $name) {
     } else {
         $action_link = '<a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, "nID=$pos_name_id") . '">' . zen_image(DIR_WS_IMAGES . 'icon_info.gif', IMAGE_ICON_INFO) . '</a>';
     }
-?>
+    ?>
                     <tr class="dataTableRow">
                         <td class="dataTableContent"><?= $names_list->fields['pos_name_id'] ?></td>
                         <td class="dataTableContent"><?= $names_list->fields['pos_name'] ?></td>
@@ -170,7 +170,7 @@ foreach ($names_list as $name) {
 <?php
 }
 if ($action === '') {
-?>
+    ?>
                     <tr>
                         <td colspan="3" class="text-right">
                             <a href="<?= zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'action=new') ?>" class="btn btn-primary" role="button"><?= IMAGE_INSERT ?></a>
@@ -191,7 +191,7 @@ switch ($action) {
     case 'new':
         $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_NEW . '</h4>'];
 
-        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'action=insert', 'post', 'class="form-horizontal"')];
+        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'action=insert', 'post')];
         $contents[] = ['text' => TEXT_INFO_INSERT_INTRO];
 
         $inputs_string = '';
@@ -211,7 +211,7 @@ switch ($action) {
     case 'edit':
         $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_EDIT . '</h4>'];
 
-        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id  . '&action=save', 'post', 'class="form-horizontal"')];
+        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id  . '&action=save', 'post')];
         $contents[] = ['text' => TEXT_INFO_EDIT_INTRO];
 
         $inputs_string = '';
@@ -221,7 +221,7 @@ switch ($action) {
             $lang_dir = $current_language['directory'];
             $lang_img = $current_language['image'];
             $lang_name = $current_language['name'];
-            $inputs_string .= 
+            $inputs_string .=
                 '<br>' .
                 zen_image(DIR_WS_CATALOG_LANGUAGES . "$lang_dir/images/$lang_img", $lang_name) .
                 '&nbsp;' .
@@ -235,7 +235,7 @@ switch ($action) {
     case 'delete':
         $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_DELETE . '</h4>'];
 
-        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'action=deleteconfirm', 'post', 'class="form-horizontal"') . zen_draw_hidden_field('nID', $nInfo->pos_name_id)];
+        $contents = ['form' => zen_draw_form('status', FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'action=deleteconfirm', 'post') . zen_draw_hidden_field('nID', $nInfo->pos_name_id)];
         $contents[] = ['text' => TEXT_INFO_DELETE_INTRO];
         $contents[] = ['text' => '<br><b>' . $nInfo->pos_name . '</b>'];
         $contents[] = ['align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-danger">' . IMAGE_DELETE . '</button> <a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'];
@@ -243,16 +243,16 @@ switch ($action) {
 
     default:
         if (isset($nInfo) && is_object($nInfo)) {
-          $heading[] = ['text' => '<h4>' . $nInfo->pos_name . '</h4>'];
+            $heading[] = ['text' => '<h4>' . $nInfo->pos_name . '</h4>'];
 
-          $contents[] = ['align' => 'text-center', 'text' => '<a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id . '&action=edit') . '" class="btn btn-primary" role="button">' . IMAGE_EDIT . '</a> <a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>'];
+            $contents[] = ['align' => 'text-center', 'text' => '<a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id . '&action=edit') . '" class="btn btn-primary" role="button">' . IMAGE_EDIT . '</a> <a href="' . zen_href_link(FILENAME_PRODUCTS_OPTIONS_STOCK_NAMES, 'nID=' . $nInfo->pos_name_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>'];
 
-          $inputs_string = '';
-          $languages = zen_get_languages();
-          foreach ($languages as $current_language) {
+            $inputs_string = '';
+            $languages = zen_get_languages();
+            foreach ($languages as $current_language) {
                 $inputs_string .= '<br>' . zen_image(DIR_WS_CATALOG_LANGUAGES . $current_language['directory'] . '/images/' . $current_language['image'], $current_language['name']) . '&nbsp;' . get_pos_oos_name($nInfo->pos_name_id, $current_language['id']);
-          }
-          $contents[] = ['text' => $inputs_string];
+            }
+            $contents[] = ['text' => $inputs_string];
         }
         break;
 }

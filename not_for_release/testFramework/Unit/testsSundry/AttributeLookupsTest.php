@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -20,7 +22,7 @@ class AttributeLookupsTest extends zcUnitTestCase
         require DIR_FS_CATALOG . 'includes/functions/functions_attributes.php';
     }
 
-    public function testZenHasProductAttributesDownloadsStatusWhenDownloadEnabledIsFalse()
+    public function testZenHasProductAttributesDownloadsStatusWhenDownloadEnabledIsFalse(): void
     {
         define('DOWNLOAD_ENABLED', 'false');
 
@@ -32,11 +34,11 @@ class AttributeLookupsTest extends zcUnitTestCase
         $this->assertFalse(zen_has_product_attributes_downloads_status(1));
     }
 
-    public function testZenHasProductAttributesDownloadsStatusCountsDownloads()
+    public function testZenHasProductAttributesDownloadsStatusCountsDownloads(): void
     {
         define('DOWNLOAD_ENABLED', 'true');
-//    define('TABLE_PRODUCTS_ATTRIBUTES', 'products_attributes');
-//    define('TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD', 'products_attributes_download');
+        //    define('TABLE_PRODUCTS_ATTRIBUTES', 'products_attributes');
+        //    define('TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD', 'products_attributes_download');
 
         $result = $this->getMockBuilder('queryFactoryResult')
             ->disableOriginalConstructor()

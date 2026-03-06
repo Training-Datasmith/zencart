@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -6,9 +8,9 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 
-  require('includes/application_top.php');
-  unset($_SESSION['admin_id']);
-  zen_session_destroy();
-  require('includes/application_bottom.php');
-  zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
-  exit();
+require('includes/application_top.php');
+unset($_SESSION['admin_id']);
+zen_session_destroy();
+require('includes/application_bottom.php');
+zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
+exit();

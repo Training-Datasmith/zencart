@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -43,8 +45,8 @@ if (isset($_POST['updateConfigure'])) {
         $adminConfigureFileReader = new zcConfigureFileReader($admConfigFile);
 
         $configureInputs = $storeConfigureFileReader->getStoreInputsFromLegacy();
-        $configureInputs['enable_ssl_admin'] = trim($adminConfigureFileReader->getRawDefine('ENABLE_SSL_ADMIN'), "'");
-        $configureInputs['http_server_admin'] = trim($adminConfigureFileReader->getRawDefine($configureInputs['enable_ssl_admin'] === 'true' ? 'HTTPS_SERVER' : 'HTTP_SERVER'), "'");
+        $configureInputs['enable_ssl_admin'] = trim((string) $adminConfigureFileReader->getRawDefine('ENABLE_SSL_ADMIN'), "'");
+        $configureInputs['http_server_admin'] = trim((string) $adminConfigureFileReader->getRawDefine($configureInputs['enable_ssl_admin'] === 'true' ? 'HTTPS_SERVER' : 'HTTP_SERVER'), "'");
         $configureInputs['adminDir'] = $selectedAdminDir;
         $storeConfigureFileWriter = new zcConfigureFileWriter($configureInputs);
     }
@@ -56,7 +58,6 @@ $isCurrentDb = $dbVersion === $currentDbVersion;
 $hasSaneConfigFile = $systemChecker->hasSaneConfigFile();
 $hasTables = $systemChecker->hasTables();
 $hasUpdatedConfigFile = $systemChecker->hasUpdatedConfigFile();
-
 
 if ($hasTables && $hasSaneConfigFile && $hasUpdatedConfigFile) {
     $systemChecker->addRunLevel('upgradeDb');

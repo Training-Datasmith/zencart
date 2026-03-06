@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * PCI Patch for v1.3.x -- to aid in avoiding false-positives thrown by PCI scans
  *
@@ -13,20 +15,17 @@
  */
 
 if (isset($_GET['keyword']) && is_array($_GET['keyword'])) {
-   $_GET['keyword'] = '';
+    $_GET['keyword'] = '';
 }
-if (isset($_GET['keyword']) && $_GET['keyword'] != '')
-{
-  $count =  substr_count($_GET['keyword'], '"');
-  if ($count == 1)
-  {
-    if(substr(stripslashes(trim($_GET['keyword'])), 0, 1) == '"')
-    {
-      $_GET['keyword'] .= '"';
+if (isset($_GET['keyword']) && $_GET['keyword'] != '') {
+    $count =  substr_count((string) $_GET['keyword'], '"');
+    if ($count == 1) {
+        if (str_starts_with(stripslashes(trim((string) $_GET['keyword'])), '"')) {
+            $_GET['keyword'] .= '"';
+        }
     }
-  }
-  $_GET['keyword'] = stripslashes($_GET['keyword']);
+    $_GET['keyword'] = stripslashes((string) $_GET['keyword']);
 }
-if (isset($_GET['sort']) && strlen($_GET['sort']) > 3) {
-  $_GET['sort'] = substr($_GET['sort'], 0, 3);
+if (isset($_GET['sort']) && strlen((string) $_GET['sort']) > 3) {
+    $_GET['sort'] = substr((string) $_GET['sort'], 0, 3);
 }

@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'Checkout',
     'NAVBAR_TITLE_2' => 'Change Billing Address',
     'HEADING_TITLE' => 'Change the Billing Information',
@@ -11,5 +13,3 @@ $define = [
     'TITLE_CONTINUE_CHECKOUT_PROCEDURE' => 'Continue',
     'TEXT_CONTINUE_CHECKOUT_PROCEDURE' => '- to payment method.',
 ];
-
-return $define;

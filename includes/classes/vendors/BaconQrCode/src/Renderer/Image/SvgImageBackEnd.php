@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Renderer\Image;
 
@@ -22,13 +23,13 @@ final class SvgImageBackEnd implements ImageBackEndInterface
     private const SCALE_FORMAT = 'scale(%.' . self::PRECISION . 'F)';
     private const TRANSLATE_FORMAT = 'translate(%.' . self::PRECISION . 'F,%.' . self::PRECISION . 'F)';
 
-    private ?XMLWriter $xmlWriter;
+    private ?XMLWriter $xmlWriter = null;
 
-    private ?array $stack;
+    private ?array $stack = null;
 
-    private ?int $currentStack;
+    private ?int $currentStack = null;
 
-    private ?int $gradientCount;
+    private ?int $gradientCount = null;
 
     public function __construct()
     {
@@ -37,7 +38,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         }
     }
 
-    public function new(int $size, ColorInterface $backgroundColor) : void
+    public function new(int $size, ColorInterface $backgroundColor): void
     {
         $this->xmlWriter = new XMLWriter();
         $this->xmlWriter->openMemory();
@@ -78,7 +79,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         $this->xmlWriter->endElement();
     }
 
-    public function scale(float $size) : void
+    public function scale(float $size): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -92,7 +93,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         ++$this->stack[$this->currentStack];
     }
 
-    public function translate(float $x, float $y) : void
+    public function translate(float $x, float $y): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -106,7 +107,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         ++$this->stack[$this->currentStack];
     }
 
-    public function rotate(int $degrees) : void
+    public function rotate(int $degrees): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -117,7 +118,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         ++$this->stack[$this->currentStack];
     }
 
-    public function push() : void
+    public function push(): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -128,7 +129,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         ++$this->currentStack;
     }
 
-    public function pop() : void
+    public function pop(): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -142,7 +143,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         --$this->currentStack;
     }
 
-    public function drawPathWithColor(Path $path, ColorInterface $color) : void
+    public function drawPathWithColor(Path $path, ColorInterface $color): void
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -171,7 +172,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         float $y,
         float $width,
         float $height
-    ) : void {
+    ): void {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
         }
@@ -182,7 +183,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         $this->xmlWriter->endElement();
     }
 
-    public function done() : string
+    public function done(): string
     {
         if (null === $this->xmlWriter) {
             throw new RuntimeException('No image has been started');
@@ -204,60 +205,44 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         return $blob;
     }
 
-    private function startPathElement(Path $path) : void
+    private function startPathElement(Path $path): void
     {
         $pathData = [];
 
         foreach ($path as $op) {
-            switch (true) {
-                case $op instanceof Move:
-                    $pathData[] = sprintf(
-                        'M%s %s',
-                        round($op->getX(), self::PRECISION),
-                        round($op->getY(), self::PRECISION)
-                    );
-                    break;
-
-                case $op instanceof Line:
-                    $pathData[] = sprintf(
-                        'L%s %s',
-                        round($op->getX(), self::PRECISION),
-                        round($op->getY(), self::PRECISION)
-                    );
-                    break;
-
-                case $op instanceof EllipticArc:
-                    $pathData[] = sprintf(
-                        'A%s %s %s %u %u %s %s',
-                        round($op->getXRadius(), self::PRECISION),
-                        round($op->getYRadius(), self::PRECISION),
-                        round($op->getXAxisAngle(), self::PRECISION),
-                        $op->isLargeArc(),
-                        $op->isSweep(),
-                        round($op->getX(), self::PRECISION),
-                        round($op->getY(), self::PRECISION)
-                    );
-                    break;
-
-                case $op instanceof Curve:
-                    $pathData[] = sprintf(
-                        'C%s %s %s %s %s %s',
-                        round($op->getX1(), self::PRECISION),
-                        round($op->getY1(), self::PRECISION),
-                        round($op->getX2(), self::PRECISION),
-                        round($op->getY2(), self::PRECISION),
-                        round($op->getX3(), self::PRECISION),
-                        round($op->getY3(), self::PRECISION)
-                    );
-                    break;
-
-                case $op instanceof Close:
-                    $pathData[] = 'Z';
-                    break;
-
-                default:
-                    throw new RuntimeException('Unexpected draw operation: ' . get_class($op));
-            }
+            $pathData[] = match (true) {
+                $op instanceof Move => sprintf(
+                    'M%s %s',
+                    round($op->getX(), self::PRECISION),
+                    round($op->getY(), self::PRECISION)
+                ),
+                $op instanceof Line => sprintf(
+                    'L%s %s',
+                    round($op->getX(), self::PRECISION),
+                    round($op->getY(), self::PRECISION)
+                ),
+                $op instanceof EllipticArc => sprintf(
+                    'A%s %s %s %u %u %s %s',
+                    round($op->getXRadius(), self::PRECISION),
+                    round($op->getYRadius(), self::PRECISION),
+                    round($op->getXAxisAngle(), self::PRECISION),
+                    $op->isLargeArc(),
+                    $op->isSweep(),
+                    round($op->getX(), self::PRECISION),
+                    round($op->getY(), self::PRECISION)
+                ),
+                $op instanceof Curve => sprintf(
+                    'C%s %s %s %s %s %s',
+                    round($op->getX1(), self::PRECISION),
+                    round($op->getY1(), self::PRECISION),
+                    round($op->getX2(), self::PRECISION),
+                    round($op->getY2(), self::PRECISION),
+                    round($op->getX3(), self::PRECISION),
+                    round($op->getY3(), self::PRECISION)
+                ),
+                $op instanceof Close => 'Z',
+                default => throw new RuntimeException('Unexpected draw operation: ' . $op::class),
+            };
         }
 
         $this->xmlWriter->startElement('path');
@@ -265,7 +250,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         $this->xmlWriter->writeAttribute('d', implode('', $pathData));
     }
 
-    private function createGradientFill(Gradient $gradient, float $x, float $y, float $width, float $height) : string
+    private function createGradientFill(Gradient $gradient, float $x, float $y, float $width, float $height): string
     {
         $this->xmlWriter->startElement('defs');
 
@@ -349,7 +334,7 @@ final class SvgImageBackEnd implements ImageBackEndInterface
         return $id;
     }
 
-    private function getColorString(ColorInterface $color) : string
+    private function getColorString(ColorInterface $color): string
     {
         $color = $color->toRgb();
 

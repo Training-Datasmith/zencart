@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -23,7 +25,7 @@ class CategoriesTreeTest extends zcUnitTestCase
     /**
      * @test
      */
-    public function it_builds_a_category_tree_for_the_legacy_category_sidebox()
+    public function it_builds_a_category_tree_for_the_legacy_category_sidebox(): void
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet.'

@@ -7,7 +7,9 @@
  * @version $Id: lat9 2025 Oct 04 Modified in v2.2.0 $
  */
 
-if (!defined('IS_ADMIN_FLAG')) die('Illegal Access');
+if (!defined('IS_ADMIN_FLAG')) {
+    die('Illegal Access');
+}
 
 $menuTitles = zen_get_menu_titles();
 ?>
@@ -36,12 +38,12 @@ $menuTitles = zen_get_menu_titles();
             </li>
           <?php
           }
-          foreach ($upperMenuArray as $upperMenu) {
-          ?>
+foreach ($upperMenuArray as $upperMenu) {
+    ?>
           <li class="upperMenuItems"><a href="<?= $upperMenu['a'] ?>" <?= ($upperMenu['params'] ?? 'class="headerLink"') ?>><?= $upperMenu['title'] ?></a></li>
           <?php
-          }
-          ?>
+}
+?>
     </ul>
   </div><!-- /.navbar-collapse -->
 </nav>

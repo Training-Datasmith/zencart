@@ -5,22 +5,24 @@
  * @version $Id: DrByte 2020 May 11 New in v1.5.7 $
  */
 
-if (!zen_is_superuser() && !check_page(FILENAME_SALEMAKER, '')) return;
+if (!zen_is_superuser() && !check_page(FILENAME_SALEMAKER, '')) {
+    return;
+}
 
 // to disable this module for everyone, uncomment the following "return" statement so the rest of this file is ignored
 // return;
 
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_SPECIALS . " WHERE status = 0", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_SPECIALS . ' WHERE status = 0', false, true, 1800);
 $specials = $result->fields['count'];
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_SPECIALS . " WHERE status = 1", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_SPECIALS . ' WHERE status = 1', false, true, 1800);
 $specials_act = $result->fields['count'];
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_FEATURED . " WHERE status = 0", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_FEATURED . ' WHERE status = 0', false, true, 1800);
 $featured = $result->fields['count'];
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_FEATURED . " WHERE status = 1", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_FEATURED . ' WHERE status = 1', false, true, 1800);
 $featured_act = $result->fields['count'];
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_SALEMAKER_SALES . " WHERE sale_status = 0", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_SALEMAKER_SALES . ' WHERE sale_status = 0', false, true, 1800);
 $salemaker = $result->fields['count'];
-$result = $db->Execute("SELECT count(*) as count FROM " . TABLE_SALEMAKER_SALES . " WHERE sale_status = 1", false, true, 1800);
+$result = $db->Execute('SELECT count(*) as count FROM ' . TABLE_SALEMAKER_SALES . ' WHERE sale_status = 1', false, true, 1800);
 $salemaker_act = $result->fields['count'];
 ?>
 

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Address functions
  *
@@ -6,14 +8,12 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * Returns an array with countries, suitable for pulldown
  * @param string $pre_populated_entry
- * @return array
  * @since ZC v1.5.8
  */
-function zen_get_countries_for_admin_pulldown($pre_populated_entry = '')
+function zen_get_countries_for_admin_pulldown($pre_populated_entry = ''): array
 {
     global $db;
     $countries_array = [];
@@ -24,9 +24,9 @@ function zen_get_countries_for_admin_pulldown($pre_populated_entry = '')
             'status' => '',
         ];
     }
-    $sql = "SELECT countries_id, countries_name, status
-            FROM " . TABLE_COUNTRIES . "
-            ORDER BY countries_name";
+    $sql = 'SELECT countries_id, countries_name, status
+            FROM ' . TABLE_COUNTRIES . '
+            ORDER BY countries_name';
     $results = $db->Execute($sql);
     foreach ($results as $result) {
         $countries_array[] = [
@@ -39,31 +39,32 @@ function zen_get_countries_for_admin_pulldown($pre_populated_entry = '')
     return $countries_array;
 }
 
-
 /**
  * Returns an array with countries
  *
  * @param int $country_id If set limits to a single country
  * @param bool $with_iso_codes whether to add the iso codes to the array
- * @param bool $activeOnly
- * @return array
  * @since ZC v1.0.3
  */
-function zen_get_countries(int $country_id = 0, bool $with_iso_codes = false, bool $activeOnly = true)
+function zen_get_countries(int $country_id = 0, bool $with_iso_codes = false, bool $activeOnly = true): array
 {
     global $db;
     $countries_array = [];
 
-    $sql = "SELECT countries_id, countries_name, countries_iso_code_2, countries_iso_code_3, status
-            FROM " . TABLE_COUNTRIES;
+    $sql = 'SELECT countries_id, countries_name, countries_iso_code_2, countries_iso_code_3, status
+            FROM ' . TABLE_COUNTRIES;
 
     if (!empty($country_id)) {
-        $sql .= " WHERE countries_id = " . (int)$country_id;
-        if ($activeOnly) $sql .= " AND status != 0 ";
+        $sql .= ' WHERE countries_id = ' . (int)$country_id;
+        if ($activeOnly) {
+            $sql .= ' AND status != 0 ';
+        }
     } else {
-        if ($activeOnly) $sql .= " WHERE status != 0 ";
+        if ($activeOnly) {
+            $sql .= ' WHERE status != 0 ';
+        }
     }
-    $sql .= " ORDER BY countries_name";
+    $sql .= ' ORDER BY countries_name';
     $results = $db->Execute($sql);
 
     if (!empty($country_id)) {
@@ -76,17 +77,17 @@ function zen_get_countries(int $country_id = 0, bool $with_iso_codes = false, bo
                 $countries_array = [
                     'countries_name' => $results->fields['countries_name'],
                     'countries_iso_code_2' => $results->fields['countries_iso_code_2'],
-                    'countries_iso_code_3' => $results->fields['countries_iso_code_3']
+                    'countries_iso_code_3' => $results->fields['countries_iso_code_3'],
                 ];
             }
-        } else if (!$results->EOF) {
+        } elseif (!$results->EOF) {
             $countries_array = ['countries_name' => $results->fields['countries_name']];
         }
     } else {
         foreach ($results as $result) {
             $countries_array[] = [
                 'countries_id' => $result['countries_id'],
-                'countries_name' => $result['countries_name']
+                'countries_name' => $result['countries_name'],
             ];
         }
     }
@@ -98,12 +99,11 @@ function zen_get_countries(int $country_id = 0, bool $with_iso_codes = false, bo
  * Alias function to zen_get_countries()
  * @since ZC v1.0.3
  */
-function zen_get_country_name($country_id, $activeOnly = true)
+function zen_get_country_name($country_id, bool $activeOnly = true)
 {
     $country_array = zen_get_countries((int)$country_id, false, $activeOnly);
     return $country_array['countries_name'] ?? '';
 }
-
 
 /**
  * Alias function to zen_get_countries, which also returns country iso codes
@@ -111,28 +111,26 @@ function zen_get_country_name($country_id, $activeOnly = true)
  * @param int $country_id If set limits to a single country
  * @since ZC v1.0.3
  */
-function zen_get_countries_with_iso_codes($country_id, $activeOnly = TRUE)
+function zen_get_countries_with_iso_codes($country_id, bool $activeOnly = true)
 {
     return zen_get_countries((int)$country_id, true, $activeOnly);
 }
-
 
 /**
  * returns a pulldown array with zones defined for the specified country
  * used by zen_prepare_country_zones_pull_down()
  *
- * @param int|string $country_id
  * @return array for pulldown
  * @since ZC v1.0.3
  */
 function zen_get_country_zones(int|string $country_id): array
 {
     global $db;
-    $zones_array = array();
-    $zones = $db->Execute("SELECT zone_id, zone_name, zone_code
-                           FROM " . TABLE_ZONES . "
-                           WHERE zone_country_id = " . (int)$country_id . "
-                           ORDER BY zone_name");
+    $zones_array = [];
+    $zones = $db->Execute('SELECT zone_id, zone_name, zone_code
+                           FROM ' . TABLE_ZONES . '
+                           WHERE zone_country_id = ' . (int)$country_id . '
+                           ORDER BY zone_name');
     foreach ($zones as $zone) {
         $zones_array[] = [
             'id' => $zone['zone_id'],
@@ -146,19 +144,16 @@ function zen_get_country_zones(int|string $country_id): array
 
 /**
  * Return the zone (State/Province) name
- * @param int $country_id
- * @param int $zone_id
- * @param string|null $default_zone
  * @return string
  * @since ZC v1.0.3
  */
 function zen_get_zone_name(int $country_id, int $zone_id, ?string $default_zone = '')
 {
     global $db;
-    $sql = "SELECT zone_name
-            FROM " . TABLE_ZONES . "
-            WHERE zone_country_id = " . (int)$country_id . "
-            AND zone_id = " . (int)$zone_id;
+    $sql = 'SELECT zone_name
+            FROM ' . TABLE_ZONES . '
+            WHERE zone_country_id = ' . $country_id . '
+            AND zone_id = ' . $zone_id;
 
     $result = $db->Execute($sql);
 
@@ -168,22 +163,18 @@ function zen_get_zone_name(int $country_id, int $zone_id, ?string $default_zone 
     return $default_zone;
 }
 
-
 /**
  * Returns the zone (State/Province) code
- * @param int $country_id
- * @param int $zone_id
- * @param string|null $default_zone
  * @return string
  * @since ZC v1.0.3
  */
 function zen_get_zone_code(int $country_id, int $zone_id, ?string $default_zone = '')
 {
     global $db;
-    $sql = "SELECT zone_code
-            FROM " . TABLE_ZONES . "
-            WHERE zone_country_id = " . (int)$country_id . "
-            AND zone_id = " . (int)$zone_id;
+    $sql = 'SELECT zone_code
+            FROM ' . TABLE_ZONES . '
+            WHERE zone_country_id = ' . $country_id . '
+            AND zone_id = ' . $zone_id;
 
     $result = $db->Execute($sql);
 
@@ -196,8 +187,6 @@ function zen_get_zone_code(int $country_id, int $zone_id, ?string $default_zone 
 /**
  * Build an array of country zones for pulldown use
  *
- * @param int|string|null $country_id
- * @return array
  * @since ZC v1.0.3
  */
 function zen_prepare_country_zones_pull_down(int|string|null $country_id = 0): array
@@ -206,12 +195,10 @@ function zen_prepare_country_zones_pull_down(int|string|null $country_id = 0): a
 
     if (count($zones) > 0) {
         $zones_select = [['id' => '', 'text' => PLEASE_SELECT]];
-        $zones = array_merge($zones_select, $zones);
-    } else {
-        $zones = [['id' => '', 'text' => TYPE_BELOW]];
+        return array_merge($zones_select, $zones);
     }
 
-    return $zones;
+    return [['id' => '', 'text' => TYPE_BELOW]];
 }
 
 /**
@@ -221,34 +208,31 @@ function zen_prepare_country_zones_pull_down(int|string|null $country_id = 0): a
 function zen_get_address_formats(): array
 {
     global $db;
-    $sql = "SELECT address_format_id
-            FROM " . TABLE_ADDRESS_FORMAT . "
-            ORDER BY address_format_id";
+    $sql = 'SELECT address_format_id
+            FROM ' . TABLE_ADDRESS_FORMAT . '
+            ORDER BY address_format_id';
     $results = $db->Execute($sql);
 
     $address_format_array = [];
     foreach ($results as $result) {
         $address_format_array[] = [
             'id' => $result['address_format_id'],
-            'text' => $result['address_format_id']
+            'text' => $result['address_format_id'],
         ];
     }
     return $address_format_array;
 }
 
-
 /**
  * Returns the address_format_id for the given country_id
- * @param int|null $country_id
- * @return int
  * @since ZC v1.0.3
  */
-function zen_get_address_format_id(?int $country_id)
+function zen_get_address_format_id(?int $country_id): int
 {
     global $db;
-    $sql = "SELECT address_format_id as format_id
-            FROM " . TABLE_COUNTRIES . "
-            WHERE countries_id = " . (int)$country_id;
+    $sql = 'SELECT address_format_id as format_id
+            FROM ' . TABLE_COUNTRIES . '
+            WHERE countries_id = ' . (int)$country_id;
 
     $result = $db->Execute($sql, 1);
 
@@ -268,14 +252,16 @@ function zen_get_address_format_id(?int $country_id)
  * @return mixed|string|string[]
  * @since ZC v1.0.3
  */
-function zen_address_format($address_format_id = 1, $incoming = array(), $html = false, $boln = '', $eoln = "\n")
+function zen_address_format($address_format_id = 1, $incoming = [], $html = false, string $boln = '', string $eoln = "\n")
 {
     global $db, $zco_notifier;
-    $address = array();
+    $address = [];
     $address['hr'] = $html ? '<hr>' : '----------------------------------------';
     $address['cr'] = $html ? ($boln == '' && $eoln == "\n" ? '<br>' : $eoln . $boln) : $eoln;
 
-    if (ACCOUNT_SUBURB !== 'true') $incoming['suburb'] = '';
+    if (ACCOUNT_SUBURB !== 'true') {
+        $incoming['suburb'] = '';
+    }
     $address['company'] = !empty($incoming['company']) ? zen_output_string_protected($incoming['company']) : '';
     $address['firstname'] = !empty($incoming['firstname']) ? zen_output_string_protected($incoming['firstname']) : (!empty($incoming['name']) ? zen_output_string_protected($incoming['name']) : '');
     $address['lastname'] = !empty($incoming['lastname']) ? zen_output_string_protected($incoming['lastname']) : '';
@@ -308,12 +294,12 @@ function zen_address_format($address_format_id = 1, $incoming = array(), $html =
     $address['HR'] = $address['hr'];
     $address['CR'] = $address['cr'];
 
-    $sql    = "select address_format as format from " . TABLE_ADDRESS_FORMAT . " where address_format_id = " . (int)$address_format_id;
+    $sql    = 'select address_format as format from ' . TABLE_ADDRESS_FORMAT . ' where address_format_id = ' . (int)$address_format_id;
     $result = $db->Execute($sql);
     $fmt    = (!$result->EOF ? $result->fields['format'] : '');
 
     // sort to put longer keys at the top of the array so that longer variants are replaced before shorter ones
-    $tmp = array_map('strlen', array_keys($address));
+    $tmp = array_map(strlen(...), array_keys($address));
     array_multisort($tmp, SORT_DESC, $address);
 
     // store translated values into original array, just for the sake of the notifier
@@ -328,10 +314,12 @@ function zen_address_format($address_format_id = 1, $incoming = array(), $html =
     // do the substitutions
     $address_out = str_replace(array_keys($address), array_values($address), $fmt);
 
-    if (ACCOUNT_COMPANY == 'true' && !empty($address['$company']) && false === strpos($fmt, '$company')) {
+    if (ACCOUNT_COMPANY == 'true' && !empty($address['$company']) && !str_contains((string) $fmt, '$company')) {
         $address_out = $address['$company'] . $address['$cr'] . $address_out;
     }
-    if (ACCOUNT_SUBURB !== 'true') $address['suburb'] = '';
+    if (ACCOUNT_SUBURB !== 'true') {
+        $address['suburb'] = '';
+    }
 
     // -----
     // "Package up" the various elements of an address and issue a notification that will enable
@@ -376,14 +364,14 @@ function zen_address_format($address_format_id = 1, $incoming = array(), $html =
 function zen_address_label($customers_id, $address_id = 1, $html = false, $boln = '', $eoln = "\n")
 {
     global $db, $zco_notifier;
-    $sql = "SELECT entry_firstname AS firstname, entry_lastname AS lastname,
+    $sql = 'SELECT entry_firstname AS firstname, entry_lastname AS lastname,
                    entry_company AS company, entry_street_address AS street_address,
                    entry_suburb AS suburb, entry_city AS city, entry_postcode AS postcode,
                    entry_state AS state, entry_zone_id AS zone_id,
                    entry_country_id AS country_id
-            FROM " . TABLE_ADDRESS_BOOK . "
-            WHERE customers_id = " . (int)$customers_id . "
-            AND address_book_id = " . (int)$address_id;
+            FROM ' . TABLE_ADDRESS_BOOK . '
+            WHERE customers_id = ' . (int)$customers_id . '
+            AND address_book_id = ' . (int)$address_id;
 
     $address = $db->Execute($sql);
 

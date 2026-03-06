@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -21,9 +23,9 @@ class StoreTest extends zcFeatureTestCaseStore
         'gv_faq' => ['strings' => ['Zen Cart! : Gift Certificate FAQ']],
     ];
 
-    public function testSimpleStore()
+    public function testSimpleStore(): void
     {
-        $request = $this->browser->request('GET', HTTP_SERVER);
+        $this->browser->request('GET', HTTP_SERVER);
         $response = $this->browser->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->browser->request('GET', HTTP_SERVER  .'/index.php?main_page=products_all');
@@ -31,15 +33,15 @@ class StoreTest extends zcFeatureTestCaseStore
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testQuickLinks()
+    public function testQuickLinks(): void
     {
         foreach ($this->quickTestMap as $page => $contentTest) {
             $pageURI = $this->buildStoreLink($page);
             $this->browser->request('GET', $pageURI);
             $response = $this->browser->getResponse();
             $this->assertEquals(200, $response->getStatusCode());
-            foreach ( $contentTest['strings'] as $contentString) {
-                $this->assertStringContainsString($contentString, (string)$response->getContent() );
+            foreach ($contentTest['strings'] as $contentString) {
+                $this->assertStringContainsString($contentString, (string)$response->getContent());
             }
         }
     }

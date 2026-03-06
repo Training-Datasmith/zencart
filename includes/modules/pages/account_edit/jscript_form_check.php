@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * jscript_form_check
  *
@@ -8,4 +10,4 @@
  * @version $Id: Steve 2022 Jun 24 Modified in v1.5.8-alpha $
  */
 
-    require $template->get_template_dir('zen_jscript_form_check.php', DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/zen_jscript_form_check.php';
+require $template->get_template_dir('zen_jscript_form_check.php', DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/zen_jscript_form_check.php';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * upcoming_products module
  *
@@ -19,15 +21,15 @@ $sql = '';
 
 $display_limit = zen_get_upcoming_date_range();
 
-$limit_clause = "  ORDER BY " . (EXPECTED_PRODUCTS_FIELD == 'date_expected' ? 'date_expected' : 'products_name') . " " . (EXPECTED_PRODUCTS_SORT == 'asc' ? 'ASC' : 'DESC') . "
-                   LIMIT " . (int)MAX_DISPLAY_UPCOMING_PRODUCTS;
+$limit_clause = '  ORDER BY ' . (EXPECTED_PRODUCTS_FIELD == 'date_expected' ? 'date_expected' : 'products_name') . ' ' . (EXPECTED_PRODUCTS_SORT == 'asc' ? 'ASC' : 'DESC') . '
+                   LIMIT ' . (int)MAX_DISPLAY_UPCOMING_PRODUCTS;
 
 if ((($manufacturers_id > 0 && empty($_GET['filter_id'])) || !empty($_GET['music_genre_id']) || !empty($_GET['record_company_id'])) || empty($new_products_category_id)) {
-    $sql = "SELECT p.products_id, pd.products_name, products_date_available AS date_expected, p.master_categories_id
-            FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+    $sql = 'SELECT p.products_id, pd.products_name, products_date_available AS date_expected, p.master_categories_id
+            FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
             WHERE p.products_id = pd.products_id
             AND p.products_status = 1
-            AND pd.language_id = " . (int)$_SESSION['languages_id'] .
+            AND pd.language_id = ' . (int)$_SESSION['languages_id'] .
             $display_limit .
             $limit_clause;
 } else {
@@ -41,12 +43,12 @@ if ((($manufacturers_id > 0 && empty($_GET['filter_id'])) || !empty($_GET['music
         }
         $list_of_products = substr($list_of_products, 0, -2); // remove trailing comma
 
-        $sql = "SELECT p.products_id, pd.products_name, products_date_available AS date_expected, p.master_categories_id
-                FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+        $sql = 'SELECT p.products_id, pd.products_name, products_date_available AS date_expected, p.master_categories_id
+                FROM ' . TABLE_PRODUCTS . ' p, ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
                 WHERE p.products_id = pd.products_id
-                AND p.products_id IN (" . $list_of_products . ")
+                AND p.products_id IN (' . $list_of_products . ')
                 AND p.products_status = 1
-                AND pd.language_id = " . (int)$_SESSION['languages_id'] .
+                AND pd.language_id = ' . (int)$_SESSION['languages_id'] .
                 $display_limit .
                 $limit_clause;
     }

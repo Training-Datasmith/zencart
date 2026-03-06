@@ -15,13 +15,13 @@
 
 <?php echo zen_draw_form('contact_us', zen_href_link(FILENAME_CONTACT_US, 'action=send', 'SSL')); ?>
 
-<?php if (CONTACT_US_STORE_NAME_ADDRESS== '1') { ?>
+<?php if (CONTACT_US_STORE_NAME_ADDRESS == '1') { ?>
 <address><?php echo nl2br(STORE_NAME_ADDRESS, false); ?></address>
 <?php } ?>
 
 <?php
   if (isset($_GET['action']) && ($_GET['action'] == 'success')) {
-?>
+      ?>
 
 <div class="mainContent success"><?php echo TEXT_SUCCESS; ?></div>
 
@@ -29,20 +29,22 @@
 
 <?php
   } else {
-?>
+      ?>
 
 <?php if (DEFINE_CONTACT_US_STATUS >= '1' and DEFINE_CONTACT_US_STATUS <= '2') { ?>
 <div id="contactUsNoticeContent" class="content">
 <?php
-/**
+      /**
  * require html_define for the contact_us page
  */
-  require($define_page);
-?>
+        require($define_page);
+    ?>
 </div>
 <?php } ?>
 
-<?php if ($messageStack->size('contact') > 0) echo $messageStack->output('contact'); ?>
+<?php if ($messageStack->size('contact') > 0) {
+    echo $messageStack->output('contact');
+} ?>
 
 <fieldset id="contactUsForm">
 <legend><?php echo HEADING_TITLE; ?></legend>
@@ -52,13 +54,13 @@
 <?php
 // show dropdown if set
     if (CONTACT_US_LIST !== '') {
-?>
+        ?>
 <label class="inputLabel" for="send-to"><?php echo SEND_TO_TEXT; ?></label>
-<?php echo zen_draw_pull_down_menu('send_to',  $send_to_array, $send_to_default, 'id="send-to" required size="' . count($send_to_array) . '"') . '<span class="alert">' . ENTRY_REQUIRED_SYMBOL . '</span>'; ?>
+<?php echo zen_draw_pull_down_menu('send_to', $send_to_array, $send_to_default, 'id="send-to" required size="' . count($send_to_array) . '"') . '<span class="alert">' . ENTRY_REQUIRED_SYMBOL . '</span>'; ?>
 <br class="clearBoth">
 <?php
     }
-?>
+      ?>
 
 <label class="inputLabel" for="contactname"><?php echo ENTRY_NAME; ?></label>
 <?php echo zen_draw_input_field('contactname', $name, ' size="40" id="contactname" placeholder="' . ENTRY_REQUIRED_SYMBOL . '" required'); ?>

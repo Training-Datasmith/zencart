@@ -1,14 +1,16 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Removes demo images 
+ * Removes demo images
  *
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: Scott C Wilson 2021 Jul 14 New in v1.5.8-alpha $
  *
  */
-chdir("..");
-require 'includes/application_top.php'; 
+chdir('..');
+require 'includes/application_top.php';
 
 @unlink(DIR_WS_IMAGES . './small_00.jpg');
 @unlink(DIR_WS_IMAGES . './b_w_grid.gif');

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,11 +13,10 @@ use Tests\Support\zcNotifierTraitAliasTestObject;
 use Tests\Support\zcObserverAliasTestObject;
 use Tests\Support\zcUnitTestCase;
 
-
 class ObserverAliasingTest extends zcUnitTestCase
 {
-    protected $preserveGlobalState = FALSE;
-    protected $runTestInSeparateProcess = TRUE;
+    protected $preserveGlobalState = false;
+    protected $runTestInSeparateProcess = true;
 
     public function setUp(): void
     {
@@ -28,16 +29,16 @@ class ObserverAliasingTest extends zcUnitTestCase
         require_once(TESTCWD . 'Support/zcNotifierTraitAliasTestObject.php');
     }
 
-    public function testObserverAliasing()
+    public function testObserverAliasing(): void
     {
-        $zcObserverAliasTestObject = new zcObserverAliasTestObject;
-        $zcNotifierBaseAliasTestObject = new zcNotifierBaseAliasTestObject;
+        new zcObserverAliasTestObject();
+        $zcNotifierBaseAliasTestObject = new zcNotifierBaseAliasTestObject();
         $result = $zcNotifierBaseAliasTestObject->fireNotifierValid();
         $this->assertEquals($result, 'NOTIFIY_ORDER_CART_SUBTOTAL_CALCULATE');
         $result = $zcNotifierBaseAliasTestObject->fireNotifierInvalid();
         $this->assertEquals($result, 'invalid');
 
-        $zcNotifierTraitAliasTestObject = new zcNotifierTraitAliasTestObject;
+        $zcNotifierTraitAliasTestObject = new zcNotifierTraitAliasTestObject();
         $result = $zcNotifierTraitAliasTestObject->fireNotifierValid();
         $this->assertEquals($result, 'NOTIFIY_ORDER_CART_SUBTOTAL_CALCULATE');
         $result = $zcNotifierTraitAliasTestObject->fireNotifierInvalid();

@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Traits;
 
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClient;
-
 
 trait GeneralConcerns
 {
@@ -16,12 +17,11 @@ trait GeneralConcerns
         if (isset($_SERVER['IS_DDEV_PROJECT'])) {
             return 'ddev';
         }
-        $user = $_SERVER['USER'] ?? $_SERVER['MY_USER'];
 
-        return $user;
+        return $_SERVER['USER'] ?? $_SERVER['MY_USER'];
     }
 
-    public static function loadConfigureFile($context)
+    public static function loadConfigureFile(string $context)
     {
         if (defined('HTTP_SERVER')) {
             return;
@@ -34,18 +34,16 @@ trait GeneralConcerns
             die('could not find config file ' .$configFile);
         }
         echo $configFile . PHP_EOL;
-        $file = require($configFile);
-        return $file;
+        return require($configFile);
     }
 
-
-    public static function loadMigrationAndSeeders($mainConfigs = [])
+    public static function loadMigrationAndSeeders($mainConfigs = []): void
     {
         self::databaseSetup(); //setup Capsule
         self::runDatabaseLoader($mainConfigs);
     }
 
-    public function createHttpBrowser()
+    public function createHttpBrowser(): void
     {
         $this->browser = new HttpBrowser(HttpClient::create());
     }
@@ -59,27 +57,23 @@ trait GeneralConcerns
 
     /**
      * @param $page
-     * @return mixed
      * @todo refactor - use zen_href_link
      */
-    protected function buildStoreLink($page)
+    protected function buildStoreLink(string $page): string
     {
-        $URI = HTTP_SERVER . '/index.php?main_page='.$page;
-        return $URI;
+        return HTTP_SERVER . '/index.php?main_page='.$page;
     }
-    protected function buildAdminLink($page)
+    protected function buildAdminLink(string $page): string
     {
-        $URI = HTTP_SERVER . '/admin/index.php?cmd='.$page;
-        return $URI;
+        return HTTP_SERVER . '/admin/index.php?cmd='.$page;
     }
-
 
     protected function browserAdminLogin()
     {
         $this->runCustomSeeder('StoreWizardSeeder');
         $this->browser->request('GET', HTTP_SERVER . '/admin');
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Admin Login', (string)$response->getContent() );
+        $this->assertStringContainsString('Admin Login', (string)$response->getContent());
         $this->browser->submitForm('Submit', [
             'admin_name' => 'Admin',
             'admin_pass' => 'password',
@@ -98,7 +92,7 @@ trait GeneralConcerns
         $this->removePluginFromFileSystem($pluginName, $version);
     }
 
-    protected function removePluginFromFileSystem($pluginName, $version)
+    protected function removePluginFromFileSystem(string $pluginName, string $version)
     {
         $filesystem = new Filesystem();
         if (is_dir(DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/' . $version)) {
@@ -106,7 +100,7 @@ trait GeneralConcerns
         }
     }
 
-    protected function addPluginToFileSystem($pluginName, $version)
+    protected function addPluginToFileSystem(string $pluginName, $version)
     {
         $srcDirectory = DIR_FS_CATALOG . 'not_for_release/testFramework/Support/plugins/' . $pluginName;
         $destinationDirectory = DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/';

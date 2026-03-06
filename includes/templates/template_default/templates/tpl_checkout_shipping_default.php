@@ -17,7 +17,9 @@
 
 <h1 id="checkoutShippingHeading"><?php echo HEADING_TITLE; ?></h1>
 
-<?php if ($messageStack->size('checkout_shipping') > 0) echo $messageStack->output('checkout_shipping'); ?>
+<?php if ($messageStack->size('checkout_shipping') > 0) {
+    echo $messageStack->output('checkout_shipping');
+} ?>
 
 <h2 id="checkoutShippingHeadingAddress"><?php echo TITLE_SHIPPING_ADDRESS; ?></h2>
 
@@ -32,85 +34,87 @@
 <br>
 <?php
   if (zen_count_shipping_modules() > 0) {
-?>
+      ?>
 
 <h2 id="checkoutShippingHeadingMethod"><?php echo HEADING_SHIPPING_METHOD; ?></h2>
 
 <?php
-    if (sizeof($quotes) > 1 && sizeof($quotes[0]) > 1) {
-?>
+          if (sizeof($quotes) > 1 && sizeof($quotes[0]) > 1) {
+              ?>
 
 <div id="checkoutShippingContentChoose" class="important"><?php echo TEXT_CHOOSE_SHIPPING_METHOD; ?></div>
 
 <?php
-    } elseif ($free_shipping == false) {
-?>
+          } elseif ($free_shipping == false) {
+              ?>
 <div id="checkoutShippingContentChoose" class="important"><?php echo TEXT_ENTER_SHIPPING_INFORMATION; ?></div>
 
 <?php
-    }
-?>
+          }
+      ?>
 <?php
-    if ($free_shipping == true) {
-?>
+      if ($free_shipping == true) {
+          ?>
 <div id="freeShip" class="important"><?php echo FREE_SHIPPING_TITLE . (isset($quotes[$i]['icon']) ? '&nbsp;' . $quotes[$i]['icon'] : ''); ?></div>
 <div id="defaultSelected"><?php echo sprintf(FREE_SHIPPING_DESCRIPTION, $currencies->format(MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER)) . zen_draw_hidden_field('shipping', 'free_free'); ?></div>
 
 <?php
-    } else {
-      $radio_buttons = 0;
-      for ($i=0, $n=sizeof($quotes); $i<$n; $i++) {
-      // bof: field set
-      if (!empty($quotes[$i]['module'])) { 
-?>
+      } else {
+          $radio_buttons = 0;
+          for ($i = 0, $n = sizeof($quotes); $i < $n; $i++) {
+              // bof: field set
+              if (!empty($quotes[$i]['module'])) {
+                  ?>
 <fieldset>
-<legend><?php echo $quotes[$i]['module']; ?>&nbsp;<?php if (isset($quotes[$i]['icon']) && !empty($quotes[$i]['icon'])) { echo $quotes[$i]['icon']; } ?></legend>
+<legend><?php echo $quotes[$i]['module']; ?>&nbsp;<?php if (isset($quotes[$i]['icon']) && !empty($quotes[$i]['icon'])) {
+    echo $quotes[$i]['icon'];
+} ?></legend>
 
 <?php
         if (isset($quotes[$i]['error'])) {
-?>
+            ?>
       <div><?php echo $quotes[$i]['error']; ?></div>
 <?php
         } else {
-          for ($j=0, $n2=sizeof($quotes[$i]['methods']); $j<$n2; $j++) {
-// set the radio button to be checked if it is the method chosen
-            $checked = FALSE;
-            if (isset($_SESSION['shipping']) && isset($_SESSION['shipping']['id'])) {
-              $checked = ($quotes[$i]['id'] . '_' . $quotes[$i]['methods'][$j]['id'] == $_SESSION['shipping']['id']);
-            }
-?>
+            for ($j = 0, $n2 = sizeof($quotes[$i]['methods']); $j < $n2; $j++) {
+                // set the radio button to be checked if it is the method chosen
+                $checked = false;
+                if (isset($_SESSION['shipping']) && isset($_SESSION['shipping']['id'])) {
+                    $checked = ($quotes[$i]['id'] . '_' . $quotes[$i]['methods'][$j]['id'] == $_SESSION['shipping']['id']);
+                }
+                ?>
 <?php
-            if ( ($n > 1) || ($n2 > 1) ) {
-?>
-<div class="important forward"><?php echo $currencies->format(zen_add_tax($quotes[$i]['methods'][$j]['cost'], (isset($quotes[$i]['tax']) ? $quotes[$i]['tax'] : 0))); ?></div>
+                if (($n > 1) || ($n2 > 1)) {
+                    ?>
+<div class="important forward"><?php echo $currencies->format(zen_add_tax($quotes[$i]['methods'][$j]['cost'], ($quotes[$i]['tax'] ?? 0))); ?></div>
 <?php
-            } else {
-?>
+                } else {
+                    ?>
 <div class="important forward"><?php echo $currencies->format(zen_add_tax($quotes[$i]['methods'][$j]['cost'], $quotes[$i]['tax'])) . zen_draw_hidden_field('shipping', $quotes[$i]['id'] . '_' . $quotes[$i]['methods'][$j]['id']); ?></div>
 <?php
-            }
-?>
+                }
+                ?>
 
 <?php echo zen_draw_radio_field('shipping', $quotes[$i]['id'] . '_' . $quotes[$i]['methods'][$j]['id'], $checked, 'id="ship-'.$quotes[$i]['id'] . '-' . str_replace(' ', '-', $quotes[$i]['methods'][$j]['id']) .'"'); ?>
 <label for="ship-<?php echo $quotes[$i]['id'] . '-' . str_replace(' ', '-', $quotes[$i]['methods'][$j]['id']); ?>" class="checkboxLabel"><?php echo $quotes[$i]['methods'][$j]['title']; ?></label>
 <br class="clearBoth">
 <?php
-            $radio_buttons++;
-          }
+                            $radio_buttons++;
+            }
         }
-?>
+                  ?>
 
 </fieldset>
 <?php
-    }
-// eof: field set
+              }
+              // eof: field set
+          }
       }
-    }
-?>
+      ?>
 
 <?php
   } else {
-?>
+      ?>
 <h2 id="checkoutShippingHeadingMethod"><?php echo TITLE_NO_SHIPPING_AVAILABLE; ?></h2>
 <div id="checkoutShippingContentChoose" class="important"><?php echo TEXT_NO_SHIPPING_AVAILABLE; ?></div>
 <?php
@@ -118,12 +122,12 @@
 ?>
 <fieldset class="shipping" id="comments">
 <legend><?php echo HEADING_ORDER_COMMENTS; ?></legend>
-<?php echo zen_draw_textarea_field('comments', '45', '3', (isset($comments) ? $comments : ''), 'aria-label="' . HEADING_ORDER_COMMENTS . '"'); ?>
+<?php echo zen_draw_textarea_field('comments', '45', '3', ($comments ?? ''), 'aria-label="' . HEADING_ORDER_COMMENTS . '"'); ?>
 </fieldset>
 
 <?php
 // this can be defined in site-specific-settings
-$show_contact_us_instead_of_continue = $show_contact_us_instead_of_continue ?? false;
+$show_contact_us_instead_of_continue ??= false;
 ?>
 <?php if (empty($show_contact_us_instead_of_continue)) { ?>
     <div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_CONTINUE_CHECKOUT, BUTTON_CONTINUE_ALT); ?></div>
@@ -132,7 +136,7 @@ $show_contact_us_instead_of_continue = $show_contact_us_instead_of_continue ?? f
     <?php if (zen_count_shipping_modules() > 0) { ?>
         <div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_CONTINUE_CHECKOUT, BUTTON_CONTINUE_ALT); ?></div>
     <?php } else { ?>
-        <div class="buttonRow forward"><a href="<?php echo zen_href_link(FILENAME_CONTACT_US, '', 'SSL'); ?>" id="linkContactUs"><?php echo zen_image_button(BUTTON_IMAGE_CONTACT_US , BUTTON_CONTACT_US_TEXT); ?></a></div>
+        <div class="buttonRow forward"><a href="<?php echo zen_href_link(FILENAME_CONTACT_US, '', 'SSL'); ?>" id="linkContactUs"><?php echo zen_image_button(BUTTON_IMAGE_CONTACT_US, BUTTON_CONTACT_US_TEXT); ?></a></div>
     <?php } ?>
     <?php if (zen_count_shipping_modules() > 0) { ?>
         <div class="buttonRow back"><?php echo '<strong>' . TITLE_CONTINUE_CHECKOUT_PROCEDURE . '</strong>' . '<br>' . TEXT_CONTINUE_CHECKOUT_PROCEDURE; ?></div>

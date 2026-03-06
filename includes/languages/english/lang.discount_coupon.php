@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Discount Coupon',
     'HEADING_TITLE' => 'Discount Coupon',
     'TEXT_INFORMATION' => '',
@@ -19,5 +21,3 @@ $define = [
     'TEXT_DISCOUNT_COUPON_ID_INFO' => 'Look-up Discount Coupon ... ',
     'TEXT_DISCOUNT_COUPON_ID' => 'Your Code: ',
 ];
-
-return $define;

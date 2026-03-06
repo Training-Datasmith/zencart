@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'TEXT_GREETING_GUEST' => 'Welcome <span class="greetUser">Guest!</span> Would you like to <a href="%s">log yourself in</a>?',
     'TEXT_GREETING_GUEST_SHOWCASE' => 'Welcome, please enjoy our online showcase.',
     'TEXT_GREETING_PERSONAL' => 'Hello <span class="greetUser">%1$s</span>! Would you like to see our <a href="%2$s">newest additions</a>?',
@@ -14,5 +16,3 @@ $define = [
     'HEADING_TITLE' => 'Congratulations! You have successfully installed your Zen Cart&reg; E-Commerce Solution.',
     'HEADING_TITLE_NESTED' => 'Congratulations! You have successfully installed your Zen Cart&reg; E-Commerce Solution.',
 ];
-
-return $define;

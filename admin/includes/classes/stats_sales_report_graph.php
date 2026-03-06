@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -11,17 +12,15 @@ declare(strict_types=1);
 
 class statsSalesReportGraph
 {
-    const HOURLY_VIEW = 1;
-    const DAILY_VIEW = 2;
-    const WEEKLY_VIEW = 3;
-    const MONTHLY_VIEW = 4;
-    const QUARTERLY_VIEW = 6;
-    const YEARLY_VIEW = 5;
+    public const HOURLY_VIEW = 1;
+    public const DAILY_VIEW = 2;
+    public const WEEKLY_VIEW = 3;
+    public const MONTHLY_VIEW = 4;
+    public const QUARTERLY_VIEW = 6;
+    public const YEARLY_VIEW = 5;
 
     /** @var int Number of years to look backward in yearly mode */
-    const LOOKBACK_YEARS = 10;
-
-    protected int $mode = self::MONTHLY_VIEW;
+    public const LOOKBACK_YEARS = 10;
     protected int|false $globalStartDate;
     protected int|false $startDate;
     protected int|false $endDate;
@@ -49,13 +48,11 @@ class statsSalesReportGraph
      * @param int|string $endDate, a UNIX timestamp (either as an integer or a string)
      * @param string $filter filter string
      */
-    public function __construct(int $mode, int|string $startDate = '', int|string $endDate = '', string $filter = '')
+    public function __construct(protected int $mode, int|string $startDate = '', int|string $endDate = '', string $filter = '')
     {
         global $db;
-
-        $this->mode = $mode;
         // get date of first sale
-        $first = $db->Execute("SELECT UNIX_TIMESTAMP(MIN(date_purchased)) as first FROM " . TABLE_ORDERS);
+        $first = $db->Execute('SELECT UNIX_TIMESTAMP(MIN(date_purchased)) as first FROM ' . TABLE_ORDERS);
         $first_timestamp = (int)$first->fields['first'];
         $this->globalStartDate = $this->mktime(0, 0, 0, date('m', $first_timestamp), date('d', $first_timestamp), date('Y', $first_timestamp));
 
@@ -229,16 +226,16 @@ class statsSalesReportGraph
             $tmpStart = $this->startDate - $tmpShift + $tmpUnit;
             $tmpEnd = $this->startDate - $tmpUnit;
             if ($tmpStart >= $this->globalStartDate) {
-                $this->previous = "report=" . $this->mode . "&startDate=" . $tmpStart . "&endDate=" . $tmpEnd;
+                $this->previous = 'report=' . $this->mode . '&startDate=' . $tmpStart . '&endDate=' . $tmpEnd;
             }
             $tmpStart = $this->endDate;
             $tmpEnd = $this->endDate + $tmpShift - 2 * $tmpUnit;
             if ($tmpEnd < $this->mktime(0, 0, 0, date('m'), date('d'), date('Y'))) {
-                $this->next = "report=" . $this->mode . "&startDate=" . $tmpStart . "&endDate=" . $tmpEnd;
+                $this->next = 'report=' . $this->mode . '&startDate=' . $tmpStart . '&endDate=' . $tmpEnd;
             } else {
                 if ($tmpEnd - $tmpDiff < $this->mktime(0, 0, 0, date('m'), date('d'), date('Y'))) {
                     $tmpEnd = $this->mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-                    $this->next = "report=" . $this->mode . "&startDate=" . $tmpStart . "&endDate=" . $tmpEnd;
+                    $this->next = 'report=' . $this->mode . '&startDate=' . $tmpStart . '&endDate=' . $tmpEnd;
                 }
             }
         } elseif ($this->mode === self::MONTHLY_VIEW) {
@@ -247,7 +244,7 @@ class statsSalesReportGraph
             $tmpStart = $this->mktime(0, 0, 0, 1, 1, $year);
             $tmpEnd = $this->mktime(0, 0, 0, 12, 1, $year);
             if (date('Y', $tmpStart) >= date('Y', $this->globalStartDate)) {
-               $this->previous = "report=" . $this->mode . "&startDate=" . $tmpStart . "&endDate=" . $tmpEnd;
+                $this->previous = 'report=' . $this->mode . '&startDate=' . $tmpStart . '&endDate=' . $tmpEnd;
             }
 
             // compute next link if data is there
@@ -255,7 +252,7 @@ class statsSalesReportGraph
             $tmpStart = $this->mktime(0, 0, 0, 1, 1, $year);
             $tmpEnd = $this->mktime(0, 0, 0, 12, 1, $year);
             if (date('Y', $tmpEnd) <= date('Y')) {
-               $this->next= "report=" . $this->mode . "&startDate=" . $tmpStart . "&endDate=" . $tmpEnd;
+                $this->next = 'report=' . $this->mode . '&startDate=' . $tmpStart . '&endDate=' . $tmpEnd;
             }
         }
 
@@ -264,14 +261,14 @@ class statsSalesReportGraph
         // 01001 means use filter for status 2 and 5 set.
         $tmp = '';
         $tmp1 = '';
-        if (is_string($filter) && strlen($filter) > 0) {
+        if (strlen($filter) > 0) {
             for ($i = 0; $i < $this->status_available_size; $i++) {
                 if (substr($filter, $i, 1) === '1') {
                     $tmp1 .= '1';
                     if (strlen($tmp) === 0) {
-                        $tmp = "o.orders_status <> " . $this->status_available[$i]['id'];
+                        $tmp = 'o.orders_status <> ' . $this->status_available[$i]['id'];
                     } else {
-                        $tmp .= " and o.orders_status <> " . $this->status_available[$i]['id'];
+                        $tmp .= ' and o.orders_status <> ' . $this->status_available[$i]['id'];
                     }
                 } else {
                     $tmp1 .= '0';
@@ -280,7 +277,7 @@ class statsSalesReportGraph
         }
         $this->filter_sql = $tmp;
         $this->filter = $tmp1;
-        $this->filter_link = "report=" . $this->mode . "&startDate=" . $startDate . "&endDate=" . $endDate;
+        $this->filter_link = 'report=' . $this->mode . '&startDate=' . $startDate . '&endDate=' . $endDate;
 
         $this->query();
     }
@@ -310,12 +307,12 @@ class statsSalesReportGraph
         global $db, $zcDate;
 
         $tmp_query =
-            "SELECT SUM(ot.value) AS value, AVG(ot.value) AS avg, COUNT(ot.value) AS count
-               FROM " . TABLE_ORDERS_TOTAL . " ot, " . TABLE_ORDERS . " o
+            'SELECT SUM(ot.value) AS value, AVG(ot.value) AS avg, COUNT(ot.value) AS count
+               FROM ' . TABLE_ORDERS_TOTAL . ' ot, ' . TABLE_ORDERS . " o
               WHERE ot.orders_id = o.orders_id
                 AND ot.class = 'ot_subtotal'";
         if (strlen($this->filter_sql) > 0) {
-            $tmp_query .= " AND (" . $this->filter_sql . ")";
+            $tmp_query .= ' AND (' . $this->filter_sql . ')';
         }
         for ($i = 0; $i < $this->size; $i++) {
             $report = $db->Execute(
@@ -336,20 +333,20 @@ class statsSalesReportGraph
                     $this->info[$i]['link'] = '';
                     break;
                 case self::DAILY_VIEW:
-                    $this->info[$i]['link'] = "report=" . self::HOURLY_VIEW . "&startDate=" . $this->startDates[$i] . "&endDate=" . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) + 1, date('Y', $this->endDates[$i]));
+                    $this->info[$i]['link'] = 'report=' . self::HOURLY_VIEW . '&startDate=' . $this->startDates[$i] . '&endDate=' . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) + 1, date('Y', $this->endDates[$i]));
                     break;
                 case self::WEEKLY_VIEW:
-                    $this->info[$i]['link'] = "report=" . self::DAILY_VIEW . "&startDate=" . $this->startDates[$i] . "&endDate=" . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) - 1, date('Y', $this->endDates[$i]));
+                    $this->info[$i]['link'] = 'report=' . self::DAILY_VIEW . '&startDate=' . $this->startDates[$i] . '&endDate=' . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) - 1, date('Y', $this->endDates[$i]));
                     break;
                 case self::MONTHLY_VIEW:
-                    $this->info[$i]['link'] = "report=" . self::WEEKLY_VIEW . "&startDate=" . $this->startDates[$i] . "&endDate=" . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) - 1, date('Y', $this->endDates[$i]));
+                    $this->info[$i]['link'] = 'report=' . self::WEEKLY_VIEW . '&startDate=' . $this->startDates[$i] . '&endDate=' . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]), date('d', $this->endDates[$i]) - 1, date('Y', $this->endDates[$i]));
                     break;
                 case self::YEARLY_VIEW:
-                    $this->info[$i]['link'] = "report=" . self::MONTHLY_VIEW . "&startDate=" . $this->startDates[$i] . "&endDate=" . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]) - 1, date('d', $this->endDates[$i]), date('Y', $this->endDates[$i]));
+                    $this->info[$i]['link'] = 'report=' . self::MONTHLY_VIEW . '&startDate=' . $this->startDates[$i] . '&endDate=' . $this->mktime(0, 0, 0, date('m', $this->endDates[$i]) - 1, date('d', $this->endDates[$i]), date('Y', $this->endDates[$i]));
                     break;
             }
         }
-        $tmp_query =  "SELECT SUM(ot.value) AS shipping FROM " . TABLE_ORDERS_TOTAL . " ot, " . TABLE_ORDERS . " o WHERE ot.orders_id = o.orders_id AND ot.class = 'ot_shipping'";
+        $tmp_query =  'SELECT SUM(ot.value) AS shipping FROM ' . TABLE_ORDERS_TOTAL . ' ot, ' . TABLE_ORDERS . " o WHERE ot.orders_id = o.orders_id AND ot.class = 'ot_shipping'";
         for ($i = 0; $i < $this->size; $i++) {
             $report = $db->Execute(
                 $tmp_query .

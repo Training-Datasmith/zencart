@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Featured Products
  *
@@ -37,9 +39,9 @@ foreach ($define_list as $key => $value) {
         $column_list[] = $key;
     }
 }
-$select_column_list = " pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,";
-$sql_joins = " LEFT JOIN " . TABLE_FEATURED . " f ON (p.products_id = f.products_id) ";
-$and = " AND f.status = 1 ";
+$select_column_list = ' pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,';
+$sql_joins = ' LEFT JOIN ' . TABLE_FEATURED . ' f ON (p.products_id = f.products_id) ';
+$and = ' AND f.status = 1 ';
 
 // display sort order dropdown
 $disp_order_default = PRODUCT_FEATURED_LIST_SORT_DEFAULT;
@@ -47,7 +49,6 @@ $disp_order_default = PRODUCT_FEATURED_LIST_SORT_DEFAULT;
 // set the product filters according to selected product type
 $typefilter = $_GET['typefilter'] ?? 'default';
 require(zen_get_index_filters_directory($typefilter . '_filter.php'));
-
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_FEATURED_PRODUCTS', null);

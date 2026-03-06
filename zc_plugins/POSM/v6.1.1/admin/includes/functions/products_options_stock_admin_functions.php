@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2024 Vinos de Frutas Tropicales
@@ -29,14 +31,14 @@ function get_pos_options_values($pID, $options_id)
     $options_id = (int)$options_id;
     return $db->Execute(
         "SELECT pov.products_options_values_name as `text`, pov.products_options_values_id as `id`, LPAD(pa.products_options_sort_order, 11, '0') as sort_order
-           FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov
-                INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " pa
+           FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . ' pov
+                INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . " pa
                     ON pa.options_values_id = pov.products_options_values_id
                    AND pa.products_id = $pID
                    AND pa.options_id = $options_id
                    AND pa.attributes_display_only = 0
-          WHERE pov.language_id = " . $_SESSION['languages_id'] . "
-       ORDER BY sort_order ASC, pov.products_options_values_name ASC"
+          WHERE pov.language_id = " . $_SESSION['languages_id'] . '
+       ORDER BY sort_order ASC, pov.products_options_values_name ASC'
     );
 }
 
@@ -58,20 +60,20 @@ function get_pos_options($pID)
     $pID = (int)$pID;
     $and_clause = '';
     if (POSM_OPTIONAL_OPTION_TYPES_LIST !== '') {
-        $and_clause .= " AND po.products_options_type NOT IN (" . POSM_OPTIONAL_OPTION_TYPES_LIST . ")";
+        $and_clause .= ' AND po.products_options_type NOT IN (' . POSM_OPTIONAL_OPTION_TYPES_LIST . ')';
     }
     if (POSM_OPTIONAL_OPTION_NAMES_LIST !== '') {
-        $and_clause .= " AND po.products_options_id NOT IN (" . POSM_OPTIONAL_OPTION_NAMES_LIST . ")";
+        $and_clause .= ' AND po.products_options_id NOT IN (' . POSM_OPTIONAL_OPTION_NAMES_LIST . ')';
     }
     return $db->Execute(
         "SELECT DISTINCT pa.options_id, po.products_options_name as options_name, LPAD(po.products_options_sort_order, 11, '0') as sort_order
-           FROM " . TABLE_PRODUCTS_OPTIONS . " po
-                INNER JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " pa
+           FROM " . TABLE_PRODUCTS_OPTIONS . ' po
+                INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . " pa
                     ON pa.options_id = po.products_options_id
                    AND pa.products_id = $pID
           WHERE po.products_options_type  IN (" . POSM_OPTIONS_TYPES_TO_MANAGE . ")$and_clause
-            AND po.language_id = " . (int)$_SESSION['languages_id'] . "
-       ORDER BY sort_order ASC, po.products_options_name ASC"
+            AND po.language_id = " . (int)$_SESSION['languages_id'] . '
+       ORDER BY sort_order ASC, po.products_options_name ASC'
     );
 }
 
@@ -95,14 +97,12 @@ function draw_option_pulldown($products_id, $options_id, $varname, $default = ''
     }
 
     if (count($options) === 0) {
-        $return_val = '';
-    } else {
-        if ($include_all === true) {
-            array_unshift($options, ['id' => 0, 'text' => TEXT_ALL]);
-        }
-        $return_val = zen_draw_pull_down_menu($varname, $options, $default, 'class="oSelect form-control input-sm" data-ocount="' . (count($options) - 1) . '"');
+        return '';
     }
-    return $return_val;
+    if ($include_all === true) {
+        array_unshift($options, ['id' => 0, 'text' => TEXT_ALL]);
+    }
+    return zen_draw_pull_down_menu($varname, $options, $default, 'class="oSelect form-control input-sm" data-ocount="' . (count($options) - 1) . '"');
 }
 
 /**
@@ -112,8 +112,8 @@ function draw_option_pulldown($products_id, $options_id, $varname, $default = ''
  */
 function build_all_options_array($options)
 {
-    end($options);  // Position at end of array to pull the to-be-removed element's data
-    $options_id = key($options);
+    // Position at end of array to pull the to-be-removed element's data
+    $options_id = array_key_last($options);
     $options_values = current($options);
 
     if (array_pop($options) === null) {
@@ -139,10 +139,8 @@ function build_all_options_array($options)
  * @param $pos_name_id
  * @param $options_values_array
  * @param $replace_quantity
- *
- * @return void
  */
-function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_array, $replace_quantity)
+function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_array, $replace_quantity): void
 {
     global $db, $messageStack, $zco_notifier;
 
@@ -151,8 +149,8 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
     $pos_name_id = (int)$pos_name_id;
     $hash = generate_pos_option_hash($pID, $options_values_array);
     $check = $db->Execute(
-        "SELECT pos_id, products_quantity
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+        'SELECT pos_id, products_quantity
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
           WHERE products_id = $pID
             AND pos_hash = '$hash'
           LIMIT 1"
@@ -165,7 +163,7 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
             $quantity = 0;
         }
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'UPDATE ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                SET products_quantity = $quantity, last_modified = now()
              WHERE pos_id = " . $check->fields['pos_id']
         );
@@ -175,7 +173,7 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
             $quantity = 0;
         }
         $db->Execute(
-            "INSERT INTO " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+            'INSERT INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                 (products_id, products_quantity, pos_name_id, pos_hash, last_modified)
              VALUES
                 ($pID, $quantity, $pos_name_id, '$hash', now())"
@@ -183,7 +181,7 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
         $pos_id = $db->insert_ID();
         foreach ($options_values_array as $options_id => $options_values_id) {
             $db->Execute(
-                "INSERT INTO " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+                'INSERT INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
                     (pos_id, products_id, options_id, options_values_id)
                  VALUES
                     ($pos_id, $pID, $options_id, $options_values_id)"
@@ -203,7 +201,7 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
                 'pID' => $pID,
                 'options_values_array' => $options_values_array,
                 'quantity' => $quantity,
-                'pos_id' => $pos_id
+                'pos_id' => $pos_id,
             ]
         );
         $zco_notifier->notify(
@@ -212,7 +210,7 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
                 'pID' => $pID,
                 'options_values_array' => $options_values_array,
                 'quantity' => $quantity,
-                'pos_id' => $pos_id
+                'pos_id' => $pos_id,
             ]
         );
     }
@@ -222,10 +220,8 @@ function insert_stock_option($pID, $quantity, $pos_name_id, $options_values_arra
  * @param $pID
  * @param $reminder_date
  * @param $names_with_dates
- *
- * @return bool
  */
-function posm_product_has_oos_options($pID, $reminder_date, $names_with_dates)
+function posm_product_has_oos_options($pID, $reminder_date, $names_with_dates): bool
 {
     global $db;
 
@@ -235,10 +231,10 @@ function posm_product_has_oos_options($pID, $reminder_date, $names_with_dates)
         $additional_clause = " OR (pos_name_id IN ($names_with_dates) AND pos_date < '$reminder_date')";
     }
     $check = $db->Execute(
-        "SELECT products_quantity
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
-          WHERE products_id = " . (int)$pID . "
-            AND ( products_quantity <= " . (int)POSM_STOCK_REORDER_LEVEL . "$additional_clause )
+        'SELECT products_quantity
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . '
+          WHERE products_id = ' . (int)$pID . '
+            AND ( products_quantity <= ' . (int)POSM_STOCK_REORDER_LEVEL . "$additional_clause )
          LIMIT 1"
     );
     return !$check->EOF;
@@ -250,10 +246,8 @@ function posm_product_has_oos_options($pID, $reminder_date, $names_with_dates)
  * @param $default
  * @param $parameters
  * @param $required
- *
- * @return string
  */
-function posm_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false)
+function posm_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false): string
 {
     $field = '<select rel="dropdown" name="' . zen_output_string($name) . '"';
     if ($parameters !== '') {
@@ -273,7 +267,7 @@ function posm_draw_pull_down_menu($name, $values, $default = '', $parameters = '
         if ((int)$default === (int)$current_value['id']) {
             $field .= ' selected="selected"';
         }
-        $field .= '>' . htmlspecialchars($current_value['text'], ENT_COMPAT, CHARSET, false) . '</option>' . "\n";
+        $field .= '>' . htmlspecialchars((string) $current_value['text'], ENT_COMPAT, CHARSET, false) . '</option>' . "\n";
     }
     $field .= '</select>' . "\n";
 
@@ -290,8 +284,6 @@ function posm_draw_pull_down_menu($name, $values, $default = '', $parameters = '
  * Added for POSM 4.4.0
  *
  * @param $value
- *
- * @return bool
  */
 function posm_is_numeric_string(string $value): bool
 {

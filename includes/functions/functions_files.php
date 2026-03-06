@@ -7,7 +7,6 @@
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
 
-
 /**
  * build a list of directories in a specified parent folder
  * (formatted in id/text pairs for SELECT boxes)
@@ -18,7 +17,7 @@
  *
  * @since ZC v1.5.5
  */
-function zen_build_subdirectories_array($parent_folder = '', $default_text = 'Main Directory')
+function zen_build_subdirectories_array($parent_folder = '', $default_text = 'Main Directory'): array
 {
     if (empty($parent_folder)) {
         $parent_folder = DIR_FS_CATALOG_IMAGES;
@@ -45,9 +44,6 @@ function zen_build_subdirectories_array($parent_folder = '', $default_text = 'Ma
  * Includes full path of folders and filename. To get just filename, call basename() on each entry in returned result
  * Sorted alphabetically. Ignores subdirectories.
  *
- * @param string $directory_path
- * @param string $extension
- * @return array
  * @since ZC v2.0.0
  */
 function zen_get_files_in_directory(string $directory_path, string $extension = 'php'): array
@@ -97,18 +93,18 @@ function zen_directory_is_in_application_dir(string $dir_to_check): bool
 
 /**
  * find template or default file
- * @param string $check_directory
  * @param string $check_file
  * @param bool $dir_only
- * @return string
  * @since ZC v1.2.0d
  */
-function zen_get_file_directory($check_directory, $check_file, $dir_only = false)
+function zen_get_file_directory(string $check_directory, $check_file, $dir_only = false): string
 {
     global $template_dir;
 
     $zv_filename = $check_file;
-    if (strpos($zv_filename, '.php') === false) $zv_filename .= '.php';
+    if (!str_contains($zv_filename, '.php')) {
+        $zv_filename .= '.php';
+    }
 
     if (file_exists($check_directory . $template_dir . '/' . $zv_filename)) {
         $zv_directory = $check_directory . $template_dir . '/';
@@ -126,7 +122,7 @@ function zen_get_file_directory($check_directory, $check_file, $dir_only = false
 /**
  * @since ZC v1.5.8
  */
-function zen_include_language_file($file, $folder, $page)
+function zen_include_language_file($file, string $folder, $page): bool
 {
     global $messageStack, $languageLoader;
     if (IS_ADMIN_FLAG === true) {
@@ -134,11 +130,11 @@ function zen_include_language_file($file, $folder, $page)
     } else {
         $lang_file = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . $folder, $file, 'false');
     }
-    if ($languageLoader->hasLanguageFile(DIR_FS_CATALOG . DIR_WS_LANGUAGES,  $_SESSION['language'], $file, $folder)) {
-        $languageLoader->loadExtraLanguageFiles(DIR_FS_CATALOG . DIR_WS_LANGUAGES,  $_SESSION['language'], $file, $folder);
+    if ($languageLoader->hasLanguageFile(DIR_FS_CATALOG . DIR_WS_LANGUAGES, $_SESSION['language'], $file, $folder)) {
+        $languageLoader->loadExtraLanguageFiles(DIR_FS_CATALOG . DIR_WS_LANGUAGES, $_SESSION['language'], $file, $folder);
     } else {
         if ($page === 'inline') {
-?>
+            ?>
           <div class="messageStackCaution">
              <?php echo WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file; ?>
           </div>
@@ -164,15 +160,16 @@ function zen_include_language_file($file, $folder, $page)
  * products_all_listing, products_discount_prices, also_purchased_products
  * @param string $check_file
  * @param bool $dir_only
- * @return string
  * @since ZC v1.2.0d
  */
-function zen_get_module_directory($check_file, $dir_only = false)
+function zen_get_module_directory($check_file, $dir_only = false): string
 {
     global $template_dir;
 
     $zv_filename = $check_file;
-    if (strpos($zv_filename, '.php') === false) $zv_filename .= '.php';
+    if (!str_contains($zv_filename, '.php')) {
+        $zv_filename .= '.php';
+    }
 
     if (file_exists(DIR_FS_CATALOG . DIR_WS_MODULES . $template_dir . '/' . $zv_filename)) {
         $template_dir_select = $template_dir . '/';
@@ -189,15 +186,16 @@ function zen_get_module_directory($check_file, $dir_only = false)
 
 /**
  * @param string $check_file
- * @return string
  * @since ZC v1.5.7
  */
-function zen_get_module_sidebox_directory($check_file)
+function zen_get_module_sidebox_directory($check_file): string
 {
     global $template_dir;
 
     $zv_filename = $check_file;
-    if (strpos($zv_filename, '.php') === false) $zv_filename .= '.php';
+    if (!str_contains($zv_filename, '.php')) {
+        $zv_filename .= '.php';
+    }
 
     if (file_exists(DIR_WS_MODULES . 'sideboxes/' . $template_dir . '/' . $zv_filename)) {
         $template_dir_select = 'sideboxes/' . $template_dir . '/';
@@ -238,16 +236,18 @@ function zen_get_admin_module_from_directory(int $product_type, string $filename
  * @return false|mixed|string
  * @since ZC v1.3.0
  */
-function zen_get_index_filters_directory($check_file, $dir_only = false)
+function zen_get_index_filters_directory($check_file, $dir_only = false): string
 {
     global $template_dir;
     $zv_filename = $check_file;
-    if (strpos($zv_filename, '.php') === false) $zv_filename .= '.php';
+    if (!str_contains((string) $zv_filename, '.php')) {
+        $zv_filename .= '.php';
+    }
     $checkArray = [];
     $checkArray[] = DIR_WS_INCLUDES . 'index_filters/' . $template_dir . '/' . $zv_filename;
     $checkArray[] = DIR_WS_INCLUDES . 'index_filters/' . $zv_filename;
     $checkArray[] = DIR_WS_INCLUDES . 'index_filters/' . $template_dir . '/' . 'default_filter.php';
-    foreach ($checkArray as $key => $val) {
+    foreach ($checkArray as $val) {
         if (file_exists($val)) {
             return ($dir_only === true || $dir_only == 'true') ? $val = substr($val, 0, strpos($val, '/')) : $val;
         }
@@ -255,11 +255,10 @@ function zen_get_index_filters_directory($check_file, $dir_only = false)
     return DIR_WS_INCLUDES . 'index_filters/' . 'default_filter.php';
 }
 
-
 /** @deprecated not used anywhere in core code  (was in v1.0.0 but never used) */
-function zen_get_file_permissions($mode)
+function zen_get_file_permissions($mode): string
 {
-// determine type
+    // determine type
     if (($mode & 0xC000) == 0xC000) { // unix domain socket
         $type = 's';
     } elseif (($mode & 0x4000) == 0x4000) { // directory
@@ -278,7 +277,7 @@ function zen_get_file_permissions($mode)
         $type = '?';
     }
 
-// determine permissions
+    // determine permissions
     $owner['read'] = ($mode & 00400) ? 'r' : '-';
     $owner['write'] = ($mode & 00200) ? 'w' : '-';
     $owner['execute'] = ($mode & 00100) ? 'x' : '-';
@@ -289,10 +288,16 @@ function zen_get_file_permissions($mode)
     $world['write'] = ($mode & 00002) ? 'w' : '-';
     $world['execute'] = ($mode & 00001) ? 'x' : '-';
 
-// adjust for SUID, SGID and sticky bit
-    if ($mode & 0x800) $owner['execute'] = ($owner['execute'] == 'x') ? 's' : 'S';
-    if ($mode & 0x400) $group['execute'] = ($group['execute'] == 'x') ? 's' : 'S';
-    if ($mode & 0x200) $world['execute'] = ($world['execute'] == 'x') ? 't' : 'T';
+    // adjust for SUID, SGID and sticky bit
+    if ($mode & 0x800) {
+        $owner['execute'] = ($owner['execute'] == 'x') ? 's' : 'S';
+    }
+    if ($mode & 0x400) {
+        $group['execute'] = ($group['execute'] == 'x') ? 's' : 'S';
+    }
+    if ($mode & 0x200) {
+        $world['execute'] = ($world['execute'] == 'x') ? 't' : 'T';
+    }
 
     return $type .
         $owner['read'] . $owner['write'] . $owner['execute'] .
@@ -306,10 +311,9 @@ function zen_get_file_permissions($mode)
  * @TODO - refactor to bypass the use of the global $zen_remove_error and use a return value instead
  * @TODO - and give it a more meaningful name at the same time
  *
- * @param string $source
  * @since ZC v1.0.3
  */
-function zen_remove($source)
+function zen_remove(string $source): void
 {
     global $messageStack, $zen_remove_error;
 
@@ -359,7 +363,6 @@ function set_unwritable($filepath)
     return @chmod($filepath, 0444);
 }
 
-
 /**
  * function to override PHP's is_writable() which can occasionally be unreliable due to O/S and F/S differences
  * attempts to open the specified file for writing. Returns true if successful, false if not.
@@ -372,11 +375,15 @@ function set_unwritable($filepath)
  */
 function is__writeable($filepath, $make_unwritable = true)
 {
-    if (is_dir($filepath)) return is_writable($filepath);
+    if (is_dir($filepath)) {
+        return is_writable($filepath);
+    }
     $fp = @fopen($filepath, 'a');
     if ($fp) {
         @fclose($fp);
-        if ($make_unwritable) set_unwritable($filepath);
+        if ($make_unwritable) {
+            set_unwritable($filepath);
+        }
         $fp = @fopen($filepath, 'a');
         if ($fp) {
             @fclose($fp);
@@ -386,23 +393,19 @@ function is__writeable($filepath, $make_unwritable = true)
     return false;
 }
 
-
 /**
  * @TODO - refactor where this is used, to find a better way of displaying whatever is needed
- * @param string $filename
- * @return string
  * @since ZC v1.5.7
  */
-function zen_get_uploaded_file(string $filename)
+function zen_get_uploaded_file(string $filename): string
 {
-    $parts = explode(". ", $filename, 2);
+    $parts = explode('. ', $filename, 2);
     $filenum = $parts[0];
     $filename = $parts[1];
-    $file_parts = explode(".", $filename, 2);
+    $file_parts = explode('.', $filename, 2);
     $filetype = $file_parts[count($file_parts) - 1];
-    return $filenum . "." . $filetype;
+    return $filenum . '.' . $filetype;
 }
-
 
 /**
  * Obtain a list of .log/.xml files from the /logs/ folder
@@ -421,37 +424,51 @@ function get_logs_data($maxToList = 'count')
 {
     global $zcDate;
 
-    if (!defined('DIR_FS_LOGS')) define('DIR_FS_LOGS', DIR_FS_CATALOG . 'logs');
-    if (!defined('DIR_FS_SQL_CACHE')) define('DIR_FS_SQL_CACHE', DIR_FS_CATALOG . 'cache');
-    $logs = array();
-    $file = array();
+    if (!defined('DIR_FS_LOGS')) {
+        define('DIR_FS_LOGS', DIR_FS_CATALOG . 'logs');
+    }
+    if (!defined('DIR_FS_SQL_CACHE')) {
+        define('DIR_FS_SQL_CACHE', DIR_FS_CATALOG . 'cache');
+    }
+    $logs = [];
     $i = 0;
-    foreach (array(DIR_FS_LOGS, DIR_FS_SQL_CACHE) as $purgeFolder) {
-        $purgeFolder = rtrim($purgeFolder, '/');
-        if (!file_exists($purgeFolder) || !is_dir($purgeFolder)) continue;
+    foreach ([DIR_FS_LOGS, DIR_FS_SQL_CACHE] as $purgeFolder) {
+        $purgeFolder = rtrim((string) $purgeFolder, '/');
+        if (!file_exists($purgeFolder)) {
+            continue;
+        }
+        if (!is_dir($purgeFolder)) {
+            continue;
+        }
 
         $dir = dir($purgeFolder);
         while ($logfile = $dir->read()) {
-            if (substr($logfile, 0, 1) == '.') continue;
-            if (!preg_match('/.*(\.log|\.xml)$/', $logfile)) continue; // xml allows for usps debug
+            if (str_starts_with($logfile, '.')) {
+                continue;
+            }
+            if (!preg_match('/.*(\.log|\.xml)$/', $logfile)) {
+                continue;
+            } // xml allows for usps debug
 
             if ($maxToList != 'count') {
                 $filename = $purgeFolder . '/' . $logfile;
-                $logs[$i]['path'] = $purgeFolder . "/";
+                $logs[$i]['path'] = $purgeFolder . '/';
                 $logs[$i]['filename'] = $logfile;
                 $logs[$i]['filesize'] = @filesize($filename);
                 $logs[$i]['unixtime'] = @filemtime($filename);
                 $logs[$i]['datetime'] = $zcDate->output(DATE_TIME_FORMAT, $logs[$i]['unixtime']);
             }
             $i++;
-            if ($maxToList != 'count' && $i >= $maxToList) break;
+            if ($maxToList != 'count' && $i >= $maxToList) {
+                break;
+            }
         }
         $dir->close();
         unset($dir);
     }
 
-    if ($maxToList == 'count') return $i;
-
-    $logs = zen_sort_array($logs, 'unixtime', SORT_DESC);
-    return $logs;
+    if ($maxToList == 'count') {
+        return $i;
+    }
+    return zen_sort_array($logs, 'unixtime', SORT_DESC);
 }

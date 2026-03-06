@@ -14,7 +14,7 @@
 // Display a message if no brands (aka manufacturers) are defined for the current store.
 //
 if (empty($brands['featured']) && empty($brands['other'])) {
-?>
+    ?>
     <p><?php echo NO_BRANDS_AVAILABLE; ?></p>
 <?php
 } else {
@@ -22,11 +22,11 @@ if (empty($brands['featured']) && empty($brands['other'])) {
     // Display the list of featured brands, so long as at least one exists.
     //
     if (!empty($brands['featured'])) {
-?>
+        ?>
     <div class="featuredBrands">
         <h2><?php echo FEATURED_BRANDS; ?></h2>
 <?php
-        $list_box_contents = [];
+                $list_box_contents = [];
         $row = 0;
         $col = 0;
         $col_width = floor(100 / BRANDS_MAX_COLUMNS);
@@ -51,7 +51,7 @@ if (empty($brands['featured']) && empty($brands['other'])) {
 
         $title = '';
         require $template->get_template_dir('tpl_columnar_display.php', DIR_WS_TEMPLATE, $current_page_base, 'common') . '/tpl_columnar_display.php';
-?>
+        ?>
     </div>
     <div class="clearBoth"></div>
 <?php
@@ -61,11 +61,11 @@ if (empty($brands['featured']) && empty($brands['other'])) {
     // Display the list of 'other' brands, so long as at least one exists.
     //
     if (!empty($brands['other'])) {
-?>
+        ?>
     <div class="otherBrands">
         <h2><?php echo OTHER_BRANDS; ?></h2>
 <?php
-        $list_box_contents = [];
+                $list_box_contents = [];
         $row = 0;
         $col = 0;
         $col_width = floor(100 / BRANDS_MAX_COLUMNS);
@@ -90,7 +90,7 @@ if (empty($brands['featured']) && empty($brands['other'])) {
 
         $title = '';
         require $template->get_template_dir('tpl_columnar_display.php', DIR_WS_TEMPLATE, $current_page_base, 'common') . '/tpl_columnar_display.php';
-?>
+        ?>
     </div>
 <?php
     }

@@ -1,10 +1,13 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
+
 namespace Zencart\LanguageLoader;
 
 /**
@@ -13,14 +16,9 @@ namespace Zencart\LanguageLoader;
 class LanguageLoader
 {
     private array $languageFilesLoaded;
-    private $arrayLoader;
-    private $fileLoader;
 
-    public function __construct($arraysLoader, $filesLoader)
+    public function __construct(private $arrayLoader, private $fileLoader)
     {
-        $this->languageFilesLoaded = ['arrays' => [], 'legacy' => []];
-        $this->arrayLoader = $arraysLoader;
-        $this->fileLoader = $filesLoader;
         $this->languageFilesLoaded = ['arrays' => [], 'legacy' => []];
     }
 
@@ -94,8 +92,6 @@ class LanguageLoader
      * Used on the catalog-side to set the current page for the language-load, since it's not necessarily
      * available during the autoload process (e.g. for AJAX handlers).
      *
-     * @param string $currentPage
-     * @return void
      * @since ZC v1.5.8
      */
     public function setCurrentPage(string $currentPage): void
@@ -152,7 +148,7 @@ class LanguageLoader
         $match_string = '~modules/' . $moduleType . '(lang\.)?' . $fileName . '$~';
         $match_string_template = '~modules/' . $moduleType . $this->arrayLoader->getTemplateDir() . '/(lang\.)?' . $fileName . '$~';
         foreach ($language_files_loaded as $next_file) {
-            if (preg_match($match_string, $next_file) || preg_match($match_string_template, $next_file)) {
+            if (preg_match($match_string, (string) $next_file) || preg_match($match_string_template, (string) $next_file)) {
                 return true;
             }
         }
@@ -166,7 +162,7 @@ class LanguageLoader
     {
         $fileInfo = pathinfo($defineFile);
         $searchFile = $fileInfo['basename'];
-        if (strpos($searchFile, 'lang.') !== 0) {
+        if (!str_starts_with($searchFile, 'lang.')) {
             $searchFile = 'lang.' . $searchFile;
         }
         $searchFile = $fileInfo['dirname'] . '/' . $searchFile;

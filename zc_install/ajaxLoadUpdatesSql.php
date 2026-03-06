@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ajaxLoadUpdatesSql.php
  *
@@ -99,8 +101,7 @@ if ($sql_files !== false) {
 
 echo json_encode(['error' => $error, 'version' => $updateVersion, 'errorList' => $errorList]);
 
-function sanitize_version($version)
+function sanitize_version($version): ?string
 {
-    $sanitizedString = preg_replace('/[^a-zA-Z0-9_-]/', '', $version);
-    return $sanitizedString;
+    return preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $version);
 }

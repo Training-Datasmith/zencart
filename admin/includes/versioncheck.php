@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Check if new versions available via the Zen Cart ping server
  *
@@ -66,7 +68,7 @@ if ((SHOW_VERSION_UPDATE_IN_HEADER === 'true'
     }
 
     if (!$isCurrent) {
-        $new_version = TEXT_VERSION_CHECK_NEW_VER . trim($newinfo['versionMajor']) . '.' . trim($newinfo['versionMinor']) . ' :: ' . $newinfo['versionDetail'];
+        $new_version = TEXT_VERSION_CHECK_NEW_VER . trim((string) $newinfo['versionMajor']) . '.' . trim((string) $newinfo['versionMinor']) . ' :: ' . $newinfo['versionDetail'];
     }
     if ($isCurrent) {
         $hasPatches = $versionServer->hasProjectPatches($newinfo);
@@ -78,10 +80,10 @@ if ((SHOW_VERSION_UPDATE_IN_HEADER === 'true'
 
     // Handle patch notices
     if ($isCurrent && $hasPatches !== 2 && $hasPatches) {
-        $new_version .= (($new_version !== '') ? '<br>' : '') . '<span class="alert">' . TEXT_VERSION_CHECK_NEW_PATCH . trim($newinfo['versionMajor']) . '.' . trim($newinfo['versionMinor']) . ' - ' . TEXT_VERSION_CHECK_PATCH . ': [' . trim($newinfo['versionPatch1']) . '] :: ' . $newinfo['versionPatchDetail'] . '</span>';
+        $new_version .= (($new_version !== '') ? '<br>' : '') . '<span class="alert">' . TEXT_VERSION_CHECK_NEW_PATCH . trim((string) $newinfo['versionMajor']) . '.' . trim((string) $newinfo['versionMinor']) . ' - ' . TEXT_VERSION_CHECK_PATCH . ': [' . trim((string) $newinfo['versionPatch1']) . '] :: ' . $newinfo['versionPatchDetail'] . '</span>';
     }
     if ($isCurrent && $hasPatches > 1) {
-        $new_version .= (($new_version !== '') ? '<br>' : '') . '<span class="alert">' . TEXT_VERSION_CHECK_NEW_PATCH . trim($newinfo['versionMajor']) . '.' . trim($newinfo['versionMinor']) . ' - ' . TEXT_VERSION_CHECK_PATCH . ': [' . trim($newinfo['versionPatch2']) . '] :: ' . $newinfo['versionPatchDetail'] . '</span>';
+        $new_version .= (($new_version !== '') ? '<br>' : '') . '<span class="alert">' . TEXT_VERSION_CHECK_NEW_PATCH . trim((string) $newinfo['versionMajor']) . '.' . trim((string) $newinfo['versionMinor']) . ' - ' . TEXT_VERSION_CHECK_PATCH . ': [' . trim((string) $newinfo['versionPatch2']) . '] :: ' . $newinfo['versionPatchDetail'] . '</span>';
     }
 
     // Prepare download link
@@ -98,8 +100,8 @@ if (!$doVersionCheck || $versionCheckError) {
     }
 
     // display the "check for updated version" button.  The button link should be the current admin page and all GET params.
-    $url = zen_href_link(basename($PHP_SELF), zen_get_all_get_params(['vcheck']), 'SSL');
-    $url .= (str_contains($url, '?') ? '&amp;' : '?') . 'vcheck=yes';
+    $url = zen_href_link(basename((string) $PHP_SELF), zen_get_all_get_params(['vcheck']), 'SSL');
+    $url .= (str_contains((string) $url, '?') ? '&amp;' : '?') . 'vcheck=yes';
 
     if ($zv_db_patch_ok === true || $version_check_sysinfo === true) {
         $new_version .= '<a href="' . $url . '" role="button" class="btn btn-link">' . TEXT_VERSION_CHECK_BUTTON . '</a>';

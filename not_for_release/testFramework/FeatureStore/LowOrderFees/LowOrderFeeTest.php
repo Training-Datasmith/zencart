@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Tests\FeatureStore\LowOrderFees;
 
 use Tests\Support\helpers\ProfileManager;
@@ -19,7 +22,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->browser->request('GET', HTTP_SERVER  . '/index.php?main_page=checkout_shipping');
         $this->browser->submitForm('Continue', []);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('39.99', (string)$response->getContent() );
+        $this->assertStringContainsString('39.99', (string)$response->getContent());
         $this->browser->submitForm('Continue', []);
         $response = (string)$this->browser->getResponse()->getContent();
         $lookup_section = self::locateElementInPageSource('id="orderTotals"', $response);
@@ -54,7 +57,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->assertStringContainsString('50.29', $lookup_section); // total
         $this->browser->submitForm('Continue', ['cot_gv' => '45.28', 'payment' => '']);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent() );
+        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent());
         $this->switchLowOrderFee('off');
     }
     /**
@@ -81,7 +84,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->assertStringContainsString('50.29', $lookup_section); // total
         $this->browser->submitForm('Continue', ['cot_gv' => '45.29', 'payment' => '']);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent() );
+        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent());
         $this->switchLowOrderFee('off');
     }
     /**
@@ -108,7 +111,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->assertStringContainsString('50.54', $lookup_section); // total
         $this->browser->submitForm('Continue', ['cot_gv' => '45.76', 'payment' => '']);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent() );
+        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent());
         $this->switchLowOrderFee('off');
         $this->switchItemShippingTax('off');
     }
@@ -231,7 +234,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->assertStringContainsString('46.01', $lookup_section);
         $this->browser->submitForm('Continue', ['cot_gv' => 39.99, 'payment' => '']);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent() );
+        $this->assertStringContainsString('Please select a payment method for your order', (string)$response->getContent());
         $this->setCustomerGroupDiscount($profile['email_address'], 0);
         $this->switchLowOrderFee('off');
     }
@@ -252,7 +255,7 @@ class LowOrderFeeTest extends zcFeatureTestCaseStore
         $this->browser->request('GET', HTTP_SERVER  . '/index.php?main_page=checkout_shipping');
         $this->browser->submitForm('Continue', []);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('39.99', (string)$response->getContent() );
+        $this->assertStringContainsString('39.99', (string)$response->getContent());
         $this->browser->submitForm('Continue', ['cot_gv' => 46.01, 'payment' => '']);
         $response = (string)$this->browser->getResponse()->getContent();
         $lookup_section = self::locateElementInPageSource('id="orderTotals"', $response);

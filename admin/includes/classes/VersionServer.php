@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -76,7 +78,7 @@ class VersionServer
         }
 
         $ids = (string)$ids;
-        $keylist = implode(',', array_map(static fn($value) => (int)trim($value), explode(',', $ids)));
+        $keylist = implode(',', array_map(static fn ($value): int => (int)trim((string) $value), explode(',', $ids)));
 
         $type = '[' . (int)$ids . ']';
         if (str_contains($ids, ',')) {
@@ -157,8 +159,7 @@ class VersionServer
         $moduleInfo = json_encode($this->getModuleInfo());
 
         $country_iso = $this->getCountryIso();
-
-        $results = [
+        return [
             'currentVersionMajor' => PROJECT_VERSION_MAJOR,
             'currentVersionMinor' => PROJECT_VERSION_MINOR,
             'httpServer' => HTTP_SERVER,
@@ -167,7 +168,6 @@ class VersionServer
             'systemInfo' => $systemInfo,
             'moduleInfo' => $moduleInfo,
         ];
-        return $results;
     }
 
     /**
@@ -175,13 +175,11 @@ class VersionServer
      */
     protected function getModuleinfo(): array
     {
-        $modules = [
+        return [
             'MODULE_PAYMENT_INSTALLED' => MODULE_PAYMENT_INSTALLED,
             'MODULE_SHIPPING_INSTALLED' => MODULE_SHIPPING_INSTALLED,
             'MODULE_ORDER_TOTAL_INSTALLED' => MODULE_ORDER_TOTAL_INSTALLED,
         ];
-
-        return $modules;
     }
 
     /**
@@ -201,7 +199,7 @@ class VersionServer
     /**
      * @since ZC v1.5.5f
      */
-    protected function formatCurlError($errorno, $error): bool|string
+    protected function formatCurlError(string $errorno, string $error): bool|string
     {
         return json_encode(['error' => $error . '[' . $errorno . ']']);
     }

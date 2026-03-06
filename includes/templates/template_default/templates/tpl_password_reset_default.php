@@ -21,7 +21,7 @@
 
     <?php
     if (!$token_error) {
-    ?>
+        ?>
     <?= zen_draw_form('account_password', zen_href_link(FILENAME_PASSWORD_RESET, '', 'SSL'), 'post', 'onsubmit="return check_form(account_password);"') ?>
     <?= zen_draw_hidden_field('action', 'process') ?>
     <?= zen_draw_hidden_field('reset_token', $reset_token) ?>
@@ -43,6 +43,6 @@
     <div class="buttonRow back"><?= '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_BACK, BUTTON_BACK_ALT) . '</a>' ?></div>
     </form>
 <?php
-}
+    }
 ?>
 </div>

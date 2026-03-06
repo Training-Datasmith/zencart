@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\helpers;
 
 class ProfileManager
 {
-    public static function getProfile($profileName)
+    public static function getProfile(string $profileName): array
     {
         $profile = [];
         $profile['admin'] = [
@@ -47,7 +49,7 @@ class ProfileManager
         return $profile[$profileName];
     }
 
-    public static function getProfileForLogin($profileName)
+    public static function getProfileForLogin($profileName): array
     {
         $profile = self::getProfile($profileName);
         $emailProfile = [];

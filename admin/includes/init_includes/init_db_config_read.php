@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -6,8 +8,8 @@
  */
 
 use Zencart\DbRepositories\ConfigurationRepository;
-use Zencart\DbRepositories\ProjectVersionRepository;
 use Zencart\DbRepositories\ProductTypeLayoutRepository;
+use Zencart\DbRepositories\ProjectVersionRepository;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');

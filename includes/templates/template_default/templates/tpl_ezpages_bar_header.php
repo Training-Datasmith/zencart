@@ -10,15 +10,15 @@
  * @version $Id: DrByte 2020 Dec 25 Modified in v1.5.8-alpha $
  */
 
-  /**
-   * require code to show EZ-Pages list
-   */
-  include(DIR_WS_MODULES . zen_get_module_directory('ezpages_bar_header.php'));
+/**
+ * require code to show EZ-Pages list
+ */
+include(DIR_WS_MODULES . zen_get_module_directory('ezpages_bar_header.php'));
 ?>
 <?php if (!empty($var_linksList)) { ?>
 <div id="navEZPagesTop">
-<?php for ($i=1, $n=sizeof($var_linksList); $i<=$n; $i++) {  ?>
+<?php for ($i = 1, $n = sizeof($var_linksList); $i <= $n; $i++) {  ?>
   <a href="<?php echo $var_linksList[$i]['link']; ?>"><?php echo $var_linksList[$i]['name']; ?></a><?php echo ($i < $n ? EZPAGES_SEPARATOR_HEADER : '') . "\n"; ?>
-<?php } // end FOR loop ?>
+<?php } // end FOR loop?>
 </div>
 <?php } ?>

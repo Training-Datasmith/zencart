@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'HEADING_TITLE' => 'Send ' . TEXT_GV_NAME,
     'HEADING_TITLE_CONFIRM_SEND' => 'Send ' . TEXT_GV_NAME . ' Confirmation',
     'HEADING_TITLE_COMPLETED' => TEXT_GV_NAME . ' Sent',
@@ -28,5 +30,3 @@ $define = [
         'you can also enter the ' . TEXT_GV_NAME . ' ' . TEXT_GV_REDEEM . ' during the checkout process at our store.',
     'EMAIL_GV_SHOP_FOOTER' => '',
 ];
-
-return $define;

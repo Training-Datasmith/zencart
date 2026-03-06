@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -12,21 +14,18 @@ namespace Zencart\ViewBuilders;
  */
 class TableViewDefinition
 {
-    /**
+    public function __construct(/**
      * $definition is an array holding the table definition
-     * @var array
      */
-    protected $definition = [];
-    public function __construct(array $definition = [])
-    {
-        $this->definition = $definition;
+        protected array $definition = []
+    ) {
         $this->setDefaults();
     }
 
     /**
      * @since ZC v1.5.8
      */
-    public function getDefinition() : array
+    public function getDefinition(): array
     {
         return $this->definition;
     }
@@ -34,7 +33,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function setParameter(string $field, $definition) : TableViewDefinition
+    public function setParameter(string $field, $definition): TableViewDefinition
     {
         $this->definition[$field] = $definition;
         return $this;
@@ -45,14 +44,13 @@ class TableViewDefinition
      */
     public function getParameter(string $field)
     {
-        $def = $this->definition[$field] ?? null;
-        return $def;
+        return $this->definition[$field] ?? null;
     }
 
     /**
      * @since ZC v1.5.8
      */
-    public function addButtonAction($definition) : TableViewDefinition
+    public function addButtonAction($definition): TableViewDefinition
     {
         $this->definition['buttonActions'][] = $definition;
         return $this;
@@ -61,7 +59,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function addRowAction($definition) : TableViewDefinition
+    public function addRowAction($definition): TableViewDefinition
     {
         $this->definition['rowActions'][] = $definition;
         return $this;
@@ -70,7 +68,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function addColumn(string $field, $definition) : TableViewDefinition
+    public function addColumn(string $field, $definition): TableViewDefinition
     {
         $this->definition['columns'][$field] = $definition;
         return $this;
@@ -79,7 +77,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function addColumnBefore($index, $newKey, $data) : TableViewDefinition
+    public function addColumnBefore($index, $newKey, $data): TableViewDefinition
     {
         $columns = $this->definition['columns'];
         $columns = $this->insertBefore($columns, $index, $newKey, $data);
@@ -90,7 +88,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function addColumnAfter($index, $newKey, $data) : TableViewDefinition
+    public function addColumnAfter($index, $newKey, $data): TableViewDefinition
     {
         $columns = $this->definition['columns'];
         $columns = $this->insertAfter($columns, $index, $newKey, $data);
@@ -100,8 +98,9 @@ class TableViewDefinition
 
     /**
      * @since ZC v1.5.8
+     * @return mixed[]
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $headers = [];
         foreach ($this->definition['columns'] as $column) {
@@ -113,7 +112,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function isPaginated() : bool
+    public function isPaginated(): bool
     {
         return ($this->definition['paginated']);
     }
@@ -121,7 +120,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function colKeyName() : string
+    public function colKeyName(): string
     {
         return $this->definition['colKeyName'];
     }
@@ -129,15 +128,15 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function hasRowActions() : bool
+    public function hasRowActions(): bool
     {
-        return (count($this->definition['rowActions']) >0);
+        return (count($this->definition['rowActions']) > 0);
     }
 
     /**
      * @since ZC v1.5.8
      */
-    public function getRowActions() : array
+    public function getRowActions(): array
     {
         return $this->definition['rowActions'];
     }
@@ -145,7 +144,7 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    public function getButtonActions() : array
+    public function getButtonActions(): array
     {
         return $this->definition['buttonActions'];
     }
@@ -155,20 +154,20 @@ class TableViewDefinition
      */
     protected function setDefaults()
     {
-        $this->definition['paginated'] = $this->definition['paginated'] ?? true;
-        $this->definition['columns'] = $this->definition['columns'] ?? [];
-        $this->definition['buttonActions'] = $this->definition['buttonActions'] ?? [];
-        $this->definition['rowActions'] = $this->definition['rowActions'] ?? [];
-        $this->definition['maxRowCount'] = $this->definition['maxRowCount'] ?? 10;
-        $this->definition['colKeyName'] = $this->definition['colKeyName'] ?? 'colKey';
-        $this->definition['pagerVariable'] = $this->definition['pagerVariable'] ?? 'page';
-        $this->definition['colKey'] = $this->definition['colKey'] ?? 'id';
+        $this->definition['paginated'] ??= true;
+        $this->definition['columns'] ??= [];
+        $this->definition['buttonActions'] ??= [];
+        $this->definition['rowActions'] ??= [];
+        $this->definition['maxRowCount'] ??= 10;
+        $this->definition['colKeyName'] ??= 'colKey';
+        $this->definition['pagerVariable'] ??= 'page';
+        $this->definition['colKey'] ??= 'id';
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function addDefinitions($original, $addition)
+    protected function addDefinitions($original, $addition): float|int|array
     {
         return $original + $addition;
     }
@@ -176,11 +175,12 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    protected function insertBefore($input, $index, $newKey, $element) {
+    protected function insertBefore($input, $index, $newKey, $element)
+    {
         if (!array_key_exists($index, $input)) {
             return $input;
         }
-        $tmpArray = array();
+        $tmpArray = [];
         foreach ($input as $key => $value) {
             if ($key === $index) {
                 $tmpArray[$newKey] = $element;
@@ -193,11 +193,12 @@ class TableViewDefinition
     /**
      * @since ZC v1.5.8
      */
-    protected function insertAfter($input, $index, $newKey, $element) {
+    protected function insertAfter($input, $index, $newKey, $element)
+    {
         if (!array_key_exists($index, $input)) {
             return $input;
         }
-        $tmpArray = array();
+        $tmpArray = [];
         foreach ($input as $key => $value) {
             $tmpArray[$key] = $value;
             if ($key === $index) {

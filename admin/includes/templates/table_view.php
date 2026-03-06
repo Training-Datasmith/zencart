@@ -65,7 +65,7 @@ use Zencart\Paginator\LaravelPaginator;
                 $box = new box();
                 echo $box->infoBox($tableController->getBoxHeader(), $tableController->getBoxContent());
             }
-            ?>
+?>
         </div>
     </div>
     <div class="row">

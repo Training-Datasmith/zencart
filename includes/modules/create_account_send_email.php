@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * create_account_send_email.php.  Split from modules/create_account.php for v2.2.0.
  *
@@ -23,7 +25,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 // - $gender (if ACCOUNT_GENDER is set to 'true')
 // - $email_address
 //
-if (IS_ADMIN_FLAG === false && !zen_is_logged_in()) {
+if (!zen_is_logged_in()) {
     return;
 }
 
@@ -60,13 +62,13 @@ $html_msg['EMAIL_WELCOME'] = str_replace('\n', '', EMAIL_WELCOME . $extra_welcom
 if (NEW_SIGNUP_DISCOUNT_COUPON !== '' && NEW_SIGNUP_DISCOUNT_COUPON !== '0') {
     $coupon_id = (int)NEW_SIGNUP_DISCOUNT_COUPON;
     $coupon = $db->Execute(
-        "SELECT * FROM " . TABLE_COUPONS . " WHERE coupon_id = " . (int)$coupon_id . " LIMIT 1"
+        'SELECT * FROM ' . TABLE_COUPONS . ' WHERE coupon_id = ' . $coupon_id . ' LIMIT 1'
     );
     $coupon_desc = $db->Execute(
-        "SELECT coupon_description FROM " . TABLE_COUPONS_DESCRIPTION . " WHERE coupon_id = " . (int)$coupon_id . " AND language_id = " . (int)$_SESSION['languages_id'] . " LIMIT 1"
+        'SELECT coupon_description FROM ' . TABLE_COUPONS_DESCRIPTION . ' WHERE coupon_id = ' . $coupon_id . ' AND language_id = ' . (int)$_SESSION['languages_id'] . ' LIMIT 1'
     );
     $db->Execute(
-        "INSERT INTO " . TABLE_COUPON_EMAIL_TRACK . "
+        'INSERT INTO ' . TABLE_COUPON_EMAIL_TRACK . "
             (coupon_id, customer_id_sent, sent_firstname, emailed_to, date_sent)
          VALUES
             ('" . $coupon_id . "', '0', 'Admin', '" . $email_address . "', now())"
@@ -91,17 +93,17 @@ if (NEW_SIGNUP_DISCOUNT_COUPON !== '' && NEW_SIGNUP_DISCOUNT_COUPON !== '0') {
 if (NEW_SIGNUP_GIFT_VOUCHER_AMOUNT > 0) {
     $coupon_code = Coupon::generateRandomCouponCode();
     $insert_query = $db->Execute(
-        "INSERT INTO " . TABLE_COUPONS . "
+        'INSERT INTO ' . TABLE_COUPONS . "
             (coupon_code, coupon_type, coupon_amount, date_created)
          VALUES
             ('" . $coupon_code . "', 'G', '" . NEW_SIGNUP_GIFT_VOUCHER_AMOUNT . "', now())"
     );
     $insert_id = $db->insert_ID();
     $db->Execute(
-        "INSERT INTO " . TABLE_COUPON_EMAIL_TRACK . "
+        'INSERT INTO ' . TABLE_COUPON_EMAIL_TRACK . '
             (coupon_id, customer_id_sent, sent_firstname, emailed_to, date_sent)
          VALUES
-            (" . (int)$insert_id . ", 0, 'Admin', '" . $email_address . "', now() )"
+            (' . (int)$insert_id . ", 0, 'Admin', '" . $email_address . "', now() )"
     );
 
     // if on, add in GV explanation
@@ -135,9 +137,9 @@ if (trim(EMAIL_SUBJECT) !== 'n/a') {
 
 // send additional emails
 if (IS_ADMIN_FLAG === false && SEND_EXTRA_CREATE_ACCOUNT_EMAILS_TO_STATUS === '1' && SEND_EXTRA_CREATE_ACCOUNT_EMAILS_TO !== '' && isset($_SESSION['customer_id'])) {
-    $sql = "SELECT customers_firstname, customers_lastname, customers_email_address, customers_telephone, customers_fax
-            FROM " . TABLE_CUSTOMERS . "
-            WHERE customers_id = " . (int)$_SESSION['customer_id'];
+    $sql = 'SELECT customers_firstname, customers_lastname, customers_email_address, customers_telephone, customers_fax
+            FROM ' . TABLE_CUSTOMERS . '
+            WHERE customers_id = ' . (int)$_SESSION['customer_id'];
     $account = $db->Execute($sql, 1);
 
     $extra_info = email_collect_extra_info($name, $email_address, $account->fields['customers_firstname'] . ' ' . $account->fields['customers_lastname'], $account->fields['customers_email_address'], $account->fields['customers_telephone'], $account->fields['customers_fax']);

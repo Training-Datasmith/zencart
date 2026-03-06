@@ -44,29 +44,29 @@ $searchBoxScriptArray = [
     'downloads_manager',
 ];
 $searchBoxJs = 'includes/javascript/searchBox.js';
-if (in_array(basename($PHP_SELF, '.php'), $searchBoxScriptArray) && file_exists($searchBoxJs)) {
+if (in_array(basename((string) $PHP_SELF, '.php'), $searchBoxScriptArray) && file_exists($searchBoxJs)) {
     ?>
     <script defer src="<?= $searchBoxJs; ?>"></script>
     <?php
 }
 ?>
 
-<?php if (file_exists($jsFile = 'includes/javascript/' . basename($PHP_SELF, '.php') . '.js')) { ?>
+<?php if (file_exists($jsFile = 'includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.js')) { ?>
 <script src="<?php echo $jsFile; ?>"></script>
 <?php
 }
-if (file_exists($jsFile = 'includes/javascript/' . basename($PHP_SELF, '.php') . '.php')) {
+if (file_exists($jsFile = 'includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.php')) {
     echo "\n";
-    require 'includes/javascript/' . basename($PHP_SELF, '.php') . '.php';
+    require 'includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.php';
 }
-$directory_array = $template->get_template_part('includes/javascript/', '/^' . basename($PHP_SELF, '.php') . '_/', '.js');
+$directory_array = $template->get_template_part('includes/javascript/', '/^' . basename((string) $PHP_SELF, '.php') . '_/', '.js');
 foreach ($directory_array as $key => $value) {
     echo "\n";
-?>
+    ?>
 <script src="includes/javascript/<?php echo $value; ?>"></script>
 <?php
 }
-$directory_array = $template->get_template_part('includes/javascript/', '/^' . basename($PHP_SELF, '.php') . '_/', '.php');
+$directory_array = $template->get_template_part('includes/javascript/', '/^' . basename((string) $PHP_SELF, '.php') . '_/', '.php');
 foreach ($directory_array as $key => $value) {
     echo "\n";
     require 'includes/javascript/' . $value;
@@ -94,28 +94,29 @@ foreach ($installedPlugins as $plugin) {
         <script src="<?php echo $relativeDir; ?>admin/includes/javascript/<?php echo $value; ?>"></script>
         <?php
     }
-    if (file_exists($absoluteDir . 'admin/includes/javascript/' . basename($PHP_SELF, '.php') . '.php')) {
+    if (file_exists($absoluteDir . 'admin/includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.php')) {
         echo "\n";
-        require $absoluteDir . 'admin/includes/javascript/' . basename($PHP_SELF, '.php') . '.php';
+        require $absoluteDir . 'admin/includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.php';
     }
-    if (file_exists($absoluteDir . 'admin/includes/javascript/' . basename($PHP_SELF, '.php') . '.js')) {
+    if (file_exists($absoluteDir . 'admin/includes/javascript/' . basename((string) $PHP_SELF, '.php') . '.js')) {
         echo "\n";
-?>
-        <script src="<?php echo $relativeDir ?>admin/includes/javascript/<?php echo basename($PHP_SELF, '.php') . '.js'; ?>"></script>
+        ?>
+        <script src="<?php echo $relativeDir ?>admin/includes/javascript/<?php echo basename((string) $PHP_SELF, '.php') . '.js'; ?>"></script>
 <?php
     }
-    $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/javascript/', '/^' . basename($PHP_SELF, '.php') . '_/', '.js');
+    $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/javascript/', '/^' . basename((string) $PHP_SELF, '.php') . '_/', '.js');
     foreach ($directory_array as $key => $value) {
         echo "\n";
         ?>
         <script src="<?php echo $relativeDir; ?>admin/includes/javascript/<?php echo $value; ?>"></script>
         <?php
     }
-    $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/javascript/', '/^' . basename($PHP_SELF, '.php') . '_/', '.php');
+    $directory_array = $template->get_template_part($absoluteDir . 'admin/includes/javascript/', '/^' . basename((string) $PHP_SELF, '.php') . '_/', '.php');
     foreach ($directory_array as $key => $value) {
         echo "\n";
         require $absoluteDir . 'admin/includes/javascript/' . $value;
-    }}
+    }
+}
 if (file_exists(DIR_WS_INCLUDES . 'keepalive_module.php')) {
     echo "\n";
     require(DIR_WS_INCLUDES . 'keepalive_module.php');

@@ -67,7 +67,7 @@ function zenGetLatestTinyMceReleaseTag(int|string $majorVersion = 0): string|fal
     }
 
     // If a specific major version is requested, return most recent
-    foreach ($tagInfo as $key => $tag) {
+    foreach ($tagInfo as $tag) {
         if (!is_string($tag['name'] ?? null)) {
             continue;
         }
@@ -80,7 +80,7 @@ function zenGetLatestTinyMceReleaseTag(int|string $majorVersion = 0): string|fal
 
 // Ensure API Key configuration entry is set; Can be overridden via an extra_configures or extra_datafiles file.
 if (!defined('TINYMCE_EDITOR_API_KEY')) {
-    $db->Execute("INSERT IGNORE INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) VALUES ('TinyMCE Editor API Key', 'TINYMCE_EDITOR_API_KEY', 'GPL', 'Basic editor features are free, in GPL mode.<br>Optionally enable premium editor features in the TinyMCE editor by providing your account API key and register your store website domain in your Tiny account.<br>Sign up at <a href=\"https://www.tiny.cloud/auth/signup/\" target=\"_blank\">www.tiny.cloud</a><br><br>Default value: <strong>GPL</strong> for free-unregistered mode with basic features.', 1, 111, now())");
+    $db->Execute('INSERT IGNORE INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) VALUES ('TinyMCE Editor API Key', 'TINYMCE_EDITOR_API_KEY', 'GPL', 'Basic editor features are free, in GPL mode.<br>Optionally enable premium editor features in the TinyMCE editor by providing your account API key and register your store website domain in your Tiny account.<br>Sign up at <a href=\"https://www.tiny.cloud/auth/signup/\" target=\"_blank\">www.tiny.cloud</a><br><br>Default value: <strong>GPL</strong> for free-unregistered mode with basic features.', 1, 111, now())");
     // the following will be ignored on next load of the page, so should not be edited here
     define('TINYMCE_EDITOR_API_KEY', 'GPL');
 }
@@ -105,15 +105,15 @@ if (str_starts_with(strtoupper(TINYMCE_EDITOR_API_KEY), 'GPL') || empty(TINYMCE_
     $editor_js_filename_path = $editor_assets_path . 'tinymce.min.js';
     $editor_js_src = file_exists($editor_js_filename_path) ? $editor_js_filename_url : "https://cdn.jsdelivr.net/npm/tinymce@$tinymceCDNversion/tinymce.min.js";
 } else {
-    $editor_js_src = "https://cdn.tiny.cloud/1/" . TINYMCE_EDITOR_API_KEY . "/tinymce/$tinymceVersionSeries/tinymce.min.js";
+    $editor_js_src = 'https://cdn.tiny.cloud/1/' . TINYMCE_EDITOR_API_KEY . "/tinymce/$tinymceVersionSeries/tinymce.min.js";
 }
 
 // Language Support Setup
-$lng ??= new language;
+$lng ??= new language();
 $localesDirectory = $editor_assets_path . 'langs';
 $tinyLanguagesUrl = $editor_assets_url . 'langs';
 $tinyLanguageCode = $_SESSION['languages_code'];
-$tinyLanguageFiles = (new FileSystem)->listFilesFromDirectory($localesDirectory, '~^([a-z]{2})([-_][A-Z]{2,4})?\.js$~', false);
+$tinyLanguageFiles = (new FileSystem())->listFilesFromDirectory($localesDirectory, '~^([a-z]{2})([-_][A-Z]{2,4})?\.js$~', false);
 foreach ($tinyLanguageFiles as $key => $tinyLanguageFile) {
     // extra sanity check
     if (!is_file($localesDirectory . '/' . $tinyLanguageFile)) {
@@ -164,9 +164,9 @@ document.addEventListener('focusin', (e) => {
         let languagesConfig = {
 <?php
 foreach ($tinyLanguageFiles as $tinyLanguageFile) {
-    if (strpos($tinyLanguageFile, $tinyLanguageCode) === 0) {
-        echo "            language_url: '" . $tinyLanguagesUrl . "/" . $tinyLanguageFile . "',\n            language_load: false,\n";
-        $tinyLanguageCode = substr($tinyLanguageFile, 0, -3);
+    if (str_starts_with((string) $tinyLanguageFile, (string) $tinyLanguageCode)) {
+        echo "            language_url: '" . $tinyLanguagesUrl . '/' . $tinyLanguageFile . "',\n            language_load: false,\n";
+        $tinyLanguageCode = substr((string) $tinyLanguageFile, 0, -3);
         break;
     }
 }
@@ -176,9 +176,9 @@ foreach ($tinyLanguageFiles as $tinyLanguageFile) {
 <?php
 $contentLangs = $lng->get_languages_by_code();
 foreach ($contentLangs as $key => $lang) {
-    foreach($tinyLanguageFiles as $tinyLanguageFile) {
-        if (strpos($tinyLanguageFile, $lang['code']) === 0) {
-            $contentLangs[$key]['code'] = substr($tinyLanguageFile, 0, -3);
+    foreach ($tinyLanguageFiles as $tinyLanguageFile) {
+        if (str_starts_with((string) $tinyLanguageFile, (string) $lang['code'])) {
+            $contentLangs[$key]['code'] = substr((string) $tinyLanguageFile, 0, -3);
             break;
         }
     }

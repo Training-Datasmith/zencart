@@ -12,7 +12,7 @@ if (! count($availableNotifications)) {
 }
 foreach ($availableNotifications as $nKey => $aNotification) {
     if (isset($aNotification['banner-group'])) {
-?>
+        ?>
         <div class="row alert alert-dismissible notification-alert" role="alert" data-notification="<?php echo $nKey; ?>">
 <?php if ($aNotification['can-forget']) { ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -26,9 +26,9 @@ foreach ($availableNotifications as $nKey => $aNotification) {
                 //]]>--></script>
         </div>
 <?php
-        }
-        if (isset($aNotification['banner-html'])) {
-?>
+    }
+    if (isset($aNotification['banner-html'])) {
+        ?>
         <div class="row alert alert-dismissible notification-alert" role="alert" data-notification="<?php echo $nKey; ?>">
             <?php if ($aNotification['can-forget']) { ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -36,8 +36,8 @@ foreach ($availableNotifications as $nKey => $aNotification) {
         <?php echo $aNotification['banner-html']; ?>
         </div>
 <?php
-        }
     }
+}
 ?>
 <script>
     $('.notification-alert').on('close.bs.alert', function () {

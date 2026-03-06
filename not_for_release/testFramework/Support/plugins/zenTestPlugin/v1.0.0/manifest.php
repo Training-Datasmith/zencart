@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'pluginVersion' => 'v1.0.0',
     'pluginName' => 'Zen Cart Test Plugin',

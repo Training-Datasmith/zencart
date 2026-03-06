@@ -1,5 +1,7 @@
 #!/usr/bin/php
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,7 +13,7 @@
 
 // This is intended to prevent unauthorized execution via a browser
 $is_browser = (isset($_SERVER['HTTP_HOST']) || PHP_SAPI !== 'cli');
-if ($is_browser && isset($_SERVER["REMOTE_ADDR"]) && ($_SERVER["REMOTE_ADDR"] !== $_SERVER["SERVER_ADDR"])) {
+if ($is_browser && isset($_SERVER['REMOTE_ADDR']) && ($_SERVER['REMOTE_ADDR'] !== $_SERVER['SERVER_ADDR'])) {
     echo ' ERROR: Permission denied.';
     exit(1);
 }
@@ -26,14 +28,14 @@ if ($is_browser && isset($_SERVER["REMOTE_ADDR"]) && ($_SERVER["REMOTE_ADDR"] !=
 define('IS_CLI', 'VERBOSE'); // options: VERBOSE will cause it to output informational messages. 'NONE' or anything else will suppress status messages other than anticipated errors.
 
 // Set timezone if passed as "TZ=Continent/City" (since often the PHP CLI doesn't know the same timezone as an apache vhost, and thus may not honor the vhost-specific date.timezone setting) (Yes, PHP 5.4+ ignores the TZ environment variable, but this uses it and takes it a step further for forward compatibility)
-if (isset($_SERVER["argc"]) && $_SERVER["argc"] > 1) {
-    for ($i = 1; $i < $_SERVER["argc"]; $i++) {
-        [$key, $val] = explode('=', $_SERVER["argv"][$i]);
+if (isset($_SERVER['argc']) && $_SERVER['argc'] > 1) {
+    for ($i = 1; $i < $_SERVER['argc']; $i++) {
+        [$key, $val] = explode('=', (string) $_SERVER['argv'][$i]);
         if ($key === 'TZ') {
-            putenv($_SERVER["argv"][$i]);
+            putenv($_SERVER['argv'][$i]);
             date_default_timezone_set($val);
         }
-        if (in_array($_SERVER["argv"][$i], ['help', '?', '-help', '--help', '-?'])) {
+        if (in_array($_SERVER['argv'][$i], ['help', '?', '-help', '--help', '-?'])) {
             echo 'Zen Cart(tm) Product Status Updater cron script.' . "\n\n";
             echo 'To use: Create a cron job on your server, and give it the following command line:' . "\n";
             echo '       php /full/path/to/products_cron.php' . "\n";
@@ -61,16 +63,12 @@ $_SERVER['HTTP_USER_AGENT'] = 'Zen Cart update';
 
 // main execution area
 if (function_exists('zen_enable_disabled_upcoming')) {
-    if (IS_CLI === 'VERBOSE' && $is_browser) {
+    if ($is_browser) {
         echo '<br><pre>' . "\n";
     }
-    if (IS_CLI === 'VERBOSE') {
-        echo 'Updating products according to available/expire dates... ' . "\n";
-    }
+    echo 'Updating products according to available/expire dates... ' . "\n";
     zen_enable_disabled_upcoming(time(), false, IS_CLI === 'VERBOSE');
-    if (IS_CLI === 'VERBOSE') {
-        echo 'Done.' . "\n\n";
-    }
+    echo 'Done.' . "\n\n";
     exit(0); // returns 0 status code, which means successful
 } else {
     echo "Error: Function not found: zen_enable_disabled_upcoming().\nMake sure you have placed the products_cron.php file in your (renamed) Admin folder.\n\n";

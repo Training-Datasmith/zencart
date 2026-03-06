@@ -9,13 +9,13 @@
  */
 
 // choose box images based on box position
-  if ($title_link) {
+if ($title_link) {
     $title = '<a href="' . zen_href_link($title_link) . '">' . $title . BOX_HEADING_LINKS . '</a>';
-  }
-//
+}
+
 ?>
 <!--// bof: <?php echo $box_id; ?> //-->
-<div class="rightBoxContainer" id="<?php echo str_replace('_', '-', $box_id ); ?>" style="width: <?php echo $column_width; ?>px">
+<div class="rightBoxContainer" id="<?php echo str_replace('_', '-', $box_id); ?>" style="width: <?php echo $column_width; ?>px">
 <h3 class="rightBoxHeading" id="<?php echo str_replace('_', '-', $box_id) . 'Heading'; ?>"><?php echo $title; ?></h3>
 <?php echo $content; ?>
 </div>

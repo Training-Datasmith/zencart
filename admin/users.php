@@ -161,9 +161,9 @@ $userList = zen_get_users();
             echo zen_draw_hidden_field('action', $formAction);
         }
     }
-    if ($action == 'edit' || $action == 'password') {
-        echo zen_draw_hidden_field('user', $user);
-    } ?>
+if ($action == 'edit' || $action == 'password') {
+    echo zen_draw_hidden_field('user', $user);
+} ?>
     <table class="table table-striped">
         <thead>
         <tr class="headingRow">
@@ -186,15 +186,15 @@ $userList = zen_get_users();
         <?php if ($action == 'add') { ?>
             <tr>
                 <td class="id">&nbsp;</td>
-                <td class="name"><?php echo zen_draw_input_field('name', isset($_POST['name']) ? $_POST['name'] : '', 'class="form-control" autofocus autocomplete="off"', true, 'text', true) ?></td>
-                <td class="email"><?php echo zen_draw_input_field('email', isset($_POST['email']) ? $_POST['email'] : '', 'class="form-control" autocomplete="off"', true, 'email', true) ?></td>
-                <td class="profile"><?php echo zen_draw_pull_down_menu('profile', $profilesList, isset($_POST['profile']) ? $_POST['profile'] : '', 'class="form-control"', true) ?></td>
+                <td class="name"><?php echo zen_draw_input_field('name', $_POST['name'] ?? '', 'class="form-control" autofocus autocomplete="off"', true, 'text', true) ?></td>
+                <td class="email"><?php echo zen_draw_input_field('email', $_POST['email'] ?? '', 'class="form-control" autocomplete="off"', true, 'email', true) ?></td>
+                <td class="profile"><?php echo zen_draw_pull_down_menu('profile', $profilesList, $_POST['profile'] ?? '', 'class="form-control"', true) ?></td>
                 <td class="changed"></td>
                 <?php if (zen_is_superuser()) { ?>
                 <td class="mfa_status"></td>
                 <?php } ?>
-                <td class="password"><?php echo zen_draw_input_field('password', isset($_POST['password']) ? $_POST['password'] : '', 'class="form-control" autocomplete="off"', true, 'password'); ?></td>
-                <td class="confirm"><?php echo zen_draw_input_field('confirm', isset($_POST['confirm']) ? $_POST['confirm'] : '', 'class="form-control" autocomplete="off"', true, 'password'); ?></td>
+                <td class="password"><?php echo zen_draw_input_field('password', $_POST['password'] ?? '', 'class="form-control" autocomplete="off"', true, 'password'); ?></td>
+                <td class="confirm"><?php echo zen_draw_input_field('confirm', $_POST['confirm'] ?? '', 'class="form-control" autocomplete="off"', true, 'password'); ?></td>
                 <td class="actions">
                     <button type="submit" class="btn btn-primary"><?php echo IMAGE_INSERT; ?></button>
                     <a href="<?php echo zen_href_link(FILENAME_USERS) ?>" class="btn btn-default" role="button"><?php echo IMAGE_CANCEL; ?></a></td>
@@ -215,39 +215,39 @@ $userList = zen_get_users();
                     <td class="name"><?php echo $userDetails['name'] ?></td>
                     <td class="email"><?php echo $userDetails['email'] ?></td>
                 <?php } ?>
-                <?php if ($action == 'edit' && $user == $userDetails['id'] && $user != $currentUser) { // do not allow current user to change profile ?>
+                <?php if ($action == 'edit' && $user == $userDetails['id'] && $user != $currentUser) { // do not allow current user to change profile?>
                     <td class="profile"><?php echo zen_draw_pull_down_menu('profile', $profilesList, $userDetails['profile'], 'class="form-control"') ?></td>
                 <?php } else { ?>
                     <td class="profile"><?php echo $userDetails['profileName'] ?></td>
                 <?php } ?>
                 <td class="changed"><?php echo zen_date_short($userDetails['pwd_last_change_date']); ?></td>
                 <?php
-                if (zen_is_superuser()) {
-                    $userFresh = zen_read_user($userDetails['name']);
-                    $user_mfa_data = json_decode($userFresh['mfa'] ?? '', true, 2);
-                    $mfa_status_of_store = MFA_ENABLED === 'True';
-                    $mfa_status = !empty($user_mfa_data['generated_at']) && !empty($user_mfa_data['secret']);
-                    $mfa_exempt = !empty($user_mfa_data['exempt']);
-                    $mfa_date = $mfa_status ? (new DateTime)->setTimestamp($user_mfa_data['generated_at'])->setTimezone((new DateTime)->getTimezone())->format('Y-m-d H:i:s') : '';
-                    $mfa_status_msg = TEXT_MFA_DISABLED_FOR_SITE;
-                    if ($mfa_status_of_store) {
-                        $mfa_status_msg = TEXT_MFA_NOT_SET;
-                    }
-                    if (!empty($user_mfa_data['generated_at'])) {
-                        $mfa_status_msg = sprintf(TEXT_MFA_ENABLED_DATE, zen_date_short($mfa_date));
-                    } elseif (!empty($user_mfa_data['via_email'])) {
-                        $mfa_status_msg = TEXT_MFA_BY_EMAIL;
-                    } elseif ($mfa_exempt) {
-                        $mfa_status_msg = TEXT_MFA_EXEMPT;
-                    }
-                    ?>
+            if (zen_is_superuser()) {
+                $userFresh = zen_read_user($userDetails['name']);
+                $user_mfa_data = json_decode($userFresh['mfa'] ?? '', true, 2);
+                $mfa_status_of_store = MFA_ENABLED === 'True';
+                $mfa_status = !empty($user_mfa_data['generated_at']) && !empty($user_mfa_data['secret']);
+                $mfa_exempt = !empty($user_mfa_data['exempt']);
+                $mfa_date = $mfa_status ? (new DateTime())->setTimestamp($user_mfa_data['generated_at'])->setTimezone((new DateTime())->getTimezone())->format('Y-m-d H:i:s') : '';
+                $mfa_status_msg = TEXT_MFA_DISABLED_FOR_SITE;
+                if ($mfa_status_of_store) {
+                    $mfa_status_msg = TEXT_MFA_NOT_SET;
+                }
+                if (!empty($user_mfa_data['generated_at'])) {
+                    $mfa_status_msg = sprintf(TEXT_MFA_ENABLED_DATE, zen_date_short($mfa_date));
+                } elseif (!empty($user_mfa_data['via_email'])) {
+                    $mfa_status_msg = TEXT_MFA_BY_EMAIL;
+                } elseif ($mfa_exempt) {
+                    $mfa_status_msg = TEXT_MFA_EXEMPT;
+                }
+                ?>
                 <td class="mfa_status"><?= $mfa_status_msg ?>
                     <?php if ($mfa_status_of_store !== true) {
                         // not enabled, so no buttons to output
                     } elseif ($mfa_status === true || !empty($user_mfa_data['via_email'])) {
                         $btn_class = '';
                         if ($action === 'deletemfa' && $userDetails['id'] === $user) {
-                           $btn_class = 'btn btn-sm btn-danger';
+                            $btn_class = 'btn btn-sm btn-danger';
                         } elseif ($action !== 'deletemfa') {
                             $btn_class = 'btn btn-sm btn-warning';
                         }
@@ -263,7 +263,7 @@ $userList = zen_get_users();
                     } elseif ($mfa_exempt !== true) {
                         $btn_class = '';
                         if ($action === 'exemptmfa' && $userDetails['id'] === $user) {
-                           $btn_class = 'btn btn-sm btn-danger';
+                            $btn_class = 'btn btn-sm btn-danger';
                         } elseif ($action !== 'exemptmfa') {
                             $btn_class = 'btn btn-sm btn-default';
                         }
@@ -278,7 +278,7 @@ $userList = zen_get_users();
                     <?php } elseif ($mfa_exempt === true) {
                         $btn_class = '';
                         if ($action === 'unexemptmfa' && $userDetails['id'] === $user) {
-                           $btn_class = 'btn btn-sm btn-danger';
+                            $btn_class = 'btn btn-sm btn-danger';
                         } elseif ($action !== 'ununexemptmfa') {
                             $btn_class = 'btn btn-sm btn-default';
                         }

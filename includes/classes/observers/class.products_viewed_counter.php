@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -13,25 +15,25 @@ class products_viewed_counter extends base
     protected $exclude_spiders = true;
     protected $exclude_maintenance_ips = true; // admins
 
-    function __construct()
+    public function __construct()
     {
         if ($this->should_be_excluded()) {
             return;
         }
-        $this->attach($this, array('NOTIFY_PRODUCT_VIEWS_HIT_INCREMENTOR'));
+        $this->attach($this, ['NOTIFY_PRODUCT_VIEWS_HIT_INCREMENTOR']);
     }
 
     /**
      * @since ZC v1.5.7
      */
-    function updateNotifyProductViewsHitIncrementor(&$class, $eventID, $product_id)
+    public function updateNotifyProductViewsHitIncrementor(&$class, $eventID, $product_id): void
     {
         global $db;
 
-        $sql = "INSERT INTO " . TABLE_COUNT_PRODUCT_VIEWS . "
+        $sql = 'INSERT INTO ' . TABLE_COUNT_PRODUCT_VIEWS . '
                 (product_id, language_id, date_viewed, views)
-                VALUES (" . (int)$product_id . ", " . (int)$_SESSION['languages_id'] . ", now(), 1)
-                ON DUPLICATE KEY UPDATE views = views + 1";
+                VALUES (' . (int)$product_id . ', ' . (int)$_SESSION['languages_id'] . ', now(), 1)
+                ON DUPLICATE KEY UPDATE views = views + 1';
         $db->Execute($sql);
     }
 
@@ -41,7 +43,7 @@ class products_viewed_counter extends base
     protected function should_be_excluded()
     {
         global $spider_flag;
-        
+
         // exclude search-engine spiders
         if ($this->exclude_spiders && $spider_flag === true) {
             return true;

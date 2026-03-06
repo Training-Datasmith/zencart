@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -7,64 +9,62 @@
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 
 /**
  * @since ZC v1.0.3
  */
-class product_notification {
-
-    /**
-     * $content_html is the email content in HTML form.
-     * @var string
-     */
-    protected $content_html;
-    /**
-     * $content is the email content in text form.
-     * @var string
-     */
-    protected $content;
+class product_notification
+{
     /**
      * $show_choose_audience is a flag that toggles the select audience form display
      * @var boolean
      */
     public $show_choose_audience;
+
     /**
-     * $title is the display title
-     * @var string
+     * @param string $content_html
+     * @param string $content
+     * @param string $title
      */
-    protected $title;
-
-  function __construct($title, $content, $content_html, $queryname = '') {
-    $this->show_choose_audience = true;
-    $this->title = $title;
-    $this->content = $content;
-    $this->content_html = $content_html;
-  }
-
-  /**
-   * @since ZC v1.0.3
+    public function __construct(/**
+   * $title is the display title
    */
-  function choose_audience() {
-    global $db;
-
-    $products_array = array();
-    $products = $db->Execute("SELECT pd.products_id, pd.products_name
-                              FROM " . TABLE_PRODUCTS . " p,
-                                   " . TABLE_PRODUCTS_DESCRIPTION . " pd
-                              WHERE pd.language_id = " . (int)$_SESSION['languages_id'] . "
-                              AND pd.products_id = p.products_id
-                              AND p.products_status = 1
-                              ORDER BY pd.products_name");
-
-    foreach ($products as $product) {
-      $products_array[] = array(
-        'id' => $product['products_id'],
-        'text' => $product['products_name']);
+        protected $title, /**
+   * $content is the email content in text form.
+   */
+        protected $content, /**
+   * $content_html is the email content in HTML form.
+   */
+        protected $content_html
+    ) {
+        $this->show_choose_audience = true;
     }
 
-    $choose_audience_string = '<script>
+    /**
+     * @since ZC v1.0.3
+     */
+    public function choose_audience(): string
+    {
+        global $db;
+
+        $products_array = [];
+        $products = $db->Execute('SELECT pd.products_id, pd.products_name
+                              FROM ' . TABLE_PRODUCTS . ' p,
+                                   ' . TABLE_PRODUCTS_DESCRIPTION . ' pd
+                              WHERE pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                              AND pd.products_id = p.products_id
+                              AND p.products_status = 1
+                              ORDER BY pd.products_name');
+
+        foreach ($products as $product) {
+            $products_array[] = [
+              'id' => $product['products_id'],
+              'text' => $product['products_name']];
+        }
+
+        $choose_audience_string = '<script>
 function mover(move) {
   if (move == \'remove\') {
     for (x=0; x<(document.notifications.products.length); x++) {
@@ -107,206 +107,205 @@ function selectAll(FormName, SelectBox) {
   }
 }
 </script>';
-    $choose_audience_string .= '<div class="row">' . sprintf(TEXT_NOTIFICATION_INFO_GLOBAL, '<strong>"' . $this->title . '"</strong>') . '</div>' . PHP_EOL;
-    $choose_audience_string .= '<div class="row"><a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm&global=true') . '" class="btn btn-default" role="button">' . BUTTON_GLOBAL . '</a></div>' . PHP_EOL;
+        $choose_audience_string .= '<div class="row">' . sprintf(TEXT_NOTIFICATION_INFO_GLOBAL, '<strong>"' . $this->title . '"</strong>') . '</div>' . PHP_EOL;
+        $choose_audience_string .= '<div class="row"><a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm&global=true') . '" class="btn btn-default" role="button">' . BUTTON_GLOBAL . '</a></div>' . PHP_EOL;
 
-    $choose_audience_string .= '<hr><div class="row">' . TEXT_NOTIFICATION_INFO_PRODUCTS . '</div><br>' . PHP_EOL;
+        $choose_audience_string .= '<hr><div class="row">' . TEXT_NOTIFICATION_INFO_PRODUCTS . '</div><br>' . PHP_EOL;
 
-    $cancel_button = '<a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID']) . '" class="btn btn-default" role="button">' . BUTTON_CANCEL . '</a>' . PHP_EOL;
+        $cancel_button = '<a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID']) . '" class="btn btn-default" role="button">' . BUTTON_CANCEL . '</a>' . PHP_EOL;
 
-    $choose_audience_string .= zen_draw_form('notifications' ,FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm', 'post', 'onSubmit="return selectAll(\'notifications\', \'chosen[]\')"') . PHP_EOL;
+        $choose_audience_string .= zen_draw_form('notifications', FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm', 'post') . PHP_EOL;
 
-    $choose_audience_string .= '<div class="row">' . PHP_EOL;
-    $choose_audience_string .= '<div class="col-sm-4"><b>' . TEXT_PRODUCTS . '</b><br>' . zen_draw_pull_down_menu('products', $products_array, '', 'size="20" class="form-control" multiple') . '</div>' . PHP_EOL;
-    $choose_audience_string .= '<div class="col-sm-4 text-center"><div class="btn-group-vertical"><input type="button" value="' . BUTTON_SELECT . '" onClick="mover(\'remove\');" class="btn btn-default"><input type="button" value="' . BUTTON_UNSELECT . '" onClick="mover(\'add\');" class="btn btn-default"><input type="submit" value="' . BUTTON_SUBMIT . '" class="btn btn-default">' . $cancel_button . '</div></div>' . PHP_EOL;
-    $choose_audience_string .= '<div class="col-sm-4"><b>' . TEXT_SELECTED_PRODUCTS . '</b><br>' . zen_draw_pull_down_menu('chosen[]', array(), '', 'size="20" class="form-control" multiple') . '</div>' . PHP_EOL;
-    $choose_audience_string .= '</div>' . PHP_EOL;
-    $choose_audience_string .= '</form>' . PHP_EOL;
+        $choose_audience_string .= '<div class="row">' . PHP_EOL;
+        $choose_audience_string .= '<div class="col-sm-4"><b>' . TEXT_PRODUCTS . '</b><br>' . zen_draw_pull_down_menu('products', $products_array, '', 'size="20" class="form-control" multiple') . '</div>' . PHP_EOL;
+        $choose_audience_string .= '<div class="col-sm-4 text-center"><div class="btn-group-vertical"><input type="button" value="' . BUTTON_SELECT . '" onClick="mover(\'remove\');" class="btn btn-default"><input type="button" value="' . BUTTON_UNSELECT . '" onClick="mover(\'add\');" class="btn btn-default"><input type="submit" value="' . BUTTON_SUBMIT . '" class="btn btn-default">' . $cancel_button . '</div></div>' . PHP_EOL;
+        $choose_audience_string .= '<div class="col-sm-4"><b>' . TEXT_SELECTED_PRODUCTS . '</b><br>' . zen_draw_pull_down_menu('chosen[]', [], '', 'size="20" class="form-control" multiple') . '</div>' . PHP_EOL;
+        $choose_audience_string .= '</div>' . PHP_EOL;
 
-    return $choose_audience_string;
-  }
-
-  /**
-   * @since ZC v1.0.3
-   */
-  function confirm() {
-    global $db;
-
-    $audience = array();
-
-    if (isset($_GET['global']) && ($_GET['global'] == 'true')) {
-      $products = $db->Execute("SELECT DISTINCT customers_id
-                                FROM " . TABLE_PRODUCTS_NOTIFICATIONS);
-
-      foreach ($products as $product) {
-        $audience[$product['customers_id']] = '1';
-      }
-
-      $customers = $db->Execute("SELECT customers_info_id
-                                 FROM " . TABLE_CUSTOMERS_INFO . "
-                                 WHERE global_product_notifications = 1");
-
-      foreach ($customers as $customer) {
-        $audience[$customer['customers_info_id']] = '1';
-      }
-    } else {
-      $chosen = $_POST['chosen'];
-
-      $ids = zen_db_input(implode(',', $chosen));
-
-      $products = $db->Execute("SELECT DISTINCT customers_id
-                                FROM " . TABLE_PRODUCTS_NOTIFICATIONS . "
-                                WHERE products_id in (" . $ids . ")");
-
-      foreach ($products as $product) {
-        $audience[$product['customers_id']] = '1';
-      }
-
-      $customers = $db->Execute("SELECT customers_info_id
-                                 FROM " . TABLE_CUSTOMERS_INFO . "
-                                 WHERE global_product_notifications = 1");
-
-      foreach ($customers as $customer) {
-        $audience[$customer['customers_info_id']] = '1';
-      }
+        return $choose_audience_string . ('</form>' . PHP_EOL);
     }
 
-    $confirm_string = '<div class="row">' . PHP_EOL;
-    $confirm_string .= '<div class="col-sm-12"><span class="text-danger"><strong>' . sprintf(TEXT_COUNT_CUSTOMERS, sizeof($audience)) . '</strong></span></div>' . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= zen_draw_separator() . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= '<div class="col-sm-12"><strong>' . $this->title . '</strong></div>' . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= zen_draw_separator() . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= '<div class="col-sm-12">' . nl2br($this->content_html) . '</div>' . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= zen_draw_separator() . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= '<div class="col-sm-12 tt">' . nl2br($this->content) . '</div>' . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= '<div class="row">' . PHP_EOL;
-    $confirm_string .= zen_draw_separator() . PHP_EOL;
-    $confirm_string .= '</div>' . PHP_EOL;
-    $confirm_string .= zen_draw_form('confirm', FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm_send') . PHP_EOL;
-    $confirm_string .= '<div class="row text-right">' . PHP_EOL;
-    if (sizeof($audience) > 0) {
-      if (isset($_GET['global']) && ($_GET['global'] == 'true')) {
-        $confirm_string .= zen_draw_hidden_field('global', 'true') . PHP_EOL;
-      } else {
-        for ($i = 0, $n = sizeof($chosen); $i < $n; $i++) {
-          $confirm_string .= zen_draw_hidden_field('chosen[]', $chosen[$i]) . PHP_EOL;
+    /**
+     * @since ZC v1.0.3
+     */
+    public function confirm(): string
+    {
+        global $db;
+
+        $audience = [];
+
+        if (isset($_GET['global']) && ($_GET['global'] == 'true')) {
+            $products = $db->Execute('SELECT DISTINCT customers_id
+                                FROM ' . TABLE_PRODUCTS_NOTIFICATIONS);
+
+            foreach ($products as $product) {
+                $audience[$product['customers_id']] = '1';
+            }
+
+            $customers = $db->Execute('SELECT customers_info_id
+                                 FROM ' . TABLE_CUSTOMERS_INFO . '
+                                 WHERE global_product_notifications = 1');
+
+            foreach ($customers as $customer) {
+                $audience[$customer['customers_info_id']] = '1';
+            }
+        } else {
+            $chosen = $_POST['chosen'];
+
+            $ids = zen_db_input(implode(',', $chosen));
+
+            $products = $db->Execute('SELECT DISTINCT customers_id
+                                FROM ' . TABLE_PRODUCTS_NOTIFICATIONS . '
+                                WHERE products_id in (' . $ids . ')');
+
+            foreach ($products as $product) {
+                $audience[$product['customers_id']] = '1';
+            }
+
+            $customers = $db->Execute('SELECT customers_info_id
+                                 FROM ' . TABLE_CUSTOMERS_INFO . '
+                                 WHERE global_product_notifications = 1');
+
+            foreach ($customers as $customer) {
+                $audience[$customer['customers_info_id']] = '1';
+            }
         }
-      }
-      $confirm_string .= '<button type="submit" class="btn btn-primary">' . IMAGE_SEND . '</button> ';
+
+        $confirm_string = '<div class="row">' . PHP_EOL;
+        $confirm_string .= '<div class="col-sm-12"><span class="text-danger"><strong>' . sprintf(TEXT_COUNT_CUSTOMERS, sizeof($audience)) . '</strong></span></div>' . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= zen_draw_separator() . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= '<div class="col-sm-12"><strong>' . $this->title . '</strong></div>' . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= zen_draw_separator() . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= '<div class="col-sm-12">' . nl2br($this->content_html) . '</div>' . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= zen_draw_separator() . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= '<div class="col-sm-12 tt">' . nl2br($this->content) . '</div>' . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= '<div class="row">' . PHP_EOL;
+        $confirm_string .= zen_draw_separator() . PHP_EOL;
+        $confirm_string .= '</div>' . PHP_EOL;
+        $confirm_string .= zen_draw_form('confirm', FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=confirm_send') . PHP_EOL;
+        $confirm_string .= '<div class="row text-right">' . PHP_EOL;
+        if (sizeof($audience) > 0) {
+            if (isset($_GET['global']) && ($_GET['global'] == 'true')) {
+                $confirm_string .= zen_draw_hidden_field('global', 'true') . PHP_EOL;
+            } else {
+                for ($i = 0, $n = sizeof($chosen); $i < $n; $i++) {
+                    $confirm_string .= zen_draw_hidden_field('chosen[]', $chosen[$i]) . PHP_EOL;
+                }
+            }
+            $confirm_string .= '<button type="submit" class="btn btn-primary">' . IMAGE_SEND . '</button> ';
+        }
+        $confirm_string .= '<a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=send') . '" class="btn btn-default" role="button">' . IMAGE_BACK . '</a> <a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID']) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>' . PHP_EOL;
+
+        return $confirm_string . ('  </div>' . PHP_EOL);
     }
-    $confirm_string .= '<a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID'] . '&action=send') . '" class="btn btn-default" role="button">' . IMAGE_BACK . '</a> <a href="' . zen_href_link(FILENAME_NEWSLETTERS, 'page=' . $_GET['page'] . '&nID=' . $_GET['nID']) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>' . PHP_EOL;
-     $confirm_string .= '  </div>' . PHP_EOL;
 
-    return $confirm_string;
-  }
+    /**
+     * @since ZC v1.0.3
+     */
+    public function send($newsletter_id): int
+    {
+        global $db;
 
-  /**
-   * @since ZC v1.0.3
-   */
-  function send($newsletter_id) {
-    global $db;
+        $audience = [];
 
-    $audience = array();
-
-    if (isset($_POST['global']) && ($_POST['global'] == 'true')) {
-      $products = $db->Execute("SELECT DISTINCT pn.customers_id, c.customers_firstname,
+        if (isset($_POST['global']) && ($_POST['global'] == 'true')) {
+            $products = $db->Execute('SELECT DISTINCT pn.customers_id, c.customers_firstname,
                                                 c.customers_lastname, c.customers_email_address
-                                FROM " . TABLE_CUSTOMERS . " c,
-                                     " . TABLE_PRODUCTS_NOTIFICATIONS . " pn
-                                WHERE c.customers_id = pn.customers_id");
+                                FROM ' . TABLE_CUSTOMERS . ' c,
+                                     ' . TABLE_PRODUCTS_NOTIFICATIONS . ' pn
+                                WHERE c.customers_id = pn.customers_id');
 
-      foreach ($products as $product) {
-        $audience[$product['customers_id']] = array(
-          'firstname' => $product['customers_firstname'],
-          'lastname' => $product['customers_lastname'],
-          'email_address' => $product['customers_email_address']);
-      }
+            foreach ($products as $product) {
+                $audience[$product['customers_id']] = [
+                  'firstname' => $product['customers_firstname'],
+                  'lastname' => $product['customers_lastname'],
+                  'email_address' => $product['customers_email_address']];
+            }
 
-      $customers = $db->Execute("SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
+            $customers = $db->Execute('SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
                                         c.customers_email_address
-                                 FROM " . TABLE_CUSTOMERS . " c,
-                                      " . TABLE_CUSTOMERS_INFO . " ci
+                                 FROM ' . TABLE_CUSTOMERS . ' c,
+                                      ' . TABLE_CUSTOMERS_INFO . ' ci
                                  WHERE c.customers_id = ci.customers_info_id
-                                 AND ci.global_product_notifications = 1");
+                                 AND ci.global_product_notifications = 1');
 
-      foreach ($customers as $customer) {
-        $audience[$customer['customers_id']] = array(
-          'firstname' => $customer['customers_firstname'],
-          'lastname' => $customer['customers_lastname'],
-          'email_address' => $customer['customers_email_address']);
-      }
-    } else {  //not global==true; instead, process all selected products
-      $chosen = $_POST['chosen'];
+            foreach ($customers as $customer) {
+                $audience[$customer['customers_id']] = [
+                  'firstname' => $customer['customers_firstname'],
+                  'lastname' => $customer['customers_lastname'],
+                  'email_address' => $customer['customers_email_address']];
+            }
+        } else {  //not global==true; instead, process all selected products
+            $chosen = $_POST['chosen'];
 
-      $ids = zen_db_input(implode(',', $chosen));
+            $ids = zen_db_input(implode(',', $chosen));
 
-      $products = $db->Execute("SELECT DISTINCT pn.customers_id, c.customers_firstname,
+            $products = $db->Execute('SELECT DISTINCT pn.customers_id, c.customers_firstname,
                                                 c.customers_lastname, c.customers_email_address
-                                FROM " . TABLE_CUSTOMERS . " c,
-                                     " . TABLE_PRODUCTS_NOTIFICATIONS . " pn
+                                FROM ' . TABLE_CUSTOMERS . ' c,
+                                     ' . TABLE_PRODUCTS_NOTIFICATIONS . ' pn
                                 WHERE c.customers_id = pn.customers_id
-                                AND pn.products_id IN (" . $ids . ")");
+                                AND pn.products_id IN (' . $ids . ')');
 
-      foreach ($products as $product) {
-        $audience[$product['customers_id']] = array(
-          'firstname' => $product['customers_firstname'],
-          'lastname' => $product['customers_lastname'],
-          'email_address' => $product['customers_email_address']);
-      }
+            foreach ($products as $product) {
+                $audience[$product['customers_id']] = [
+                  'firstname' => $product['customers_firstname'],
+                  'lastname' => $product['customers_lastname'],
+                  'email_address' => $product['customers_email_address']];
+            }
 
-      $customers = $db->Execute("SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
+            $customers = $db->Execute('SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
                                         c.customers_email_address
-                                 FROM " . TABLE_CUSTOMERS . " c,
-                                      " . TABLE_CUSTOMERS_INFO . " ci
+                                 FROM ' . TABLE_CUSTOMERS . ' c,
+                                      ' . TABLE_CUSTOMERS_INFO . ' ci
                                  WHERE c.customers_id = ci.customers_info_id
-                                 AND ci.global_product_notifications = 1");
+                                 AND ci.global_product_notifications = 1');
 
-      foreach ($customers as $customer) {
-        $audience[$customer['customers_id']] = array(
-          'firstname' => $customer['customers_firstname'],
-          'lastname' => $customer['customers_lastname'],
-          'email_address' => $customer['customers_email_address']);
-      }
-    }
+            foreach ($customers as $customer) {
+                $audience[$customer['customers_id']] = [
+                  'firstname' => $customer['customers_firstname'],
+                  'lastname' => $customer['customers_lastname'],
+                  'email_address' => $customer['customers_email_address']];
+            }
+        }
 
+        //send emails
+        $i = 0;
+        foreach ($audience as $value) {
+            $i++;
+            $html_msg['EMAIL_SALUTATION'] = EMAIL_SALUTATION;
+            $html_msg['EMAIL_FIRST_NAME'] = $value['firstname'];
+            $html_msg['EMAIL_LAST_NAME'] = $value['lastname'];
+            $html_msg['EMAIL_MESSAGE_HTML'] = $this->content_html;
+            zen_mail($value['firstname'] . ' ' . $value['lastname'], $value['email_address'], $this->title, $this->content, STORE_NAME, EMAIL_FROM, $html_msg, 'product_notification', '');
+            echo zen_icon('tick', $value['email_address'], 'lg');
 
-//send emails
-    $i = 0;
-    foreach ($audience as $key => $value) {
-      $i++;
-      $html_msg['EMAIL_SALUTATION'] = EMAIL_SALUTATION;
-      $html_msg['EMAIL_FIRST_NAME'] = $value['firstname'];
-      $html_msg['EMAIL_LAST_NAME'] = $value['lastname'];
-      $html_msg['EMAIL_MESSAGE_HTML'] = $this->content_html;
-      zen_mail($value['firstname'] . ' ' . $value['lastname'], $value['email_address'], $this->title, $this->content, STORE_NAME, EMAIL_FROM, $html_msg, 'product_notification', '');
-      echo zen_icon('tick', $value['email_address'], 'lg');
+            //force output to the screen to show status indicator each time a message is sent...
+            if (function_exists('ob_flush')) {
+                @ob_flush();
+            }
+            @flush();
+        }
 
-      //force output to the screen to show status indicator each time a message is sent...
-      if (function_exists('ob_flush')) {
-        @ob_flush();
-      }
-      @flush();
-    }
-
-    $newsletter_id = zen_db_prepare_input($newsletter_id);
-    $db->Execute("UPDATE " . TABLE_NEWSLETTERS . "
+        $newsletter_id = zen_db_prepare_input($newsletter_id);
+        $db->Execute('UPDATE ' . TABLE_NEWSLETTERS . '
                   SET date_sent = now(),
                       status = 1
-                  WHERE newsletters_id = " . zen_db_input($newsletter_id));
-    return $i;  //return number of records processed whether successful or not
-  }
+                  WHERE newsletters_id = ' . zen_db_input($newsletter_id));
+        return $i;  //return number of records processed whether successful or not
+    }
 
 }

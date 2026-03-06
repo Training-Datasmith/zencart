@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -10,7 +12,6 @@ use Tests\Support\zcFeatureTestCaseAdmin;
 
 class AdminEndpointsTest extends zcFeatureTestCaseAdmin
 {
-
     protected array $quickTestMap = [
         'configuration&gID=1' => ['strings' => ['Admin Session Time Out in Seconds']],
         'category_product_listing' => ['strings' => ['Admin Category Product Listing']],
@@ -85,7 +86,7 @@ class AdminEndpointsTest extends zcFeatureTestCaseAdmin
         'media_types' => ['strings' => ['Extension']],
     ];
 
-    public function testSimpleEndpoints()
+    public function testSimpleEndpoints(): void
     {
         $this->browser->request('GET', HTTP_SERVER . '/admin');
         $response = $this->browser->getResponse();
@@ -93,7 +94,7 @@ class AdminEndpointsTest extends zcFeatureTestCaseAdmin
         $this->browser->request('GET', HTTP_SERVER . '/admin');
         $response = $this->browser->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringContainsString('Admin Login', (string)$response->getContent() );
+        $this->assertStringContainsString('Admin Login', (string)$response->getContent());
         $this->browser->submitForm('Submit', [
             'admin_name' => 'Admin',
             'admin_pass' => 'password',
@@ -102,18 +103,17 @@ class AdminEndpointsTest extends zcFeatureTestCaseAdmin
             'store_name' => 'Zencart Store',
         ]);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Initial Setup Wizard', (string)$response->getContent() );
+        $this->assertStringContainsString('Initial Setup Wizard', (string)$response->getContent());
         $this->browser->submitForm('Update', [
             'store_name' => 'Zencart Store',
             'store_owner' => 'Store Owner',
         ]);
         $response = $this->browser->getResponse();
-        $this->assertStringContainsString('Admin Home', (string)$response->getContent() );
+        $this->assertStringContainsString('Admin Home', (string)$response->getContent());
         $this->quickLinksTest();
     }
 
-
-    public function quickLinksTest()
+    public function quickLinksTest(): void
     {
         foreach ($this->quickTestMap as $page => $contentTest) {
             $pageURI = $this->buildAdminLink($page);
@@ -121,7 +121,7 @@ class AdminEndpointsTest extends zcFeatureTestCaseAdmin
             $response = $this->browser->getResponse();
             $this->assertEquals(200, $response->getStatusCode());
             foreach ($contentTest['strings'] as $contentString) {
-                $this->assertStringContainsString($contentString, (string)$response->getContent() );
+                $this->assertStringContainsString($contentString, (string)$response->getContent());
             }
         }
     }

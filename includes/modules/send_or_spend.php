@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *  send_or_spend.php
  *
@@ -8,7 +10,5 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
-
-?>

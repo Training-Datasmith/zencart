@@ -16,20 +16,19 @@
 /**
  * require the downloads module
  */
-  require(DIR_WS_MODULES . zen_get_module_directory('downloads.php'));
+require(DIR_WS_MODULES . zen_get_module_directory('downloads.php'));
 
 // if download is not available yet
 if ($downloadsNotAvailableYet) {
-?>
+    ?>
  <fieldset><?php echo DOWNLOADS_CONTROLLER_ON_HOLD_MSG ?></fieldset>
 <?php
-  return;
+      return;
 }
 
 if ($numberOfDownloads < 1) {
-  return;
+    return;
 }
-
 
 // download is available
 ?>
@@ -46,23 +45,23 @@ if ($numberOfDownloads < 1) {
   </tr>
 <!-- list of products -->
 <?php
-    foreach($downloads as $file) {
-?>
+    foreach ($downloads as $file) {
+        ?>
   <tr class="tableRow">
 <!-- left box -->
 <?php
-  if ($file['is_downloadable']) {
-?>
+          if ($file['is_downloadable']) {
+              ?>
       <td class="downloadProductNameLink"><?php echo '<a href="' . $file['link_url'] . '" download="' . $file['filename'] . '">' . $file['products_name'] . '</a>'; ?></td>
 <?php } else { ?>
       <td class="downloadProductName"><?php echo $file['products_name']; ?></td>
 <?php
-  }
-?>
+}
+        ?>
       <td class="downloadFilesize"><?php echo $file['filesize'] . $file['filesize_units']; ?></td>
       <td class="downloadFilename"><?php echo $file['filename']; ?></td>
-      <td class="downloadExpiry"><?php echo ($file['unlimited_downloads'] ? TEXT_DOWNLOADS_UNLIMITED : zen_date_short($file['expiry'])); ?></td>
-      <td class="downloadCounts centeredContent"><?php echo ($file['unlimited_downloads'] ? TEXT_DOWNLOADS_UNLIMITED_COUNT : $file['download_count']); ?></td>
+      <td class="downloadExpiry"><?php echo($file['unlimited_downloads'] ? TEXT_DOWNLOADS_UNLIMITED : zen_date_short($file['expiry'])); ?></td>
+      <td class="downloadCounts centeredContent"><?php echo($file['unlimited_downloads'] ? TEXT_DOWNLOADS_UNLIMITED_COUNT : $file['download_count']); ?></td>
       <td class="downloadButton centeredContent"><?php echo ($file['is_downloadable']) ? '<a href="' . $file['link_url'] . '" download="' . $file['filename'] . '">' . zen_image_button(BUTTON_IMAGE_DOWNLOAD, BUTTON_DOWNLOAD_ALT) . '</a>' : '&nbsp;'; ?></td>
     </tr>
 <?php
@@ -72,7 +71,7 @@ if ($numberOfDownloads < 1) {
 
 <?php
   if ($show_footer_link_to_my_account) {
-?>
+      ?>
 <p><?php printf(FOOTER_DOWNLOAD, '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . HEADER_TITLE_MY_ACCOUNT . '</a>'); ?></p>
 <?php
   }

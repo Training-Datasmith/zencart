@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2024 Vinos de Frutas Tropicales
@@ -6,7 +8,7 @@
 // Last updated: POSM 5.0.0
 //
 $products_options_stock_in_stock = 'In Stock';
-$define = [
+return [
     'PRODUCTS_OPTIONS_STOCK_WRAPPER' => '<div class="stock-wrapper">%s</div>',
     'PRODUCTS_OPTIONS_STOCK_STOCK_HTML' => '<div class="stock-msg %1$s">%2$s</div>',
     'PRODUCTS_OPTIONS_STOCK_STOCK_TEXT' => ' [%s]',
@@ -48,4 +50,3 @@ $define = [
     //
     'POSM_ERROR_INVALID_VARIANT' => 'The option-combinations that you chose are not available; please update your choices and try again.',
 ];
-return $define;

@@ -18,7 +18,7 @@
  * load the html_define for the page_2 default
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 

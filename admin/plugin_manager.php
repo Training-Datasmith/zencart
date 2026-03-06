@@ -67,13 +67,11 @@ $tableDefinition = [
                     (string)PluginStatus::DISABLED => zen_icon('status-yellow'),
                 ],
             ],
-            'class' => static function($value) {
-                return match ($value) {
-                    PluginStatus::ENABLED => 'status-enabled',
-                    PluginStatus::DISABLED => 'status-disabled',
-                    default => 'status-not-installed',
-                };
-            }
+            'class' => static fn ($value) => match ($value) {
+                PluginStatus::ENABLED => 'status-enabled',
+                PluginStatus::DISABLED => 'status-disabled',
+                default => 'status-not-installed',
+            },
         ],
     ],
 ];

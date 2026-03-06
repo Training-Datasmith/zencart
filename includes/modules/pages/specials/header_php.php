@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Specials
  *
@@ -31,24 +33,22 @@ $define_list = [
 ];
 asort($define_list);
 $column_list = [];
-foreach ($define_list as $key => $value)
-{
+foreach ($define_list as $key => $value) {
     if ((int)$value > 0) {
         $column_list[] = $key;
     }
 }
-$select_column_list = "pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,";
+$select_column_list = 'pd.products_name, p.products_image, p.products_date_added, m.manufacturers_name, p.products_model, p.products_quantity, p.products_weight,';
 $sql_joins = '';
-$and = " AND s.status = 1 ";
-
+$and = ' AND s.status = 1 ';
 
 // OPTIONALLY INCLUDE SALE ITEMS IN SPECIALS LISTING
 if (defined('INCLUDE_SALEMAKER_IN_SPECIALS') && INCLUDE_SALEMAKER_IN_SPECIALS === 'True') {
-    $sale_categories = $db->Execute("SELECT sale_categories_all FROM " . TABLE_SALEMAKER_SALES . " WHERE sale_status = 1");
+    $sale_categories = $db->Execute('SELECT sale_categories_all FROM ' . TABLE_SALEMAKER_SALES . ' WHERE sale_status = 1');
     if (!$sale_categories->EOF) {
         $sale_categories_all = '';
         foreach ($sale_categories as $row) {
-            $sale_categories_all .= ',' . trim($row['sale_categories_all'], ','); // remove trailing comma
+            $sale_categories_all .= ',' . trim((string) $row['sale_categories_all'], ','); // remove trailing comma
         }
         $sale_categories_all = trim($sale_categories_all, ','); // remove preceeding comma
 
@@ -66,7 +66,7 @@ if (!empty($_GET['sale_category'])) {
     $subcategories_array[] = $_GET['sale_category'];
     $subcategories_string = trim(implode(',', $subcategories_array), ',');
     // append to $and
-    $and .= " AND p.master_categories_id IN (" . $subcategories_string . ") ";
+    $and .= ' AND p.master_categories_id IN (' . $subcategories_string . ') ';
 }
 
 // display sort order dropdown
@@ -76,7 +76,6 @@ $default_sort_order = ' ORDER BY s.specials_date_added DESC ';
 // set the product filters according to selected product type
 $typefilter = $_GET['typefilter'] ?? 'default';
 require(zen_get_index_filters_directory($typefilter . '_filter.php'));
-
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_SPECIALS', null);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Services;
 
 /**
@@ -17,10 +19,9 @@ class MigrationsRunner
     public function run(): void
     {
         $files = glob($this->migrationDir . '*_migration.php');
-        foreach ($files as $migration)
-        {
+        foreach ($files as $migration) {
             $className = 'Migrations\\Create' . ucfirst(self::camel(str_replace(['.php', 'migration'], '', basename($migration)))) . 'Table';
-            $class =  new $className;
+            $class =  new $className();
             $class->down();
             $class->up();
         }
@@ -32,7 +33,7 @@ class MigrationsRunner
     private static function camel(string $value): string
     {
         $value = preg_replace('/[^a-zA-Z0-9]+/', ' ', $value);
-        $value = ucwords(strtolower(trim($value)));
+        $value = ucwords(strtolower(trim((string) $value)));
         return str_replace(' ', '', $value);
     }
 }

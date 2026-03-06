@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * System Inspection (formerly Mod List by That Software Guy)
  *
@@ -12,7 +14,7 @@ use Zencart\PluginSupport\ScriptedInstaller as ScriptedInstallBase;
 
 class ScriptedInstaller extends ScriptedInstallBase
 {
-    protected function executeInstall()
+    protected function executeInstall(): bool
     {
         if (!zen_page_key_exists('system_inspection')) {
             zen_register_admin_page('system_inspection', 'BOX_TOOLS_SYSTEM_INSPECTION', 'FILENAME_SYSTEM_INSPECTION', '', 'tools', 'Y');
@@ -26,10 +28,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    protected function executeUninstall()
+    protected function executeUninstall(): bool
     {
         zen_deregister_admin_pages('system_inspection');
 
@@ -53,9 +52,10 @@ class ScriptedInstaller extends ScriptedInstallBase
         $this->removeOldNonencapsulatedModList();
 
         // Forcefully remove old ModList plugin from zc_plugins dir (This is a very aggressive approach, not recommended.)
-        (new FileSystem)->deleteDirectory($path = DIR_FS_CATALOG . 'zc_plugins/ModList');
+        (new FileSystem())->deleteDirectory($path = DIR_FS_CATALOG . 'zc_plugins/ModList');
         if (is_dir($path)) {
-            $this->errorContainer->addError(0,
+            $this->errorContainer->addError(
+                0,
                 sprintf(ERROR_UNABLE_TO_DELETE_FILE, ' (entire zc_plugins/ModList/ directory)'),
                 true,
             );
@@ -78,7 +78,7 @@ class ScriptedInstaller extends ScriptedInstallBase
             DIR_FS_CATALOG . 'mod_list.sql', // in case it got uploaded
         ];
 
-        foreach ($filesToDelete as $key => $nextFile) {
+        foreach ($filesToDelete as $nextFile) {
             if (file_exists($nextFile)) {
                 $result = unlink($nextFile);
                 if (!$result && file_exists($nextFile)) {

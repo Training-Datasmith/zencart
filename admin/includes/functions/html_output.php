@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -11,17 +13,18 @@
  *
  * @since ZC v1.0.3
  */
-function zen_href_link($page = '', $parameters = '', $connection = 'SSL', $add_session_id = true) {
+function zen_href_link($page = '', $parameters = '', $connection = 'SSL', $add_session_id = true): string|array
+{
     global $zco_notifier, $session_started;
 
     // Notify any observers listening for href_link calls
     $zco_notifier->notify(
         'NOTIFY_HANDLE_ADMIN_HREF_LINK',
-        array(
+        [
             'page' => $page,
             'parameters' => $parameters,
             'add_session_id' => false,
-        ),
+        ],
         $page,
         $parameters
     );
@@ -30,12 +33,11 @@ function zen_href_link($page = '', $parameters = '', $connection = 'SSL', $add_s
     $link = HTTP_SERVER . DIR_WS_ADMIN;
 
     // Handle parameters passed as an array (using RFC 3986)
-    if(is_array($parameters)) {
+    if (is_array($parameters)) {
         $parameters = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
-    }
-    else {
+    } else {
         // Clean up parameters (should not start or end with these characters)
-        $parameters = trim($parameters, '&?');
+        $parameters = trim((string) $parameters, '&?');
     }
 
     // Keep track of the separator
@@ -44,11 +46,9 @@ function zen_href_link($page = '', $parameters = '', $connection = 'SSL', $add_s
     if (empty($page) || ($page == FILENAME_DEFAULT && empty($parameters))) {
         // If the request was for the homepage, do nothing
         $separator = '?';
-    }
-    else if (!empty($parameters)) {
+    } elseif (!empty($parameters)) {
         $link .= 'index.php?cmd='. $page . '&' . zen_output_string($parameters);
-    }
-    else {
+    } else {
         $link .= 'index.php?cmd=' . $page;
     }
 
@@ -71,38 +71,43 @@ function zen_href_link($page = '', $parameters = '', $connection = 'SSL', $add_s
 /**
    * @since ZC v1.0.3
  */
-  function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONSSL') {
+function zen_catalog_href_link(string $page = '', string $parameters = '', string $connection = 'NONSSL')
+{
     global $zco_notifier;
     $link = null;
-    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT_ADMCATHREF', array(), $link, $page, $parameters, $connection);
-    if($link !== null) return $link;
+    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT_ADMCATHREF', [], $link, $page, $parameters, $connection);
+    if ($link !== null) {
+        return $link;
+    }
 
     if ($connection == 'NONSSL') {
-      $link = HTTP_CATALOG_SERVER . DIR_WS_CATALOG;
-    } elseif ($connection == 'SSL') {
-      if (ENABLE_SSL_CATALOG == 'true') {
-        $link = HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG;
-      } else {
         $link = HTTP_CATALOG_SERVER . DIR_WS_CATALOG;
-      }
+    } elseif ($connection == 'SSL') {
+        if (ENABLE_SSL_CATALOG == 'true') {
+            $link = HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG;
+        } else {
+            $link = HTTP_CATALOG_SERVER . DIR_WS_CATALOG;
+        }
     } else {
-      trigger_error("FATAL ERROR: zen_catalog_href_link($page, $parameters, $connection), Unable to determine connection method on a link! Known methods: NONSSL SSL", E_USER_WARNING);
-      die('</td></tr></table></td></tr></table><br><br><font color="#ff0000"><b>Error!</b></font><br><br><b>Unable to determine connection method on a link!<br><br>Known methods: NONSSL SSL<br><br>Function used:<br><br>zen_catalog_href_link(\'' . $page . '\', \'' . $parameters . '\', \'' . $connection . '\')</b>');
+        trigger_error("FATAL ERROR: zen_catalog_href_link($page, $parameters, $connection), Unable to determine connection method on a link! Known methods: NONSSL SSL", E_USER_WARNING);
+        die('</td></tr></table></td></tr></table><br><br><font color="#ff0000"><b>Error!</b></font><br><br><b>Unable to determine connection method on a link!<br><br>Known methods: NONSSL SSL<br><br>Function used:<br><br>zen_catalog_href_link(\'' . $page . '\', \'' . $parameters . '\', \'' . $connection . '\')</b>');
     }
     if ($parameters == '') {
-      $link .= 'index.php?main_page='. $page;
+        $link .= 'index.php?main_page='. $page;
     } else {
-      $link .= 'index.php?main_page='. $page . "&" . zen_output_string($parameters);
+        $link .= 'index.php?main_page='. $page . '&' . zen_output_string($parameters);
     }
 
-    while ( (substr($link, -1) == '&') || (substr($link, -1) == '?') ) $link = substr($link, 0, -1);
-      $link = preg_replace('/(&{2,}|(&amp;)+)/', '&', $link);
+    while ((str_ends_with($link, '&')) || (str_ends_with($link, '?'))) {
+        $link = substr($link, 0, -1);
+    }
+    $link = preg_replace('/(&{2,}|(&amp;)+)/', '&', $link);
 
-      // Convert any remaining '&' into '&amp;' (valid URL for href)
-      $link = str_replace('&', '&amp;', $link);
+    // Convert any remaining '&' into '&amp;' (valid URL for href)
+    $link = str_replace('&', '&amp;', $link);
 
     return $link;
-  }
+}
 
 /**
  * @since ZC v1.5.7
@@ -116,8 +121,10 @@ function zen_catalog_base_link($connection = '')
     }
 
     $link = null;
-    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT_ADMCATHOME', array(), $link, $connection);
-    if ($link !== null) return $link;
+    $zco_notifier->notify('NOTIFY_SEFU_INTERCEPT_ADMCATHOME', [], $link, $connection);
+    if ($link !== null) {
+        return $link;
+    }
 
     switch ($connection) {
         case 'NONSSL':
@@ -140,26 +147,27 @@ function zen_catalog_base_link($connection = '')
  * HTML image wrapper function
  * @since ZC v1.0.3
  */
-  function zen_image($src, $alt = '', $width = '', $height = '', $params = '') {
+function zen_image(string $src, $alt = '', $width = '', $height = '', $params = ''): string
+{
     if ($src === DIR_WS_CATALOG_IMAGES) {
-      return '';
+        return '';
     }
     $image = '<img src="' . $src . '" alt="' . zen_output_string($alt) . '"';
     // soft clean the alt tag
     $alt = zen_clean_html($alt);
     if ($alt) {
-      $image .= ' title="' . zen_output_string($alt) . '"';
+        $image .= ' title="' . zen_output_string($alt) . '"';
     }
 
     $styles = '';
 
     if ($width !== '' && !str_contains($params, 'width:')) {
-        $width = trim($width);
+        $width = trim((string) $width);
         $styles .= 'width:' . $width . (!str_ends_with($width, '%') ? 'px' : '') . '; ';
     }
 
     if ($height !== '' && !str_contains($params, 'height:')) {
-        $height = trim($height);
+        $height = trim((string) $height);
         $styles .= 'height:' . $height . (!str_ends_with($height, '%') ? 'px' : '') . '; ';
     }
 
@@ -169,20 +177,18 @@ function zen_catalog_base_link($connection = '')
         $params .= ' style="' . $styles . '"';
     }
 
-
     if ($params) {
-      $image .= ' ' . trim($params);
+        $image .= ' ' . trim($params);
     }
-    $image .= '>';
 
-    return $image;
-  }
+    return $image . '>';
+}
 
 /**
  * @deprecated since v1.5.8. Use <button> markup instead
  * @since ZC v1.0.3
  */
-function zen_image_submit($image, $alt = '', $parameters = '')
+function zen_image_submit(string $image, $alt = '', string $parameters = ''): string
 {
     $image_submit = '<input type="image" src="' . zen_output_string(DIR_WS_LANGUAGES . $_SESSION['language'] . '/images/buttons/' . $image) . '" alt="' . zen_output_string($alt) . '"';
     if (zen_not_null($alt)) {
@@ -191,8 +197,7 @@ function zen_image_submit($image, $alt = '', $parameters = '')
     if (zen_not_null($parameters)) {
         $image_submit .= ' ' . $parameters;
     }
-    $image_submit .= '>';
-    return $image_submit;
+    return $image_submit . '>';
 }
 
 /**
@@ -211,29 +216,29 @@ $iconMap = [
   'new-window' => 'fa-square txt-orange',
   'new-window-off' => [
     'fa-square fa-stack-2x opacity-25 txt-orange',
-    'fa-xmark fa-stack-1x txt-red'
+    'fa-xmark fa-stack-1x txt-red',
   ],
   'line-chart' => 'fa-line-chart txt-black',
   'calendar-days' => 'fa-regular fa-calendar-days',
   'status-green' => [
     'fa-solid fa-circle fa-stack-1x txt-status-on',
-    'fa-regular fa-circle fa-stack-1x txt-black'
+    'fa-regular fa-circle fa-stack-1x txt-black',
   ],
   'status-green-light' => [
     'fa-solid fa-circle fa-stack-1x txt-status-on txt-light',
-    'fa-regular fa-circle fa-stack-1x txt-black'
+    'fa-regular fa-circle fa-stack-1x txt-black',
   ],
   'status-yellow' => [
     'fa-solid fa-circle fa-stack-1x txt-linked',
-    'fa-regular fa-circle fa-stack-1x txt-black'
+    'fa-regular fa-circle fa-stack-1x txt-black',
   ],
   'status-red' => [
     'fa-solid fa-circle fa-stack-1x txt-status-off',
-    'fa-regular fa-circle fa-stack-1x txt-black'
+    'fa-regular fa-circle fa-stack-1x txt-black',
   ],
   'status-red-light' => [
     'fa-solid fa-circle fa-stack-1x txt-status-off txt-light',
-    'fa-regular fa-circle fa-stack-1x txt-black'
+    'fa-regular fa-circle fa-stack-1x txt-black',
   ],
   'pencil' => 'fa-pencil',
   'trash' => 'fa-trash-alt',
@@ -262,117 +267,121 @@ $iconMap = [
  * Only use when the icon is in a focussable parent e.g. an anchor, so the parent takes focus and the icon
  * itself is not declared by screen readers and the like. Note that in these cases, the tooltip text should
  * go on the parent anchor and not on this icon element using $tooltip.
- * @return string
  *
  * @since ZC v2.0.0
  */
 function zen_icon(string $icon, ?string $tooltip = null, string $size = '', bool $fixedWidth = false, bool $hidden = false): string
 {
-  global $iconMap;
-  if (!array_key_exists($icon, $iconMap)) {
-    return '';
-  }
-  $tooltip = empty($tooltip) ? '' : (' data-toggle="tooltip" title="' . str_replace('"', '\"', $tooltip) . '"');
-  $fw = empty($fixedWidth) ? '' : ' fa-fw';
-  $classes = $iconMap[$icon];
-  if (is_array($classes)) {
-    return "<div class=\"icon-{$icon} fa-stack\"{$tooltip}{$fw}>" .
-      join(
-        '',
-        array_map(
-          function ($cls) {
-            return '<i class="fa-solid ' . $cls . '"></i>';
-          }, $classes
-        )
-      ) .
-      '</div>';
-  }
-  // If the classes looked up have an override, use it (add nothing), otherwise default to fa-solid
-  $iconSet = str_contains($classes, 'fa-regular') ? '' : 'fa-solid';
-  $sizeClass = $size === '2x' ? ' fa-2x' : ($size === 'lg' ? ' fa-lg' : '');
-  $ariaHidden = $hidden ? ' aria-hidden="true"' : '';
-  return "<i class=\"$iconSet$sizeClass align-middle $classes$fw\"$tooltip$ariaHidden></i>";
+    global $iconMap;
+    if (!array_key_exists($icon, $iconMap)) {
+        return '';
+    }
+    $tooltip = empty($tooltip) ? '' : (' data-toggle="tooltip" title="' . str_replace('"', '\"', $tooltip) . '"');
+    $fw = empty($fixedWidth) ? '' : ' fa-fw';
+    $classes = $iconMap[$icon];
+    if (is_array($classes)) {
+        return "<div class=\"icon-{$icon} fa-stack\"{$tooltip}{$fw}>" .
+          join(
+              '',
+              array_map(
+                  fn ($cls) => '<i class="fa-solid ' . $cls . '"></i>',
+                  $classes
+              )
+          ) .
+          '</div>';
+    }
+    // If the classes looked up have an override, use it (add nothing), otherwise default to fa-solid
+    $iconSet = str_contains((string) $classes, 'fa-regular') ? '' : 'fa-solid';
+    $sizeClass = $size === '2x' ? ' fa-2x' : ($size === 'lg' ? ' fa-lg' : '');
+    $ariaHidden = $hidden ? ' aria-hidden="true"' : '';
+    return "<i class=\"$iconSet$sizeClass align-middle $classes$fw\"$tooltip$ariaHidden></i>";
 }
 
 /**
  *  Draw a 1 pixel black line
  * @since ZC v1.0.3
  */
-  function zen_black_line() {
+function zen_black_line()
+{
     return zen_image(DIR_WS_IMAGES . 'pixel_black.gif', '', '', '1', 'style="width:100%;"');
-  }
+}
 
 /**
  * Output a separator either through whitespace, or with an image
  * @since ZC v1.0.3
  */
-  function zen_draw_separator($image = 'pixel_black.gif', $width = '100%', $height = '1') {
-	if (!empty($width)) {
-		if (substr(rtrim($width), -1) !== '%') {
+function zen_draw_separator(string $image = 'pixel_black.gif', $width = '100%', $height = '1')
+{
+    if (!empty($width)) {
+        if (!str_ends_with(rtrim((string) $width), '%')) {
             $width = $width . 'px';
         }
-		$param = 'style="width:' . $width . ';"';
-	} else {
-		$param = '';
-	}
+        $param = 'style="width:' . $width . ';"';
+    } else {
+        $param = '';
+    }
     return zen_image(DIR_WS_IMAGES . $image, '', '', $height, $param);
-  }
+}
 /**
  * @deprecated since v1.5.8. Use <button> markup instead
  * @since ZC v1.0.3
  */
-  function zen_image_button($image, $alt = '', $params = '') {
+function zen_image_button(string $image, $alt = '', $params = '')
+{
     return zen_image(DIR_WS_LANGUAGES . $_SESSION['language'] . '/images/buttons/' . $image, $alt, '', '', $params);
-  }
+}
 
 /**
  * javascript to dynamically update the states/provinces list when the country is changed
  * @since ZC v1.0.3
  */
-  function zen_js_zone_list($country, $form, $field, $showTextField = true) {
+function zen_js_zone_list(string $country, string $form, string $field, $showTextField = true): string
+{
     global $db;
-    $countries = $db->Execute("SELECT DISTINCT zone_country_id
-                               FROM " . TABLE_ZONES . "
-                               ORDER BY zone_country_id");
+    $countries = $db->Execute('SELECT DISTINCT zone_country_id
+                               FROM ' . TABLE_ZONES . '
+                               ORDER BY zone_country_id');
 
     $num_country = 1;
     $output_string = '';
     while (!$countries->EOF) {
-      if ($num_country == 1) {
-        $output_string .= '  if (' . $country . ' == "' . $countries->fields['zone_country_id'] . '") {' . "\n";
-      } else {
-        $output_string .= '  } else if (' . $country . ' == "' . $countries->fields['zone_country_id'] . '") {' . "\n";
-      }
+        if ($num_country == 1) {
+            $output_string .= '  if (' . $country . ' == "' . $countries->fields['zone_country_id'] . '") {' . "\n";
+        } else {
+            $output_string .= '  } else if (' . $country . ' == "' . $countries->fields['zone_country_id'] . '") {' . "\n";
+        }
 
-      $states = $db->Execute("SELECT zone_name, zone_id
-                              FROM " . TABLE_ZONES . "
+        $states = $db->Execute('SELECT zone_name, zone_id
+                              FROM ' . TABLE_ZONES . "
                               WHERE zone_country_id = '" . $countries->fields['zone_country_id'] . "'
                               ORDER BY zone_name");
 
-      $num_state = 1;
-      while (!$states->EOF) {
-        if ($num_state == 1) $output_string .= '    ' . $form . '.' . $field . '.options[0] = new Option("' . PLEASE_SELECT . '", "");' . "\n";
-        $output_string .= '    ' . $form . '.' . $field . '.options[' . $num_state . '] = new Option("' . $states->fields['zone_name'] . '", "' . $states->fields['zone_id'] . '");' . "\n";
-        $num_state++;
-        $states->MoveNext();
-      }
-      $num_country++;
-      $countries->MoveNext();
+        $num_state = 1;
+        while (!$states->EOF) {
+            if ($num_state == 1) {
+                $output_string .= '    ' . $form . '.' . $field . '.options[0] = new Option("' . PLEASE_SELECT . '", "");' . "\n";
+            }
+            $output_string .= '    ' . $form . '.' . $field . '.options[' . $num_state . '] = new Option("' . $states->fields['zone_name'] . '", "' . $states->fields['zone_id'] . '");' . "\n";
+            $num_state++;
+            $states->MoveNext();
+        }
+        $num_country++;
+        $countries->MoveNext();
     }
-      $output_string .= '  }';
-      if ($showTextField) {
-          $output_string .= ' else {' . "\n" .
-              '    ' . $form . '.' . $field . '.options[0] = new Option("' . TYPE_BELOW . '", "");' . "\n" .
-              '  }' . "\n";
-      }
+    $output_string .= '  }';
+    if ($showTextField) {
+        $output_string .= ' else {' . "\n" .
+            '    ' . $form . '.' . $field . '.options[0] = new Option("' . TYPE_BELOW . '", "");' . "\n" .
+            '  }' . "\n";
+    }
     return $output_string;
-  }
+}
 
 /**
  * Output a form
  * @since ZC v1.0.3
  */
-function zen_draw_form($name, $action, $parameters = '', $method = 'post', $params = '', $usessl = 'false')
+function zen_draw_form(?string $name, $action, $parameters = '', $method = 'post', ?string $params = '', $usessl = 'false'): string
 {
     $form = '<form name="' . zen_output_string($name) . '" action="';
     if (!empty($parameters)) {
@@ -385,16 +394,16 @@ function zen_draw_form($name, $action, $parameters = '', $method = 'post', $para
         $form .= ' ' . $params;
     }
     $form .= '>';
-    if (strtolower($method) === 'post') {
+    if (strtolower((string) $method) === 'post') {
         $form .= '<input type="hidden" name="securityToken" value="' . $_SESSION['securityToken'] . '">';
     }
-    if (strtolower($method) === 'get') {
+    if (strtolower((string) $method) === 'get') {
         $form .= '<input type="hidden" name="cmd" value="' . str_replace('.php', '', $action) . '">';
     }
     return $form;
 }
 
-  /**
+/**
  *
  * Output a form input field
  * @param string $name field name
@@ -403,38 +412,37 @@ function zen_draw_form($name, $action, $parameters = '', $method = 'post', $para
  * @param boolean $required field is required
  * @param string $type filed type
  * @param boolean $reinsert_value
- * @return string
  * @since ZC v1.0.3
  */
-function zen_draw_input_field($name, $value = '~*~*#', $parameters = '', $required = false, $type = 'text', $reinsert_value = true)
+function zen_draw_input_field($name, $value = '~*~*#', ?string $parameters = '', $required = false, $type = 'text', $reinsert_value = true): string
 {
-  $type = zen_output_string($type);
-  if ($type === 'price') {
-    $type = 'number" step="0.01';
-  }
-  $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
-  $field .= '<input type="' . $type . '" name="' . zen_output_string($name) . '"';
+    $type = zen_output_string($type);
+    if ($type === 'price') {
+        $type = 'number" step="0.01';
+    }
+    $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
+    $field .= '<input type="' . $type . '" name="' . zen_output_string($name) . '"';
 
-  if ($value == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true)) {
-    $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
-  } elseif ($value != '~*~*#' && zen_not_null($value)) {
-    $field .= ' value="' . zen_output_string($value) . '"';
-  }
+    if ($value == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true)) {
+        $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
+    } elseif ($value != '~*~*#' && zen_not_null($value)) {
+        $field .= ' value="' . zen_output_string($value) . '"';
+    }
 
-  if (!empty($parameters)) {
-    $field .= ' ' . $parameters;
-  }
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
-  if ($required && strpos($parameters, 'required') === false) {
-    $field .= ' required';
-  }
+    if ($required && !str_contains((string) $parameters, 'required')) {
+        $field .= ' required';
+    }
 
-  $field .= '>' . PHP_EOL;
-  if ($required) {
-    $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
-    $field .= '</div>' . PHP_EOL;
-  }
-  return $field;
+    $field .= '>' . PHP_EOL;
+    if ($required) {
+        $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
+        $field .= '</div>' . PHP_EOL;
+    }
+    return $field;
 }
 
 /**
@@ -449,29 +457,29 @@ function zen_draw_password_field(string $name, string $value = '', bool $require
         $parameters .= ' autocomplete="off"';
     }
 
-    $field = zen_draw_input_field($name, $value, $parameters, $required, 'password', false);
-
-    return $field;
+    return zen_draw_input_field($name, $value, $parameters, $required, 'password', false);
 }
 
 /**
  * Output a form file field
  * @since ZC v1.0.3
  */
-  function zen_draw_file_field($name, $required = false, $parameters = '') {
-    $field = zen_draw_input_field($name, '', ' size="50" ' . $parameters, $required, 'file');
-
-    return $field;
-  }
+function zen_draw_file_field($name, $required = false, string $parameters = '')
+{
+    return zen_draw_input_field($name, '', ' size="50" ' . $parameters, $required, 'file');
+}
 
 /**
  * Output a selection field - alias function for zen_draw_checkbox_field() and zen_draw_radio_field()
  * @since ZC v1.0.3
  */
-  function zen_draw_selection_field($name, $type, $value = '', $checked = false, $compare = '', $parameters = '') {
+function zen_draw_selection_field($name, ?string $type, $value = '', $checked = false, $compare = '', ?string $parameters = ''): string
+{
     $selection = '<input type="' . zen_output_string($type) . '" name="' . zen_output_string($name) . '"';
 
-    if (zen_not_null($value)) $selection .= ' value="' . zen_output_string($value) . '"';
+    if (zen_not_null($value)) {
+        $selection .= ' value="' . zen_output_string($value) . '"';
+    }
 
     if (
         ($checked == true)
@@ -479,80 +487,84 @@ function zen_draw_password_field(string $name, string $value = '', bool $require
         || (isset($value) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name]) && (stripslashes($GLOBALS[$name]) == $value))
         || (zen_not_null($value) && zen_not_null($compare) && ($value == $compare))
     ) {
-      $selection .= ' checked="checked"';
+        $selection .= ' checked="checked"';
     }
 
-    if (!empty($parameters)) $selection .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $selection .= ' ' . $parameters;
+    }
 
-    $selection .= '>';
-
-    return $selection;
-  }
+    return $selection . '>';
+}
 
 /**
  * Output a form checkbox field
  * @since ZC v1.0.3
  */
-function zen_draw_checkbox_field($name, $value = '', $checked = false, $compare = '', $parameters = '') {
-    return zen_draw_selection_field($name, 'checkbox', $value, $checked, $compare, $parameters);
+function zen_draw_checkbox_field($name, $value = '', $checked = false, $compare = '', $parameters = '')
+{
+    return zen_draw_selection_field($name, 'checkbox', $value, $checked, $compare);
 }
 
 /**
  * Output a form radio field
  * @since ZC v1.0.3
  */
-function zen_draw_radio_field($name, $value = '', $checked = false, $compare = '', $parameters = '') {
-    return zen_draw_selection_field($name, 'radio', $value, $checked, $compare, $parameters);
+function zen_draw_radio_field($name, $value = '', $checked = false, $compare = '', $parameters = '')
+{
+    return zen_draw_selection_field($name, 'radio', $value, $checked, $compare);
 }
 
 /**
  * Output a form textarea field
  * @since ZC v1.0.3
  */
-function zen_draw_textarea_field($name, $wrap, $cols, $height, $text = '~*~*#', $parameters = '', $reinsert_value = true) {
+function zen_draw_textarea_field($name, $wrap, $cols, ?string $height, string $text = '~*~*#', ?string $parameters = '', $reinsert_value = true): string
+{
     $cols = (int)$cols;
     $wrap = in_array($wrap, ['soft', 'hard', 'off'], true) ? $wrap : 'soft';
     $field = '<textarea name="' . zen_output_string($name) . '" wrap="' . $wrap . '"' . ($cols > 0 ? ' cols="' . $cols . '"' : '') . ' rows="' . zen_output_string($height) . '"';
 
-    if (!empty($parameters)) $field .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
-    if (!str_contains($parameters, 'id="')) {
+    if (!str_contains((string) $parameters, 'id="')) {
         $field .= ' id="' . zen_output_string(str_replace(['[', ']'], '-', $name)) . '"';
     }
 
     $field .= '>';
 
-    if ($text == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true) ) {
-      $field .= stripslashes($GLOBALS[$name]);
-      $field = str_replace('&gt;', '>', $field);
+    if ($text == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true)) {
+        $field .= stripslashes($GLOBALS[$name]);
+        $field = str_replace('&gt;', '>', $field);
     } elseif ($text != '~*~*#' && zen_not_null($text)) {
-      $field = str_replace('&gt;', '>', $field);
-      $field .= $text;
+        $field = str_replace('&gt;', '>', $field);
+        $field .= $text;
     }
 
-    $field .= '</textarea>';
-
-    return $field;
+    return $field . '</textarea>';
 }
 
 /**
  * Output a form hidden field
  * @since ZC v1.0.3
  */
-function zen_draw_hidden_field($name, $value = '~*~*#', $parameters = '') {
+function zen_draw_hidden_field(?string $name, $value = '~*~*#', ?string $parameters = ''): string
+{
     $field = '<input type="hidden" name="' . zen_output_string($name) . '"';
 
     if (zen_not_null($value) && $value != '~*~*#') {
-      $field .= ' value="' . zen_output_string($value) . '"';
+        $field .= ' value="' . zen_output_string($value) . '"';
     } elseif (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
-      $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
+        $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
     }
 
-    if (!empty($parameters)) $field .= ' ' . $parameters;
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
+    }
 
-    $field .= '>';
-
-    return $field;
+    return $field . '>';
 }
 
 /**
@@ -562,43 +574,42 @@ function zen_draw_hidden_field($name, $value = '~*~*#', $parameters = '') {
  * @param string $default default value
  * @param string $parameters parameters
  * @param boolean $required required
- * @return string
  * @since ZC v1.0.3
  */
-function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false)
+function zen_draw_pull_down_menu($name, $values, $default = '', ?string $parameters = '', $required = false): string
 {
-  $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
-  $field .= '<select name="' . zen_output_string($name) . '"';
+    $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
+    $field .= '<select name="' . zen_output_string($name) . '"';
 
-  if (!empty($parameters)) {
-    $field .= ' ' . $parameters;
-  }
-
-  if ($required && strpos($parameters, 'required') === false) {
-    $field .= ' required';
-  }
-
-  $field .= '>' . "\n";
-
-  if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
-    $default = stripslashes($GLOBALS[$name]);
-  }
-
-  foreach ($values as $value) {
-    $field .= '<option value="' . zen_output_string($value['id']) . '"';
-    if ($default == $value['id']) {
-      $field .= ' selected="selected"';
+    if (!empty($parameters)) {
+        $field .= ' ' . $parameters;
     }
 
-    $field .= '>' . zen_output_string($value['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>' . "\n";
-  }
-  $field .= '</select>' . "\n";
-  if ($required) {
-    $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
-    $field .= '</div>' . PHP_EOL;
-  }
+    if ($required && !str_contains((string) $parameters, 'required')) {
+        $field .= ' required';
+    }
 
-  return $field;
+    $field .= '>' . "\n";
+
+    if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
+        $default = stripslashes($GLOBALS[$name]);
+    }
+
+    foreach ($values as $value) {
+        $field .= '<option value="' . zen_output_string($value['id']) . '"';
+        if ($default == $value['id']) {
+            $field .= ' selected="selected"';
+        }
+
+        $field .= '>' . zen_output_string($value['text'], ['"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;']) . '</option>' . "\n";
+    }
+    $field .= '</select>' . "\n";
+    if ($required) {
+        $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
+        $field .= '</div>' . PHP_EOL;
+    }
+
+    return $field;
 }
 
 /**
@@ -609,8 +620,8 @@ function zen_hide_session_id(): string
 {
     global $session_started;
 
-    if (PHP_VERSION_ID < 80401 && $session_started && defined('SID') && !empty(constant('SID')) ) {
-      return zen_draw_hidden_field(zen_session_name(), zen_session_id());
+    if (PHP_VERSION_ID < 80401 && $session_started && defined('SID') && !empty(constant('SID'))) {
+        return zen_draw_hidden_field(zen_session_name(), zen_session_id());
     }
 
     return '';
@@ -618,80 +629,72 @@ function zen_hide_session_id(): string
 
 /**
  * output label for input fields
- * @param string $text
- * @param string $for
  * @param string $parameters
- * @return string
  * @since ZC v1.5.5
  */
-function zen_draw_label($text, $for, $parameters = '')
+function zen_draw_label(string $text, string $for, ?string $parameters = ''): string
 {
-    $label = '<label for="' . $for . '"' . (!empty($parameters) ? ' ' . $parameters : '') . '>' . $text . '</label>';
-    return $label;
+    return '<label for="' . $for . '"' . (!empty($parameters) ? ' ' . $parameters : '') . '>' . $text . '</label>';
 }
-
 
 /**
  * Output a day/month/year dropdown selector
- * @param string $fieldname_prefix
- * @param int|null $default_date_timestamp
- * @return string
  * @since ZC v1.0.3
  */
 function zen_draw_date_selector(string $fieldname_prefix, ?int $default_date_timestamp = null): string
 {
-    $month_array = array();
-    $month_array[1] =_JANUARY;
-    $month_array[2] =_FEBRUARY;
-    $month_array[3] =_MARCH;
-    $month_array[4] =_APRIL;
-    $month_array[5] =_MAY;
-    $month_array[6] =_JUNE;
-    $month_array[7] =_JULY;
-    $month_array[8] =_AUGUST;
-    $month_array[9] =_SEPTEMBER;
-    $month_array[10] =_OCTOBER;
-    $month_array[11] =_NOVEMBER;
-    $month_array[12] =_DECEMBER;
+    $month_array = [];
+    $month_array[1] = _JANUARY;
+    $month_array[2] = _FEBRUARY;
+    $month_array[3] = _MARCH;
+    $month_array[4] = _APRIL;
+    $month_array[5] = _MAY;
+    $month_array[6] = _JUNE;
+    $month_array[7] = _JULY;
+    $month_array[8] = _AUGUST;
+    $month_array[9] = _SEPTEMBER;
+    $month_array[10] = _OCTOBER;
+    $month_array[11] = _NOVEMBER;
+    $month_array[12] = _DECEMBER;
     $usedate = getdate($default_date_timestamp);
     $day = $usedate['mday'];
     $month = $usedate['mon'];
     $year = $usedate['year'];
     $date_selector = '<select name="'. $fieldname_prefix .'_day">';
-    for ($i=1;$i<32;$i++){
+    for ($i = 1;$i < 32;$i++) {
         $date_selector .= '<option value="' . $i . '"';
-        if ($i==$day) $date_selector .= ' selected';
+        if ($i == $day) {
+            $date_selector .= ' selected';
+        }
         $date_selector .= '>' . $i . '</option>';
     }
     $date_selector .= '</select>';
     $date_selector .= '<select name="'. $fieldname_prefix .'_month">';
-    for ($i=1;$i<13;$i++){
+    for ($i = 1;$i < 13;$i++) {
         $date_selector .= '<option value="' . $i . '"';
-        if ($i==$month) $date_selector .= ' selected';
+        if ($i == $month) {
+            $date_selector .= ' selected';
+        }
         $date_selector .= '>' . $month_array[$i] . '</option>';
     }
     $date_selector .= '</select>';
     $date_selector .= '<select name="'. $fieldname_prefix .'_year">';
     for ($i = date('Y') - 5, $j = date('Y') + 11; $i < $j; $i++) {
         $date_selector .= '<option value="' . $i . '"';
-        if ($i==$year) $date_selector .= ' selected';
+        if ($i == $year) {
+            $date_selector .= ' selected';
+        }
         $date_selector .= '>' . $i . '</option>';
     }
-    $date_selector .= '</select>';
-    return $date_selector;
+    return $date_selector . '</select>';
 }
 
 /**
  * intended to add a universal search for use with any pulldown that extends the
  * abstract pulldown class.  returns a html string.
- * @param string $filename
- * @param string $action
- * @param bool $includeForm
- * @param array $extrafieldsArray
- * @return string
  * @since ZC v1.5.8
  */
-function addSearchKeywordForm(string $filename, string $action = '', bool $includeForm = true, array $extrafieldsArray = [])
+function addSearchKeywordForm(string $filename, string $action = '', bool $includeForm = true, array $extrafieldsArray = []): string
 {
     $keywords_products = (isset($_POST['keywords']) && zen_not_null($_POST['keywords'])) ? zen_db_input(zen_db_prepare_input($_POST['keywords'])) : '';
     $form = '';
@@ -701,7 +704,7 @@ function addSearchKeywordForm(string $filename, string $action = '', bool $inclu
         $fullAction = 'action=' . $action;
     }
     if ($includeForm) {
-        $form = zen_draw_form('keywords', $filename, $fullAction, 'post', 'class="form-horizontal"');
+        $form = zen_draw_form('keywords', $filename, $fullAction, 'post');
         $endForm = '</form>';
     }
     $html = '
@@ -726,8 +729,7 @@ function addSearchKeywordForm(string $filename, string $action = '', bool $inclu
     foreach ($extrafieldsArray as $key => $value) {
         $html .= zen_draw_hidden_field($key, $value) . '<br>';
     }
-    $html .= '<br>' . $endForm . '
+    return $html . ('<br>' . $endForm . '
         </div>
-    </div>';
-    return $html;
+    </div>');
 }

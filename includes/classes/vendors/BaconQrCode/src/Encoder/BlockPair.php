@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Encoder;
 
@@ -8,7 +9,7 @@ use SplFixedArray;
 /**
  * Block pair.
  */
-final class BlockPair
+final readonly class BlockPair
 {
     /**
      * Creates a new block pair.
@@ -17,8 +18,8 @@ final class BlockPair
      * @param SplFixedArray<int> $errorCorrectionBytes Error correction bytes in the block.
      */
     public function __construct(
-        private readonly SplFixedArray $dataBytes,
-        private readonly SplFixedArray $errorCorrectionBytes
+        private SplFixedArray $dataBytes,
+        private SplFixedArray $errorCorrectionBytes
     ) {
     }
 
@@ -27,7 +28,7 @@ final class BlockPair
      *
      * @return SplFixedArray<int>
      */
-    public function getDataBytes() : SplFixedArray
+    public function getDataBytes(): SplFixedArray
     {
         return $this->dataBytes;
     }
@@ -37,7 +38,7 @@ final class BlockPair
      *
      * @return SplFixedArray<int>
      */
-    public function getErrorCorrectionBytes() : SplFixedArray
+    public function getErrorCorrectionBytes(): SplFixedArray
     {
         return $this->errorCorrectionBytes;
     }

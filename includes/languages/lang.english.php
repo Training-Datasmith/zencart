@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Since the languages are now loaded via classes, the $locales definition
 // needs to be globalized for use in payment-methods (e.g. paypalwpp) and
@@ -535,22 +537,22 @@ $define = [
 ];
 
 // Definitions that require references to other definitions
-    $define['ATTRIBUTES_QTY_PRICE_SYMBOL'] = zen_image(DIR_WS_TEMPLATE_ICONS . 'icon_status_green.gif', $define['TEXT_ATTRIBUTES_QTY_PRICE_HELP_LINK'], 10, 10) . '&nbsp;';
-    $define['BOX_HEADING_GIFT_VOUCHER'] = $define['TEXT_GV_NAME'] . ' Account';
-    $define['BOX_INFORMATION_GV'] = $define['TEXT_GV_NAME'] . ' FAQ';
-    $define['ENTRY_EMAIL_PREFERENCE'] = 'Newsletter and Email Details';
-    if (ACCOUNT_NEWSLETTER_STATUS === '0') {
-       $define['ENTRY_EMAIL_PREFERENCE'] = 'Email Details';
-    }
-    $define['ERROR_NO_INVALID_REDEEM_GV'] = 'Invalid ' . $define['TEXT_GV_NAME'] . ' ' . $define['TEXT_GV_REDEEM'];
-    $define['ERROR_NO_REDEEM_CODE'] = 'You did not enter a ' . $define['TEXT_GV_REDEEM'] . '.';
-    $define['ERROR_REDEEMED_AMOUNT'] = 'Congratulations, you have redeemed ';
-    $define['GV_FAQ'] = $define['TEXT_GV_NAME'] . ' FAQ';
-    $define['TABLE_HEADING_CREDIT'] = 'Credits Available';
-    $define['TEXT_AVAILABLE_BALANCE'] = 'Your ' . $define['TEXT_GV_NAME'] . ' Account';
-    $define['TEXT_BALANCE_IS'] = 'Your ' . $define['TEXT_GV_NAME'] . ' balance is: ';
-    $define['TEXT_COUPON_GV_RESTRICTION'] = '<p class="smallText">Discount Coupons may not be applied towards the purchase of ' . $define['TEXT_GV_NAMES'] . '. Limit 1 coupon per order.</p>';
-    $define['TEXT_SEND_OR_SPEND'] = 'You have a balance available in your ' . $define['TEXT_GV_NAME'] . ' account. You may spend it or send it to someone else. To send click the button below.';
-    $define['VOUCHER_BALANCE'] = $define['TEXT_GV_NAME'] . ' Balance ';
+$define['ATTRIBUTES_QTY_PRICE_SYMBOL'] = zen_image(DIR_WS_TEMPLATE_ICONS . 'icon_status_green.gif', $define['TEXT_ATTRIBUTES_QTY_PRICE_HELP_LINK'], 10, 10) . '&nbsp;';
+$define['BOX_HEADING_GIFT_VOUCHER'] = $define['TEXT_GV_NAME'] . ' Account';
+$define['BOX_INFORMATION_GV'] = $define['TEXT_GV_NAME'] . ' FAQ';
+$define['ENTRY_EMAIL_PREFERENCE'] = 'Newsletter and Email Details';
+if (ACCOUNT_NEWSLETTER_STATUS === '0') {
+    $define['ENTRY_EMAIL_PREFERENCE'] = 'Email Details';
+}
+$define['ERROR_NO_INVALID_REDEEM_GV'] = 'Invalid ' . $define['TEXT_GV_NAME'] . ' ' . $define['TEXT_GV_REDEEM'];
+$define['ERROR_NO_REDEEM_CODE'] = 'You did not enter a ' . $define['TEXT_GV_REDEEM'] . '.';
+$define['ERROR_REDEEMED_AMOUNT'] = 'Congratulations, you have redeemed ';
+$define['GV_FAQ'] = $define['TEXT_GV_NAME'] . ' FAQ';
+$define['TABLE_HEADING_CREDIT'] = 'Credits Available';
+$define['TEXT_AVAILABLE_BALANCE'] = 'Your ' . $define['TEXT_GV_NAME'] . ' Account';
+$define['TEXT_BALANCE_IS'] = 'Your ' . $define['TEXT_GV_NAME'] . ' balance is: ';
+$define['TEXT_COUPON_GV_RESTRICTION'] = '<p class="smallText">Discount Coupons may not be applied towards the purchase of ' . $define['TEXT_GV_NAMES'] . '. Limit 1 coupon per order.</p>';
+$define['TEXT_SEND_OR_SPEND'] = 'You have a balance available in your ' . $define['TEXT_GV_NAME'] . ' account. You may spend it or send it to someone else. To send click the button below.';
+$define['VOUCHER_BALANCE'] = $define['TEXT_GV_NAME'] . ' Balance ';
 
 return $define;

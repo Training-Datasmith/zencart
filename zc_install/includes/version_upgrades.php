@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * version_upgrades.php
  *
@@ -32,4 +34,3 @@ return [
     '2.1.0' => ['required' => '2.0.0'],
     '2.2.0' => ['required' => '2.1.0'],
 ];
-

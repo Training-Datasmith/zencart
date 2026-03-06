@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -10,7 +12,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 if (isset($_GET['pID'])) {
-  $products_id = zen_db_prepare_input($_GET['pID']);
+    $products_id = zen_db_prepare_input($_GET['pID']);
 }
 
 $redirect_page = (isset($_GET['page'])) ? '&page=' . $_GET['page'] : '';
@@ -96,10 +98,10 @@ if (isset($_POST['edit']) && $_POST['edit'] === 'edit') {
         zen_update_products_price_sorter($products_id);
 
         $db->Execute(
-            "INSERT INTO " . TABLE_PRODUCTS_TO_CATEGORIES . "
+            'INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . '
                 (products_id, categories_id)
              VALUES
-                (" . (int)$products_id . ", " . (int)$current_category_id . ")"
+                (' . (int)$products_id . ', ' . (int)$current_category_id . ')'
         );
 
         zen_record_admin_activity('New product ' . (int)$products_id . ' added via admin console.', 'info');
@@ -135,20 +137,20 @@ if (isset($_POST['edit']) && $_POST['edit'] === 'edit') {
         // get sort order for existing additional images
         $next_sort_order = 0;
         $existing_sort = $db->Execute(
-            "SELECT MAX(sort_order) AS max_sort_order
-               FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . "
-              WHERE products_id = " . (int)$products_id
+            'SELECT MAX(sort_order) AS max_sort_order
+               FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . '
+              WHERE products_id = ' . (int)$products_id
         );
         if ($existing_sort->RecordCount() > 0 && $existing_sort->fields['max_sort_order'] !== null) {
             $next_sort_order = (int)$existing_sort->fields['max_sort_order'] + 1;
         }
 
         // Insert each additional image
-        foreach ($additional_images as $sort_order => $img) {
+        foreach ($additional_images as $img) {
             if (!empty($img)) {
                 $db->Execute(
-                    "INSERT INTO " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (products_id, additional_image, sort_order)
-                 VALUES (" . (int)$products_id . ", '" . zen_db_input($img) . "', " . (int)$next_sort_order . ")"
+                    'INSERT INTO ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . ' (products_id, additional_image, sort_order)
+                 VALUES (' . (int)$products_id . ", '" . zen_db_input($img) . "', " . $next_sort_order . ')'
                 );
             }
             $next_sort_order++;
@@ -161,17 +163,17 @@ if (isset($_POST['edit']) && $_POST['edit'] === 'edit') {
             if ($img_id > 0) {
                 // get image filename before deleting record
                 $img_to_delete = $db->Execute(
-                    "SELECT additional_image FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . "
-                   WHERE id = " . $img_id . "
-                     AND products_id = " . (int)$products_id
+                    'SELECT additional_image FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . '
+                   WHERE id = ' . $img_id . '
+                     AND products_id = ' . (int)$products_id
                 );
                 $img_name = $img_to_delete->fields['additional_image'];
 
                 // check if not used by another product
                 $img_to_delete = $db->Execute(
-                    "SELECT id FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . "
-                   WHERE additional_image = (SELECT additional_image FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " WHERE id = " . $img_id . ")
-                     AND products_id <> " . (int)$products_id
+                    'SELECT id FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . '
+                   WHERE additional_image = (SELECT additional_image FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . ' WHERE id = ' . $img_id . ')
+                     AND products_id <> ' . (int)$products_id
                 );
 
                 // delete file if not used by another product
@@ -187,9 +189,9 @@ if (isset($_POST['edit']) && $_POST['edit'] === 'edit') {
 
                 // delete record for this product
                 $db->Execute(
-                    "DELETE FROM " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . "
-                   WHERE products_id = " . (int)$products_id . "
-                     AND id = " . $img_id
+                    'DELETE FROM ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . '
+                   WHERE products_id = ' . (int)$products_id . '
+                     AND id = ' . $img_id
                 );
             }
         }
@@ -202,11 +204,11 @@ if (isset($_POST['edit']) && $_POST['edit'] === 'edit') {
         $sql_data_array = [
           'products_name' => zen_db_prepare_input($_POST['products_name'][$language_id]),
           'products_description' => zen_db_prepare_input($_POST['products_description'][$language_id]),
-          'products_url' => zen_db_prepare_input($_POST['products_url'][$language_id])
+          'products_url' => zen_db_prepare_input($_POST['products_url'][$language_id]),
         ];
 
         // For database consistency, check whether a record exists for this language already; if not, we will create it even if we're in update mode
-        $sql = "SELECT count(products_id) AS found FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE products_id = " . (int)$products_id . " AND language_id = " . (int)$language_id;
+        $sql = 'SELECT count(products_id) AS found FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . (int)$products_id . ' AND language_id = ' . (int)$language_id;
         $result = $db->Execute($sql, 1);
         $record_exists = !empty($result->fields['found']);
 

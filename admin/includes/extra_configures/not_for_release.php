@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Load in any specialized developer and/or unit-testing scripts
  *
@@ -7,8 +9,7 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 
-function twoFactorAuthenticationFunction($params = array())
+function twoFactorAuthenticationFunction($params = []): bool
 {
-  $result = (TWO_FACTOR_AUTHENTICATION_RESULT == 'true') ? TRUE : FALSE;
-  return $result;
+    return (TWO_FACTOR_AUTHENTICATION_RESULT == 'true') ? true : false;
 }

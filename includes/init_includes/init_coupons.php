@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,12 +13,13 @@
  * @return ?string the coupon_code if found, else null.
  * @since ZC v2.0.0
  */
-function initCouponReferrerCheck(): ?string {
+function initCouponReferrerCheck(): ?string
+{
     global $db;
 
     // If there is no referer header, cannot do any lookup,
     // or if referer starts with own server it's an internal request and can be ignored.
-    if (empty($_SERVER['HTTP_REFERER']) || str_starts_with($_SERVER['HTTP_REFERER'], HTTPS_SERVER)) {
+    if (empty($_SERVER['HTTP_REFERER']) || str_starts_with((string) $_SERVER['HTTP_REFERER'], HTTPS_SERVER)) {
         return null;
     }
     $referrer = $_SERVER['HTTP_REFERER'];
@@ -24,33 +27,33 @@ function initCouponReferrerCheck(): ?string {
     // Check for coupon that probably matches this referer.  More expensive validation done later.
     // Strip the domain name from the URL e.g. https://www.blah.com/page.html becomes blah.com
     $matches = [];
-    $result = preg_match('/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/', $referrer, $matches);
+    $result = preg_match('/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/', (string) $referrer, $matches);
     if ($result !== 1) {
         return null;
     }
     $domain = $matches[1];
 
-    $sql = "SELECT coupon_code
-        FROM " . TABLE_COUPONS . " c
-        LEFT JOIN " . TABLE_COUPON_REFERRERS . " r ON (c.coupon_id = r.coupon_id)
-        WHERE referrer_domain = :referrer";
+    $sql = 'SELECT coupon_code
+        FROM ' . TABLE_COUPONS . ' c
+        LEFT JOIN ' . TABLE_COUPON_REFERRERS . ' r ON (c.coupon_id = r.coupon_id)
+        WHERE referrer_domain = :referrer';
     $sql = $db->bindVars($sql, ':referrer', $domain, 'string');
 
-//    $sql = "SELECT coupon_id
-//        FROM " . TABLE_COUPON_REFERRERS . "
-//        WHERE referrer_domain = :referrer";
-//    $sql = $db->bindVars($sql, ':referrer', $domain, 'string');
-//
-//    $result = $db->Execute($sql, 1);
-//
-//    if ($result->EOF) {
-//        return null;
-//    }
-//
-//    $sql = "SELECT coupon_code
-//        FROM " . TABLE_COUPONS . "
-//        WHERE coupon_id = :coupon_id";
-//    $sql = $db->bindVars($sql, ':coupon_id', $result['coupon_id'], 'integer');
+    //    $sql = "SELECT coupon_id
+    //        FROM " . TABLE_COUPON_REFERRERS . "
+    //        WHERE referrer_domain = :referrer";
+    //    $sql = $db->bindVars($sql, ':referrer', $domain, 'string');
+    //
+    //    $result = $db->Execute($sql, 1);
+    //
+    //    if ($result->EOF) {
+    //        return null;
+    //    }
+    //
+    //    $sql = "SELECT coupon_code
+    //        FROM " . TABLE_COUPONS . "
+    //        WHERE coupon_id = :coupon_id";
+    //    $sql = $db->bindVars($sql, ':coupon_id', $result['coupon_id'], 'integer');
 
     $result = $db->Execute($sql, 1);
 
@@ -67,7 +70,8 @@ function initCouponReferrerCheck(): ?string {
  * @return ?string the coupon_code if found, else null.
  * @since ZC v2.0.0
  */
-function initCouponRequestCheck() {
+function initCouponRequestCheck(): null|string|int|float|array
+{
     if (empty($_GET['coupon_code'])) {
         return null;
     }
@@ -77,10 +81,10 @@ function initCouponRequestCheck() {
 /**
  * Look for any coupon_code, validate it and apply it.
  *
- * @return void
  * @since ZC v2.0.0
  */
-function initCouponChecks() {
+function initCouponChecks(): void
+{
     global $languageLoader, $messageStack;
     $coupon_code = initCouponRequestCheck();
     if (empty($coupon_code)) {
@@ -94,7 +98,7 @@ function initCouponChecks() {
     $module_file = DIR_WS_MODULES . 'order_total/ot_coupon.php';
     include_once($module_file);
     $languageLoader->loadExtraLanguageFiles(DIR_FS_CATALOG . DIR_WS_LANGUAGES, $_SESSION['language'], 'ot_coupon.php', '/modules/order_total');
-    $ot_coupon = new ot_coupon;
+    $ot_coupon = new ot_coupon();
     if (!$ot_coupon->check()) {
         return;
     }

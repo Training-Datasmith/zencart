@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Your Download ...',
     'HEADING_TITLE' => 'Your Download ...',
     'TEXT_INFORMATION' => 'Sorry, your download has expired.<br><br>
@@ -9,5 +11,3 @@ $define = [
   Thank you!
   ',
 ];
-
-return $define;

@@ -14,19 +14,19 @@ include DIR_WS_MODULES . zen_get_module_directory(FILENAME_PRODUCT_LISTING);
 <div id="productListing" class="group">
 
 <?php
-  if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '1' || PREV_NEXT_BAR_LOCATION === '3') ) {
-?>
+  if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '1' || PREV_NEXT_BAR_LOCATION === '3')) {
+      ?>
 <div class="prod-list-wrap group">
   <div id="productsListingListingTopLinks" class="navSplitPagesLinks back"><?php echo TEXT_RESULT_PAGE . $listing_split->display_links($max_display_page_links, zen_get_all_get_params(['page', 'info', 'x', 'y', 'main_page']), $paginateAsUL); ?></div>
   <div id="productsListingTopNumber" class="navSplitPagesResult back<?php echo $listing_split->number_of_pages == 1 ? ' navSplitEmpty3rdColumn' : ''; ?>"><?php echo $listing_split->display_count(TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?></div>
 <?php
-}
+  }
 ?>
 
 <?php
 // only show when there is something to submit and enabled
     if ($show_top_submit_button) {
-?>
+        ?>
 <?php if (PREV_NEXT_BAR_LOCATION === '2' && $listing_split->number_of_rows) { ?>
   <div class="prod-list-wrap group">
 <?php } ?>
@@ -39,7 +39,7 @@ include DIR_WS_MODULES . zen_get_module_directory(FILENAME_PRODUCT_LISTING);
     } // show top submit
 ?>
 
-<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '1' || PREV_NEXT_BAR_LOCATION === '3') ) { ?>
+<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '1' || PREV_NEXT_BAR_LOCATION === '3')) { ?>
 </div>
 <?php } ?>
 
@@ -49,24 +49,24 @@ include DIR_WS_MODULES . zen_get_module_directory(FILENAME_PRODUCT_LISTING);
  * load the list_box_content template to display the products
  */
 if (in_array($product_listing_layout_style, ['columns', 'fluid'])) {
-  require($template->get_template_dir('tpl_columnar_display.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_columnar_display.php');
+    require($template->get_template_dir('tpl_columnar_display.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_columnar_display.php');
 } else {
-  require($template->get_template_dir('tpl_tabular_display.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_tabular_display.php');
+    require($template->get_template_dir('tpl_tabular_display.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_tabular_display.php');
 }
 ?>
 
-<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION == '2' || PREV_NEXT_BAR_LOCATION == '3') ) { ?>
+<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION == '2' || PREV_NEXT_BAR_LOCATION == '3')) { ?>
 <div class="prod-list-wrap group">
   <div id="productsListingListingBottomLinks"  class="navSplitPagesLinks back"><?php echo TEXT_RESULT_PAGE . $listing_split->display_links($max_display_page_links, zen_get_all_get_params(['page', 'info', 'x', 'y', 'main_page']), $paginateAsUL); ?></div>
   <div id="productsListingBottomNumber" class="navSplitPagesResult back<?php echo $listing_split->number_of_pages == 1 ? ' navSplitEmpty3rdColumn' : ''; ?>"><?php echo $listing_split->display_count(TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?></div>
 <?php
-  }
+}
 ?>
 
 <?php
 // only show when there is something to submit and enabled
     if ($show_bottom_submit_button) {
-?>
+        ?>
 
 <?php if (PREV_NEXT_BAR_LOCATION === '1') { ?>
   <div class="prod-list-wrap group button-bottom">
@@ -79,7 +79,7 @@ if (in_array($product_listing_layout_style, ['columns', 'fluid'])) {
 <?php
     } // show_bottom_submit_button
 ?>
-<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '2' || PREV_NEXT_BAR_LOCATION === '3') ) { ?>
+<?php if ($listing_split->number_of_rows && (PREV_NEXT_BAR_LOCATION === '2' || PREV_NEXT_BAR_LOCATION === '3')) { ?>
 </div>
 <?php } ?>
 

@@ -5,11 +5,12 @@
  * @version $Id: Nick Fenwick 2023 Jul 03 Modified in v2.0.0-alpha1 $
  */
 
-if (!zen_is_superuser() && !check_page(FILENAME_WHOS_ONLINE, '')) return;
+if (!zen_is_superuser() && !check_page(FILENAME_WHOS_ONLINE, '')) {
+    return;
+}
 
 // to disable this module for everyone, uncomment the following "return" statement so the rest of this file is ignored
 // return;
-
 
 $whos_online = new WhosOnline();
 $whos_online_stats = $whos_online->getStats();
@@ -29,25 +30,25 @@ $spider_array = $whos_online_stats['spider_array'];
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-lime"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($user_array[0] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($user_array[0] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-orange"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($user_array[1] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($user_array[1] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-red"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($user_array[2] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($user_array[2] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-pink"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($user_array[3] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($user_array[3] ?: ''); ?>
         </td>
       </tr>
       <tr>
@@ -56,25 +57,25 @@ $spider_array = $whos_online_stats['spider_array'];
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-lime"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($guest_array[0] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($guest_array[0] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-orange"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($guest_array[1] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($guest_array[1] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-red"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($guest_array[2] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($guest_array[2] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-pink"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($guest_array[3] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($guest_array[3] ?: ''); ?>
         </td>
       </tr>
       <tr>
@@ -83,24 +84,24 @@ $spider_array = $whos_online_stats['spider_array'];
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-lime"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($spider_array[0] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($spider_array[0] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-orange"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($spider_array[1] ?: ''); ?></td>
+          </span>&nbsp;&nbsp;<?php echo($spider_array[1] ?: ''); ?></td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-red"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($spider_array[2] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($spider_array[2] ?: ''); ?>
         </td>
         <td>
           <span class="fa-stack fa-lg">
             <i class="fa-solid fa-circle fa-stack-1x txt-pink"></i>
             <i class="fa-regular fa-circle fa-stack-1x"></i>
-          </span>&nbsp;&nbsp;<?php echo ($spider_array[3] ?: ''); ?>
+          </span>&nbsp;&nbsp;<?php echo($spider_array[3] ?: ''); ?>
         </td>
       </tr>
       <tr>

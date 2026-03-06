@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seeders;
 
 use Tests\Support\Database\TestDb;
 
 class CompoundTaxesSeeder
 {
-
     /**
      * Auto generated seed file
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         $now = date('Y-m-d H:i:s');
         $geoZoneId = TestDb::insert('geo_zones', ['geo_zone_name' => 'Canada', 'geo_zone_description' => 'Canada Compound']);

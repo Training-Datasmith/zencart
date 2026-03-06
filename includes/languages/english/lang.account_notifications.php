@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'My Account',
     'NAVBAR_TITLE_2' => 'Product Notifications',
     'HEADING_TITLE' => 'Product Notifications',
@@ -12,5 +14,3 @@ $define = [
     'TEXT_NO_PURCHASES' => 'No Purchases',
     'SUCCESS_NOTIFICATIONS_UPDATED' => 'Your product notifications have been updated.',
 ];
-
-return $define;

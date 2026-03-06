@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -14,7 +16,8 @@ use Tests\Support\Traits\GeneralConcerns;
  */
 abstract class zcFeatureTestCaseStore extends zcFeatureTestCase
 {
-    use DatabaseConcerns, GeneralConcerns;
+    use DatabaseConcerns;
+    use GeneralConcerns;
     protected $context = 'store';
     /**
      * @return void

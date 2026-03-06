@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -14,11 +16,10 @@ use Tests\Support\zcUnitTestCase;
  */
 class EmailValidationTest extends zcUnitTestCase
 {
-
     /**
      * test whether email RFC tests are valid
      */
-    public function testEmailRfcValidation()
+    public function testEmailRfcValidation(): void
     {
         /**
          * set up prerequisites needed in order to use the function_email.php functions.
@@ -30,7 +31,7 @@ class EmailValidationTest extends zcUnitTestCase
         /**
          * Set up test of email addresses to validate
          */
-        $toTestAsValid = $toTestAsInvalid = array();
+        $toTestAsValid = $toTestAsInvalid = [];
         $toTestAsValid [] = 'l3tt3rsAndNumb3rs@domain.com';
         $toTestAsValid [] = 'has-dash@domain.com';
         $toTestAsValid [] = "hasApostrophe.o'leary@domain.org";

@@ -14,8 +14,8 @@
 // Enabling this product-information template to be reused for other product
 // types.
 //
-$product_info_html_id = $product_info_html_id ?? 'productGeneral';
-$product_info_class = $product_info_class ?? 'productGeneral';
+$product_info_html_id ??= 'productGeneral';
+$product_info_class ??= 'productGeneral';
 ?>
 <div class="centerColumn" id="<?= $product_info_html_id ?>">
 
@@ -89,7 +89,7 @@ echo
 <!--bof free ship icon  -->
 <?php
 if (zen_get_product_is_always_free_shipping($products_id_current) && $flag_show_product_info_free_shipping) {
-?>
+    ?>
     <div id="freeShippingIcon"><?= TEXT_PRODUCT_FREE_SHIPPING_ICON ?></div>
 <?php
 }
@@ -99,9 +99,9 @@ if (zen_get_product_is_always_free_shipping($products_id_current) && $flag_show_
  <!--bof Product description -->
 <?php
 if ($products_description != '') {
-?>
+    ?>
     <div id="productDescription" class="<?= $product_info_class ?> biggerText">
-        <?= stripslashes($products_description) ?>
+        <?= stripslashes((string) $products_description) ?>
     </div>
 <?php
 }
@@ -112,7 +112,7 @@ if ($products_description != '') {
 <!--bof Add to Cart Box -->
 <?php
 if (CUSTOMERS_APPROVAL === '3' && TEXT_LOGIN_FOR_PRICE_BUTTON_REPLACE_SHOWROOM == '') {
-  // do nothing
+    // do nothing
 } else {
     $display_qty = (($flag_show_product_info_in_cart_qty == 1 && $_SESSION['cart']->in_cart($_GET['products_id'])) ? '<p>' . PRODUCTS_ORDER_QTY_TEXT_IN_CART . $_SESSION['cart']->get_quantity($_GET['products_id']) . '</p>' : '');
     if ($products_qty_box_status == 0 || $products_quantity_order_max == 1) {
@@ -135,7 +135,7 @@ if (CUSTOMERS_APPROVAL === '3' && TEXT_LOGIN_FOR_PRICE_BUTTON_REPLACE_SHOWROOM =
     $display_button = zen_get_buy_now_button($_GET['products_id'], $the_button);
 
     if ($display_qty != '' || $display_button != '') {
-?>
+        ?>
     <div id="cartAdd">
         <?= $display_qty . $display_button ?>
     </div>
@@ -166,7 +166,7 @@ if (file_exists($product_details_filepath)) {
 <!--eof Product details list -->
 <?php
 if ($flag_show_ask_a_question) {
-?>
+    ?>
 <!-- bof Ask a Question -->
     <br>
     <span id="productQuestions" class="biggerText">
@@ -233,8 +233,8 @@ if (PRODUCT_INFO_PREVIOUS_NEXT === '2' || PRODUCT_INFO_PREVIOUS_NEXT === '3') {
 <?php
 if ($flag_show_product_info_reviews == 1) {
     // if more than 0 reviews, then show reviews button; otherwise, show the "write review" button
-    if ($reviews->fields['count'] > 0 ) {
-?>
+    if ($reviews->fields['count'] > 0) {
+        ?>
     <div id="productReviewLink" class="buttonRow back">
         <a href="<?= zen_href_link(FILENAME_PRODUCT_REVIEWS, zen_get_all_get_params()) ?>">
             <?= zen_image_button(BUTTON_IMAGE_REVIEWS, BUTTON_REVIEWS_ALT) ?>
@@ -246,7 +246,7 @@ if ($flag_show_product_info_reviews == 1) {
     </p>
 <?php
     } else {
-?>
+        ?>
     <div id="productReviewLink" class="buttonRow back">
         <a href="<?= zen_href_link(FILENAME_PRODUCT_REVIEWS_WRITE, zen_get_all_get_params()) ?>">
             <?= zen_image_button(BUTTON_IMAGE_WRITE_REVIEW, BUTTON_WRITE_REVIEW_ALT) ?>
@@ -263,14 +263,14 @@ if ($flag_show_product_info_reviews == 1) {
 <?php
 if ($products_date_available > date('Y-m-d H:i:s')) {
     if ($flag_show_product_info_date_available == 1) {
-?>
+        ?>
     <p id="productDateAvailable" class="<?= $product_info_class ?> centeredContent">
         <?= sprintf(TEXT_DATE_AVAILABLE, zen_date_long($products_date_available)) ?>
     </p>
 <?php
     }
 } elseif ($flag_show_product_info_date_added == 1) {
-?>
+    ?>
     <p id="productDateAdded" class="<?= $product_info_class ?> centeredContent">
         <?= sprintf(TEXT_DATE_ADDED, zen_date_long($products_date_added)) ?>
     </p>
@@ -282,7 +282,7 @@ if ($products_date_available > date('Y-m-d H:i:s')) {
 <!--bof Product URL -->
 <?php
 if (!empty($products_url) && $flag_show_product_info_url == 1) {
-?>
+    ?>
     <p id="productInfoLink" class="<?= $product_info_class ?> centeredContent">
         <?= sprintf(TEXT_MORE_INFORMATION, zen_href_link(FILENAME_REDIRECT, 'action=product&products_id=' . zen_output_string_protected($_GET['products_id']), 'NONSSL', true, false)) ?>
     </p>

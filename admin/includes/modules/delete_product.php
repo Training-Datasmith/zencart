@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -31,13 +33,15 @@ for ($i = 0, $n = count($product_categories); $i < $n; $i++) {
         $product_categories_string .= '<div class="checkbox"><label>' . zen_draw_checkbox_field('product_categories[]', $product_categories[$i][count($product_categories[$i]) - 1]['id'], true) . $category_path . '</label></div>';
     }
 }
-if (!isset($product_master_category_string)) $product_master_category_string = zen_get_category_name($pInfo->master_categories_id, (int)$_SESSION['languages_id']);
+if (!isset($product_master_category_string)) {
+    $product_master_category_string = zen_get_category_name($pInfo->master_categories_id, (int)$_SESSION['languages_id']);
+}
 
 $zco_notifier->notify('NOTIFY_ADMIN_DELETE_PRODUCT_INFOBOX', $pInfo, $product_master_category_string, $product_categories_string);
 
 $heading = [];
 $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_DELETE_PRODUCT . '</h4>'];
-$contents = ['form' => zen_draw_form('delete_products', FILENAME_CATEGORY_PRODUCT_LISTING, 'action=delete_product_confirm&product_type=' . $product_type . '&cPath=' . $cPath . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post', 'class="form-horizontal"') . zen_draw_hidden_field('products_id', $pInfo->products_id)];
+$contents = ['form' => zen_draw_form('delete_products', FILENAME_CATEGORY_PRODUCT_LISTING, 'action=delete_product_confirm&product_type=' . $product_type . '&cPath=' . $cPath . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post') . zen_draw_hidden_field('products_id', $pInfo->products_id)];
 $contents[] = ['text' => '<h3>ID#' . $pInfo->products_id . ': ' . $pInfo->products_name . '</h3>'];
 $contents[] = ['text' => '<span class="text-danger"><strong>' . TEXT_MASTER_CATEGORIES_ID . ' ID#' . zen_get_parent_category_id($pInfo->products_id) . ' ' . $product_master_category_string . '</strong></span>'];
 if (count($product_categories) > 1) {

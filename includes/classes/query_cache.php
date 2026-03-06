@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Memoization cache for MySQL SELECT queries
  *
@@ -21,10 +23,9 @@ class QueryCache
      * returns TRUE if and only if query has been stored in cache
      * @param string $query query string, used as a key
      * @param mysqli_result $valueToStore result from mysqli_query
-     * @return bool
      * @since ZC v1.5.1
      */
-    public function cache(string $query, $valueToStore)
+    public function cache(string $query, $valueToStore): bool
     {
         if ($this->isSelectStatement($query) === true) {
             $this->queries[$query] = $valueToStore;
@@ -35,7 +36,6 @@ class QueryCache
     }
 
     /**
-     * @param string $query
      * @return mixed
      * @since ZC v1.5.1
      */
@@ -48,28 +48,24 @@ class QueryCache
 
     /**
      * @param string $query used as a cache key
-     * @return bool
      * @since ZC v1.5.1
      */
-    public function inCache(string $query)
+    public function inCache(string $query): bool
     {
         return (isset($this->queries[$query]) && $this->queries[$query] instanceof mysqli_result);
     }
 
     /**
      * ensure the query is a SELECT query
-     * @param string $q
-     * @return bool
      * @since ZC v1.5.1
      */
-    protected function isSelectStatement(string $q)
+    protected function isSelectStatement(string $q): bool
     {
-        return 0 === stripos($q, "SELECT");
+        return 0 === stripos($q, 'SELECT');
     }
 
     /**
      * Remove query from cache. Pass ALL to reset entire cache
-     * @param string $query
      * @return bool
      * @since ZC v1.5.3
      */
@@ -79,6 +75,6 @@ class QueryCache
             $this->queries = [];
             return false;
         }
-        unset ($this->queries[$query]);
+        unset($this->queries[$query]);
     }
 }

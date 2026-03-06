@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *  product_info main_template_vars.php
  *
@@ -14,7 +16,7 @@
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_START_PRODUCT_INFO');
 
-if (!isset($product_info) || get_class($product_info) !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
+if (!isset($product_info) || $product_info::class !== 'Product' || $product_info->getID() !== (int)$_GET['products_id']) {
     $product_info = new Product((int)$_GET['products_id']);
 }
 
@@ -56,11 +58,11 @@ if ($product_not_found) {
     require DIR_WS_MODULES . zen_get_module_directory(FILENAME_ATTRIBUTES);
 
     $reviews_query =
-        "SELECT COUNT(*) AS count FROM " . TABLE_REVIEWS . " r, " . TABLE_REVIEWS_DESCRIPTION . " rd
-          WHERE r.products_id = " . $products_id_current . "
+        'SELECT COUNT(*) AS count FROM ' . TABLE_REVIEWS . ' r, ' . TABLE_REVIEWS_DESCRIPTION . ' rd
+          WHERE r.products_id = ' . $products_id_current . '
             AND r.reviews_id = rd.reviews_id
-            AND rd.languages_id = " . (int)$_SESSION['languages_id'] . "
-            AND r.status = 1";
+            AND rd.languages_id = ' . (int)$_SESSION['languages_id'] . '
+            AND r.status = 1';
 
     $reviews = $db->Execute($reviews_query);
 
@@ -90,7 +92,6 @@ if ($product_not_found) {
     $products_base_price = $currencies->display_price(zen_get_products_base_price($products_id_current), $products_tax_rate);
 
     $product_is_free = $product_data['product_is_free'];
-
 
     $products_discount_type = $product_data['products_discount_type'];
     $products_discount_type_from = $product_data['products_discount_type_from'];

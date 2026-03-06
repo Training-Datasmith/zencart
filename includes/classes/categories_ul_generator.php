@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -16,7 +18,7 @@ class zen_categories_ul_generator
         protected int $max_level = 0,
         protected string $parent_group_start_string = "\n<ul%s>",
         protected string $parent_group_end_string = "</ul>\n",
-        protected string $child_start_string = "<li%s>",
+        protected string $child_start_string = '<li%s>',
         protected string $child_end_string = "</li>\n",
         protected string $spacer_string = '
 ', // line-break and new line are intentional
@@ -24,12 +26,12 @@ class zen_categories_ul_generator
     ) {
         global $db;
         $this->data = [];
-        $categories_query = "SELECT c.categories_id, cd.categories_name, c.parent_id
-                             FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+        $categories_query = 'SELECT c.categories_id, cd.categories_name, c.parent_id
+                             FROM ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . ' cd
                              WHERE c.categories_id = cd.categories_id
                              AND c.categories_status = 1
-                             AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
-                             ORDER BY c.parent_id, c.sort_order, cd.categories_name";
+                             AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                             ORDER BY c.parent_id, c.sort_order, cd.categories_name';
 
         $results = $db->Execute($categories_query, null, true, 300);
 
@@ -57,7 +59,7 @@ class zen_categories_ul_generator
                     $class_attribute = ($submenu === true) ? ' class="submenu"' : '';
                 }
                 $result .= sprintf($this->child_start_string, $class_attribute);
-                $result .= str_repeat($this->spacer_string, $this->spacer_multiplier * 1) . '<a href="' . zen_href_link(FILENAME_DEFAULT, 'cPath=' . $category_link) . '">';
+                $result .= str_repeat($this->spacer_string, $this->spacer_multiplier) . '<a href="' . zen_href_link(FILENAME_DEFAULT, 'cPath=' . $category_link) . '">';
                 $result .= $category['name'];
                 $result .= '</a>';
 
@@ -67,9 +69,7 @@ class zen_categories_ul_generator
                 $result .= $this->child_end_string;
             }
         }
-
-        $result .= $this->parent_group_end_string;
-        return $result;
+        return $result . $this->parent_group_end_string;
     }
 
     /**

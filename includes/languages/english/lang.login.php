@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Login',
     'HEADING_TITLE' => 'Welcome, Please Sign In',
     'HEADING_NEW_CUSTOMER' => 'New? Please Provide Your Billing Information',
@@ -16,5 +18,3 @@ $define = [
     'ERROR_SECURITY_ERROR' => 'There was a security error when trying to login.',
     'TEXT_LOGIN_BANNED' => 'Error: Access denied.',
 ];
-
-return $define;

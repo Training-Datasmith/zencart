@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Reviews',
     'SUB_TITLE_FROM' => 'Written by:',
     'SUB_TITLE_REVIEW' => 'Please tell us what you think and share your opinions with others. Be sure to focus your comments on the product.',
@@ -12,5 +14,3 @@ $define = [
     'TEXT_REVIEW_SUBMITTED_FOR_REVIEW' => 'Thank you, your post has been submitted for review.',
     'TEXT_REVIEW_SUBMITTED' => 'Thank you for submitting your review!',
 ];
-
-return $define;

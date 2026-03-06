@@ -28,36 +28,38 @@ if (is_array($list_box_contents)) {
         if (isset($list_box_contents[$row]['params'])) {
             $r_params = $list_box_contents[$row]['params'];
         }
-?>
+        ?>
 
 <div <?php echo $r_params; ?>>
 <?php
-    foreach ($cols as $col) {
-        if ($cols === 'params') {
-            continue; // a $cols index named 'params' is only display-instructions ($r_params above) for the row, no data, so skip this iteration
-        }
+            foreach ($cols as $col) {
+                if ($cols === 'params') {
+                    continue; // a $cols index named 'params' is only display-instructions ($r_params above) for the row, no data, so skip this iteration
+                }
 
-        if (!empty($col['wrap_with_classes'])) { 
-            echo '<div class="' . $col['wrap_with_classes'] . '">';
-        }
+                if (!empty($col['wrap_with_classes'])) {
+                    echo '<div class="' . $col['wrap_with_classes'] . '">';
+                }
 
-      $c_params = "";
-      if (isset($col['params'])) $c_params .= ' ' . (string)$col['params'];
-      if (isset($col['text'])) {
-            echo '<div' . $c_params . '>' . $col['text'] .  '</div>';
-        }
+                $c_params = '';
+                if (isset($col['params'])) {
+                    $c_params .= ' ' . $col['params'];
+                }
+                if (isset($col['text'])) {
+                    echo '<div' . $c_params . '>' . $col['text'] .  '</div>';
+                }
 
-        if (!empty($col['wrap_with_classes'])) { 
-            echo '</div>';
-      }
-      echo PHP_EOL;
-    }
-?>
+                if (!empty($col['wrap_with_classes'])) {
+                    echo '</div>';
+                }
+                echo PHP_EOL;
+            }
+        ?>
 </div>
 <br class="clearBoth">
 
 <?php
-  }
+    }
 }
 ?>
 </div>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ez_pages ("page") header_php.php
  *
@@ -27,14 +29,14 @@ if ($ezpage_id === 0) {
 $chapter_id = isset($_GET['chapter']) ? (int)$_GET['chapter'] : 0;
 $chapter_link = isset($_GET['chapter']) ? (int)$_GET['chapter'] : 0;
 
-$sql = "SELECT e.*, ec.*
-        FROM  " . TABLE_EZPAGES . " e,
-              " . TABLE_EZPAGES_CONTENT . " ec
+$sql = 'SELECT e.*, ec.*
+        FROM  ' . TABLE_EZPAGES . ' e,
+              ' . TABLE_EZPAGES_CONTENT . ' ec
         WHERE e.pages_id = ec.pages_id
-        AND ec.languages_id = " . (int)$_SESSION['languages_id'] . "
-        AND e.pages_id = " . (int)$ezpage_id;
+        AND ec.languages_id = ' . (int)$_SESSION['languages_id'] . '
+        AND e.pages_id = ' . $ezpage_id;
 // comment the following line to allow access to pages which don't have a status switch set to Yes:
-$sql .= " AND (status_toc > 0 or status_header > 0 or status_sidebox > 0 or status_footer > 0 or status_visible > 0)";
+$sql .= ' AND (status_toc > 0 or status_header > 0 or status_sidebox > 0 or status_footer > 0 or status_visible > 0)';
 
 // Check to see if page exists and is accessible, retrieving relevant details for display if found
 $var_pageDetails = $db->Execute($sql);
@@ -49,15 +51,15 @@ if ($var_pageDetails->EOF) {
 //check db for prev/next based on sort orders
 $vert_links = [];
 $toc_links = [];
-$pages_order_query = "SELECT e.*,ec.*
-                      FROM  " . TABLE_EZPAGES . " e,
-                            " . TABLE_EZPAGES_CONTENT . " ec
+$pages_order_query = 'SELECT e.*,ec.*
+                      FROM  ' . TABLE_EZPAGES . ' e,
+                            ' . TABLE_EZPAGES_CONTENT . " ec
                       WHERE ((e.status_toc = 1 AND e.toc_sort_order <> 0) AND e.toc_chapter = :chapterID )
                       AND e.alt_url_external = ''
                       AND e.alt_url = ''
-                      AND ec.languages_id = " . (int)$_SESSION['languages_id'] . "
+                      AND ec.languages_id = " . (int)$_SESSION['languages_id'] . '
                       AND e.pages_id = ec.pages_id
-                      ORDER BY e.toc_sort_order, ec.pages_title";
+                      ORDER BY e.toc_sort_order, ec.pages_title';
 
 $pages_order_query = $db->bindVars($pages_order_query, ':chapterID', $chapter_id, 'integer');
 $pages_ordering = $db->execute($pages_order_query);
@@ -66,7 +68,7 @@ foreach ($pages_ordering as $page_order) {
     $vert_links[] = $page_order['pages_id'];
     $toc_links[] = [
       'pages_id' => $page_order['pages_id'],
-      'pages_title' => $page_order['pages_title']
+      'pages_title' => $page_order['pages_title'],
     ];
 }
 
@@ -124,16 +126,16 @@ if (!defined('EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST')) {
     define('EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST', '');
 }
 if ($ezpage_id > 0) {
-    if (in_array($ezpage_id, explode(",", EZPAGES_DISABLE_HEADER_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_HEADER_DISPLAY_LIST, '*')) {
+    if (in_array($ezpage_id, explode(',', EZPAGES_DISABLE_HEADER_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_HEADER_DISPLAY_LIST, '*')) {
         $flag_disable_header = true;
     }
-    if (in_array($ezpage_id, explode(",", EZPAGES_DISABLE_FOOTER_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_FOOTER_DISPLAY_LIST, '*')) {
+    if (in_array($ezpage_id, explode(',', EZPAGES_DISABLE_FOOTER_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_FOOTER_DISPLAY_LIST, '*')) {
         $flag_disable_footer = true;
     }
-    if (in_array($ezpage_id, explode(",", EZPAGES_DISABLE_LEFTCOLUMN_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_LEFTCOLUMN_DISPLAY_LIST, '*')) {
+    if (in_array($ezpage_id, explode(',', EZPAGES_DISABLE_LEFTCOLUMN_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_LEFTCOLUMN_DISPLAY_LIST, '*')) {
         $flag_disable_left = true;
     }
-    if (in_array($ezpage_id, explode(",", EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST, '*')) {
+    if (in_array($ezpage_id, explode(',', EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST)) || strstr(EZPAGES_DISABLE_RIGHTCOLUMN_DISPLAY_LIST, '*')) {
         $flag_disable_right = true;
     }
 }

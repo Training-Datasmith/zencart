@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * send_auth_token_email.php. Sends a customer an account-authorization token
  * via email.

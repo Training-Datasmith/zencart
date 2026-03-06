@@ -18,7 +18,7 @@
  * require the html_define for the page_3 page
  */
   require($define_page);
-?>
+    ?>
 </div>
 <?php } ?>
 

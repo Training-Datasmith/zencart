@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'HEADING_CVV' => 'What is CVV?',
     'TEXT_CVV_HELP1' => 'Visa, Mastercard, Discover 3 Digit Card Verification Number<br><br>
                     For your safety and security, we require that you enter your card\'s verification number.<br><br>
@@ -13,5 +15,3 @@ $define = [
         zen_image(DIR_WS_TEMPLATE_ICONS . 'cvv2amex.gif'),
     'TEXT_CLOSE_CVV_WINDOW' => 'Close Window [x]',
 ];
-
-return $define;

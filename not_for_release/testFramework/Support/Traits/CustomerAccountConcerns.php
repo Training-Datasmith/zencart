@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Traits;
 
 use Tests\Support\Database\TestDb;
@@ -7,9 +9,10 @@ use Tests\Support\helpers\ProfileManager;
 
 trait CustomerAccountConcerns
 {
-
-
-    public function createCustomerAccountOrLogin($profileName)
+    /**
+     * @return mixed[]
+     */
+    public function createCustomerAccountOrLogin(string $profileName): array
     {
         $profile = ProfileManager::getProfile($profileName);
         if ($this->getCustomerIdFromEmail($profile['email_address']) !== null) {
@@ -25,7 +28,7 @@ trait CustomerAccountConcerns
         return $profile;
     }
 
-    public function logoutCustomer()
+    public function logoutCustomer(): void
     {
         //echo 'Logging out customer' . PHP_EOL;
         $this->browser->request('GET', HTTP_SERVER . '/index.php?main_page=logoff');
@@ -33,7 +36,10 @@ trait CustomerAccountConcerns
         $this->assertStringContainsString('Log Off', (string)$response->getContent());
     }
 
-    public function loginCustomer($profileName)
+    /**
+     * @return mixed[]
+     */
+    public function loginCustomer($profileName): array
     {
         //echo 'Logging in customer ' . $profileName . PHP_EOL;
         $this->logoutCustomer();
@@ -47,7 +53,7 @@ trait CustomerAccountConcerns
         return $profile;
     }
 
-    public function getCouponBalanceCustomer($customerEmail)
+    public function getCouponBalanceCustomer($customerEmail): int|float
     {
         $customerId = $this->getCustomerIdFromEmail($customerEmail);
         if ($customerId === null) {
@@ -61,7 +67,7 @@ trait CustomerAccountConcerns
         return $amount === null ? 0 : (float) $amount;
     }
 
-    public function getCustomerIdFromEmail($customerEmail)
+    public function getCustomerIdFromEmail($customerEmail): ?int
     {
         $customerId = TestDb::selectValue(
             'SELECT customers_id FROM customers WHERE customers_email_address = :email LIMIT 1',
@@ -71,7 +77,7 @@ trait CustomerAccountConcerns
         return $customerId === null ? null : (int) $customerId;
     }
 
-    public function addGiftVoucherBalance($customerEmail, $value)
+    public function addGiftVoucherBalance($customerEmail, $value): void
     {
         $customerId = $this->getCustomerIdFromEmail($customerEmail);
         if ($customerId === null) {
@@ -95,7 +101,7 @@ trait CustomerAccountConcerns
         }
     }
 
-    public function setCustomerGroupDiscount($customerEmail, $value)
+    public function setCustomerGroupDiscount($customerEmail, $value): void
     {
         $customerId = $this->getCustomerIdFromEmail($customerEmail);
         if ($customerId === null) {
@@ -109,7 +115,7 @@ trait CustomerAccountConcerns
             [':customer_id' => $customerId]
         );
     }
-    public function updateGVBalance($profile)
+    public function updateGVBalance(array $profile): void
     {
         if ($this->getCouponBalanceCustomer($profile['email_address']) < 300) {
             $this->addGiftVoucherBalance($profile['email_address'], 1000);

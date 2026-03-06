@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2023 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -27,7 +29,7 @@ $define = [
     'TEXT_INFO_MATCHES_FOUND' => 'Match Lines found: ',
     'TEXT_INFO_FILENAME' => 'FILENAME: ',
     'TEXT_LANGUAGE_LOOKUPS' => 'Language File Look-ups:',
-    'TEXT_LANGUAGE_LOOKUP_CURRENT_LANGUAGE' => 'All Language Files for ' . strtoupper($_SESSION['language']) . ' - Catalog/Admin',
+    'TEXT_LANGUAGE_LOOKUP_CURRENT_LANGUAGE' => 'All Language Files for ' . strtoupper((string) $_SESSION['language']) . ' - Catalog/Admin',
     'TEXT_LANGUAGE_LOOKUP_CURRENT_CATALOG' => 'All Main Language files - Catalog (' . DIR_WS_CATALOG . DIR_WS_LANGUAGES . 'english.php /espanol.php etc.)',
     'TEXT_LANGUAGE_LOOKUP_CURRENT_CATALOG_TEMPLATE' => 'All Current Selected Language Files - ' . DIR_WS_CATALOG . DIR_WS_LANGUAGES . 'language' . '/*.php',
     'TEXT_LANGUAGE_LOOKUP_CURRENT_ADMIN' => 'All Main Language files - Admin (' . DIR_WS_ADMIN . DIR_WS_LANGUAGES . 'english.php /espanol.php etc.)',

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
 use Zencart\PluginSupport\ScriptedInstaller as ScriptedInstallBase;
 
 class ScriptedInstaller extends ScriptedInstallBase
 {
-    protected function executeInstall()
+    protected function executeInstall(): bool
     {
         zen_deregister_admin_pages(['toolsDisplayLogs']);
         zen_register_admin_page('toolsDisplayLogs', 'BOX_TOOLS_DISPLAY_LOGS', 'FILENAME_DISPLAY_LOGS', '', 'tools', 'Y', 20);
@@ -16,7 +18,6 @@ class ScriptedInstaller extends ScriptedInstallBase
             'sort_order' => 100,
         ]);
 
-
         $this->addConfigurationKey('DISPLAY_LOGS_MAX_FILE_SIZE', [
             'configuration_title' => 'Display Logs: Maximum File Size',
             'configuration_value' => '80000',
@@ -25,7 +26,6 @@ class ScriptedInstaller extends ScriptedInstallBase
             'sort_order' => 101,
         ]);
 
-
         $this->addConfigurationKey('DISPLAY_LOGS_INCLUDED_FILES', [
             'configuration_title' => 'Display Logs: Included File Prefixes',
             'configuration_value' =>  'myDEBUG-|AIM_Debug_|SIM_Debug_|FirstData_Debug_|Paypal|paypal|ipn_|zcInstall|notifier|usps|SHIP_usps',
@@ -33,7 +33,6 @@ class ScriptedInstaller extends ScriptedInstallBase
             'configuration_group_id' => 10,
             'sort_order' => 102,
         ]);
-
 
         $this->addConfigurationKey('DISPLAY_LOGS_EXCLUDED_FILES', [
             'configuration_title' => 'Display Logs: Excluded File Prefixes',
@@ -46,7 +45,7 @@ class ScriptedInstaller extends ScriptedInstallBase
         parent::executeInstall();
     }
 
-    protected function executeUninstall()
+    protected function executeUninstall(): bool
     {
         zen_deregister_admin_pages(['toolsDisplayLogs']);
 

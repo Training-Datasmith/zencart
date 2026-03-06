@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Initially load the splitPageResults class, if a class of that
  * name is not already loaded, thus enabling that base class to be

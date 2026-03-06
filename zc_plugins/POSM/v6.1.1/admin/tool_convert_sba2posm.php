@@ -7,7 +7,7 @@
 //
 require 'includes/application_top.php';
 
-if (!defined ('TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK')) {
+if (!defined('TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK')) {
     define('TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK', DB_PREFIX . 'products_with_attributes_stock');
 }
 
@@ -15,17 +15,17 @@ $convert = false;
 $conversion = [];
 if ($sniffer->table_exists(TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK)) {
     $convert = (isset($_GET['action']) && $_GET['action'] === 'convert');
-    $sba_info = $db->Execute("SELECT * FROM " . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
+    $sba_info = $db->Execute('SELECT * FROM ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
     $posm_options_types = explode(',', POSM_OPTIONS_TYPES_TO_MANAGE);
     foreach ($sba_info as $sba_next) {
         $products_id = $sba_next['products_id'];
         if (!isset($conversion[$products_id])) {
             $option_info = $db->Execute(
-                "SELECT DISTINCT pa.options_id
-                   FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_OPTIONS . " po
+                'SELECT DISTINCT pa.options_id
+                   FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa, ' . TABLE_PRODUCTS_OPTIONS . " po
                   WHERE pa.products_id = $products_id
                     AND pa.options_id = po.products_options_id
-                    AND po.products_options_type IN (" . POSM_OPTIONS_TYPES_TO_MANAGE . ")"
+                    AND po.products_options_type IN (" . POSM_OPTIONS_TYPES_TO_MANAGE . ')'
             );
             $options_array = [];
             foreach ($option_info as $next_option) {
@@ -33,11 +33,11 @@ if ($sniffer->table_exists(TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK)) {
             }
 
             $product_info = $db->Execute(
-                "SELECT products_name
-                   FROM " . TABLE_PRODUCTS_DESCRIPTION . "
+                'SELECT products_name
+                   FROM ' . TABLE_PRODUCTS_DESCRIPTION . "
                   WHERE products_id = $products_id
-                    AND language_id = " . (int)$_SESSION['languages_id'] . "
-                  LIMIT 1"
+                    AND language_id = " . (int)$_SESSION['languages_id'] . '
+                  LIMIT 1'
             );
             $products_name = ($product_info->EOF) ? TEXT_MISSING_PRODUCT : $product_info->fields['products_name'];
             $conversion[$products_id] = [
@@ -54,10 +54,10 @@ if ($sniffer->table_exists(TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK)) {
             'options' => [],
         ];
         $attr_info = $db->Execute(
-            "SELECT pa.options_id, pa.options_values_id, po.products_options_type
-               FROM " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_OPTIONS . " po
-              WHERE pa.products_attributes_id IN (" . $sba_next['stock_attributes'] . ")
-                AND pa.options_id = po.products_options_id"
+            'SELECT pa.options_id, pa.options_values_id, po.products_options_type
+               FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa, ' . TABLE_PRODUCTS_OPTIONS . ' po
+              WHERE pa.products_attributes_id IN (' . $sba_next['stock_attributes'] . ')
+                AND pa.options_id = po.products_options_id'
         );
         foreach ($attr_info as $next_attr) {
             if (!in_array($next_attr['products_options_type'], $posm_options_types)) {
@@ -77,21 +77,21 @@ if ($convert === true) {
     foreach ($conversion as $products_id => $products_details) {
         $options_count = count($products_details['all_options']);
         unset($products_details['name'], $products_details['all_options']);
-        foreach ($products_details as $stock_id => $stock_details) {
+        foreach ($products_details as $stock_details) {
             if ($options_count === 0 || $options_count !== count($stock_details['options'])) {
                 $completion_message = MESSAGE_CONVERTED_MISSING;
                 $completion_status = 'error';
             } else {
                 $db->Execute(
-                    "INSERT INTO " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+                    'INSERT INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
                         (products_id, products_quantity, pos_hash, pos_model, last_modified)
                      VALUES
-                        ($products_id, " . $stock_details['qty'] . ", '" . generate_pos_option_hash ($products_id, $stock_details['options']) . "', '" . $stock_details['model'] . "', now() )"
+                        ($products_id, " . $stock_details['qty'] . ", '" . generate_pos_option_hash($products_id, $stock_details['options']) . "', '" . $stock_details['model'] . "', now() )"
                 );
                 $pos_id = $db->Insert_ID();
                 foreach ($stock_details['options'] as $options_id => $options_values_id) {
                     $db->Execute(
-                        "INSERT INTO " . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
+                        'INSERT INTO ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . "
                             (pos_id, products_id, options_id, options_values_id)
                          VALUES
                             ($pos_id, $products_id, $options_id, $options_values_id)"
@@ -101,7 +101,7 @@ if ($convert === true) {
         }
     }
     $messageStack->add_session($completion_message, $completion_status);
-    zen_redirect(zen_href_link (FILENAME_CONVERT_SBA2POSM));
+    zen_redirect(zen_href_link(FILENAME_CONVERT_SBA2POSM));
 }
 ?>
 <!doctype html>
@@ -153,31 +153,31 @@ function checkSubmit() {
       </tr>
 <?php
 if (!$sniffer->table_exists(TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK)) {
-?>
+    ?>
       <tr>
         <td class="error"><?php echo ERROR_NO_SBA_TABLE; ?></td>
       </tr>
 <?php
 } else {
-?>
+    ?>
       <tr>
-        <td><?= zen_draw_form ('convert', FILENAME_CONVERT_SBA2POSM, 'action=convert') ?>
+        <td><?= zen_draw_form('convert', FILENAME_CONVERT_SBA2POSM, 'action=convert') ?>
           <div>
             <p><?= TEXT_FORM_INSTRUCTIONS . '&nbsp;&nbsp;' . zen_image_submit('button_submit.gif', BUTTON_ALT_TEXT, 'onclick="return checkSubmit();"') ?></p>
           </div>
         </form></td>
       </tr>
 <?php
-    foreach ($conversion as $products_id => $products_details) {
-?>
+        foreach ($conversion as $products_id => $products_details) {
+            ?>
       <tr class="p-name">
         <td><?= "($products_id) " . $products_details['name'] ?></td>
       </tr>
 <?php
-        $all_options = $products_details['all_options'];
-        $count_all_options = count($all_options);
-        unset($products_details['name'], $products_details['all_options']);
-?>
+                    $all_options = $products_details['all_options'];
+            $count_all_options = count($all_options);
+            unset($products_details['name'], $products_details['all_options']);
+            ?>
       <tr>
         <td><table class="p-info">
           <tr class="p-info-head">
@@ -185,44 +185,44 @@ if (!$sniffer->table_exists(TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK)) {
             <th><?= TABLE_HEADING_QUANTITY ?></th>
             <th><?= TABLE_HEADING_MODEL ?></th>
 <?php
-        foreach ($all_options as $options_id => $option_name) {
-?>
+                    foreach ($all_options as $options_id => $option_name) {
+                        ?>
             <th><?= $option_name ?></th>
 <?php
-        }
-?>
+                    }
+            ?>
             <th><?= TABLE_HEADING_STATUS ?></th>
           </tr>
 <?php
-        foreach ($products_details as $stock_id => $stock_details) {
-?>
+                    foreach ($products_details as $stock_id => $stock_details) {
+                        ?>
           <tr>
             <td><?= $stock_id ?></td>
             <td><?= $stock_details['qty'] ?></td>
-            <td><?= ($stock_details['model'] === null) ? '&mdash;' : $stock_details['model'] ?></td>
+            <td><?= $stock_details['model'] ?? '&mdash;' ?></td>
 <?php
-            foreach ($all_options as $options_id => $options_name) {
-?>
+                                    foreach ($all_options as $options_id => $options_name) {
+                                        ?>
             <td><?= (isset($stock_details['options'][$options_id])) ? zen_values_name($stock_details['options'][$options_id]) : '&mdash;' ?></td>
 <?php
-            }
-?>
+                                    }
+                        ?>
             <td>
-<?php 
-            echo (count($stock_details['options']) !== 0 && $count_all_options === count($stock_details['options'])) ? TEXT_OK : sprintf(TEXT_MISSING_OPTIONS, $stock_details['attributes_id']);
-            foreach ($stock_details['errors'] as $current_error) {
-                echo '<br>' . $current_error;
-            }
-?>
+<?php
+                                    echo (count($stock_details['options']) !== 0 && $count_all_options === count($stock_details['options'])) ? TEXT_OK : sprintf(TEXT_MISSING_OPTIONS, $stock_details['attributes_id']);
+                        foreach ($stock_details['errors'] as $current_error) {
+                            echo '<br>' . $current_error;
+                        }
+                        ?>
             </td>
           </tr>
 <?php
-        }
-?>
+                    }
+            ?>
         </table></td>
       </tr>
 <?php
-    }
+        }
 }
 ?>
     </table></td>

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -9,7 +11,6 @@ use Tests\Support\zcURLTestObserver;
 
 class AdminCatalogUrlGenerationTest extends zcUnitTestCase
 {
-
     public function setUp(): void
     {
         if (!defined('IS_ADMIN_FLAG')) {
@@ -40,16 +41,16 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
 
     }
 
-    public function testUrlFunctionsExist()
+    public function testUrlFunctionsExist(): void
     {
         $this->assertTrue(function_exists('zen_catalog_href_link'), 'zen_catalog_href_link() did not exist');
         $reflect = new ReflectionFunction('zen_catalog_href_link');
         $this->assertEquals(3, $reflect->getNumberOfParameters());
-        $params = array(
+        $params = [
             'page',
             'parameters',
             'connection',
-        );
+        ];
         foreach ($reflect->getParameters() as $param) {
             $this->assertTrue(in_array($param->getName(), $params));
         }
@@ -58,7 +59,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testUrlFunctionsExist
      */
-    public function testHomePage()
+    public function testHomePage(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFAULT, 'test=test'),
@@ -69,7 +70,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePage
      */
-    public function testHomePageSsl()
+    public function testHomePageSsl(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFAULT, null, 'SSL'),
@@ -84,7 +85,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePage
      */
-    public function testNoAddSessionWhenSwitchingProtocolAndServers()
+    public function testNoAddSessionWhenSwitchingProtocolAndServers(): void
     {
         $GLOBALS['session_started'] = true;
         $GLOBALS['https_domain'] = 'dummy.local';
@@ -101,11 +102,9 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testNoAddSessionWhenSwitchingProtocolAndServers
      */
-    public function testNoAddSessionWhenSidDefined()
+    public function testNoAddSessionWhenSidDefined(): void
     {
-        if (PHP_VERSION_ID >= 80401) {
-            $this->markTestSkipped('IgnoredAfterPHP841');
-        }
+        $this->markTestSkipped('IgnoredAfterPHP841');
         $GLOBALS['session_started'] = true;
         define('SID', 'zenadminid=1234567890');
         $this->assertURLGenerated(
@@ -121,7 +120,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePage
      */
-    public function testValidCategoryUrls()
+    public function testValidCategoryUrls(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=1'),
@@ -136,7 +135,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testValidCategoryUrls
      */
-    public function testValidCategoryUrlsFilters()
+    public function testValidCategoryUrlsFilters(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=1&sort=20a&alpha_filter_id=65'),
@@ -151,7 +150,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePageSsl
      */
-    public function testValidCategoryUrlsSsl()
+    public function testValidCategoryUrlsSsl(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=1', 'SSL'),
@@ -166,7 +165,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePage
      */
-    public function testValidEzPageUrls()
+    public function testValidEzPageUrls(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_EZPAGES, 'id=1'),
@@ -181,7 +180,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePage
      */
-    public function testDefinePageUrls()
+    public function testDefinePageUrls(): void
     {
         $this->assertURLGenerated(
             zen_catalog_href_link(FILENAME_DEFINE_PAGE_2),
@@ -200,7 +199,7 @@ class AdminCatalogUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testHomePageSsl
      */
-    public function testObserverCannotDowngradeFromSsl()
+    public function testObserverCannotDowngradeFromSsl(): void
     {
         $GLOBALS['zcURLTestObserver']->mode = zcURLTestObserver::$CHANGE_CONNECTION;
 

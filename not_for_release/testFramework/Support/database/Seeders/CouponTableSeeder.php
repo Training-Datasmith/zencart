@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seeders;
 
 use Tests\Support\Database\TestDb;
 
 class CouponTableSeeder
 {
-
     /**
      * Auto generated seed file
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         TestDb::truncate('coupons');
         TestDb::truncate('coupons_description');

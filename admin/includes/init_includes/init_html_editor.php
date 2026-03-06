@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -33,7 +35,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  *
  * NOTE: THERE SHOULD BE NO NEED TO EDIT ANYTHING BELOW THIS LINE:
  */
-$editors_list = $editors_list ?? [];
+$editors_list ??= [];
 
 /**
  * Note the key associated with the plain-text editor, added below as 'NONE'.
@@ -107,7 +109,7 @@ $new_editor_choice = (isset($_GET['action']) && $_GET['action'] === 'set_editor'
  * $editor_handler = the path to the handler file containing the logic required for <HEAD> insertion to activate editor features
  *
  */
-foreach ($editors_pulldown as $key => $value) {
+foreach ($editors_pulldown as $value) {
     if ($new_editor_choice === $value['id']) {
         $_SESSION['html_editor_preference_status'] = $value['key'];
     }
@@ -129,12 +131,18 @@ if ($editor_handler !== '' && !is_file($editor_handler)) {
  * Debug code:
  */
 if (false) {
-    echo '<br><pre>'; print_r($_GET); echo '</pre>';
+    echo '<br><pre>';
+    print_r($_GET);
+    echo '</pre>';
     echo '<br>new_editor_choice = ' . $new_editor_choice;
     echo '<br>current_editor_key = ' . $current_editor_key;
     echo '<br>$_SESSION[html_editor_preference_status] = ' . $_SESSION['html_editor_preference_status'];
     echo '<br>editor_handler = ' . $editor_handler;
-    echo '<br><pre>'; print_r($editors_list); echo '</pre>';
-    echo '<br><pre>'; print_r($editors_pulldown); echo '</pre>';
+    echo '<br><pre>';
+    print_r($editors_list);
+    echo '</pre>';
+    echo '<br><pre>';
+    print_r($editors_pulldown);
+    echo '</pre>';
     //die('debug end');
 }

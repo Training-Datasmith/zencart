@@ -67,7 +67,7 @@ if (!empty($action)) {
 // -----
 // Note: $_GET['page'] is set (by reference) by the splitPageResults class.
 //
-$template_query_raw = "SELECT * FROM " . TABLE_TEMPLATE_SELECT;
+$template_query_raw = 'SELECT * FROM ' . TABLE_TEMPLATE_SELECT;
 $template_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $template_query_raw, $template_query_numrows);
 $templates = $db->Execute($template_query_raw);
 foreach ($templates as $template) {
@@ -102,22 +102,22 @@ foreach ($templates as $template) {
     } else {
         $template_language = zen_get_language_name($template['template_language']);
     }
-?>
+    ?>
                         <tr <?= $row_parameters ?>>
                             <td class="dataTableContent"><?= $template_language ?></td>
                             <td class="dataTableContent"><?= $template_info[$template['template_dir']]['name'] ?></td>
                             <td class="dataTableContent text-center"><?= $template['template_dir'] ?></td>
                             <td class="dataTableContent text-right">
 <?php
-    if (isset($tInfo) && is_object($tInfo) && $template['template_id'] == $tInfo->template_id) {
-        echo zen_icon('caret-right', '', '2x', true);
-    } else {
-        echo
-            '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $template['template_id']) . '" data-toggle="tooltip" title="' . IMAGE_ICON_INFO . '" role="button">' .
-                zen_icon('circle-info', '', '2x', true, false) .
-            '</a>';
-    }
-?>
+        if (isset($tInfo) && is_object($tInfo) && $template['template_id'] == $tInfo->template_id) {
+            echo zen_icon('caret-right', '', '2x', true);
+        } else {
+            echo
+                '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $template['template_id']) . '" data-toggle="tooltip" title="' . IMAGE_ICON_INFO . '" role="button">' .
+                    zen_icon('circle-info', '', '2x', true, false) .
+                '</a>';
+        }
+    ?>
                                 &nbsp;
                             </td>
                         </tr>
@@ -127,7 +127,7 @@ foreach ($templates as $template) {
                     </tbody>
                 </table>
                 <div class="row">
-                    <div class="col-xs-6"><?= $template_split->display_count($template_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_TEMPLATES) ?></div>
+                    <div class="col-xs-6"><?= $template_split->display_count($template_query_numrows) ?></div>
                     <div class="col-xs-6 text-right"><?= $template_split->display_links($template_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']) ?></div>
                 </div>
             </div>
@@ -147,9 +147,9 @@ switch ($action) {
     case 'new':
         $heading[] = ['text' => '<h4>' . TEXT_INFO_HEADING_NEW_TEMPLATE . '</h4>'];
 
-        $contents = ['form' => zen_draw_form('zones', FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&action=insert', 'post', 'class="form-horizontal"')];
+        $contents = ['form' => zen_draw_form('zones', FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&action=insert', 'post')];
         $contents[] = ['text' => TEXT_INFO_INSERT_INTRO];
-        foreach($template_info as $key => $value) {
+        foreach ($template_info as $key => $value) {
             if (isset($value['missing'])) {
                 continue;
             }
@@ -168,12 +168,12 @@ switch ($action) {
         $contents[] = [
             'text' =>
                 zen_draw_label(TEXT_INFO_TEMPLATE_NAME, 'ln', 'class="control-label"') .
-                zen_draw_pull_down_menu('ln', $template_array, '', 'class="form-control" id="ln"')
+                zen_draw_pull_down_menu('ln', $template_array, '', 'class="form-control" id="ln"'),
         ];
         $contents[] = [
             'text' =>
                 zen_draw_label(TEXT_INFO_LANGUAGE_NAME, 'lang', 'class="control-label"') .
-                zen_draw_pull_down_menu('lang', $language_array, '', 'class="form-control" id="lang"')
+                zen_draw_pull_down_menu('lang', $language_array, '', 'class="form-control" id="lang"'),
         ];
         $contents[] = [
             'align' => 'text-center',
@@ -181,16 +181,16 @@ switch ($action) {
                 '<button type="submit" class="btn btn-primary">' . IMAGE_INSERT . '</button> ' .
                 '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page']) . '" class="btn btn-default" role="button">' .
                     IMAGE_CANCEL .
-                '</a>'
+                '</a>',
         ];
         break;
 
     case 'edit':
         $heading[] = ['text' => '<h4>' . TABLE_HEADING_LANGUAGE . ': '  . $template_language . '</h4>'];
 
-        $contents = ['form' => zen_draw_form('templateselect', FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id . '&action=save', 'post', 'class="form-horizontal"')];
+        $contents = ['form' => zen_draw_form('templateselect', FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id . '&action=save', 'post')];
         $contents[] = ['text' => TEXT_INFO_EDIT_INTRO];
-        foreach($template_info as $key => $value) {
+        foreach ($template_info as $key => $value) {
             if (isset($value['missing'])) {
                 continue;
             }
@@ -199,7 +199,7 @@ switch ($action) {
         $contents[] = [
             'text' =>
                 zen_draw_label(TEXT_INFO_TEMPLATE_NAME, 'ln', 'class="control-label"') .
-                zen_draw_pull_down_menu('ln', $template_array, $templates->fields['template_dir'], 'class="form-control" id="ln"')
+                zen_draw_pull_down_menu('ln', $template_array, $templates->fields['template_dir'], 'class="form-control" id="ln"'),
         ];
         $contents[] = [
             'align' => 'text-center',
@@ -207,7 +207,7 @@ switch ($action) {
                 '<button type="submit" class="btn btn-primary">' . IMAGE_UPDATE . '</button> ' .
                 '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id) . '" class="btn btn-default" role="button">' .
                     IMAGE_CANCEL .
-                '</a>'
+                '</a>',
         ];
         break;
 
@@ -223,7 +223,7 @@ switch ($action) {
                 '<button type="submit" class="btn btn-danger">' . IMAGE_DELETE . '</button> ' .
                 '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id) . '" class="btn btn-default" role="button">' .
                     IMAGE_CANCEL .
-                '</a>'
+                '</a>',
         ];
         break;
 
@@ -270,7 +270,7 @@ switch ($action) {
                                 '</div>' .
                             '</div>' .
                         '</div>' .
-                    '</div>'
+                    '</div>',
             ];
         }
         $contents[] = [
@@ -280,17 +280,17 @@ switch ($action) {
                 '<a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id . '&action=edit') . '" class="btn btn-primary" role="button">' .
                     TEXT_INFO_EDIT_INTRO .
                 '</a>' .
-                ($tInfo->template_language != '0' ? ' <a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>' : '')
+                ($tInfo->template_language != '0' ? ' <a href="' . zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&tID=' . $tInfo->template_id . '&action=delete') . '" class="btn btn-warning" role="button">' . IMAGE_DELETE . '</a>' : ''),
         ];
         $contents[] = ['text' => '<hr>'];
         $contents[] = ['text' => TEXT_INFO_TEMPLATE_INSTALLED];
-        foreach($template_info as $key => $value) {
+        foreach ($template_info as $key => $value) {
             $contents[] = [
                 'text' =>
                     '<a href="' . DIR_WS_CATALOG_TEMPLATE . $key . '/images/' . $value['screenshot'] . '" rel="noreferrer noopener" target = "_blank" class="btn btn-info" role="button">' .
                         IMAGE_PREVIEW .
                     '</a>&nbsp;&nbsp;' .
-                    $value['name']
+                    $value['name'],
             ];
         }
         break;
@@ -310,14 +310,14 @@ if (empty($action)) {
     }
     foreach ($languages as $language) {
         if (!in_array($language['id'], $template_languages)) {
-?>
+            ?>
             <div class="row text-right">
                 <a href="<?= zen_href_link(FILENAME_TEMPLATE_SELECT, 'page=' . $_GET['page'] . '&action=new') ?>" class="btn btn-primary" role="button">
                     <?= IMAGE_NEW_TEMPLATE ?>
                 </a>
             </div>
   <?php
-            break;
+                        break;
         }
     }
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -7,13 +9,13 @@
 /** @var \Aura\Autoload\Loader $psr4Autoloader */
 $psr4Autoloader->addPrefix('Zencart\QueryBuilder', DIR_FS_CATALOG . DIR_WS_CLASSES);
 $psr4Autoloader->addPrefix('Zencart\Traits', DIR_FS_CATALOG . DIR_WS_CLASSES . 'traits');
-$psr4Autoloader->addPrefix('Zencart\FileSystem', DIR_FS_CATALOG . DIR_WS_CLASSES );
-$psr4Autoloader->addPrefix('Zencart\InitSystem', DIR_FS_CATALOG . DIR_WS_CLASSES );
+$psr4Autoloader->addPrefix('Zencart\FileSystem', DIR_FS_CATALOG . DIR_WS_CLASSES);
+$psr4Autoloader->addPrefix('Zencart\InitSystem', DIR_FS_CATALOG . DIR_WS_CLASSES);
 $psr4Autoloader->addPrefix('Zencart\PluginManager', DIR_FS_CATALOG . DIR_WS_CLASSES);
 $psr4Autoloader->addPrefix('Zencart\LanguageLoader', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ResourceLoaders');
 $psr4Autoloader->addPrefix('Zencart\ResourceLoaders', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ResourceLoaders');
 $psr4Autoloader->addPrefix('Zencart\PageLoader', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ResourceLoaders');
-$psr4Autoloader->addPrefix('Zencart\Events', DIR_FS_CATALOG . DIR_WS_CLASSES );
+$psr4Autoloader->addPrefix('Zencart\Events', DIR_FS_CATALOG . DIR_WS_CLASSES);
 
 $psr4Autoloader->addPrefix('Zencart\DbRepositories', DIR_FS_CATALOG . DIR_WS_CLASSES . 'DbRepositories');
 // The two App\Models classes are aliases for the above Zencart\DbRepositories classes, so that encap plugins built for prior versions can still type-hint against \App\Models without throwing errors.
@@ -40,16 +42,16 @@ if (defined('DIR_FS_ADMIN')) {
     $psr4Autoloader->setClassFile('products', DIR_FS_CATALOG . DIR_WS_CLASSES . 'products.php');    //- Deprecated v2.1.0
     $psr4Autoloader->setClassFile('VersionServer', DIR_FS_ADMIN . DIR_WS_CLASSES . 'VersionServer.php');
     $psr4Autoloader->setClassFile('WhosOnline', DIR_FS_ADMIN . DIR_WS_CLASSES . 'WhosOnline.php');
-// -----
-// Storefront-only classes
-//
+    // -----
+    // Storefront-only classes
+    //
 } else {
     $psr4Autoloader->setClassFile('breadcrumb', DIR_FS_CATALOG . DIR_WS_CLASSES . 'breadcrumb.php');
     $psr4Autoloader->setClassFile('messageStack', DIR_FS_CATALOG . DIR_WS_CLASSES . 'message_stack.php');
     $psr4Autoloader->setClassFile('navigationHistory', DIR_FS_CATALOG . DIR_WS_CLASSES . 'navigation_history.php');
     $psr4Autoloader->setClassFile('template_func', DIR_FS_CATALOG . DIR_WS_CLASSES . 'template_func.php');
-    $psr4Autoloader->setClassFile('Zencart\Search\Search', DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.search.php');
-    $psr4Autoloader->setClassFile('Zencart\Search\SearchOptions', DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.search.php');
+    $psr4Autoloader->setClassFile(\Zencart\Search\Search::class, DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.search.php');
+    $psr4Autoloader->setClassFile(\Zencart\Search\SearchOptions::class, DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.search.php');
 }
 
 // -----
@@ -72,5 +74,5 @@ $psr4Autoloader->setClassFile('upload', DIR_FS_CATALOG . DIR_WS_CLASSES . 'uploa
 $psr4Autoloader->setClassFile('zcDate', DIR_FS_CATALOG . DIR_WS_CLASSES . 'zcDate.php');
 $psr4Autoloader->setClassFile('zcPassword', DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.zcPassword.php');
 $psr4Autoloader->setClassFile('ZenShipping', DIR_FS_CATALOG . DIR_WS_CLASSES . 'ZenShipping.php');
-$psr4Autoloader->setClassFile('Zencart\SessionHandler', DIR_FS_CATALOG . DIR_WS_CLASSES . 'SessionHandler.php' );
-$psr4Autoloader->setClassFile('Category', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Category.php' );
+$psr4Autoloader->setClassFile(\Zencart\SessionHandler::class, DIR_FS_CATALOG . DIR_WS_CLASSES . 'SessionHandler.php');
+$psr4Autoloader->setClassFile('Category', DIR_FS_CATALOG . DIR_WS_CLASSES . 'Category.php');

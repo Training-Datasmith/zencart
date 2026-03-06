@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * shopping_cart header_php.php
  *
@@ -30,7 +32,6 @@ $shipping_weight = $_SESSION['cart']->show_weight();
 $numberOfItemsInCart = $_SESSION['cart']->count_contents();
 $cartTotalPrice = $_SESSION['cart']->show_total();
 
-
 $prodImgWidth = (int)IMAGE_SHOPPING_CART_WIDTH;
 $prodImgHeight = (int)IMAGE_SHOPPING_CART_HEIGHT;
 
@@ -44,9 +45,9 @@ $zco_notifier->notify('NOTIFY_HEADER_SHOPPING_CART_BEFORE_PRODUCTS_LOOP', null, 
 for ($i = 0, $n = count($products); $i < $n; $i++) {
     $flagStockCheck = '';
     $ppe = $ppt = 0;
-    $rowClass = (($i / 2) == floor($i / 2)) ? "rowEven" : "rowOdd";
+    $rowClass = (($i / 2) == floor($i / 2)) ? 'rowEven' : 'rowOdd';
 
-    $attributeHiddenField = "";
+    $attributeHiddenField = '';
     $attrArray = [];
 
     $productsName = $products[$i]['name'];
@@ -59,15 +60,15 @@ for ($i = 0, $n = count($products); $i < $n; $i++) {
             $options_order_by = ' ORDER BY popt.products_options_name';
         }
         foreach ($products[$i]['attributes'] as $option => $value) {
-            $sql = "SELECT popt.products_options_name, poval.products_options_values_name, pa.options_values_price, pa.price_prefix, pa.attributes_image
-                    FROM " . TABLE_PRODUCTS_OPTIONS . " popt, " . TABLE_PRODUCTS_OPTIONS_VALUES . " poval, " . TABLE_PRODUCTS_ATTRIBUTES . " pa
+            $sql = 'SELECT popt.products_options_name, poval.products_options_values_name, pa.options_values_price, pa.price_prefix, pa.attributes_image
+                    FROM ' . TABLE_PRODUCTS_OPTIONS . ' popt, ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' poval, ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
                     WHERE pa.products_id = :productsID
                     AND pa.options_id = :optionsID
                     AND pa.options_id = popt.products_options_id
                     AND pa.options_values_id = :optionsValuesID
                     AND pa.options_values_id = poval.products_options_values_id
                     AND popt.language_id = :languageID
-                    AND poval.language_id = :languageID " . $options_order_by;
+                    AND poval.language_id = :languageID ' . $options_order_by;
 
             $sql = $db->bindVars($sql, ':productsID', $products[$i]['id'], 'integer');
             $sql = $db->bindVars($sql, ':optionsID', $option, 'integer');
@@ -81,7 +82,7 @@ for ($i = 0, $n = count($products); $i < $n; $i++) {
 
             if ($value == PRODUCTS_OPTIONS_VALUES_TEXT_ID) {
                 $attributeHiddenField .= zen_draw_hidden_field('id[' . $products[$i]['id'] . '][' . TEXT_PREFIX . $option . ']', $products[$i]['attributes_values'][$option]);
-                $attr_value = htmlspecialchars($products[$i]['attributes_values'][$option], ENT_COMPAT, CHARSET, TRUE);
+                $attr_value = htmlspecialchars((string) $products[$i]['attributes_values'][$option], ENT_COMPAT, CHARSET, true);
             } else {
                 $attributeHiddenField .= zen_draw_hidden_field('id[' . $products[$i]['id'] . '][' . $option . ']', $value);
                 $attr_value = $attributes_values->fields['products_options_values_name'];

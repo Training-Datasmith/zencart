@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * attributes module
  *
@@ -18,16 +20,15 @@ $show_onetime_charges_description = false;
 $show_attributes_qty_prices_description = false;
 
 // Determine number of attributes associated with this product
-$sql = "SELECT COUNT(*) as total
-        FROM " . TABLE_PRODUCTS_OPTIONS . " popt
-        LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " patrib ON (popt.products_options_id = patrib.options_id)
+$sql = 'SELECT COUNT(*) as total
+        FROM ' . TABLE_PRODUCTS_OPTIONS . ' popt
+        LEFT JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' patrib ON (popt.products_options_id = patrib.options_id)
         WHERE patrib.products_id = :products_id
         AND popt.language_id = :language_id
-        LIMIT 1";
+        LIMIT 1';
 $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');
 $sql = $db->bindVars($sql, ':language_id', $_SESSION['languages_id'], 'integer');
 $pr_attr = $db->Execute($sql);
-
 
 $prod_id = $_GET['products_id'];
 $number_of_uploads = 0;
@@ -41,9 +42,9 @@ $options_comment_position = [];
 $options_attributes_image = [];
 $attributeDetailsArrayForJson = [];
 
-    if ($pr_attr->fields['total'] < 1) {
-        return;
-    }
+if ($pr_attr->fields['total'] < 1) {
+    return;
+}
 
 // Only process the rest of this file if attributes are defined for this product
 
@@ -57,16 +58,16 @@ if (PRODUCTS_OPTIONS_SORT_ORDER === '0') {
     $options_order_by = ' ORDER BY popt.products_options_name';
 }
 
-$sql = "SELECT DISTINCT popt.products_options_id, popt.products_options_name, popt.products_options_sort_order,
+$sql = 'SELECT DISTINCT popt.products_options_id, popt.products_options_name, popt.products_options_sort_order,
             popt.products_options_type, popt.products_options_length, popt.products_options_comment, popt.products_options_comment_position,
             popt.products_options_size,
             popt.products_options_images_per_row,
             popt.products_options_images_style,
             popt.products_options_rows
-        FROM " . TABLE_PRODUCTS_OPTIONS . " popt
-        LEFT JOIN " . TABLE_PRODUCTS_ATTRIBUTES . " patrib ON (patrib.options_id = popt.products_options_id)
+        FROM ' . TABLE_PRODUCTS_OPTIONS . ' popt
+        LEFT JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' patrib ON (patrib.options_id = popt.products_options_id)
         WHERE patrib.products_id= :products_id
-        AND popt.language_id = :language_id " .
+        AND popt.language_id = :language_id ' .
         $options_order_by;
 $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');
 $sql = $db->bindVars($sql, ':language_id', $_SESSION['languages_id'], 'integer');
@@ -98,11 +99,11 @@ foreach ($products_options_names as $next_option_name) {
         pa.attributes_discounted
         pa.attributes_image
     */
-    $sql = "SELECT pov.products_options_values_id, pov.products_options_values_name, pa.*
-            FROM  " . TABLE_PRODUCTS_ATTRIBUTES . " pa
-            LEFT JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov ON (pa.options_values_id = pov.products_options_values_id AND pov.language_id = :language_id)
+    $sql = 'SELECT pov.products_options_values_id, pov.products_options_values_name, pa.*
+            FROM  ' . TABLE_PRODUCTS_ATTRIBUTES . ' pa
+            LEFT JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' pov ON (pa.options_values_id = pov.products_options_values_id AND pov.language_id = :language_id)
             WHERE pa.products_id = :products_id
-            AND   pa.options_id = :options_id " .
+            AND   pa.options_id = :options_id ' .
             $order_by;
     $sql = $db->bindVars($sql, ':products_id', $_GET['products_id'], 'integer');
     $sql = $db->bindVars($sql, ':options_id', $products_options_id, 'integer');
@@ -263,7 +264,9 @@ foreach ($products_options_names as $next_option_name) {
 
         // prepare product options details
         if ($products_options->RecordCount() == 1
-            || in_array($products_options_type, [
+            || in_array(
+                $products_options_type,
+                [
                 PRODUCTS_OPTIONS_TYPE_FILE,
                 PRODUCTS_OPTIONS_TYPE_TEXT,
                 PRODUCTS_OPTIONS_TYPE_CHECKBOX,
@@ -351,7 +354,7 @@ foreach ($products_options_names as $next_option_name) {
                     }
 
                     if (!empty($next_option['attributes_image'])) {
-                        $tmp_attributes_image .= 
+                        $tmp_attributes_image .=
                             '<div class="attribImg">' .
                                 zen_draw_radio_field($option_form_name, $products_options_value_id, $selected_attribute, 'id="' . $inputFieldId . '" ' . $data_properties . $field_disabled) .
                                 '<label class="attribsRadioButton three" for="' . $inputFieldId . '">' .
@@ -360,7 +363,7 @@ foreach ($products_options_names as $next_option_name) {
                                 '</label>' .
                             '</div>' . "\n";
                     } else {
-                        $tmp_attributes_image .= 
+                        $tmp_attributes_image .=
                             '<div class="attribImg">' .
                                 zen_draw_radio_field($option_form_name, $products_options_value_id, $selected_attribute, 'id="' . $inputFieldId . '" ' . $data_properties . $field_disabled) .
                                 '<br>' .
@@ -445,7 +448,7 @@ foreach ($products_options_names as $next_option_name) {
                 if (!empty($_POST['id']) && is_array($_POST['id'])) {
                     foreach ($_POST['id'] as $key => $value) {
                         if (is_array($value)) {
-                            foreach ($value as $kkey => $vvalue) {
+                            foreach ($value as $vvalue) {
                                 if ($key == $products_options_id && $vvalue == $products_options_value_id) {
                                     $selected_attribute = true;
                                     break;
@@ -590,16 +593,16 @@ foreach ($products_options_names as $next_option_name) {
             $option_form_name = 'id[' . TEXT_PREFIX . $products_options_id . ']';
             if (!empty($_POST['id']) && is_array($_POST['id'])) {
                 foreach ($_POST['id'] as $key => $value) {
-                    if (preg_replace('/txt_/', '', $key) == $products_options_id) {
+                    if (preg_replace('/txt_/', '', (string) $key) == $products_options_id) {
                         // use text area or input box based on setting of products_options_rows in the products_options table
                         if ($next_option_name['products_options_rows'] > 1) {
                             $tmp_html =
                                 '  <input disabled="disabled" type="text" name="remaining' . TEXT_PREFIX . $products_options_id . '" size="3" maxlength="3" value="' . $next_option_name['products_options_length'] . '"> ' .
                                 TEXT_MAXIMUM_CHARACTERS_ALLOWED .
                                 '<br>';
-                            $tmp_html .= '<textarea class="attribsTextarea" name="' . $option_form_name . '" rows="' . $next_option_name['products_options_rows'] . '" cols="' . $next_option_name['products_options_size'] . '" onkeydown="characterCount(this.form[\'' . $option_form_name . '\'],this.form.remaining' . TEXT_PREFIX . $products_options_id . ',' . $next_option_name['products_options_length'] . ');" onKeyUp="characterCount(this.form[\'' . $option_form_name . '\'],this.form.remaining' . TEXT_PREFIX . $products_options_id . ',' . $next_option_name['products_options_length'] . ');" id="' . $inputFieldId . '">' . stripslashes($value) . '</textarea>' . "\n";
+                            $tmp_html .= '<textarea class="attribsTextarea" name="' . $option_form_name . '" rows="' . $next_option_name['products_options_rows'] . '" cols="' . $next_option_name['products_options_size'] . '" onkeydown="characterCount(this.form[\'' . $option_form_name . '\'],this.form.remaining' . TEXT_PREFIX . $products_options_id . ',' . $next_option_name['products_options_length'] . ');" onKeyUp="characterCount(this.form[\'' . $option_form_name . '\'],this.form.remaining' . TEXT_PREFIX . $products_options_id . ',' . $next_option_name['products_options_length'] . ');" id="' . $inputFieldId . '">' . stripslashes((string) $value) . '</textarea>' . "\n";
                         } else {
-                            $tmp_html = '<input type="text" name="' . $option_form_name . '" size="' . $next_option_name['products_options_size'] . '" maxlength="' . $next_option_name['products_options_length'] . '" value="' . htmlspecialchars($value, ENT_COMPAT, CHARSET, true) . '" id="' . $inputFieldId . '"'  . $data_properties . $field_disabled . '>  ';
+                            $tmp_html = '<input type="text" name="' . $option_form_name . '" size="' . $next_option_name['products_options_size'] . '" maxlength="' . $next_option_name['products_options_length'] . '" value="' . htmlspecialchars((string) $value, ENT_COMPAT, CHARSET, true) . '" id="' . $inputFieldId . '"'  . $data_properties . $field_disabled . '>  ';
                         }
                         $tmp_html .= $products_options_details;
                         break;
@@ -617,16 +620,13 @@ foreach ($products_options_names as $next_option_name) {
                 }
                 $tmp_html .= $products_options_details;
 
-                if (defined('ATTRIBUTES_ENABLED_TEXT_PRICES') && ATTRIBUTES_ENABLED_TEXT_PRICES === 'true') { // test ATTRIBUTES_ENABLED_TEXT_PRICES
-                    $tmp_word_cnt_string = '';
-
-                    // calculate word charges
+                if (defined('ATTRIBUTES_ENABLED_TEXT_PRICES') && ATTRIBUTES_ENABLED_TEXT_PRICES === 'true') { // calculate word charges
                     $tmp_word_cnt_string = $tmp_value;
                     $tmp_word_cnt = zen_get_word_count($tmp_word_cnt_string, $next_option['attributes_price_words_free']);
                     $tmp_word_price = zen_get_word_count_price($tmp_word_cnt_string, $next_option['attributes_price_words_free'], $next_option['attributes_price_words']);
 
                     if ($next_option['attributes_price_words'] != 0) {
-                        $tmp_html .= 
+                        $tmp_html .=
                             TEXT_PER_WORD .
                             $currencies->display_price($next_option['attributes_price_words'], $products_tax_rate) .
                             ($next_option['attributes_price_words_free'] != 0 ? TEXT_WORDS_FREE . $next_option['attributes_price_words_free'] : '');
@@ -660,7 +660,7 @@ foreach ($products_options_names as $next_option_name) {
             $number_of_uploads++;
             $tmp_html = '';
             if (zen_run_normal() && zen_check_show_prices()) {
-                $file_attribute_value = isset($_SESSION['cart']->contents[$prod_id]['attributes_values'][$products_options_id]) ? $_SESSION['cart']->contents[$prod_id]['attributes_values'][$products_options_id] : '';
+                $file_attribute_value = $_SESSION['cart']->contents[$prod_id]['attributes_values'][$products_options_id] ?? '';
                 $tmp_html = '<input type="file" name="id[' . TEXT_PREFIX . $products_options_id . ']"  id="' . $inputFieldId . '" ' . $data_properties . '><br>' . $file_attribute_value . "\n" .
                     zen_draw_hidden_field(UPLOAD_PREFIX . $number_of_uploads, $products_options_id) . "\n" .
                     zen_draw_hidden_field(TEXT_PREFIX . UPLOAD_PREFIX . $number_of_uploads, $file_attribute_value);
@@ -719,31 +719,31 @@ foreach ($products_options_names as $next_option_name) {
             $options_html_id[] = 'txt-attrib-' . $products_options_id;
             $options_menu[] = $tmp_html . "\n";
             break;
-        // checkbox
+            // checkbox
         case ($products_options_type == PRODUCTS_OPTIONS_TYPE_CHECKBOX):
             $options_name[] = ($show_attributes_qty_prices_icon ? ATTRIBUTES_QTY_PRICE_SYMBOL : '') . $products_options_name;
             $options_html_id[] = 'chk-attrib-' . $products_options_id;
             $options_menu[] = $tmp_checkbox . "\n";
             break;
-        // radio buttons
+            // radio buttons
         case ($products_options_type == PRODUCTS_OPTIONS_TYPE_RADIO):
             $options_name[] = ($show_attributes_qty_prices_icon ? ATTRIBUTES_QTY_PRICE_SYMBOL : '') . $products_options_name;
             $options_html_id[] = 'rad-attrib-' . $products_options_id;
             $options_menu[] = $tmp_radio . "\n";
             break;
-        // file upload
+            // file upload
         case ($products_options_type == PRODUCTS_OPTIONS_TYPE_FILE):
             $options_name[] = '<label class="attribsUploads" for="' . $inputFieldId . '">' . ($show_attributes_qty_prices_icon ? ATTRIBUTES_QTY_PRICE_SYMBOL : '') . $products_options_name . '</label>';
             $options_html_id[] = 'upl-attrib-' . $products_options_id;
             $options_menu[] = $tmp_html . "\n";
             break;
-        // READONLY
+            // READONLY
         case ($products_options_type == PRODUCTS_OPTIONS_TYPE_READONLY):
             $options_name[] = $products_options_name;
             $options_html_id[] = 'ro-attrib-' . $products_options_id;
             $options_menu[] = $tmp_html . "\n";
             break;
-        // dropdown menu auto switch to selected radio button display
+            // dropdown menu auto switch to selected radio button display
         case ($products_options->RecordCount() == 1):
             if ($show_attributes_qty_prices_icon) {
                 $options_name[] = '<label class="switchedLabel ONE" for="' . $inputFieldId . '">' . ATTRIBUTES_QTY_PRICE_SYMBOL . $products_options_name . '</label>';
@@ -754,7 +754,7 @@ foreach ($products_options_names as $next_option_name) {
             $options_menu[] = zen_draw_radio_field('id[' . $products_options_id . ']', $products_options_value_id, true, 'id="' . $inputFieldId . '" ' . $data_properties . $field_disabled) . '<label class="attribsRadioButton" for="' . $inputFieldId . '">' . $products_options_details . '</label>' . "\n";
             break;
 
-        // SELECT dropdown
+            // SELECT dropdown
         case ($products_options_type == PRODUCTS_OPTIONS_TYPE_SELECT):
             // normal dropdown menu display
             if (isset($_SESSION['cart']->contents[$prod_id]['attributes'][$products_options_id])) {
@@ -792,7 +792,6 @@ foreach ($products_options_names as $next_option_name) {
 }
 
 $zco_notifier->notify('NOTIFY_ATTRIBUTES_MODULE_END', $prod_id, $options_name, $options_menu, $options_comment, $options_comment_position, $options_html_id, $options_attributes_image, $options_inputfield_id, $attributeDetailsArrayForJson);
-
 
 // manage filename uploads
 $_GET['number_of_uploads'] = $number_of_uploads;

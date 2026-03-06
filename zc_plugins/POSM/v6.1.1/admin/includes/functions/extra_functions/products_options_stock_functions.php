@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // -----
 // Part of the "Product Options Stock Manager" plugin by Cindy Merkin (cindy@vinosdefrutastropicales.com)
 // Copyright (c) 2014-2024 Vinos de Frutas Tropicales
@@ -17,7 +19,7 @@ function pos_extract_stock_type($products_name, bool $messages_never_included = 
 {
     global $posObserver;
 
-    if (preg_match('/(.*)\[(.*)\]$/', $products_name, $matches)) {
+    if (preg_match('/(.*)\[(.*)\]$/', (string) $products_name, $matches)) {
         $products_name = $matches[1];
         if ($messages_never_included === false && $posObserver->show_stock_messages === true) {
             $products_name .= '<br>' . zen_draw_checkbox_field('check') . ' ' . str_replace(',', ' ' . zen_draw_checkbox_field('check2'), $matches[2]);
@@ -36,9 +38,9 @@ function posm_modelnum_is_duplicate($pos_id, $model): bool
     $pos_id = (int)$pos_id;
     $model = zen_db_input($model);
     $check = $db->Execute(
-        "SELECT p.products_id
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . " pos
-                LEFT JOIN " . TABLE_PRODUCTS . " p
+        'SELECT p.products_id
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . ' pos
+                LEFT JOIN ' . TABLE_PRODUCTS . " p
                     ON p.products_id = pos.products_id
           WHERE p.products_status = 1
             AND (p.products_model = '$model' OR (pos.pos_id != $pos_id AND pos.pos_model = '$model'))
@@ -56,15 +58,15 @@ function posm_update_base_product_quantity($pID)
     global $db;
 
     $quantity_sum = $db->Execute(
-        "SELECT SUM(products_quantity) as quantity
-           FROM " . TABLE_PRODUCTS_OPTIONS_STOCK . "
+        'SELECT SUM(products_quantity) as quantity
+           FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK . "
           WHERE products_id = $pID"
     );
     $products_quantity = $quantity_sum->fields['quantity'];
     if ($products_quantity !== null) {
         $db->Execute(
-            "UPDATE " . TABLE_PRODUCTS . "
-                SET products_quantity = " . $products_quantity . "
+            'UPDATE ' . TABLE_PRODUCTS . '
+                SET products_quantity = ' . $products_quantity . "
               WHERE products_id = $pID
               LIMIT 1"
         );

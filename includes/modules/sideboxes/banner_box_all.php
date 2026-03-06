@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * banner_box_all sidebox - used to display "square" banners in sideboxes
  *
@@ -12,23 +14,23 @@
 // ALTER TABLE `banners` ADD `banners_sort_order` INT( 11 ) DEFAULT '0' NOT NULL;
 
 // test if box should display
-  $show_banner_box_all = true;
-  if (SHOW_BANNERS_GROUP_SET_ALL == '') {
+$show_banner_box_all = true;
+if (SHOW_BANNERS_GROUP_SET_ALL == '') {
     $show_banner_box_all = false;
-  }
+}
 
-  if ($show_banner_box_all == true) {
-    $banner_box = array();
+if ($show_banner_box_all == true) {
+    $banner_box = [];
     $banner_box[] = TEXT_BANNER_BOX_ALL;
-    $banner_box_group= SHOW_BANNERS_GROUP_SET_ALL;
+    $banner_box_group = SHOW_BANNERS_GROUP_SET_ALL;
 
-    require($template->get_template_dir('tpl_banner_box_all.php',DIR_WS_TEMPLATE, $current_page_base,'sideboxes'). '/tpl_banner_box_all.php');
+    require($template->get_template_dir('tpl_banner_box_all.php', DIR_WS_TEMPLATE, $current_page_base, 'sideboxes'). '/tpl_banner_box_all.php');
 
-// if no active banner in the specified banner group then the box will not show
-// uses banners in the defined group $banner_box_group
+    // if no active banner in the specified banner group then the box will not show
+    // uses banners in the defined group $banner_box_group
     if ($content != '') {
-      $title =  BOX_HEADING_BANNER_BOX_ALL;
-      $title_link = false;
-      require($template->get_template_dir($column_box_default, DIR_WS_TEMPLATE, $current_page_base,'common') . '/' . $column_box_default);
+        $title =  BOX_HEADING_BANNER_BOX_ALL;
+        $title_link = false;
+        require($template->get_template_dir($column_box_default, DIR_WS_TEMPLATE, $current_page_base, 'common') . '/' . $column_box_default);
     }
-  }
+}

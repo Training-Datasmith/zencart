@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ajax front controller
  *
@@ -53,7 +55,7 @@ require $zc_ajax_base_dir . 'includes/application_top.php';
 // Note that as of PHP 8.4.0, a single '_' as a class name is deprecated, so it's not allowed.
 //
 $class_method_regex = '/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/';
-if (!isset($_GET['act'], $_GET['method']) || $_GET['act'] === '_' || !preg_match($class_method_regex, $_GET['act']) || !preg_match($class_method_regex, $_GET['method'])) {
+if (!isset($_GET['act'], $_GET['method']) || $_GET['act'] === '_' || !preg_match($class_method_regex, (string) $_GET['act']) || !preg_match($class_method_regex, $_GET['method'])) {
     ajaxAbort(403);
 }
 
@@ -63,7 +65,7 @@ if (isset($spider_flag) && $spider_flag === true) {
 }
 
 // --- begin support functions ------------------
-function ajaxAbort($status = 400, $msg = null)
+function ajaxAbort($status = 400, $msg = null): void
 {
     global $zc_ajax_base_dir;
     http_response_code($status); // 400 = "Bad Request"
@@ -81,7 +83,7 @@ function inDeveloperMode(): bool
 
 $language_page_directory = DIR_WS_LANGUAGES . $_SESSION['language'] . '/';
 
-$className = 'zc' . ucfirst($_GET['act']);
+$className = 'zc' . ucfirst((string) $_GET['act']);
 $classFile = basename($className . '.php');
 $classPath = DIR_WS_CLASSES . 'ajax/';
 $basePath = DIR_FS_CATALOG;

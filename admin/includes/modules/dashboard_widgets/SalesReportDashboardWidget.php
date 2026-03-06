@@ -6,7 +6,9 @@
  * @version $Id: DrByte 2025 Oct 03 Modified in v2.2.0 $
  */
 
-if (!zen_is_superuser() && !check_page(FILENAME_STATS_SALES_REPORT_GRAPHS, '')) return;
+if (!zen_is_superuser() && !check_page(FILENAME_STATS_SALES_REPORT_GRAPHS, '')) {
+    return;
+}
 
 // to disable this module for everyone, uncomment the following "return" statement so the rest of this file is ignored
 // return;
@@ -22,9 +24,9 @@ $startDate = time() - (365 * 2) * 3600 * 24;
 $report = new statsSalesReportGraph($report, $startDate, $endDate);
 for ($i = 0, $salesData = ''; $i < $report->size; $i++) {
     $month = $zcDate->output(DATE_FORMAT_SHORT_NO_DAY, $report->info[$i]['startDates']);
-    $salesData .= "['$month'," . round($report->info[$i]['sum'], $currencies->get_decimal_places(DEFAULT_CURRENCY)) . "]";
+    $salesData .= "['$month'," . round($report->info[$i]['sum'], $currencies->get_decimal_places(DEFAULT_CURRENCY)) . ']';
     if ($i < $report->size - 1) {
-        $salesData .= ",";
+        $salesData .= ',';
     }
 }
 
@@ -49,7 +51,7 @@ $currencies ??= new currencies();
       data = new google.visualization.DataTable();
       data.addColumn('string', '<?= DASHBOARD_MONTH ?>');
       data.addColumn('number', '<?= DASHBOARD_SALES ?>');
-      data.addRows(<?= "[" . $salesData . "]" ?>);
+      data.addRows(<?= '[' . $salesData . ']' ?>);
 
       var options = {
           trendlines: {

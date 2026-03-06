@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -6,7 +8,7 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 
 define('TABLE_RECORD_ARTISTS', DB_PREFIX . 'record_artists');
@@ -20,4 +22,3 @@ define('TABLE_MEDIA_MANAGER', DB_PREFIX . 'media_manager');
 define('TABLE_MEDIA_TYPES', DB_PREFIX . 'media_types');
 define('TABLE_MEDIA_CLIPS', DB_PREFIX . 'media_clips');
 define('TABLE_MEDIA_TO_PRODUCTS', DB_PREFIX . 'media_to_products');
-?>

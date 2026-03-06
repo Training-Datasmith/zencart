@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * logoff header_php.php 
+ * logoff header_php.php
  *
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -17,7 +19,7 @@ $breadcrumb->add(NAVBAR_TITLE);
 /**
  * Check what language should be used on the logoff screen
  */
-  $logoff_lang = ($_SESSION['languages_code'] != DEFAULT_LANGUAGE) ? 'language=' . $_SESSION['languages_code'] : '';
+$logoff_lang = ($_SESSION['languages_code'] != DEFAULT_LANGUAGE) ? 'language=' . $_SESSION['languages_code'] : '';
 
 /**
   * Check if there is still a customer_id
@@ -25,10 +27,9 @@ $breadcrumb->add(NAVBAR_TITLE);
   * This will cause the header logic to see that the customer_id is gone, and thus not display another logoff link
   */
 if (zen_is_logged_in() || !empty($_SESSION['customer_guest_id'])) {
-  zen_session_destroy();
-  zen_redirect(zen_href_link(FILENAME_LOGOFF, $logoff_lang));
+    zen_session_destroy();
+    zen_redirect(zen_href_link(FILENAME_LOGOFF, $logoff_lang));
 }
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_LOGOFF');
-?>

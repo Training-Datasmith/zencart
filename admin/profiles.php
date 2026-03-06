@@ -8,81 +8,81 @@
 require('includes/application_top.php');
 
 // determine whether an action has been requested
-if (isset($_POST['action']) && in_array($_POST['action'], array('insert', 'update', 'update_name'))) {
-  $action = $_POST['action'];
-} elseif (isset($_GET['action']) && in_array($_GET['action'], array('add', 'edit', 'rename', 'delete', 'delete_confirm'))) {
-  $action = $_GET['action'];
+if (isset($_POST['action']) && in_array($_POST['action'], ['insert', 'update', 'update_name'])) {
+    $action = $_POST['action'];
+} elseif (isset($_GET['action']) && in_array($_GET['action'], ['add', 'edit', 'rename', 'delete', 'delete_confirm'])) {
+    $action = $_GET['action'];
 } else {
-  $action = '';
+    $action = '';
 }
 
 // if needed, check that a valid profile id has been passed
 if (isset($action) && ($action == 'update' || $action == 'update_name') && $_POST['profile']) {
-  $profile = $_POST['profile'];
+    $profile = $_POST['profile'];
 } elseif (isset($action) && ($action == 'edit' || $action == 'delete' || $action == 'delete_confirm') && $_GET['profile']) {
-  $profile = $_GET['profile'];
-} elseif (in_array($action, array('edit', 'delete', 'delete_confirm', 'update', 'update-name'))) {
-  $messageStack->add_session(ERROR_NO_PROFILE_DEFINED, 'error');
-  zen_redirect(zen_href_link(FILENAME_PROFILES));
+    $profile = $_GET['profile'];
+} elseif (in_array($action, ['edit', 'delete', 'delete_confirm', 'update', 'update-name'])) {
+    $messageStack->add_session(ERROR_NO_PROFILE_DEFINED, 'error');
+    zen_redirect(zen_href_link(FILENAME_PROFILES));
 }
 
 // take appropriate steps depending upon the action requested
 switch ($action) {
-  case 'add':
-    $pagesByMenu = zen_get_admin_pages(FALSE);
-    $menuTitles = zen_get_menu_titles();
-    break;
-  case 'edit':
-    $pagesByMenu = zen_get_admin_pages(FALSE);
-    $menuTitles = zen_get_menu_titles();
-    $profileName = zen_get_profile_name($profile);
-    $permittedPages = zen_get_permitted_pages_for_profile($profile);
-    break;
-  case 'delete_confirm':
-    $error = zen_delete_profile($profile);
-    if ($error != '') {
-      $messageStack->add_session($error, 'error');
-      zen_redirect(zen_href_link(FILENAME_PROFILES));
-    } else {
-      $messageStack->add(SUCCESS_PROFILE_DELETED, 'success');
-      $action = '';
-      $profileList = zen_get_profiles(TRUE);
-    }
-    break;
-  case 'insert':
-    $error = zen_create_profile($_POST);
-    if ($error != '') {
-      $messageStack->add($error, 'error');
-      $pagesByMenu = zen_get_admin_pages(FALSE);
-      $action = 'add';
-    } else {
-      $messageStack->add_session(SUCCESS_PROFILE_INSERTED, 'success');
-      zen_redirect(zen_href_link(FILENAME_PROFILES));
-    }
-    break;
-  case 'update':
-    zen_remove_profile_permits($profile);
-    zen_insert_pages_into_profile($profile, $_POST['p']);
-    $messageStack->add_session(SUCCESS_PROFILE_UPDATED, 'success');
-    zen_redirect(zen_href_link(FILENAME_PROFILES));
-    break;
-  case 'update_name':
-    $profileName = $_POST['profile-name'];
-    $_POST['profile-name'] = trim($_POST['profile-name']);
-//    $_POST['profile-name'] = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['profile-name']);
-    if ($_POST['profile-name'] != '' && $_POST['profile-name'] == $profileName) {
-      zen_update_profile_name($profile, $_POST['profile-name']);
-      $messageStack->add_session(SUCCESS_PROFILE_NAME_UPDATED, 'success');
-    } else {
-      $messageStack->add_session(ERROR_INVALID_PROFILE_NAME, 'error');
-    }
-    zen_redirect(zen_href_link(FILENAME_PROFILES));
-    break;
-  case 'rename':
-  case 'delete':
-  default: // if no specific action requested prepare the listing data
-    $profileList = zen_get_profiles(TRUE);
-    break;
+    case 'add':
+        $pagesByMenu = zen_get_admin_pages(false);
+        $menuTitles = zen_get_menu_titles();
+        break;
+    case 'edit':
+        $pagesByMenu = zen_get_admin_pages(false);
+        $menuTitles = zen_get_menu_titles();
+        $profileName = zen_get_profile_name($profile);
+        $permittedPages = zen_get_permitted_pages_for_profile($profile);
+        break;
+    case 'delete_confirm':
+        $error = zen_delete_profile($profile);
+        if ($error != '') {
+            $messageStack->add_session($error, 'error');
+            zen_redirect(zen_href_link(FILENAME_PROFILES));
+        } else {
+            $messageStack->add(SUCCESS_PROFILE_DELETED, 'success');
+            $action = '';
+            $profileList = zen_get_profiles(true);
+        }
+        break;
+    case 'insert':
+        $error = zen_create_profile($_POST);
+        if ($error != '') {
+            $messageStack->add($error, 'error');
+            $pagesByMenu = zen_get_admin_pages(false);
+            $action = 'add';
+        } else {
+            $messageStack->add_session(SUCCESS_PROFILE_INSERTED, 'success');
+            zen_redirect(zen_href_link(FILENAME_PROFILES));
+        }
+        break;
+    case 'update':
+        zen_remove_profile_permits($profile);
+        zen_insert_pages_into_profile($profile, $_POST['p']);
+        $messageStack->add_session(SUCCESS_PROFILE_UPDATED, 'success');
+        zen_redirect(zen_href_link(FILENAME_PROFILES));
+        break;
+    case 'update_name':
+        $profileName = $_POST['profile-name'];
+        $_POST['profile-name'] = trim((string) $_POST['profile-name']);
+        //    $_POST['profile-name'] = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['profile-name']);
+        if ($_POST['profile-name'] != '' && $_POST['profile-name'] == $profileName) {
+            zen_update_profile_name($profile, $_POST['profile-name']);
+            $messageStack->add_session(SUCCESS_PROFILE_NAME_UPDATED, 'success');
+        } else {
+            $messageStack->add_session(ERROR_INVALID_PROFILE_NAME, 'error');
+        }
+        zen_redirect(zen_href_link(FILENAME_PROFILES));
+        break;
+    case 'rename':
+    case 'delete':
+    default: // if no specific action requested prepare the listing data
+        $profileList = zen_get_profiles(true);
+        break;
 }
 ?>
 <!doctype html>
@@ -128,10 +128,10 @@ switch ($action) {
                   <td class="id"><?php echo $profileDetails['id'] ?></td>
                   <?php if ($action == 'rename' && $_GET['profile'] == $profileDetails['id']) { ?>
                     <td>
-                        <?php echo zen_draw_form('profileNameForm', FILENAME_PROFILES, '', 'post', 'id="profile-update"') ?>
+                        <?php echo zen_draw_form('profileNameForm', FILENAME_PROFILES, '', 'post') ?>
                         <?php echo zen_draw_hidden_field('action', 'update_name'); ?>
                         <?php echo zen_draw_hidden_field('profile', $profileDetails['id']); ?>
-                        <?php echo zen_draw_input_field('profile-name', htmlspecialchars($profileDetails['name'], ENT_COMPAT, CHARSET, TRUE), 'class="form-control"'); ?>
+                        <?php echo zen_draw_input_field('profile-name', htmlspecialchars((string) $profileDetails['name'], ENT_COMPAT, CHARSET, true), 'class="form-control"'); ?>
                     </td>
                     <td></td>
                     <td>
@@ -139,8 +139,8 @@ switch ($action) {
                       <?php echo '</form>'; ?>
                     </td>
                   <?php } else { ?>
-                    <td class="name"><?php echo zen_output_string($profileDetails['name'], FALSE, TRUE); ?></td>
-                    <td class="users"><?php echo zen_output_string($profileDetails['users'], FALSE, TRUE) ?></td>
+                    <td class="name"><?php echo zen_output_string($profileDetails['name'], false, true); ?></td>
+                    <td class="users"><?php echo zen_output_string($profileDetails['users'], false, true) ?></td>
                     <?php if ($profileDetails['id'] != SUPERUSER_PROFILE) { ?>
                       <td class="actions">
                           <?php if ($action != 'delete') { ?>
@@ -150,13 +150,13 @@ switch ($action) {
                         <?php if ($profileDetails['users'] == 0) { ?>
                           <?php
                           if ($action == 'delete' && $profileDetails['name'] == zen_get_profile_name($profile)) {
-                            echo TEXT_CONFIRM_DELETE;
-                            ?>
+                              echo TEXT_CONFIRM_DELETE;
+                              ?>
                             <a href="<?php echo zen_href_link(FILENAME_PROFILES, 'action=delete_confirm&profile=' . $profileDetails['id']) ?>" class="btn btn-danger" role="button"><?php echo IMAGE_DELETE; ?></a>
                             <a href="<?php echo zen_href_link(FILENAME_PROFILES) ?>" class="btn btn-default" role="button"><?php echo IMAGE_CANCEL; ?></a>
                             <?php
-                          } else if ($action != 'delete') {
-                            ?>
+                          } elseif ($action != 'delete') {
+                              ?>
                             <a href="<?php echo zen_href_link(FILENAME_PROFILES, 'action=delete&profile=' . $profileDetails['id']) ?>" class="btn btn-warning" role="button"><?php echo IMAGE_DELETE; ?></a>
                           <?php } ?>
                         <?php } ?>
@@ -165,7 +165,7 @@ switch ($action) {
                       <td>&nbsp;</td>
                     <?php } ?>
                   <?php } ?>
-                <?php } // end foreach ?>
+                <?php } // end foreach?>
               </tr>
             <?php } else { ?>
               <tr>
@@ -186,7 +186,7 @@ switch ($action) {
 
         <h1><?php echo sprintf(HEADING_TITLE_INDIVIDUAL_PROFILE, $profileName) ?></h1>
 
-        <?php echo zen_draw_form('profilesBoxes', FILENAME_PROFILES, '', 'post', 'class="form-horizontal"') ?>
+        <?php echo zen_draw_form('profilesBoxes', FILENAME_PROFILES, '', 'post') ?>
         <?php echo zen_draw_hidden_field('action', 'update'); ?>
         <?php echo zen_draw_hidden_field('profile', $profile); ?>
         <div class="row formButtons">
@@ -202,7 +202,7 @@ switch ($action) {
               <input class="btn btn-info checkButton" type="button" value="<?php echo TEXT_UNCHECK_ALL; ?>" onclick="checkAll(this.form, '<?php echo $menuKey ?>', false);">
             </dt>
             <?php foreach ($pageList as $pageKey => $page) { ?>
-              <dd><label><?php echo zen_draw_checkbox_field('p[]', htmlspecialchars($pageKey, ENT_COMPAT, CHARSET, TRUE), in_array($pageKey, $permittedPages), '', ' class="' . $menuKey . ' admin-profile"'); ?><?php echo zen_output_string($page['name'], false, true); ?></label></dd>
+              <dd><label><?php echo zen_draw_checkbox_field('p[]', htmlspecialchars((string) $pageKey, ENT_COMPAT, CHARSET, true), in_array($pageKey, $permittedPages), ''); ?><?php echo zen_output_string($page['name'], false, true); ?></label></dd>
             <?php } ?>
           </dl>
         <?php } ?>
@@ -215,10 +215,10 @@ switch ($action) {
       <?php } elseif ($action == 'add') { ?>
 
         <h1><?php echo HEADING_TITLE_NEW_PROFILE ?></h1>
-        <?php echo zen_draw_form('profiles', FILENAME_PROFILES, 'action=insert', 'post', 'class="form-horizontal"') ?>
+        <?php echo zen_draw_form('profiles', FILENAME_PROFILES, 'action=insert', 'post') ?>
         <div class="row">
           <div class="col-sm-6 col-md-4">
-              <?php echo zen_draw_input_field('name', isset($_POST['name']) ? $_POST['name'] : '', 'class="form-control field"', false, 'text', true) ?>
+              <?php echo zen_draw_input_field('name', $_POST['name'] ?? '', 'class="form-control field"', false, 'text', true) ?>
           </div>
         </div>
         <?php echo zen_draw_hidden_field('action', 'insert'); ?>
@@ -234,7 +234,7 @@ switch ($action) {
               <input class="btn btn-info checkButton" type="button" value="<?php echo TEXT_UNCHECK_ALL; ?>" onclick="checkAll(this.form, '<?php echo $menuKey ?>', false);">
             </dt>
             <?php foreach ($pageList as $pageKey => $page) { ?>
-              <dd><label><?php echo zen_draw_checkbox_field('p[]', htmlspecialchars($pageKey, ENT_COMPAT, CHARSET, TRUE), isset($_POST['p']) && in_array($pageKey, $_POST['p']), '', ' class="' . $menuKey . '"'); ?><?php echo zen_output_string($page['name'], false, true); ?></label></dd>
+              <dd><label><?php echo zen_draw_checkbox_field('p[]', htmlspecialchars((string) $pageKey, ENT_COMPAT, CHARSET, true), isset($_POST['p']) && in_array($pageKey, $_POST['p']), ''); ?><?php echo zen_output_string($page['name'], false, true); ?></label></dd>
             <?php } ?>
           </dl>
         <?php } ?>

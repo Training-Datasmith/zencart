@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * unsubscribe header_php.php 
+ * unsubscribe header_php.php
  *
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -15,7 +17,7 @@ require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 
 //present the option to unsubscribe, with a confirm button/link
 if (isset($_GET['addr'])) {
-    $unsubscribe_address = preg_replace('/[^0-9A-Za-z@._-]/', '', $_GET['addr']);
+    $unsubscribe_address = preg_replace('/[^0-9A-Za-z@._-]/', '', (string) $_GET['addr']);
     if ($unsubscribe_address == '') {
         zen_redirect(zen_href_link(FILENAME_ACCOUNT_NEWSLETTERS));
     }
@@ -28,10 +30,10 @@ $breadcrumb->add(NAVBAR_TITLE, zen_href_link(FILENAME_UNSUBSCRIBE, '', 'NONSSL')
 // if they clicked on the "confirm unsubscribe" then process it:
 if (isset($_GET['action']) && $_GET['action'] === 'unsubscribe') {
     $unsubscribe_address = zen_db_prepare_input($unsubscribe_address);
-  /// Check and see if the email exists in the database, and is subscribed to the newsletter.
+    /// Check and see if the email exists in the database, and is subscribed to the newsletter.
     $unsubscribe_count_query =
-        "SELECT 1
-           FROM " . TABLE_CUSTOMERS . " 
+        'SELECT 1
+           FROM ' . TABLE_CUSTOMERS . " 
           WHERE customers_newsletter = '1' 
             AND customers_email_address = :emailAddress";
 
@@ -41,12 +43,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'unsubscribe') {
     // If we found the customer's email address, and they currently subscribe
     if (!$unsubscribe->EOF) {
         $unsubscribe_query =
-            "UPDATE " . TABLE_CUSTOMERS . "
+            'UPDATE ' . TABLE_CUSTOMERS . "
                 SET customers_newsletter = '0' 
               WHERE customers_email_address = :emailAddress
               LIMIT 1";
 
-        $unsubscribe_query = $db->bindVars($unsubscribe_query, ':emailAddress', $unsubscribe_address, 'string');    
+        $unsubscribe_query = $db->bindVars($unsubscribe_query, ':emailAddress', $unsubscribe_address, 'string');
         $unsubscribe = $db->Execute($unsubscribe_query);
         $status_display = UNSUBSCRIBE_DONE_TEXT_INFORMATION . $unsubscribe_address;
     } else {

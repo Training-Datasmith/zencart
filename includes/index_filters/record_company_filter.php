@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * record_company_filter.php  for index filters
  *
@@ -19,8 +21,8 @@
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-if (isset($_GET['sort']) && strlen($_GET['sort']) > 3) {
-    $_GET['sort'] = substr($_GET['sort'], 0, 3);
+if (isset($_GET['sort']) && strlen((string) $_GET['sort']) > 3) {
+    $_GET['sort'] = substr((string) $_GET['sort'], 0, 3);
 }
 if (isset($_GET['alpha_filter_id']) && (int)$_GET['alpha_filter_id'] > 0) {
     $alpha_sort = " AND pd.products_name LIKE '" . zen_db_input(chr((int)$_GET['alpha_filter_id'])) . "%' ";
@@ -34,53 +36,52 @@ if (!isset($do_filter_list)) {
     $do_filter_list = false;
 }
 
-$and = $and ?? '';
-$sql_joins = $sql_joins ?? '';
+$and ??= '';
+$sql_joins ??= '';
 
 // show the products of a specified record-company
 if (!empty($_GET['record_company_id'])) {
     // We show them all
-    $and .= " AND r.record_company_id = " . (int)$_GET['record_company_id'] . " ";
+    $and .= ' AND r.record_company_id = ' . (int)$_GET['record_company_id'] . ' ';
     if (isset($_GET['filter_id']) && zen_not_null($_GET['filter_id'])) {
         // We are asked to show only a specific category
-        $sql_joins .= " LEFT JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c ON p2c.products_id = p.products_id ";
-        $and .= " AND p2c.categories_id = " . (int)$_GET['filter_id'] . " ";
+        $sql_joins .= ' LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c ON p2c.products_id = p.products_id ';
+        $and .= ' AND p2c.categories_id = ' . (int)$_GET['filter_id'] . ' ';
     } else {
-        $sql_joins .= " LEFT JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c ON p2c.products_id = p.products_id ";
+        $sql_joins .= ' LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c ON p2c.products_id = p.products_id ';
         $and .= ' AND p2c.categories_id = p.master_categories_id ';
     }
 } else {
     if (empty($and) && !empty($current_category_id)) {
         // show the products in a given category
         // We show them all
-        $sql_joins .= " LEFT JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c ON p2c.products_id = p.products_id ";
-        $and .= " AND p2c.categories_id = " . (int)$current_category_id . " ";
+        $sql_joins .= ' LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c ON p2c.products_id = p.products_id ';
+        $and .= ' AND p2c.categories_id = ' . (int)$current_category_id . ' ';
     }
     if (isset($_GET['filter_id']) && zen_not_null($_GET['filter_id'])) {
         // We are asked to show only specific category
-        $and .= " AND r.record_company_id = " . (int)$_GET['filter_id'] . " ";
+        $and .= ' AND r.record_company_id = ' . (int)$_GET['filter_id'] . ' ';
     }
 }
-$listing_sql = "SELECT " . $select_column_list . " p.products_id, p.products_type, p.master_categories_id,
+$listing_sql = 'SELECT ' . $select_column_list . ' p.products_id, p.products_type, p.master_categories_id,
                        r.record_company_id, p.products_price, p.products_tax_class_id, pd.products_description,
                        IF(s.status = 1, s.specials_new_products_price, NULL) AS specials_new_products_price,
                        IF(s.status = 1, s.specials_new_products_price, p.products_price) AS final_price,
                        p.products_sort_order, p.product_is_call, p.product_is_always_free_shipping, p.products_qty_box_status
-                FROM " . TABLE_PRODUCTS . " p
-                LEFT JOIN " . TABLE_SPECIALS . " s ON s.products_id = p.products_id
-                LEFT JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd ON pd.products_id = p.products_id
-                  AND pd.language_id = " . (int)$_SESSION['languages_id'] . "
-                LEFT JOIN " . TABLE_PRODUCT_MUSIC_EXTRA . " pme ON pme.products_id = p.products_id
-                LEFT JOIN " . TABLE_RECORD_COMPANY . " r ON r.record_company_id = pme.record_company_id
-                ";
+                FROM ' . TABLE_PRODUCTS . ' p
+                LEFT JOIN ' . TABLE_SPECIALS . ' s ON s.products_id = p.products_id
+                LEFT JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd ON pd.products_id = p.products_id
+                  AND pd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                LEFT JOIN ' . TABLE_PRODUCT_MUSIC_EXTRA . ' pme ON pme.products_id = p.products_id
+                LEFT JOIN ' . TABLE_RECORD_COMPANY . ' r ON r.record_company_id = pme.record_company_id
+                ';
 $listing_sql .= $sql_joins ?? ' ';
-$where_str = "
+$where_str = '
                 WHERE p.products_status = 1
-                " . $and . "
-                " . $alpha_sort;
+                ' . $and . '
+                ' . $alpha_sort;
 
 $listing_sql = str_replace('m.manufacturers_name', 'r.record_company_name as manufacturers_name', $listing_sql);
-
 
 // $default_sort_order could be set in header_php or main_template_vars before we get here
 $order_by = $default_sort_order ?? '';
@@ -100,12 +101,12 @@ if (isset($column_list) && !empty($_GET['sort'])) {
     }
 
     if ((!isset($_GET['sort']))
-        || !preg_match('/[1-8][ad]/', $_GET['sort'])
-        || (substr($_GET['sort'], 0, 1) > count($column_list))) {
+        || !preg_match('/[1-8][ad]/', (string) $_GET['sort'])
+        || (substr((string) $_GET['sort'], 0, 1) > count($column_list))) {
         for ($i = 0, $n = count($column_list); $i < $n; $i++) {
             if (isset($column_list[$i]) && $column_list[$i] === 'PRODUCT_LIST_NAME') {
                 $_GET['sort'] = $i + 1 . 'a';
-                $order_by = " ORDER BY p.products_sort_order, pd.products_name";
+                $order_by = ' ORDER BY p.products_sort_order, pd.products_name';
                 break;
             }
         }
@@ -114,29 +115,29 @@ if (isset($column_list) && !empty($_GET['sort'])) {
             $_GET['sort'] = '20a';
         }
     } else {
-        $sort_col = substr($_GET['sort'], 0, 1);
-        $sort_order = substr($_GET['sort'], -1);
+        $sort_col = substr((string) $_GET['sort'], 0, 1);
+        $sort_order = substr((string) $_GET['sort'], -1);
         switch ($column_list[$sort_col - 1]) {
             case 'PRODUCT_LIST_MODEL':
-                $order_by .= " ORDER BY p.products_model " . ($sort_order === 'd' ? 'DESC' : '') . ", pd.products_name";
+                $order_by .= ' ORDER BY p.products_model ' . ($sort_order === 'd' ? 'DESC' : '') . ', pd.products_name';
                 break;
             case 'PRODUCT_LIST_NAME':
-                $order_by .= " ORDER BY pd.products_name " . ($sort_order === 'd' ? 'DESC' : '');
+                $order_by .= ' ORDER BY pd.products_name ' . ($sort_order === 'd' ? 'DESC' : '');
                 break;
             case 'PRODUCT_LIST_MANUFACTURER':
-                $order_by .= " ORDER BY r.record_company_name " . ($sort_order === 'd' ? 'DESC' : '') . ", pd.products_name";
+                $order_by .= ' ORDER BY r.record_company_name ' . ($sort_order === 'd' ? 'DESC' : '') . ', pd.products_name';
                 break;
             case 'PRODUCT_LIST_QUANTITY':
-                $order_by .= " ORDER BY p.products_quantity " . ($sort_order === 'd' ? 'DESC' : '') . ", pd.products_name";
+                $order_by .= ' ORDER BY p.products_quantity ' . ($sort_order === 'd' ? 'DESC' : '') . ', pd.products_name';
                 break;
             case 'PRODUCT_LIST_IMAGE':
-                $order_by .= " ORDER BY pd.products_name";
+                $order_by .= ' ORDER BY pd.products_name';
                 break;
             case 'PRODUCT_LIST_WEIGHT':
-                $order_by .= " ORDER BY p.products_weight " . ($sort_order === 'd' ? 'DESC' : '') . ", pd.products_name";
+                $order_by .= ' ORDER BY p.products_weight ' . ($sort_order === 'd' ? 'DESC' : '') . ', pd.products_name';
                 break;
             case 'PRODUCT_LIST_PRICE':
-                $order_by .= " ORDER BY p.products_price_sorter " . ($sort_order === 'd' ? 'DESC' : '') . ", pd.products_name";
+                $order_by .= ' ORDER BY p.products_price_sorter ' . ($sort_order === 'd' ? 'DESC' : '') . ', pd.products_name';
                 break;
         }
     }
@@ -145,32 +146,30 @@ if (isset($column_list) && !empty($_GET['sort'])) {
 $zco_notifier->notify('NOTIFY_PRODUCT_LISTING_QUERY_STRING', ['record_company'], $listing_sql, $where_str, $order_by);
 $listing_sql .= ' ' . $where_str . ' ' . $order_by;
 
-
-
 // optional Product List Filter
 if (PRODUCT_LIST_FILTER > 0) {
     if (!empty($_GET['record_company_id'])) {
-        $filterlist_sql = "SELECT c.categories_id AS id, cd.categories_name AS name
-                       FROM " . TABLE_PRODUCTS . " p
-                       LEFT JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c ON p2c.products_id = p.products_id
-                       LEFT JOIN " . TABLE_CATEGORIES . " c ON c.categories_id = p2c.categories_id
-                       LEFT JOIN " . TABLE_CATEGORIES_DESCRIPTION . " cd ON cd.categories_id = p2c.categories_id
-                         AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
-                       LEFT JOIN " . TABLE_PRODUCT_MUSIC_EXTRA . " pme ON pme.products_id = p.products_id
+        $filterlist_sql = 'SELECT c.categories_id AS id, cd.categories_name AS name
+                       FROM ' . TABLE_PRODUCTS . ' p
+                       LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c ON p2c.products_id = p.products_id
+                       LEFT JOIN ' . TABLE_CATEGORIES . ' c ON c.categories_id = p2c.categories_id
+                       LEFT JOIN ' . TABLE_CATEGORIES_DESCRIPTION . ' cd ON cd.categories_id = p2c.categories_id
+                         AND cd.language_id = ' . (int)$_SESSION['languages_id'] . '
+                       LEFT JOIN ' . TABLE_PRODUCT_MUSIC_EXTRA . ' pme ON pme.products_id = p.products_id
                        WHERE p.products_status = 1
-                       AND pme.record_company_id = " . (int)$_GET['record_company_id'] . "
+                       AND pme.record_company_id = ' . (int)$_GET['record_company_id'] . '
                        GROUP BY c.categories_id, cd.categories_name
-                       ORDER BY cd.categories_name";
+                       ORDER BY cd.categories_name';
     } else {
-        $filterlist_sql = "SELECT r.record_company_id AS id, r.record_company_name AS name
-                       FROM " . TABLE_PRODUCTS . " p
-                       LEFT JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c ON p2c.products_id = p.products_id
-                       JOIN " . TABLE_PRODUCT_MUSIC_EXTRA . " pme ON pme.products_id = p.products_id
-                       JOIN " . TABLE_RECORD_COMPANY . " r ON r.record_company_id = pme.record_company_id
+        $filterlist_sql = 'SELECT r.record_company_id AS id, r.record_company_name AS name
+                       FROM ' . TABLE_PRODUCTS . ' p
+                       LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' p2c ON p2c.products_id = p.products_id
+                       JOIN ' . TABLE_PRODUCT_MUSIC_EXTRA . ' pme ON pme.products_id = p.products_id
+                       JOIN ' . TABLE_RECORD_COMPANY . ' r ON r.record_company_id = pme.record_company_id
                        WHERE p.products_status = 1
-                       AND p2c.categories_id = " . (int)$current_category_id . "
+                       AND p2c.categories_id = ' . (int)$current_category_id . '
                        GROUP BY r.record_company_id, r.record_company_name
-                       ORDER BY r.record_company_name";
+                       ORDER BY r.record_company_name';
     }
     $getoption_set = false;
     $do_filter_list = false;

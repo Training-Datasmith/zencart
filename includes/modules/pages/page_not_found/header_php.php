@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * page_not_found header_php.php 
+ * page_not_found header_php.php
  *
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -22,8 +24,7 @@ $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] .
 $breadcrumb->add(NAVBAR_TITLE);
 
 require DIR_WS_CLASSES . 'site_map.php';
-$zen_SiteMapTree = new zen_SiteMapTree;
+$zen_SiteMapTree = new zen_SiteMapTree();
 
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_PAGE_NOT_FOUND');
-?>

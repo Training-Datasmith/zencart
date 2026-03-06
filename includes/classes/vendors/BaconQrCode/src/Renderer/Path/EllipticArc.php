@@ -1,9 +1,10 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Renderer\Path;
 
-final class EllipticArc implements OperationInterface
+final readonly class EllipticArc implements OperationInterface
 {
     private const ZERO_TOLERANCE = 1e-05;
 
@@ -15,47 +16,47 @@ final class EllipticArc implements OperationInterface
         float                  $xRadius,
         float                  $yRadius,
         float                  $xAxisAngle,
-        private readonly bool  $largeArc,
-        private readonly bool  $sweep,
-        private readonly float $x,
-        private readonly float $y
+        private bool  $largeArc,
+        private bool  $sweep,
+        private float $x,
+        private float $y
     ) {
         $this->xRadius = abs($xRadius);
         $this->yRadius = abs($yRadius);
         $this->xAxisAngle = $xAxisAngle % 360;
     }
 
-    public function getXRadius() : float
+    public function getXRadius(): float
     {
         return $this->xRadius;
     }
 
-    public function getYRadius() : float
+    public function getYRadius(): float
     {
         return $this->yRadius;
     }
 
-    public function getXAxisAngle() : float
+    public function getXAxisAngle(): float
     {
         return $this->xAxisAngle;
     }
 
-    public function isLargeArc() : bool
+    public function isLargeArc(): bool
     {
         return $this->largeArc;
     }
 
-    public function isSweep() : bool
+    public function isSweep(): bool
     {
         return $this->sweep;
     }
 
-    public function getX() : float
+    public function getX(): float
     {
         return $this->x;
     }
 
-    public function getY() : float
+    public function getY(): float
     {
         return $this->y;
     }
@@ -63,7 +64,7 @@ final class EllipticArc implements OperationInterface
     /**
      * @return self
      */
-    public function translate(float $x, float $y) : OperationInterface
+    public function translate(float $x, float $y): OperationInterface
     {
         return new self(
             $this->xRadius,
@@ -79,7 +80,7 @@ final class EllipticArc implements OperationInterface
     /**
      * @return self
      */
-    public function rotate(int $degrees) : OperationInterface
+    public function rotate(int $degrees): OperationInterface
     {
         $radians = deg2rad($degrees);
         $sin = sin($radians);
@@ -106,7 +107,7 @@ final class EllipticArc implements OperationInterface
      * @see https://mortoray.com/2017/02/16/rendering-an-svg-elliptical-arc-as-bezier-curves/
      * @return array<Curve|Line>
      */
-    public function toCurves(float $fromX, float $fromY) : array
+    public function toCurves(float $fromX, float $fromY): array
     {
         if (sqrt(($fromX - $this->x) ** 2 + ($fromY - $this->y) ** 2) < self::ZERO_TOLERANCE) {
             return [];
@@ -122,10 +123,10 @@ final class EllipticArc implements OperationInterface
     /**
      * @return Curve[]
      */
-    private function createCurves(float $fromX, float $fromY) : array
+    private function createCurves(float $fromX, float $fromY): array
     {
         $xAngle = deg2rad($this->xAxisAngle);
-        list($centerX, $centerY, $radiusX, $radiusY, $startAngle, $deltaAngle) =
+        [$centerX, $centerY, $radiusX, $radiusY, $startAngle, $deltaAngle] =
             $this->calculateCenterPointParameters($fromX, $fromY, $xAngle);
 
         $s = $startAngle;
@@ -220,7 +221,7 @@ final class EllipticArc implements OperationInterface
         return [$cx, $cy, $rX, $rY, $theta, $delta];
     }
 
-    private static function angle(float $ux, float $uy, float $vx, float $vy) : float
+    private static function angle(float $ux, float $uy, float $vx, float $vy): float
     {
         // F.6.5.4
         $dot = $ux * $vx + $uy * $vy;
@@ -244,7 +245,7 @@ final class EllipticArc implements OperationInterface
         float $radiusY,
         float $xAngle,
         float $angle
-    ) : array {
+    ): array {
         return [
             $centerX + $radiusX * cos($xAngle) * cos($angle) - $radiusY * sin($xAngle) * sin($angle),
             $centerY + $radiusX * sin($xAngle) * cos($angle) + $radiusY * cos($xAngle) * sin($angle),
@@ -254,7 +255,7 @@ final class EllipticArc implements OperationInterface
     /**
      * @return float[]
      */
-    private static function derivative(float $radiusX, float $radiusY, float $xAngle, float $angle) : array
+    private static function derivative(float $radiusX, float $radiusY, float $xAngle, float $angle): array
     {
         return [
             -$radiusX * cos($xAngle) * sin($angle) - $radiusY * sin($xAngle) * cos($angle),

@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Cookie Usage',
     'HEADING_TITLE' => 'Cookie Usage',
     'TEXT_INFORMATION' => 'We have detected that your browser does not support cookies, or cookies have been disabled.',
@@ -10,5 +12,3 @@ $define = [
     'BOX_INFORMATION_HEADING' => '<strong>Cookie Privacy and Security</strong>',
     'BOX_INFORMATION' => 'Cookies must be enabled to purchase online on this store, this is to embrace privacy and security related issues regarding your visit to this site.<br><br>By enabling cookie support on your browser, the communication between you and this site is strengthened to be certain it is you who are making transactions on your own behalf, and to prevent leakage of your privacy information.',
 ];
-
-return $define;

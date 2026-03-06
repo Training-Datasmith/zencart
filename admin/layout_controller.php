@@ -5,8 +5,8 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: lat9 2024 Aug 19 Modified in v2.1.0-alpha2 $
  */
-use Zencart\FileSystem\FileSystem;
 use Zencart\DbRepositories\LayoutBoxRepository;
+use Zencart\FileSystem\FileSystem;
 use Zencart\ResourceLoaders\SideboxFinder;
 
 require 'includes/application_top.php';
@@ -20,10 +20,10 @@ $selected_template = $template_dir;
 
 // check if a different template has been selected for viewing
 if (!empty($_SESSION['layout_editor_selected_template']) && isset($available_templates[$_SESSION['layout_editor_selected_template']])) {
-    $selected_template = strip_tags($_SESSION['layout_editor_selected_template']);
+    $selected_template = strip_tags((string) $_SESSION['layout_editor_selected_template']);
 }
 if (!empty($_POST['t']) && isset($available_templates[$_POST['t']])) {
-    $selected_template = strip_tags($_POST['t']);
+    $selected_template = strip_tags((string) $_POST['t']);
     $_SESSION['layout_editor_selected_template'] = $selected_template;
 }
 if ($selected_template !== $template_dir) {
@@ -134,7 +134,7 @@ switch ($action) {
         }
 
         foreach ($layout_update as $box_id => $values) {
-            $model->updateByLayoutId((int)$box_id, $values);
+            $model->updateByLayoutId($box_id, $values);
         }
 
         $messageStack->add_session(SUCCESS_BOX_UPDATED, 'success');
@@ -143,7 +143,7 @@ switch ($action) {
 
     case 'deleteconfirm':
         if (isset($_POST['delete_boxes'], $_POST['delete_boxes_names'])) {
-            $boxes_to_remove = explode(',', $_POST['delete_boxes']);
+            $boxes_to_remove = explode(',', (string) $_POST['delete_boxes']);
             $boxes_names = explode(',', str_replace(' ', '', zen_db_prepare_input($_POST['delete_boxes_names'])));
             if (count($boxes_to_remove) === count($boxes_names)) {
                 foreach ($boxes_to_remove as $index => $box_id) {
@@ -170,9 +170,9 @@ switch ($action) {
         if ($_POST['tfrom'] === '0') {
             $tfrom = 'default_template_settings';
         } else {
-            $tfrom = strip_tags($_POST['tfrom']);
+            $tfrom = strip_tags((string) $_POST['tfrom']);
         }
-        $tto = strip_tags($_POST['tto']);
+        $tto = strip_tags((string) $_POST['tto']);
 
         $reset_boxes = $model->getByTemplate($tfrom);
         foreach ($reset_boxes as $reset_box) {
@@ -228,7 +228,7 @@ foreach ($available_templates as $key => $value) {
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 alert alert-warning my-0 text-center">
-                <?= zen_draw_form('templateselect', FILENAME_LAYOUT_CONTROLLER, '', 'post', 'class="form-inline"') .
+                <?= zen_draw_form('templateselect', FILENAME_LAYOUT_CONTROLLER, '', 'post') .
                     zen_draw_label(TEXT_CURRENTLY_VIEWING, 'template_select', 'class="control-label"') . "\n" .
                     zen_draw_pull_down_menu('t', $template_array_to, $selected_template, 'class="form-control" id="template_select"') ?>
                     <button type="submit" class="btn btn-primary"><?= IMAGE_SELECT ?></button>
@@ -238,7 +238,7 @@ foreach ($available_templates as $key => $value) {
         <hr class="border-dark">
 <?php
 if (count($new_boxes) !== 0) {
-?>
+    ?>
         <div class="alert alert-warning"><?= TEXT_WARNING_NEW_BOXES_FOUND . implode(', ', array_values($new_boxes)) ?></div>
 <?php
 }
@@ -335,7 +335,7 @@ if ($include_single_column_settings === true) {
     }
     $template_specific_boxes = ltrim($template_specific_boxes, ', ');
     if ($template_specific_boxes !== '') {
-?>
+        ?>
                         <li class="py-1"><?= sprintf(TEXT_NOTE1_OPT, '<b>' . ucwords($template_specific_boxes) . '</b>', '<samp>' . $selected_template . '</samp>') ?></li>
 <?php
     }
@@ -352,7 +352,7 @@ if ($include_single_column_settings === true) {
         </div>
 <?php
 if (count($missing) !== 0) {
-?>
+    ?>
         <div class="row">
             <div class="col-md-4"></div>
             <div class="col-md-4">
@@ -361,21 +361,21 @@ if (count($missing) !== 0) {
                     <div class="panel-body pb-0">
                         <ul id="lbc-missing" class="list-group mb-0">
 <?php
-    foreach ($missing as $next_box => $next_box_id) {
-?>
+        foreach ($missing as $next_box => $next_box_id) {
+            ?>
                             <li class="list-group-item list-group-item-danger my-1">
                                 <div class="row">
                                     <div class="col-sm-9 pl-0 lbc-item">
                                         <?= $next_box ?>
                                     </div>
                                     <div class="col-sm-3 pr-0 text-right">
-                                        <?= zen_draw_checkbox_field($next_box, '1', false, '', 'data-id="' . $next_box_id . '"') ?>
+                                        <?= zen_draw_checkbox_field($next_box, '1', false, '') ?>
                                     </div>
                                 </div>
                             </li>
 <?php
-    }
-?>
+        }
+    ?>
                         </ul>
                         <div class="row text-center py-2">
                             <button id="remove-missing" class="btn btn-danger"><?= BUTTON_REMOVE_SELECTED ?></button>
@@ -434,7 +434,7 @@ $show_single_column = $include_single_column_settings && ($uses_mobile_sidebox_s
                                     <div class="panel-heading text-center">
 <?php
 if (COLUMN_LEFT_STATUS === '0') {
-?>
+    ?>
                                         <a href="javascript:void(0);" data-toggle="popover" title="<?= TEXT_COLUMN_DISABLED ?>" data-content="<?= TEXT_DISABLED_MESSAGE ?>" data-trigger="focus">
                                             <i class="fa-solid fa-2x fa-circle-exclamation text-danger"></i>
                                         </a>
@@ -450,7 +450,7 @@ foreach ($left_active as $next_box => $next_box_id) {
     $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
-?>
+    ?>
                                             <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                                 <div class="row">
                                                     <div class="col-sm-9 pl-0 pt-2">
@@ -475,7 +475,7 @@ foreach ($left_active as $next_box => $next_box_id) {
                                     <div class="panel-heading text-center">
 <?php
 if (COLUMN_RIGHT_STATUS === '0') {
-?>
+    ?>
                                         <a href="javascript:void(0);" data-toggle="popover" title="<?= TEXT_COLUMN_DISABLED ?>" data-content="<?= TEXT_DISABLED_MESSAGE ?>" data-trigger="focus">
                                             <i class="fa-solid fa-2x fa-circle-exclamation text-danger"></i>
                                         </a>
@@ -491,7 +491,7 @@ foreach ($right_active as $next_box => $next_box_id) {
     $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
-?>
+    ?>
                                             <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                                 <div class="row">
                                                     <div class="col-sm-9 pl-0 pt-2">
@@ -526,7 +526,7 @@ foreach ($left_right_inactive as $next_box => $next_box_id) {
     $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
     $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MAIN_PAGE_COLUMN);
-?>
+    ?>
                                             <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                                 <div class="row">
                                                     <div class="col-sm-9 pl-0 pt-2">
@@ -554,7 +554,7 @@ foreach ($left_right_inactive as $next_box => $next_box_id) {
 <?php
 if ($show_single_column === true) {
     if ($header_boxes_present === true) {
-?>
+        ?>
             <div class="col-md-4">
                 <div class="panel panel-info dataTableRow">
                     <div class="panel-heading text-center panel-collapse" data-toggle="collapse" data-target="#header-panel">
@@ -573,11 +573,11 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="header-box" class="list-group lbc-box-h mb-0">
 <?php
-        foreach ($header_active as $next_box => $next_box_id) {
-            $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_HEADER_COLUMN);
-            $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_HEADER_COLUMN);
-            $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_HEADER_COLUMN);
-?>
+                foreach ($header_active as $next_box => $next_box_id) {
+                    $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_HEADER_COLUMN);
+                    $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_HEADER_COLUMN);
+                    $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_HEADER_COLUMN);
+                    ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -591,8 +591,8 @@ if ($show_single_column === true) {
                                         </div>
                                     </li>
 <?php
-        }
-?>
+                }
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -601,12 +601,12 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="header-unused" class="list-group lbc-box-h mb-0">
 <?php
-        ksort($header_inactive);
+                ksort($header_inactive);
         foreach ($header_inactive as $next_box => $next_box_id) {
             $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_HEADER_COLUMN);
             $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_HEADER_COLUMN);
             $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_HEADER_COLUMN);
-?>
+            ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -621,7 +621,7 @@ if ($show_single_column === true) {
                                     </li>
 <?php
         }
-?>
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -632,7 +632,7 @@ if ($show_single_column === true) {
     }
 
     if ($footer_boxes_present === true) {
-?>
+        ?>
             <div class="col-md-4">
                 <div class="panel panel-info dataTableRow">
                     <div class="panel-heading text-center panel-collapse" data-toggle="collapse" data-target="#footer-panel">
@@ -651,11 +651,11 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="footer-box" class="list-group lbc-box-f mb-0">
 <?php
-        foreach ($footer_active as $next_box => $next_box_id) {
-            $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_FOOTER_COLUMN);
-            $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_FOOTER_COLUMN);
-            $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_FOOTER_COLUMN);
-?>
+                foreach ($footer_active as $next_box => $next_box_id) {
+                    $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_FOOTER_COLUMN);
+                    $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_FOOTER_COLUMN);
+                    $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_FOOTER_COLUMN);
+                    ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -669,8 +669,8 @@ if ($show_single_column === true) {
                                         </div>
                                     </li>
 <?php
-        }
-?>
+                }
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -679,12 +679,12 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="footer-unused" class="list-group lbc-box-f mb-0">
 <?php
-        ksort($footer_inactive);
+                ksort($footer_inactive);
         foreach ($footer_inactive as $next_box => $next_box_id) {
             $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_FOOTER_COLUMN);
             $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_FOOTER_COLUMN);
             $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_FOOTER_COLUMN);
-?>
+            ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -699,7 +699,7 @@ if ($show_single_column === true) {
                                     </li>
 <?php
         }
-?>
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -710,7 +710,7 @@ if ($show_single_column === true) {
     }
 
     if ($uses_mobile_sidebox_settings === true) {
-?>
+        ?>
             <div class="col-md-4">
                 <div class="panel panel-info dataTableRow">
                     <div class="panel-heading text-center panel-collapse" data-toggle="collapse" data-target="#mobile-panel">
@@ -729,11 +729,11 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="mobile-box" class="list-group lbc-box-m mb-0">
 <?php
-        foreach ($mobile_active as $next_box => $next_box_id) {
-            $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MOBILE_COLUMN);
-            $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MOBILE_COLUMN);
-            $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MOBILE_COLUMN);
-?>
+                foreach ($mobile_active as $next_box => $next_box_id) {
+                    $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MOBILE_COLUMN);
+                    $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MOBILE_COLUMN);
+                    $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MOBILE_COLUMN);
+                    ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -747,8 +747,8 @@ if ($show_single_column === true) {
                                         </div>
                                     </li>
 <?php
-        }
-?>
+                }
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -757,12 +757,12 @@ if ($show_single_column === true) {
                             <div class="panel-body">
                                 <ul id="mobile-unused" class="list-group lbc-box-m mb-0">
 <?php
-        ksort($mobile_inactive);
+                ksort($mobile_inactive);
         foreach ($mobile_inactive as $next_box => $next_box_id) {
             $move_up_title = sprintf(TEXT_MOVE_BOX_UP, $next_box, TEXT_MOVE_MOBILE_COLUMN);
             $move_down_title = sprintf(TEXT_MOVE_BOX_DOWN, $next_box, TEXT_MOVE_MOBILE_COLUMN);
             $move_unused_title = sprintf(TEXT_MOVE_BOX_UNUSED, $next_box, TEXT_MOVE_MOBILE_COLUMN);
-?>
+            ?>
                                     <li class="list-group-item my-1 lbc-item" data-id="<?= $next_box_id ?>">
                                         <div class="row">
                                             <div class="col-sm-9 pl-0 pt-2">
@@ -777,7 +777,7 @@ if ($show_single_column === true) {
                                     </li>
 <?php
         }
-?>
+        ?>
                                 </ul>
                             </div>
                         </div>
@@ -812,7 +812,7 @@ if ($show_single_column === true) {
                         <p><?= TEXT_INFO_RESET_TEMPLATE_SORT_ORDER ?></p>
                         <p><?= TEXT_INFO_RESET_TEMPLATE_SORT_ORDER_NOTE ?></p>
 
-                        <?= zen_draw_form('templatecopysettings', FILENAME_LAYOUT_CONTROLLER, 'action=reset_defaults', 'post', 'class="form-inline"') .
+                        <?= zen_draw_form('templatecopysettings', FILENAME_LAYOUT_CONTROLLER, 'action=reset_defaults', 'post') .
                             zen_draw_hidden_field('action', 'reset_defaults') .
                             zen_draw_label(TEXT_SETTINGS_COPY_FROM, 'template_select_from', 'class="control-label"') . "\n" .
                             zen_draw_pull_down_menu('tfrom', $template_array_from, $selected_template, 'class="form-control" id="template_select_from"') . "\n" .

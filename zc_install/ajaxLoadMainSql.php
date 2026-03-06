@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * ajaxLoadMainSql.php
  *
@@ -29,7 +31,7 @@ $options = [
 
 // trim spaces from inputs
 foreach ($options as $key => $val) {
-    $options[$key] = trim($val);
+    $options[$key] = trim((string) $val);
 }
 
 $dbInstaller = new zcDatabaseInstaller($options);
@@ -90,7 +92,7 @@ if (isset($_POST['demoData'])) {
     // attempt to unzip demo images, failing silently if Zip extension isn't installed
     if (class_exists('ZipArchive')) {
         // system('unzip --q demo_images/images.zip -d ../images/');
-        $za = new ZipArchive;
+        $za = new ZipArchive();
         if ($za->open('demo_images/images.zip') === true) {
             $za->extractTo('../images');
             $za->close();
@@ -133,4 +135,3 @@ if ($d = dir($pluginsfolder)) {
 
 echo json_encode(['error' => $error, 'file' => $file]);
 die();
-

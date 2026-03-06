@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -16,9 +17,9 @@ class Coupon extends base
     {
         global $db;
 
-        $sql = "SELECT coupon_code
-                FROM " . TABLE_COUPONS . "
-                WHERE coupon_code = :couponcode";
+        $sql = 'SELECT coupon_code
+                FROM ' . TABLE_COUPONS . '
+                WHERE coupon_code = :couponcode';
         $sql = $db->bindVars($sql, ':couponcode', $code, 'string');
 
         return $db->Execute($sql)->RecordCount() > 0;
@@ -30,7 +31,7 @@ class Coupon extends base
     public static function disable(int|string $coupon_id): void
     {
         global $db;
-        $sql = "UPDATE " . TABLE_COUPONS . "
+        $sql = 'UPDATE ' . TABLE_COUPONS . "
                 SET coupon_active = 'N'
                 WHERE coupon_id = " . (int)$coupon_id;
         $db->Execute($sql);
@@ -42,7 +43,7 @@ class Coupon extends base
     public static function enable(int|string $coupon_id): void
     {
         global $db;
-        $sql = "UPDATE " . TABLE_COUPONS . "
+        $sql = 'UPDATE ' . TABLE_COUPONS . "
                 SET coupon_active = 'Y'
                 WHERE coupon_id = " . (int)$coupon_id;
         $db->Execute($sql);
@@ -57,8 +58,8 @@ class Coupon extends base
         $results = [];
 
         // report if attempted change matches the welcome coupon, because we will skip it
-        $sql = "SELECT coupon_id
-                FROM " . TABLE_COUPONS . "
+        $sql = 'SELECT coupon_id
+                FROM ' . TABLE_COUPONS . "
                 WHERE coupon_code LIKE ':original_code:%'
                 AND coupon_id = " . (int)NEW_SIGNUP_DISCOUNT_COUPON;
         $sql = $db->bindVars($sql, ':original_code:', $origin_prefix, 'noquotestring');
@@ -68,8 +69,8 @@ class Coupon extends base
         }
 
         // Find duplicates (that are not also the Welcome coupon) (and are not 'G' (GV) records)
-        $sql = "SELECT coupon_id, coupon_code
-                FROM " . TABLE_COUPONS . "
+        $sql = 'SELECT coupon_id, coupon_code
+                FROM ' . TABLE_COUPONS . "
                 WHERE coupon_code LIKE ':original_code:%'
                 AND coupon_active = 'Y'
                 AND coupon_id !=  " . (int)NEW_SIGNUP_DISCOUNT_COUPON . "
@@ -92,7 +93,7 @@ class Coupon extends base
     public static function make_duplicates(int|string $original_id, int|string $new_code, int $quantity): bool
     {
         for ($i = 1; $i <= $quantity; $i++) {
-            $old_code_length = strlen($new_code);
+            $old_code_length = strlen((string) $new_code);
             $minimum_extra_chars = 7;
             $delta_calculation = SECURITY_CODE_LENGTH - ($old_code_length + $minimum_extra_chars);
             $new_code_length = ($delta_calculation > 0) ? $minimum_extra_chars + $delta_calculation : $minimum_extra_chars;
@@ -117,9 +118,9 @@ class Coupon extends base
             return false;
         }
 
-        $sql = "SELECT *
-                FROM " . TABLE_COUPONS . "
-                WHERE coupon_id = " . (int)$original_id;
+        $sql = 'SELECT *
+                FROM ' . TABLE_COUPONS . '
+                WHERE coupon_id = ' . (int)$original_id;
         $copied_coupon = $db->Execute($sql);
 
         // create duplicate coupon
@@ -148,9 +149,9 @@ class Coupon extends base
         $cid = $db->insert_ID();
 
         // create duplicate coupon description
-        $sql = "SELECT *
-                FROM " . TABLE_COUPONS_DESCRIPTION . "
-                WHERE coupon_id = " . (int)$original_id;
+        $sql = 'SELECT *
+                FROM ' . TABLE_COUPONS_DESCRIPTION . '
+                WHERE coupon_id = ' . (int)$original_id;
         $new_coupon_descriptions = $db->Execute($sql);
 
         foreach ($new_coupon_descriptions as $new_coupon_description) {
@@ -164,9 +165,9 @@ class Coupon extends base
         }
 
         // copy restrictions
-        $sql = "SELECT *
-                FROM " . TABLE_COUPON_RESTRICT . "
-                WHERE coupon_id = " . (int)$original_id;
+        $sql = 'SELECT *
+                FROM ' . TABLE_COUPON_RESTRICT . '
+                WHERE coupon_id = ' . (int)$original_id;
         $copy_coupon_restrictions = $db->Execute($sql);
 
         foreach ($copy_coupon_restrictions as $copy_coupon_restriction) {
@@ -190,7 +191,7 @@ class Coupon extends base
      * @return string (new coupon code) (will be blank if the function failed)
      * @since ZC v2.0.0
      */
-    public static function generateRandomCouponCode(string $salt = "secret", $length = SECURITY_CODE_LENGTH, string $prefix = ''): string
+    public static function generateRandomCouponCode(string $salt = 'secret', $length = SECURITY_CODE_LENGTH, string $prefix = ''): string
     {
         $length = (int)$length;
         static $max_db_length;
@@ -240,10 +241,10 @@ class Coupon extends base
     public static function getAllCouponsByName(): array
     {
         global $db;
-        $results = $db->Execute("SELECT cd.coupon_name, c.coupon_id, c.coupon_code
-                                FROM " . TABLE_COUPONS . " c, " . TABLE_COUPONS_DESCRIPTION . " cd
+        $results = $db->Execute('SELECT cd.coupon_name, c.coupon_id, c.coupon_code
+                                FROM ' . TABLE_COUPONS . ' c, ' . TABLE_COUPONS_DESCRIPTION . ' cd
                                 WHERE cd.coupon_id = c.coupon_id
-                                AND cd.language_id = " . (int)$_SESSION['languages_id']);
+                                AND cd.language_id = ' . (int)$_SESSION['languages_id']);
 
         $coupons = [];
         foreach ($results as $coupon) {

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -42,7 +44,7 @@ trait ObserverManager
             }
 
             // handle attach
-            $nameHash = hash('md5', get_class($observer) . $eventID);
+            $nameHash = hash('md5', $observer::class . $eventID);
             EventDto::getInstance()->setObserver($nameHash, ['obs' => &$observer, 'eventID' => $eventID]);
         }
     }
@@ -51,13 +53,12 @@ trait ObserverManager
      * Detach an observer from the notifier object
      *
      * @param object $observer
-     * @param array $eventIDArray
      * @since ZC v1.5.8
      */
     public function detach($observer, array $eventIDArray): void
     {
         foreach ($eventIDArray as $eventID) {
-            $nameHash = hash('md5', get_class($observer) . $eventID);
+            $nameHash = hash('md5', $observer::class . $eventID);
             EventDto::getInstance()->removeObserver($nameHash);
         }
     }

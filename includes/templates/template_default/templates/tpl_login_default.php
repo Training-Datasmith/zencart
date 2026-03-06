@@ -19,17 +19,17 @@
         <fieldset class="floatingBox back">
             <legend><?php echo HEADING_NEW_CUSTOMER_SPLIT; ?></legend>
 
-            <?php // ** BEGIN PAYPAL EXPRESS CHECKOUT ** ?>
+            <?php // ** BEGIN PAYPAL EXPRESS CHECKOUT **?>
             <?php if ($ec_button_enabled) { ?>
                 <div class="information"><?php echo TEXT_NEW_CUSTOMER_INTRODUCTION_SPLIT; ?></div>
                 <div class="center"><?php require(DIR_FS_CATALOG . DIR_WS_MODULES . 'payment/paypal/tpl_ec_button.php'); ?></div>
                 <hr/>
                 <?php echo TEXT_NEW_CUSTOMER_POST_INTRODUCTION_DIVIDER; ?>
             <?php } ?>
-            <?php // ** END PAYPAL EXPRESS CHECKOUT ** ?>
+            <?php // ** END PAYPAL EXPRESS CHECKOUT **?>
 
             <div class="information"><?php echo TEXT_NEW_CUSTOMER_POST_INTRODUCTION_SPLIT; ?></div>
-            <?php echo zen_draw_form('create', zen_href_link(FILENAME_CREATE_ACCOUNT, (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', $_GET['gv_no']) : ''), 'SSL')); ?>
+            <?php echo zen_draw_form('create', zen_href_link(FILENAME_CREATE_ACCOUNT, (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', (string) $_GET['gv_no']) : ''), 'SSL')); ?>
 
             <div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_CREATE_ACCOUNT, BUTTON_CREATE_ACCOUNT_ALT, 'name="registrationButton"'); ?></div>
             <?php echo '</form>'; ?>
@@ -38,7 +38,7 @@
         <fieldset class="floatingBox forward">
             <legend><?php echo HEADING_RETURNING_CUSTOMER_SPLIT; ?></legend>
             <div class="information"><?php echo TEXT_RETURNING_CUSTOMER_SPLIT; ?></div>
-            <?php echo zen_draw_form('loginForm', zen_href_link(FILENAME_LOGIN, 'action=process' . (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', $_GET['gv_no']) : ''), 'SSL'), 'post', 'id="loginForm"'); ?>
+            <?php echo zen_draw_form('loginForm', zen_href_link(FILENAME_LOGIN, 'action=process' . (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', (string) $_GET['gv_no']) : ''), 'SSL'), 'post', 'id="loginForm"'); ?>
 
             <label class="inputLabel" for="login-email-address"><?php echo ENTRY_EMAIL_ADDRESS; ?></label>
             <?php echo zen_draw_input_field('email_address', '', 'size="18" id="login-email-address" autofocus autocomplete="username" placeholder="' . ENTRY_EMAIL_ADDRESS_TEXT . '"' . ((int)ENTRY_EMAIL_ADDRESS_MIN_LENGTH > 0 ? ' required' : ''), 'email'); ?>
@@ -64,7 +64,7 @@
             <?php
         }
         ?>
-        <?php echo zen_draw_form('loginForm', zen_href_link(FILENAME_LOGIN, 'action=process' . (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', $_GET['gv_no']) : ''), 'SSL'), 'post', 'id="loginForm"'); ?>
+        <?php echo zen_draw_form('loginForm', zen_href_link(FILENAME_LOGIN, 'action=process' . (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', (string) $_GET['gv_no']) : ''), 'SSL'), 'post', 'id="loginForm"'); ?>
         <fieldset>
             <legend><?php echo HEADING_RETURNING_CUSTOMER; ?></legend>
 
@@ -83,7 +83,7 @@
         <?php echo '</form>'; ?>
         <br class="clearBoth">
 
-        <?php echo zen_draw_form('createAccountForm', zen_href_link(FILENAME_CREATE_ACCOUNT, (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', $_GET['gv_no']) : ''), 'SSL'), 'post', 'onsubmit="return check_form(createAccountForm);" id="createAccountForm"') . zen_draw_hidden_field('action', 'process') . zen_draw_hidden_field('email_pref_html', 'email_format'); ?>
+        <?php echo zen_draw_form('createAccountForm', zen_href_link(FILENAME_CREATE_ACCOUNT, (isset($_GET['gv_no']) ? '&gv_no=' . preg_replace('/[^0-9.,%]/', '', (string) $_GET['gv_no']) : ''), 'SSL'), 'post', 'onsubmit="return check_form(createAccountForm);" id="createAccountForm"') . zen_draw_hidden_field('action', 'process') . zen_draw_hidden_field('email_pref_html', 'email_format'); ?>
         <fieldset>
             <legend><?php echo HEADING_NEW_CUSTOMER; ?></legend>
             <div class="information"><?php echo TEXT_NEW_CUSTOMER_INTRODUCTION; ?></div>

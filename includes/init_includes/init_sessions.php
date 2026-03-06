@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * session handling
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -33,7 +35,7 @@ zen_session_save_path(SESSION_WRITE_DIRECTORY);
 /**
  * set the session cookie parameters
  */
-$path = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$path = str_replace('\\', '/', dirname((string) $_SERVER['SCRIPT_NAME']));
 if (defined('SESSION_USE_ROOT_COOKIE_PATH') && SESSION_USE_ROOT_COOKIE_PATH === 'True') {
     $path = '/';
 }
@@ -93,7 +95,7 @@ if (SESSION_FORCE_COOKIE_USE === 'True') {
     $spider_flag = false;
     if (!empty($user_agent)) {
         $spiders = file(DIR_WS_INCLUDES . 'spiders.txt');
-        for ($i=0, $n = count($spiders); $i < $n; $i++) {
+        for ($i = 0, $n = count($spiders); $i < $n; $i++) {
             if (!empty($spiders[$i]) && !str_starts_with($spiders[$i], '$Id:')) {
                 if (is_int(strpos($user_agent, trim($spiders[$i])))) {
                     $spider_flag = true;
@@ -107,7 +109,7 @@ if (SESSION_FORCE_COOKIE_USE === 'True') {
         $session_started = true;
     } elseif (isset($_GET[$zenSessionId]) && $_GET[$zenSessionId] !== '') {
         $tmp = (isset($_GET['main_page']) && $_GET['main_page'] !== '') ? $_GET['main_page'] : FILENAME_DEFAULT;
-        @header("HTTP/1.1 301 Moved Permanently");
+        @header('HTTP/1.1 301 Moved Permanently');
         @zen_redirect(@zen_href_link($tmp, @zen_get_all_get_params([$zenSessionId]), $request_type, false));
         unset($tmp);
         die();

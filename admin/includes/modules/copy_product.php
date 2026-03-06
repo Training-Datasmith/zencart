@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -26,7 +28,7 @@ if (empty($pInfo->products_id)) {
     }
 }
 
-$contents = ['form' => zen_draw_form('copy_product', FILENAME_CATEGORY_PRODUCT_LISTING, 'action=copy_product_confirm&cPath=' . $cPath . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post', 'class="form-horizontal"') . zen_draw_hidden_field('products_id', $pInfo->products_id)];
+$contents = ['form' => zen_draw_form('copy_product', FILENAME_CATEGORY_PRODUCT_LISTING, 'action=copy_product_confirm&cPath=' . $cPath . (isset($_GET['page']) ? '&page=' . $_GET['page'] : ''), 'post') . zen_draw_hidden_field('products_id', $pInfo->products_id)];
 $contents[] = ['text' => TEXT_INFO_CURRENT_PRODUCT . '<br><strong>' . $pInfo->products_model . ' - ' . $pInfo->products_name . ' [ID#' . $pInfo->products_id . ']</strong>'];
 $contents[] = ['text' => TEXT_INFO_CURRENT_CATEGORIES . '<br><strong>' . zen_output_generated_category_path($pInfo->products_id, 'product') . '</strong>'];
 
@@ -43,7 +45,7 @@ $contents[] = [
     'text' => '<h5>' . TEXT_HOW_TO_COPY . '</h5>' .
         '<div class="radio h6"><label>' . zen_draw_radio_field('copy_as', 'link', true) . TEXT_COPY_AS_LINK . '</label></div>' .
         zen_image(DIR_WS_IMAGES . 'pixel_black.gif', '', '', '1', 'style="width:100%"') .
-        '<div class="radio h6"><label>' . zen_draw_radio_field('copy_as', 'duplicate') . TEXT_COPY_AS_DUPLICATE . '</label></div>'
+        '<div class="radio h6"><label>' . zen_draw_radio_field('copy_as', 'duplicate') . TEXT_COPY_AS_DUPLICATE . '</label></div>',
 ];
 
 // only ask about attributes if defined
@@ -114,7 +116,7 @@ $contents[] = ['text' => zen_image(DIR_WS_IMAGES . 'pixel_black.gif', '', '', '3
 $contents[] = [
     'align' => 'center',
     'text' => '<button type="submit" class="btn btn-primary">' . IMAGE_COPY . '</button>' .
-        '<a href="' . zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $cPath . '&pID=' . $pInfo->products_id . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>'
+        '<a href="' . zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $cPath . '&pID=' . $pInfo->products_id . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')) . '" class="btn btn-default" role="button">' . IMAGE_CANCEL . '</a>',
 ];
 
 $contents[] = ['text' => zen_image(DIR_WS_IMAGES . 'pixel_black.gif', '', '', '1', 'style="width:100%"')];

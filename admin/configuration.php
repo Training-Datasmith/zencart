@@ -19,13 +19,13 @@ if (!empty($action)) {
             // Handle radio fields (configuration[cfg_XX])
             if (is_array($_POST['configuration'] ?? false)) {
                 foreach ($_POST['configuration'] as $key => $value) {
-                    if (str_starts_with($key, 'cfg_')) {
-                        $config_id = (int)substr($key, 4);
+                    if (str_starts_with((string) $key, 'cfg_')) {
+                        $config_id = (int)substr((string) $key, 4);
                         $configuration_value = zen_db_prepare_input($value);
 
                         // See if there are any configuration checks
-                        $checks = $db->Execute("SELECT val_function FROM " . TABLE_CONFIGURATION . " WHERE configuration_id = " . $config_id, 1);
-                        if (!$checks->EOF && $checks->fields['val_function'] != NULL) {
+                        $checks = $db->Execute('SELECT val_function FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_id = ' . $config_id, 1);
+                        if (!$checks->EOF && $checks->fields['val_function'] != null) {
                             require_once 'includes/functions/configuration_checks.php';
                             if (!zen_validate_configuration_entry($configuration_value, $checks->fields['val_function'])) {
                                 zen_redirect(zen_href_link(FILENAME_CONFIGURATION, 'gID=' . $_GET['gID']));
@@ -36,7 +36,7 @@ if (!empty($action)) {
                             continue; // No change, skip update
                         }
                         $db->Execute(
-                            "UPDATE " . TABLE_CONFIGURATION . "
+                            'UPDATE ' . TABLE_CONFIGURATION . "
                                 SET configuration_value = '" . zen_db_input($configuration_value) . "',
                                     last_modified = now()
                               WHERE configuration_id = " . $config_id
@@ -45,10 +45,10 @@ if (!empty($action)) {
                     }
 
                     $result = $db->Execute(
-                        "SELECT configuration_key
-                           FROM " . TABLE_CONFIGURATION . "
-                          WHERE configuration_id = " . $config_id . "
-                          LIMIT 1"
+                        'SELECT configuration_key
+                           FROM ' . TABLE_CONFIGURATION . '
+                          WHERE configuration_id = ' . $config_id . '
+                          LIMIT 1'
                     );
                     zen_record_admin_activity('Configuration setting changed for ' . $result->fields['configuration_key'] . ': ' . $configuration_value, 'warning');
 
@@ -59,13 +59,13 @@ if (!empty($action)) {
 
             // Handle text fields (cfg_XX)
             foreach ($_POST as $key => $value) {
-                if (str_starts_with($key, 'cfg_') && !is_array($value)) {
-                    $config_id = (int)substr($key, 4);
+                if (str_starts_with((string) $key, 'cfg_') && !is_array($value)) {
+                    $config_id = (int)substr((string) $key, 4);
                     $configuration_value = zen_db_prepare_input($value);
 
                     // See if there are any configuration checks
-                    $checks = $db->Execute("SELECT val_function FROM " . TABLE_CONFIGURATION . " WHERE configuration_id = " . $config_id, 1);
-                    if (!$checks->EOF && $checks->fields['val_function'] != NULL) {
+                    $checks = $db->Execute('SELECT val_function FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_id = ' . $config_id, 1);
+                    if (!$checks->EOF && $checks->fields['val_function'] != null) {
                         require_once 'includes/functions/configuration_checks.php';
                         if (!zen_validate_configuration_entry($configuration_value, $checks->fields['val_function'])) {
                             zen_redirect(zen_href_link(FILENAME_CONFIGURATION, 'gID=' . $_GET['gID']));
@@ -76,7 +76,7 @@ if (!empty($action)) {
                         continue; // No change, skip update
                     }
                     $db->Execute(
-                        "UPDATE " . TABLE_CONFIGURATION . "
+                        'UPDATE ' . TABLE_CONFIGURATION . "
                             SET configuration_value = '" . zen_db_input($configuration_value) . "',
                                 last_modified = now()
                           WHERE configuration_id = " . $config_id
@@ -84,10 +84,10 @@ if (!empty($action)) {
                     $counter++;
 
                     $result = $db->Execute(
-                        "SELECT configuration_key
-                           FROM " . TABLE_CONFIGURATION . "
-                          WHERE configuration_id = " . $config_id . "
-                          LIMIT 1"
+                        'SELECT configuration_key
+                           FROM ' . TABLE_CONFIGURATION . '
+                          WHERE configuration_id = ' . $config_id . '
+                          LIMIT 1'
                     );
                     zen_record_admin_activity('Configuration setting changed for ' . $result->fields['configuration_key'] . ': ' . $configuration_value, 'warning');
 
@@ -99,7 +99,7 @@ if (!empty($action)) {
             // set the WARN_BEFORE_DOWN_FOR_MAINTENANCE to false if DOWN_FOR_MAINTENANCE = true
             if (zen_get_configuration_key_value('WARN_BEFORE_DOWN_FOR_MAINTENANCE') === 'true' && zen_get_configuration_key_value('DOWN_FOR_MAINTENANCE') === 'true') {
                 $db->Execute(
-                    "UPDATE " . TABLE_CONFIGURATION . "
+                    'UPDATE ' . TABLE_CONFIGURATION . "
                         SET configuration_value = 'false',
                             last_modified = now()
                       WHERE configuration_key = 'WARN_BEFORE_DOWN_FOR_MAINTENANCE'
@@ -118,10 +118,10 @@ if (!empty($action)) {
 }
 
 $cfg_group = $db->Execute(
-    "SELECT configuration_group_title
-       FROM " . TABLE_CONFIGURATION_GROUP . "
-      WHERE configuration_group_id = " . (int)$gID . "
-      LIMIT 1"
+    'SELECT configuration_group_title
+       FROM ' . TABLE_CONFIGURATION_GROUP . '
+      WHERE configuration_group_id = ' . $gID . '
+      LIMIT 1'
 );
 
 if ($cfg_group->EOF) {
@@ -154,8 +154,8 @@ if ($gID === 7) {
     }
 } elseif ($gID === 5) {
     if (zen_get_configuration_key_value('CUSTOMERS_ACTIVATION_REQUIRED') === 'true') {
-        $db->Execute("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '3' WHERE configuration_key = 'CUSTOMERS_APPROVAL_AUTHORIZATION'", 1);
-        $db->Execute("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = 'customers_authorization' WHERE configuration_key = 'CUSTOMERS_AUTHORIZATION_FILENAME'", 1);
+        $db->Execute('UPDATE ' . TABLE_CONFIGURATION . " SET configuration_value = '3' WHERE configuration_key = 'CUSTOMERS_APPROVAL_AUTHORIZATION'", 1);
+        $db->Execute('UPDATE ' . TABLE_CONFIGURATION . " SET configuration_value = 'customers_authorization' WHERE configuration_key = 'CUSTOMERS_AUTHORIZATION_FILENAME'", 1);
     }
 }
 ?>
@@ -194,23 +194,23 @@ if ($gID === 7) {
     <h1><?= $cfg_group->fields['configuration_group_title'] ?></h1>
 <?php
 $query =
-    "SELECT configuration_id, configuration_title, configuration_description, configuration_value, configuration_key, use_function, set_function
-       FROM " . TABLE_CONFIGURATION . "
-      WHERE configuration_group_id = " . (int)$gID;
+    'SELECT configuration_id, configuration_title, configuration_description, configuration_value, configuration_key, use_function, set_function
+       FROM ' . TABLE_CONFIGURATION . '
+      WHERE configuration_group_id = ' . $gID;
 $default_sort = true;
 if (defined('CONFIGURATION_MENU_ENTRIES_TO_SORT_BY_NAME') && !empty(CONFIGURATION_MENU_ENTRIES_TO_SORT_BY_NAME)) {
-    $sorted_menus = explode(',', CONFIGURATION_MENU_ENTRIES_TO_SORT_BY_NAME);
+    $sorted_menus = explode(',', (string) CONFIGURATION_MENU_ENTRIES_TO_SORT_BY_NAME);
     if (in_array($gID, $sorted_menus)) {
         $default_sort = false;
     }
 }
 if ($default_sort) {
-    $query .= " ORDER BY sort_order";
+    $query .= ' ORDER BY sort_order';
 } else {
-    $query .= " ORDER BY configuration_title";
+    $query .= ' ORDER BY configuration_title';
 }
 $configuration = $db->Execute($query);
-echo zen_draw_form('configuration', FILENAME_CONFIGURATION, 'gID=' . $_GET['gID'] . '&action=saveall', 'post', 'class="form-horizontal"');
+echo zen_draw_form('configuration', FILENAME_CONFIGURATION, 'gID=' . $_GET['gID'] . '&action=saveall', 'post');
 ?>
     <div class="row font-weight-bold bg-primary py-3">
         <div class="col-md-3"><?= TABLE_HEADING_CONFIGURATION_TITLE ?></div>
@@ -220,7 +220,7 @@ echo zen_draw_form('configuration', FILENAME_CONFIGURATION, 'gID=' . $_GET['gID'
 <?php
 foreach ($configuration as $item) {
     $fieldName = 'cfg_' . $item['configuration_id'];
-    $cfgValue = htmlspecialchars($item['configuration_value'], ENT_COMPAT, CHARSET, true);
+    $cfgValue = htmlspecialchars((string) $item['configuration_value'], ENT_COMPAT, CHARSET, true);
 
     if (defined('CFGTITLE_' . $item['configuration_key'])) {
         $item['configuration_title'] = constant('CFGTITLE_' . $item['configuration_key']);
@@ -229,38 +229,38 @@ foreach ($configuration as $item) {
         $item['configuration_description'] = constant('CFGDESC_' . $item['configuration_key']);
     }
 
-?>
+    ?>
     <div class="row row-hover align-items-center py-2">
         <div class="col-md-3">
             <?php
-            echo '<strong>' . $item['configuration_title'] . '</strong>';
-            if (ADMIN_CONFIGURATION_KEY_ON == 1) {
-                echo '<br>Key: ' . $item['configuration_key'];
-            }
-            ?>
+                echo '<strong>' . $item['configuration_title'] . '</strong>';
+    if (ADMIN_CONFIGURATION_KEY_ON == 1) {
+        echo '<br>Key: ' . $item['configuration_key'];
+    }
+    ?>
         </div>
         <div class="col-md-3">
             <?php
-            if (!empty($item['set_function'])) {
-                // use addslashes() instead of $cfgValue directly here.
-                $safe_value = addslashes($item['configuration_value']);
-                $set_function = $item['set_function'] . '\'' . $safe_value . '\', \'' . $fieldName . '\')';
+    if (!empty($item['set_function'])) {
+        // use addslashes() instead of $cfgValue directly here.
+        $safe_value = addslashes((string) $item['configuration_value']);
+        $set_function = $item['set_function'] . '\'' . $safe_value . '\', \'' . $fieldName . '\')';
 
-                eval('$inputField = ' . $set_function . ';');
+        eval('$inputField = ' . $set_function . ';');
 
-                // backward compatibility
-                // if a plugin ignores the new $fieldName parameter and hardcodes 'configuration_value', dynamically rewrite the name and id attributes
-                if (strpos($inputField, 'configuration_value') !== false) {
-                    $inputField = preg_replace('/name=[\'"]configuration_value(\[\])?[\'"]/', 'name="' . $fieldName . '$1"', $inputField);
-                    $inputField = preg_replace('/id=[\'"]configuration_value[\'"]/', 'id="' . $fieldName . '"', $inputField);
-                }
+        // backward compatibility
+        // if a plugin ignores the new $fieldName parameter and hardcodes 'configuration_value', dynamically rewrite the name and id attributes
+        if (str_contains((string) $inputField, 'configuration_value')) {
+            $inputField = preg_replace('/name=[\'"]configuration_value(\[\])?[\'"]/', 'name="' . $fieldName . '$1"', (string) $inputField);
+            $inputField = preg_replace('/id=[\'"]configuration_value[\'"]/', 'id="' . $fieldName . '"', $inputField);
+        }
 
-                echo $inputField;
-            } else {
-                echo '<input type="text" name="' . $fieldName . '" value="' . htmlspecialchars($cfgValue, ENT_COMPAT, CHARSET, true) . '" class="form-control">';
-            }
-            echo '<input type="hidden" name="orig_' . $fieldName . '" value="' . htmlspecialchars($cfgValue, ENT_COMPAT, CHARSET, true) . '">';
-            ?>
+        echo $inputField;
+    } else {
+        echo '<input type="text" name="' . $fieldName . '" value="' . htmlspecialchars($cfgValue, ENT_COMPAT, CHARSET, true) . '" class="form-control">';
+    }
+    echo '<input type="hidden" name="orig_' . $fieldName . '" value="' . htmlspecialchars($cfgValue, ENT_COMPAT, CHARSET, true) . '">';
+    ?>
         </div>
         <div class="col-md-6 bg-info p-3"><?= $item['configuration_description'] ?></div>
     </div>

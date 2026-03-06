@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -17,13 +19,12 @@ class DerivedItemsManager
     /**
      * @since ZC v1.5.8
      */
-    public function process($tableRow, string $colName, array $columnInfo): string
+    public function process(array $tableRow, string $colName, array $columnInfo): string
     {
         if (!isset($columnInfo['derivedItem'])) {
             return $tableRow[$colName];
         }
-        $colData = $this->processDerivedItem($tableRow, $colName, $columnInfo);
-        return $colData;
+        return $this->processDerivedItem($tableRow, $colName, $columnInfo);
     }
 
     /**
@@ -34,54 +35,49 @@ class DerivedItemsManager
         $type = $columnInfo['derivedItem']['type'];
         switch ($type) {
             case 'local':
-                $result = $this->{$columnInfo['derivedItem']['method']}($tableRow, $colName, $columnInfo);
-                return $result;
-                break;
+                return $this->{$columnInfo['derivedItem']['method']}($tableRow, $colName, $columnInfo);
             case 'closure':
-                $result = $columnInfo['derivedItem']['method']($tableRow, $colName, $columnInfo);
-                return $result;
-                break;
+                return $columnInfo['derivedItem']['method']($tableRow, $colName, $columnInfo);
         }
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function booleanReplace($tableRow, string $colName, array $columnInfo): string
+    protected function booleanReplace(array $tableRow, string $colName, array $columnInfo): string
     {
         $params = $columnInfo['derivedItem']['params'];
         $listValue = $tableRow[$colName];
-        $result = $params['false'];
-        if ($listValue) $result = $params['true'];
-        return $result;
+        if ($listValue) {
+            return $params['true'];
+        }
+        return $params['false'];
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function arrayReplace($tableRow, string $colName, array $columnInfo): string
+    protected function arrayReplace(array $tableRow, string $colName, array $columnInfo): string
     {
         $params = $columnInfo['derivedItem']['params'];
         $listValue = $tableRow[$colName];
-        $result = $params[$listValue];
-        return $result;
+        return $params[$listValue];
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function getPluginFileSize($tableRow, string $colName, array $columnInfo): string
+    protected function getPluginFileSize(array $tableRow, string $colName, array $columnInfo): string
     {
         $filePath = DIR_FS_CATALOG . 'zc_plugins/' . $tableRow['unique_key'] . '/';
-        $fs = new FileSystem;
-        $dirSize = $fs->getDirectorySize($filePath);
-        return $dirSize;
+        $fs = new FileSystem();
+        return $fs->getDirectorySize($filePath);
     }
 
     /**
      * @since ZC v2.1.0
      */
-    protected function getLanguageTranslationForName($tableRow, string $colName, array $columnInfo): string
+    protected function getLanguageTranslationForName(array $tableRow, string $colName, array $columnInfo): string
     {
         return zen_lookup_admin_menu_language_override('plugin_name', $tableRow['unique_key'], $tableRow['name']);
     }

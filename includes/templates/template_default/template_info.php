@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Template Information File
  *
@@ -17,4 +19,4 @@ $template_screenshot = 'scr_template_default.jpg';
 // Normally, this template does not use "Single Column Settings" in the admin's "Layout Controller",
 // but if a site has set the value, the template honors that setting.
 //
-$uses_single_column_layout_settings = (isset($uses_single_column_layout_settings)) ? $uses_single_column_layout_settings : false;
+$uses_single_column_layout_settings ??= false;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -9,11 +11,10 @@ namespace Tests\Unit\testsNotifiers;
 use Tests\Support\zcNotifierTestObserver;
 use Tests\Support\zcUnitTestCase;
 
-
 class NotifierUpdateHandlersTest extends zcUnitTestCase
 {
-    protected $preserveGlobalState = FALSE;
-    protected $runTestInSeparateProcess = TRUE;
+    protected $preserveGlobalState = false;
+    protected $runTestInSeparateProcess = true;
 
     protected $base;
 
@@ -21,12 +22,12 @@ class NotifierUpdateHandlersTest extends zcUnitTestCase
     {
         parent::setUp();
         require_once TESTCWD . 'Support/zcNotifierTestObserver.php';
-        $this->base = new \base;
+        $this->base = new \base();
     }
 
-    public function testObserverUpdateHandlers()
+    public function testObserverUpdateHandlers(): void
     {
-        $observer = new zcNotifierTestObserver;
+        new zcNotifierTestObserver();
         $testVar = 'foo';
         $this->base->notify('NOTIFY_TEST_SNAKE_CASE', null, $testVar);
         $this->assertEquals('snake', $testVar);

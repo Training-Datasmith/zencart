@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 if (!defined('SHOW_ACCEPTED_CREDIT_CARDS')) {
     return;
 }
-global $template, $current_page_base; 
-$define = [
+global $template, $current_page_base;
+
+return [
     'TEXT_ACCEPTED_CREDIT_CARDS' => '<strong>We accept:</strong> ',
     'TEXT_CC_ENABLED_VISA' => 'Visa',
     'TEXT_CC_ENABLED_MC' => 'MC',
@@ -26,5 +29,3 @@ $define = [
     'IMAGE_CC_ENABLED_DEBIT' => zen_image($template->get_template_dir('cc9.gif', DIR_WS_TEMPLATE, $current_page_base, 'images/icons') . '/' . 'cc9.gif'),
     'IMAGE_CC_ENABLED_MAESTRO' => zen_image($template->get_template_dir('cc10.gif', DIR_WS_TEMPLATE, $current_page_base, 'images/icons') . '/' . 'cc10.gif'),
 ];
-
-return $define;

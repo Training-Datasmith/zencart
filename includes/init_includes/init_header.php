@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * header code, mainly concerned with adding to messagestack when certain warnings are applicable
  *
@@ -35,11 +37,11 @@ if (
     (defined('MODULE_PAYMENT_AUTHORIZENET_STATUS')
     && MODULE_PAYMENT_AUTHORIZENET_STATUS === 'True'
     && defined('MODULE_PAYMENT_AUTHORIZENET_TESTMODE')
-    && MODULE_PAYMENT_AUTHORIZENET_TESTMODE ==='Test')
+    && MODULE_PAYMENT_AUTHORIZENET_TESTMODE === 'Test')
 ) {
     $messageStack->add('header', 'AUTHORIZENET IS IN TESTING MODE', 'warning');
 }
-if (defined('MODULE_SHIPPING_USPS_SERVER') &&   MODULE_SHIPPING_USPS_SERVER === 'test' ) {
+if (defined('MODULE_SHIPPING_USPS_SERVER') &&   MODULE_SHIPPING_USPS_SERVER === 'test') {
     $messageStack->add('header', 'USPS IS IN TESTING MODE', 'warning');
 }
 
@@ -59,7 +61,7 @@ if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING === true) {
 
 // if down for maintenance, prevent indexing
 if (DOWN_FOR_MAINTENANCE === 'true' && !zen_is_whitelisted_admin_ip()) {
-    header("HTTP/1.1 503 Service Unavailable");
+    header('HTTP/1.1 503 Service Unavailable');
 }
 
 /* Check for invalid countries in customer's address book.
@@ -68,9 +70,9 @@ if (DOWN_FOR_MAINTENANCE === 'true' && !zen_is_whitelisted_admin_ip()) {
  */
 if (zen_is_logged_in() && !in_array($_GET['main_page'], [FILENAME_ADDRESS_BOOK_PROCESS, FILENAME_LOGOFF], true)) {
     $addresses_query =
-        "SELECT address_book_id, entry_country_id as country_id
-           FROM   " . TABLE_ADDRESS_BOOK . "
-          WHERE  customers_id = :customersID";
+        'SELECT address_book_id, entry_country_id as country_id
+           FROM   ' . TABLE_ADDRESS_BOOK . '
+          WHERE  customers_id = :customersID';
 
     $addresses_query = $db->bindVars($addresses_query, ':customersID', $_SESSION['customer_id'], 'integer');
     $addresses = $db->Execute($addresses_query);

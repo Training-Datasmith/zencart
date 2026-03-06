@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -22,7 +24,7 @@ class InstallerFactory
     /**
      * @since ZC v1.5.7
      */
-    public function make($plugin, $version)
+    public function make(string $plugin, string $version): \Zencart\PluginSupport\BasePluginInstaller|\Installer
     {
         $pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $plugin . '/';
         $versionDir = $pluginDir . $version . '/';
@@ -38,12 +40,10 @@ class InstallerFactory
         }
 
         if (!file_exists($versionDir . 'Installer/Installer.php')) {
-            $installer = new BasePluginInstaller($this->dbConn, $this->pluginInstaller, $this->errorContainer);
-            return $installer;
+            return new BasePluginInstaller($this->dbConn, $this->pluginInstaller, $this->errorContainer);
         }
 
         require_once $versionDir . 'Installer/Installer.php';
-        $installer = new \Installer($this->dbConn, $this->pluginInstaller, $this->errorContainer);
-        return $installer;
+        return new \Installer($this->dbConn, $this->pluginInstaller, $this->errorContainer);
     }
 }

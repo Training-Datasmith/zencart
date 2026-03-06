@@ -1,5 +1,5 @@
 <?php
-$define = [
-];
 
-return $define;
+declare(strict_types=1);
+return [
+];

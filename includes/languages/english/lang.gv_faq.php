@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => TEXT_GV_NAME . ' FAQ',
     'HEADING_TITLE' => TEXT_GV_NAME . ' FAQ',
     'TEXT_INFORMATION' => '<a id="Top"></a>
@@ -59,5 +61,3 @@ click the Redeem button. The code will be
     'TEXT_GV_REDEEM_INFO' => 'Please enter your ' . TEXT_GV_NAME . ' redemption code: ',
     'TEXT_GV_REDEEM_ID' => 'Redemption Code:',
 ];
-
-return $define;

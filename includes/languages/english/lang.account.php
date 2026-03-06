@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'My Account',
     'HEADING_TITLE' => 'My Account Information',
     'OVERVIEW_SHOW_ALL_ORDERS' => '(show all orders)',
@@ -17,5 +19,3 @@ $define = [
     'EMAIL_NOTIFICATIONS_NEWSLETTERS' => 'Subscribe or unsubscribe from newsletters.',
     'EMAIL_NOTIFICATIONS_PRODUCTS' => 'View or change my product notification list.',
 ];
-
-return $define;

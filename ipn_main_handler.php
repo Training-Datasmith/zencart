@@ -25,7 +25,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
     // this is an EC handler request
     require 'includes/application_top.php';
 
-// Validate Cart for checkout
+    // Validate Cart for checkout
     $_SESSION['valid_to_checkout'] = true;
     $_SESSION['cart']->get_products(true);
     if ($_SESSION['valid_to_checkout'] !== true || $_SESSION['cart']->count_contents() <= 0) {
@@ -55,8 +55,8 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 }
             }
         }
-//  } else {
-//      zen_redirect(zen_href_link(FILENAME_TIME_OUT));
+        //  } else {
+        //      zen_redirect(zen_href_link(FILENAME_TIME_OUT));
     }
 
     require(DIR_WS_CLASSES . 'payment.php');
@@ -112,8 +112,8 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
             'last_name',
         ] as $key
     ) {
-        if (isset($_POST[$key]) && str_contains($_POST[$key], '%')) {
-            $_POST[$key] = urldecode($_POST[$key]);
+        if (isset($_POST[$key]) && str_contains((string) $_POST[$key], '%')) {
+            $_POST[$key] = urldecode((string) $_POST[$key]);
         }
     }
 
@@ -127,8 +127,8 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
     /**
      * detect type of transaction
      */
-    $isECtransaction = $posted_txn_type === 'express_checkout' || in_array(substr($posted_custom, 0, 3), ['EC-', 'DP-', 'WPP']); /*|| $_POST['txn_type']=='cart'*/
-    $isDPtransaction = in_array(substr($posted_custom, 0, 3), ['DP-', 'WPP', 'PF-']);
+    $isECtransaction = $posted_txn_type === 'express_checkout' || in_array(substr((string) $posted_custom, 0, 3), ['EC-', 'DP-', 'WPP']); /*|| $_POST['txn_type']=='cart'*/
+    $isDPtransaction = in_array(substr((string) $posted_custom, 0, 3), ['DP-', 'WPP', 'PF-']);
 
     /**
      * set paypal-specific application_top parameters
@@ -142,9 +142,9 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
 
     $extraDebug = (defined('IPN_EXTRA_DEBUG_DETAILS') && IPN_EXTRA_DEBUG_DETAILS === 'All');
 
-    if ((defined('MODULE_PAYMENT_PAYPALWPP_DEBUGGING') && str_contains(MODULE_PAYMENT_PAYPALWPP_DEBUGGING, 'Log'))
-        || (defined('MODULE_PAYMENT_PAYPAL_IPN_DEBUG') && str_contains(MODULE_PAYMENT_PAYPAL_IPN_DEBUG, 'Log'))
-        || (!empty($_REQUEST['ppdebug']) && $_REQUEST['ppdebug'] === 'on' && str_contains(EXCLUDE_ADMIN_IP_FOR_MAINTENANCE, $_SERVER['REMOTE_ADDR']))
+    if ((defined('MODULE_PAYMENT_PAYPALWPP_DEBUGGING') && str_contains((string) MODULE_PAYMENT_PAYPALWPP_DEBUGGING, 'Log'))
+        || (defined('MODULE_PAYMENT_PAYPAL_IPN_DEBUG') && str_contains((string) MODULE_PAYMENT_PAYPAL_IPN_DEBUG, 'Log'))
+        || (!empty($_REQUEST['ppdebug']) && $_REQUEST['ppdebug'] === 'on' && str_contains(EXCLUDE_ADMIN_IP_FOR_MAINTENANCE, (string) $_SERVER['REMOTE_ADDR']))
         || $extraDebug) {
         $show_all_errors = true;
         $debug_logfile_path = ipn_debug_email('Breakpoint: 0 - Initializing debugging.');
@@ -282,18 +282,15 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
             // these types are irrelevant to ZC transactions
             ipn_debug_email('IPN NOTICE :: Transaction txn_type not relevant to Zen Cart processing. IPN handler aborted.' . $posted_txn_type);
             die();
-            break;
-        case (str_starts_with($posted_txn_type, 'subscr_')):
+        case (str_starts_with((string) $posted_txn_type, 'subscr_')):
             // For now we filter out subscription payments
             ipn_debug_email('IPN NOTICE :: Subscription payment - Not currently supported by Zen Cart. IPN handler aborted.');
             die();
-            break;
 
         case 'pending-unilateral':
             // cannot process this order because the merchant's PayPal account isn't valid yet
             ipn_debug_email('IPN NOTICE :: Please create a valid PayPal account and follow the steps to *Verify* it. IPN handler aborted.');
             die();
-            break;
         case 'pending-address':
         case 'pending-intl':
         case 'pending-multicurrency':
@@ -305,9 +302,9 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 $sql_data_array = ipn_create_order_history_array($paypalipnID);
                 zen_db_perform(TABLE_PAYPAL_PAYMENT_STATUS_HISTORY, $sql_data_array);
                 die();
-                break;
             }
-        case (($txn_type === 'express_checkout' || $isECtransaction) && !str_contains($txn_type, 'cleared') && $parentLookup !== 'parent'):
+            // no break
+        case (($txn_type === 'express_checkout' || $isECtransaction) && !str_contains((string) $txn_type, 'cleared') && $parentLookup !== 'parent'):
             if ($_POST['payment_status'] === 'Completed') {
                 // This is an express-checkout transaction -- IPN may not be needed
                 if (isset($_POST['auth_status']) && $_POST['auth_status'] === 'Completed') {
@@ -320,7 +317,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 die();
             }
             ipn_debug_email('Breakpoint: 5 - midstream checkpoint');
-            if (!(str_starts_with($txn_type, 'pending-') && (int)$ordersID <= 0)
+            if (!(str_starts_with((string) $txn_type, 'pending-') && (int)$ordersID <= 0)
                 && !($new_record_needed && $txn_type === 'echeck-cleared')
                 && $txn_type !== 'unique' && $txn_type !== 'echeck-denied' && $txn_type !== 'voided'
             ) {
@@ -328,19 +325,22 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 break;
             }
 
+            // no break
         case ($txn_type === 'cart'):
             ipn_debug_email('IPN NOTICE :: This is a detailed-cart transaction');
 
+            // no break
         case ($txn_type === 'cart' && !$isECtransaction):
             ipn_debug_email('IPN NOTICE :: This is a detailed-cart transaction (i)');
 
-        case (str_starts_with($txn_type, 'pending-') && (int)$ordersID <= 0):
+            // no break
+        case (str_starts_with((string) $txn_type, 'pending-') && (int)$ordersID <= 0):
         case ($new_record_needed && $txn_type === 'echeck-cleared'):
         case 'unique':
             /**
              * delete IPN session from PayPal table -- housekeeping
              */
-            $db->Execute("DELETE FROM " . TABLE_PAYPAL_SESSION . " WHERE session_id = '" . zen_db_input(str_replace($zenSessionId . '=', '', $posted_custom)) . "'");
+            $db->Execute('DELETE FROM ' . TABLE_PAYPAL_SESSION . " WHERE session_id = '" . zen_db_input(str_replace($zenSessionId . '=', '', $posted_custom)) . "'");
             /**
              * require shipping class
              */
@@ -355,7 +355,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
              * require order class
              */
             require(DIR_WS_CLASSES . 'order.php');
-            $order = new order;
+            $order = new order();
             /**
              * require order_total class
              */
@@ -373,7 +373,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 ipn_debug_email('IPN NOTICE :: Unique but no session - Assumed to be a personal payment, rather than a new Website Payments Standard transaction. Ignoring.');
                 die();
             }
-            if (!str_contains($txn_type, 'denied') && !str_contains($txn_type, 'failed') && !str_contains($txn_type, 'voided')) {
+            if (!str_contains((string) $txn_type, 'denied') && !str_contains((string) $txn_type, 'failed') && !str_contains((string) $txn_type, 'voided')) {
                 $insert_id = $order->create($order_totals);
                 $zco_notifier->notify('NOTIFY_CHECKOUT_PROCESS_AFTER_ORDER_CREATE');
                 ipn_debug_email('Breakpoint: 5a - built order -- OID: ' . $insert_id);
@@ -392,7 +392,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 ipn_debug_email('Breakpoint: 5g - new status code: ' . $new_status);
                 if ($_POST['payment_status'] === 'Pending') {
                     $new_status = (defined('MODULE_PAYMENT_PAYPAL_PROCESSING_STATUS_ID') && (int)MODULE_PAYMENT_PAYPAL_PROCESSING_STATUS_ID > 0 ? (int)MODULE_PAYMENT_PAYPAL_PROCESSING_STATUS_ID : 2);
-                    ipn_debug_email('Breakpoint: 5h - newer status code: ' . (int)$new_status);
+                    ipn_debug_email('Breakpoint: 5h - newer status code: ' . $new_status);
                 }
 
                 $comments = 'PayPal status: ' . $_POST['payment_status'] . ' ' . $posted_pending_reason . ' @ ' . $_POST['payment_date'] . (($_POST['parent_txn_id'] != '') ? "\n" . ' Parent Trans ID:' . $_POST['parent_txn_id'] : '') . "\n" . ' Trans ID:' . $_POST['txn_id'] . "\n" . ' Amount: ' . $_POST['mc_gross'] . ' ' . $_POST['mc_currency'];
@@ -441,7 +441,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 $_SESSION['order_summary']['order_total'] = $ototal;
                 $_SESSION['order_summary']['commissionable_order'] = $commissionable_order;
                 $_SESSION['order_summary']['commissionable_order_formatted'] = $commissionable_order_formatted;
-                $_SESSION['order_summary']['coupon_code'] = urlencode($order->info['coupon_code']);
+                $_SESSION['order_summary']['coupon_code'] = urlencode((string) $order->info['coupon_code']);
                 $_SESSION['order_summary']['currency_code'] = $order->info['currency'];
                 $_SESSION['order_summary']['currency_value'] = $order->info['currency_value'];
                 $_SESSION['order_summary']['payment_module_code'] = $order->info['payment_module_code'];
@@ -450,8 +450,8 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 $_SESSION['order_summary']['tax'] = $otax ?? 0;
                 $_SESSION['order_summary']['shipping'] = $oshipping ?? 0;
                 $products_array = [];
-                foreach ($order->products as $key => $val) {
-                    $products_array[urlencode((string)$val['id'])] = urlencode($val['model']);
+                foreach ($order->products as $val) {
+                    $products_array[urlencode((string)$val['id'])] = urlencode((string) $val['model']);
                 }
                 $_SESSION['order_summary']['products_ordered_ids'] = implode('|', array_keys($products_array));
                 $_SESSION['order_summary']['products_ordered_models'] = implode('|', array_values($products_array));
@@ -466,6 +466,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                     break;
                 }
             }
+            // no break
         case 'parent':
         case 'cleared-address':
         case 'cleared-multicurrency':
@@ -492,7 +493,7 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
             } else {
                 $sql_data_array = ipn_create_order_update_array($txn_type);
                 zen_db_perform(TABLE_PAYPAL, $sql_data_array, 'update', "txn_id='" . ($txn_type === 'cleared-authorization' ? $_POST['parent_txn_id'] : $_POST['txn_id']) . "'");
-                $sql = "SELECT paypal_ipn_id FROM " . TABLE_PAYPAL . " WHERE txn_id=:txn:";
+                $sql = 'SELECT paypal_ipn_id FROM ' . TABLE_PAYPAL . ' WHERE txn_id=:txn:';
                 $sql = $db->bindVars($sql, ':txn:', $_POST['txn_id'], 'string');
                 $result = $db->Execute($sql, 1);
                 $paypalipnID = $result->fields['paypal_ipn_id'];
@@ -515,39 +516,36 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
                 case 'echeck-denied':
                 case 'denied-echeck':
                 case 'failed-echeck':
+                case 'pending-auth':
                     //payment_status=Denied or failed
                     $new_status = ($isECtransaction ? (int)MODULE_PAYMENT_PAYPALWPP_REFUNDED_STATUS_ID : (int)MODULE_PAYMENT_PAYPAL_REFUND_ORDER_STATUS_ID);
                     break;
                 case 'echeck-cleared':
                     $new_status = (int)MODULE_PAYMENT_PAYPAL_ORDER_STATUS_ID;
                     break;
-                case ($txn_type === 'express-checkout-cleared' || str_starts_with($txn_type, 'cleared-')):
+                case ($txn_type === 'express-checkout-cleared' || str_starts_with((string) $txn_type, 'cleared-')):
                     //express-checkout-cleared
                     $new_status = ($isECtransaction && defined('MODULE_PAYMENT_PAYPALWPP_ORDER_STATUS_ID') ? (int)MODULE_PAYMENT_PAYPALWPP_ORDER_STATUS_ID : (int)MODULE_PAYMENT_PAYPAL_ORDER_STATUS_ID);
                     if (empty($new_status)) {
                         $new_status = 2;
                     }
                     break;
-                case 'pending-auth':
-                    // pending authorization
-                    $new_status = ($isECtransaction ? (int)MODULE_PAYMENT_PAYPALWPP_REFUNDED_STATUS_ID : (int)MODULE_PAYMENT_PAYPAL_REFUND_ORDER_STATUS_ID);
-                    break;
-                case (str_starts_with($txn_type, 'denied-')):
+                case (str_starts_with((string) $txn_type, 'denied-')):
                     // denied for any other reason - treat as pending for now
-                case (str_starts_with($txn_type, 'pending-')):
+                case (str_starts_with((string) $txn_type, 'pending-')):
                     // pending anything
                     $new_status = ($isECtransaction ? (int)MODULE_PAYMENT_PAYPALWPP_ORDER_PENDING_STATUS_ID : (int)MODULE_PAYMENT_PAYPAL_PROCESSING_STATUS_ID);
                     break;
             }
             // update order status history with new information
             ipn_debug_email(
-                'IPN NOTICE :: Set new status ' . $new_status . " for order ID = " . $ordersID . ($posted_pending_reason !== '' ? '.   Reason_code = ' . $posted_pending_reason : '')
+                'IPN NOTICE :: Set new status ' . $new_status . ' for order ID = ' . $ordersID . ($posted_pending_reason !== '' ? '.   Reason_code = ' . $posted_pending_reason : '')
             );
             if (empty($new_status)) {
                 $new_status = 1;
             }
             if (in_array($_POST['payment_status'], ['Refunded', 'Reversed', 'Denied', 'Failed'])
-                || str_starts_with($txn_type, 'cleared-')
+                || str_starts_with((string) $txn_type, 'cleared-')
                 || $txn_type === 'echeck-cleared'
                 || $txn_type === 'express-checkout-cleared'
             ) {
@@ -581,4 +579,3 @@ if (isset($_GET['type']) && $_GET['type'] === 'ec') {
             break;
     }
 }
-

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * jscript_addr_pulldowns
  *

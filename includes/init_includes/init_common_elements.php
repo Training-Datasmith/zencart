@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Set some common processing flags, overridable via site-specific /extra_datafiles processing.  See
  * /includes/extra_datafiles/dist-site_specific_overrides.php.
@@ -40,12 +42,12 @@ if (isset($flag_show_brand_sidebox_link)) {
     // Setting a flag for use in the 'information' sidebox.
     //
     $brand_check = $db->Execute(
-        "SELECT m.manufacturers_id
-           FROM " . TABLE_MANUFACTURERS . " m
-                LEFT JOIN " . TABLE_PRODUCTS . " p
+        'SELECT m.manufacturers_id
+           FROM ' . TABLE_MANUFACTURERS . ' m
+                LEFT JOIN ' . TABLE_PRODUCTS . ' p
                     ON p.manufacturers_id = m.manufacturers_id
           WHERE p.products_status = 1
-          LIMIT 1"
+          LIMIT 1'
     );
     $flag_show_brand_sidebox_link = !$brand_check->EOF;
     unset($brand_check);

@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'EMAIL_LOGO_ALT_TITLE_TEXT' => 'Zen Cart! The Art of E-commerce',
     'EMAIL_LOGO_FILENAME' => 'header.jpg',
     'EMAIL_LOGO_WIDTH' => '550',
@@ -29,5 +31,3 @@ $define = [
     'EMAIL_TEXT_SUBJECT_LOWSTOCK' => 'Warning: Low Stock',
     'SEND_EXTRA_LOW_STOCK_EMAIL_TITLE' => 'Low Stock Report: ',
 ];
-
-return $define;

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * ot_total order-total module
  *
@@ -48,20 +50,19 @@ class ot_loworderfee
      */
     public $output = [];
 
-    function __construct()
+    public function __construct()
     {
         $this->code = 'ot_loworderfee';
         $this->title = MODULE_ORDER_TOTAL_LOWORDERFEE_TITLE;
         $this->description = MODULE_ORDER_TOTAL_LOWORDERFEE_DESCRIPTION;
         $this->enabled = $this->isEnabled();
         $this->sort_order = defined('MODULE_ORDER_TOTAL_LOWORDERFEE_SORT_ORDER') ? MODULE_ORDER_TOTAL_LOWORDERFEE_SORT_ORDER : null;
-        if (null === $this->sort_order) return false;
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function process()
+    public function process(): void
     {
         global $order, $currencies;
         if ($this->enabled === false) {
@@ -86,7 +87,7 @@ class ot_loworderfee
                 break;
         }
 
-//        if ( ($pass == true) && ( ($order->info['total'] - $order->info['shipping_cost']) < MODULE_ORDER_TOTAL_LOWORDERFEE_ORDER_UNDER) ) {
+        //        if ( ($pass == true) && ( ($order->info['total'] - $order->info['shipping_cost']) < MODULE_ORDER_TOTAL_LOWORDERFEE_ORDER_UNDER) ) {
         if ($pass == true && $order->info['subtotal'] < MODULE_ORDER_TOTAL_LOWORDERFEE_ORDER_UNDER) {
             $charge_it = 'true';
             $cart_content_type = $_SESSION['cart']->get_content_type();
@@ -124,14 +125,14 @@ class ot_loworderfee
                 }
 
                 $tax_amount = zen_calculate_tax($low_order_fee, $tax);
-                $order->info['tax'] += $tax_amount; 
+                $order->info['tax'] += $tax_amount;
                 if (!isset($order->info['tax_groups'][$tax_description])) {
                     $order->info['tax_groups'][$tax_description] = 0;
                 }
-                $order->info['tax_groups'][$tax_description] += $tax_amount; 
-                $order->info['total'] += $low_order_fee + $tax_amount; 
+                $order->info['tax_groups'][$tax_description] += $tax_amount;
+                $order->info['total'] += $low_order_fee + $tax_amount;
                 if (DISPLAY_PRICE_WITH_TAX === 'true') {
-                    $low_order_fee += $tax_amount; 
+                    $low_order_fee += $tax_amount;
                 }
 
                 $this->output[] = [
@@ -146,13 +147,13 @@ class ot_loworderfee
     /**
      * @since ZC v1.0.3
      */
-    function check()
+    public function check()
     {
         global $db;
         if (!isset($this->_check)) {
             $check_query =
-                "SELECT configuration_value
-                   FROM " . TABLE_CONFIGURATION . "
+                'SELECT configuration_value
+                   FROM ' . TABLE_CONFIGURATION . "
                   WHERE configuration_key = 'MODULE_ORDER_TOTAL_LOWORDERFEE_STATUS'";
 
             $check_query = $db->Execute($check_query);
@@ -165,7 +166,7 @@ class ot_loworderfee
     /**
      * @since ZC v1.0.3
      */
-    function keys()
+    public function keys(): array
     {
         return [
             'MODULE_ORDER_TOTAL_LOWORDERFEE_STATUS',
@@ -183,35 +184,35 @@ class ot_loworderfee
     /**
      * @since ZC v1.0.3
      */
-    function install()
+    public function install(): void
     {
         global $db;
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_LOWORDERFEE_STATUS', 'true', '', '6', '1','zen_cfg_select_option([\'true\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_LOWORDERFEE_STATUS', 'true', '', '6', '1','zen_cfg_select_option([\'true\'], ', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ORDER_TOTAL_LOWORDERFEE_SORT_ORDER', '400', 'Sort order of display.', '6', '2', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ORDER_TOTAL_LOWORDERFEE_SORT_ORDER', '400', 'Sort order of display.', '6', '2', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Allow Low Order Fee', 'MODULE_ORDER_TOTAL_LOWORDERFEE_LOW_ORDER_FEE', 'false', 'Do you want to allow low order fees?', '6', '3', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Allow Low Order Fee', 'MODULE_ORDER_TOTAL_LOWORDERFEE_LOW_ORDER_FEE', 'false', 'Do you want to allow low order fees?', '6', '3', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) values ('Order Fee For Orders Under', 'MODULE_ORDER_TOTAL_LOWORDERFEE_ORDER_UNDER', '50', 'Add the low order fee to orders under this amount.', '6', '4', 'currencies->format', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) values ('Order Fee For Orders Under', 'MODULE_ORDER_TOTAL_LOWORDERFEE_ORDER_UNDER', '50', 'Add the low order fee to orders under this amount.', '6', '4', 'currencies->format', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) values ('Order Fee', 'MODULE_ORDER_TOTAL_LOWORDERFEE_FEE', '5', 'For Percentage Calculation - include a % Example: 10%<br>For a flat amount just enter the amount - Example: 5 for $5.00', '6', '5', '', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, date_added) values ('Order Fee', 'MODULE_ORDER_TOTAL_LOWORDERFEE_FEE', '5', 'For Percentage Calculation - include a % Example: 10%<br>For a flat amount just enter the amount - Example: 5 for $5.00', '6', '5', '', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Attach Low Order Fee On Orders Made', 'MODULE_ORDER_TOTAL_LOWORDERFEE_DESTINATION', 'both', 'Attach low order fee for orders sent to the set destination.', '6', '6', 'zen_cfg_select_option([\'national\', \'international\', \'both\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Attach Low Order Fee On Orders Made', 'MODULE_ORDER_TOTAL_LOWORDERFEE_DESTINATION', 'both', 'Attach low order fee for orders sent to the set destination.', '6', '6', 'zen_cfg_select_option([\'national\', \'international\', \'both\'], ', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_ORDER_TOTAL_LOWORDERFEE_TAX_CLASS', '0', 'Use the following tax class on the low order fee.', '6', '7', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_ORDER_TOTAL_LOWORDERFEE_TAX_CLASS', '0', 'Use the following tax class on the low order fee.', '6', '7', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('No Low Order Fee on Virtual Products', 'MODULE_ORDER_TOTAL_LOWORDERFEE_VIRTUAL', 'false', 'Do not charge Low Order Fee when cart is Virtual Products Only', '6', '8', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('No Low Order Fee on Virtual Products', 'MODULE_ORDER_TOTAL_LOWORDERFEE_VIRTUAL', 'false', 'Do not charge Low Order Fee when cart is Virtual Products Only', '6', '8', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
 
-        $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('No Low Order Fee on Gift Vouchers', 'MODULE_ORDER_TOTAL_LOWORDERFEE_GV', 'false', 'Do not charge Low Order Fee when cart is Gift Vouchers Only', '6', '9', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
+        $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('No Low Order Fee on Gift Vouchers', 'MODULE_ORDER_TOTAL_LOWORDERFEE_GV', 'false', 'Do not charge Low Order Fee when cart is Gift Vouchers Only', '6', '9', 'zen_cfg_select_option([\'true\', \'false\'], ', now())");
     }
 
     /**
      * @since ZC v1.0.3
      */
-    function remove()
+    public function remove(): void
     {
         global $db;
-        $db->Execute("DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
+        $db->Execute('DELETE FROM ' . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
     }
 
     /**
@@ -228,4 +229,3 @@ class ot_loworderfee
         return true;
     }
 }
-

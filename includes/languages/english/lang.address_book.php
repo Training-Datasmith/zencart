@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE_1' => 'My Account',
     'NAVBAR_TITLE_2' => 'Address Book',
     'HEADING_TITLE' => 'My Personal Address Book',
@@ -8,5 +10,3 @@ $define = [
     'PRIMARY_ADDRESS' => '(primary address)',
     'TEXT_MAXIMUM_ENTRIES' => '<span class="coming"><strong>NOTE:</strong></span> A maximum of %s address book entries allowed.',
 ];
-
-return $define;

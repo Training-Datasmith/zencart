@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * more_information sidebox - displays list of links to additional pages on the site.  Must separately build those pages' content.
  *
@@ -30,7 +32,6 @@ if (DEFINE_PAGE_4_STATUS <= 1) {
 // ... or create an observer-class file that monitors the following notification.
 //
 $zco_notifier->notify('NOTIFY_MORE_INFORMATION_SIDEBOX_ADDITIONS', [], $more_information);
-
 
 // only show if links are active
 if (count($more_information) > 0) {

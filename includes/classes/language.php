@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * language Class.
  *
@@ -48,7 +50,6 @@ class language extends base
      */
     protected array $browser_languages = [];
 
-
     public function __construct(string $language = '')
     {
         $this->build_list_of_configured_languages();
@@ -65,9 +66,9 @@ class language extends base
         global $db;
 
         $this->languages_by_code = [];
-        $sql = "SELECT languages_id, name, code, image, directory
-                FROM " . TABLE_LANGUAGES . "
-                ORDER BY sort_order";
+        $sql = 'SELECT languages_id, name, code, image, directory
+                FROM ' . TABLE_LANGUAGES . '
+                ORDER BY sort_order';
         $results = $db->Execute($sql);
 
         foreach ($results as $result) {
@@ -156,7 +157,7 @@ class language extends base
             return;
         }
 
-        $this->browser_languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        $this->browser_languages = explode(',', (string) $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
         foreach ($this->browser_languages as $val) {
             $lang = explode(';', $val);

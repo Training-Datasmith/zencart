@@ -105,12 +105,12 @@
   if (isset($product['attributes']) && is_array($product['attributes'])) {
     echo '<div class="cartAttribsList">';
     echo '<ul>';
-    foreach ($product['attributes'] as $option => $value) {
+    foreach ($product['attributes'] as $value) {
 ?>
 
 <li>
     <?php
-    echo $value['products_options_name'] . TEXT_OPTION_DIVIDER . nl2br($value['products_options_values_name']);
+    echo $value['products_options_name'] . TEXT_OPTION_DIVIDER . nl2br((string) $value['products_options_values_name']);
     ?>
 </li>
 
@@ -135,9 +135,7 @@
        </td>
        <td class="cartQuantityUpdate"><?php echo $product['buttonUpdate']; ?></td>
 
-<?php  } else {
-
-  }  ?>
+<?php  }  ?>
 
 
        <td class="cartUnitDisplay"><?php if ($display_as_mobile) { echo '<b class="hide">' . TABLE_HEADING_PRICE . '&#58;&nbsp;&nbsp;</b>'; } ?><?php echo $product['productsPriceEach']; ?></td>

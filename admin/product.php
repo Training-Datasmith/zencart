@@ -19,7 +19,7 @@ if (isset($_GET['pID'])) {
     $type_handler = $product_lookup->getTypeHandler() . '.php';
 }
 
-if ($action !== 'new_product' && $action !== 'new_product_preview' && $action !== 'insert_product') { 
+if ($action !== 'new_product' && $action !== 'new_product_preview' && $action !== 'insert_product') {
     if ($product_lookup === null || !$product_lookup->exists()) {
         $messageStack->add_session(sprintf(WARNING_PRODUCT_DOES_NOT_EXIST, (int)($_GET['pID'] ?? 0)), 'warning');
         zen_redirect(zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING));
@@ -42,8 +42,7 @@ if (!empty($action)) {
 
         case 'new_product_preview':
             if (!isset($_POST['master_categories_id'])
-                || (($_POST['products_model'] ?? '') . implode('', $_POST['products_url'] ?? []) . implode('', $_POST['products_name'] ?? []) . implode('', $_POST['products_description'] ?? [])) === '')
-            {
+                || (($_POST['products_model'] ?? '') . implode('', $_POST['products_url'] ?? []) . implode('', $_POST['products_name'] ?? []) . implode('', $_POST['products_description'] ?? [])) === '') {
                 $messageStack->add(ERROR_NO_DATA_TO_SAVE, 'error');
                 $action = 'new_product';
                 break;
@@ -76,9 +75,9 @@ $tax_class_array = [
     ['id' => '0', 'text' => TEXT_NONE],
 ];
 $tax_class = $db->Execute(
-    "SELECT tax_class_id, tax_class_title
-       FROM " . TABLE_TAX_CLASS . "
-      ORDER BY tax_class_title"
+    'SELECT tax_class_id, tax_class_title
+       FROM ' . TABLE_TAX_CLASS . '
+      ORDER BY tax_class_title'
 );
 foreach ($tax_class as $item) {
     $tax_class_array[] = [

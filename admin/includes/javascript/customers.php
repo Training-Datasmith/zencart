@@ -22,12 +22,12 @@ $c2z = [];
 // countries-to-zones will be created for use by the jQuery section.
 //
 $countries = $db->Execute(
-    "SELECT DISTINCT zone_country_id
-       FROM " . TABLE_ZONES . "
-            INNER JOIN " . TABLE_COUNTRIES . "
+    'SELECT DISTINCT zone_country_id
+       FROM ' . TABLE_ZONES . '
+            INNER JOIN ' . TABLE_COUNTRIES . '
                 ON countries_id = zone_country_id
                AND status = 1
-   ORDER BY zone_country_id"
+   ORDER BY zone_country_id'
 );
 foreach ($countries as $next_country) {
     $current_country_id = $next_country['zone_country_id'];

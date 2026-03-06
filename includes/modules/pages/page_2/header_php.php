@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Page 2
  *
@@ -12,4 +14,3 @@ $breadcrumb->add(NAVBAR_TITLE);
 
 // include template specific file name defines
 $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/', FILENAME_DEFINE_PAGE_2, 'false');
-?>

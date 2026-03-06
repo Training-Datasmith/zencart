@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @package plugins
  * @copyright Copyright 2003-2014 Zen Cart Development Team
@@ -10,9 +12,9 @@
  * Loadpoint 40 is for instantiating the observer class after dependencies are loaded
  *
  */
-  $autoLoadConfig[1][] = array('autoType'=>'class',
-                               'loadFile'=>'class.admin.zcObserverLogWriterDatabase.php',
-                               'classPath'=>DIR_WS_CLASSES);
-  $autoLoadConfig[65][] = array('autoType'=>'classInstantiate',
-                               'className'=>'zcObserverLogWriterDatabase',
-                               'objectName'=>'zcObserverLogWriterDatabase');
+$autoLoadConfig[1][] = ['autoType' => 'class',
+                             'loadFile' => 'class.admin.zcObserverLogWriterDatabase.php',
+                             'classPath' => DIR_WS_CLASSES];
+$autoLoadConfig[65][] = ['autoType' => 'classInstantiate',
+                             'className' => 'zcObserverLogWriterDatabase',
+                             'objectName' => 'zcObserverLogWriterDatabase'];

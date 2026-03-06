@@ -6,7 +6,6 @@
  * @version $Id: Zcwilt 2020 May 20 New in v1.5.7 $
  */
 
-use Zencart\PluginSupport\PluginConfigInstaller;
 use Zencart\QueryBuilder\QueryBuilder;
 use Zencart\TableViewControllers\PluginManagerController;
 
@@ -15,7 +14,11 @@ require('includes/application_top.php');
 $tableDefinition = [];
 
 $tableController = (new PluginManagerController(
-    $db, $messageStack, new QueryBuilder($db), $tableDefinition))->processRequest();
+    $db,
+    $messageStack,
+    new QueryBuilder($db),
+    $tableDefinition
+))->processRequest();
 
 ?>
 <!doctype html>
@@ -30,7 +33,7 @@ $tableController = (new PluginManagerController(
 
 <!-- body //-->
 
-<?php require "includes/templates/table_view.php"; ?>
+<?php require 'includes/templates/table_view.php'; ?>
 
 <!-- body_eof //-->
 

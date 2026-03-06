@@ -1,5 +1,7 @@
 <?php
-$define = [
+
+declare(strict_types=1);
+return [
     'NAVBAR_TITLE' => 'Login Time Out',
     'HEADING_TITLE' => 'Whoops! Your session has expired.',
     'HEADING_TITLE_LOGGED_IN' => 'Whoops! Sorry, but you are not allowed to perform the action requested. ',
@@ -7,5 +9,3 @@ $define = [
     'TEXT_INFORMATION_LOGGED_IN' => 'You are still logged in to your account and may continue shopping. Please choose a destination from a menu.',
     'HEADING_RETURNING_CUSTOMER' => 'Login',
 ];
-
-return $define;

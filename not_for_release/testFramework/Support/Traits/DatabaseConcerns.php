@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Traits;
 
 use Tests\Services\SeederRunner;
@@ -17,13 +19,15 @@ trait DatabaseConcerns
         if (!defined('DIR_FS_LOGS')) {
             define('DIR_FS_LOGS', ROOTCWD);
         }
-        if (!defined('DEBUG_LOG_FOLDER')) define('DEBUG_LOG_FOLDER', DIR_FS_LOGS);
+        if (!defined('DEBUG_LOG_FOLDER')) {
+            define('DEBUG_LOG_FOLDER', DIR_FS_LOGS);
+        }
         if (!defined('IS_ADMIN_FLAG')) {
             define('IS_ADMIN_FLAG', false);
         }
     }
 
-    public static function runDatabaseLoader($mainConfigs)
+    public static function runDatabaseLoader($mainConfigs): void
     {
         $options = [
             'db_host' => DB_SERVER,
@@ -66,7 +70,7 @@ trait DatabaseConcerns
         $runner->run('InitialSetupSeeder', $mainConfigs);
     }
 
-    public static function runCustomSeeder($seederClass)
+    public static function runCustomSeeder($seederClass): void
     {
         echo 'Running Custom Seeder' . PHP_EOL;
         $runner = new SeederRunner();

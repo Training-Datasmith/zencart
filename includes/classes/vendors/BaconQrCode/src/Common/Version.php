@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Common;
 
@@ -9,7 +10,7 @@ use SplFixedArray;
 /**
  * Version representation.
  */
-final class Version
+final class Version implements \Stringable
 {
     private const VERSION_DECODE_INFO = [
         0x07c94,
@@ -49,18 +50,6 @@ final class Version
     ];
 
     /**
-     * Version number of this version.
-     */
-    private int $versionNumber;
-
-    /**
-     * Alignment pattern centers.
-     *
-     * @var SplFixedArray|array
-     */
-    private SplFixedArray|array $alignmentPatternCenters;
-
-    /**
      * Error correction blocks.
      *
      * @var EcBlocks[]
@@ -70,7 +59,7 @@ final class Version
     /**
      * Total number of codewords.
      */
-    private null|int|float $totalCodewords;
+    private readonly null|int|float $totalCodewords;
 
     /**
      * Cached version instances.
@@ -83,12 +72,16 @@ final class Version
      * @param int[] $alignmentPatternCenters
      */
     private function __construct(
-        int $versionNumber,
-        array $alignmentPatternCenters,
+        /**
+         * Version number of this version.
+         */
+        private readonly int $versionNumber,
+        /**
+         * Alignment pattern centers.
+         */
+        private SplFixedArray|array $alignmentPatternCenters,
         EcBlocks ...$ecBlocks
     ) {
-        $this->versionNumber = $versionNumber;
-        $this->alignmentPatternCenters = $alignmentPatternCenters;
         $this->ecBlocks = $ecBlocks;
 
         $totalCodewords = 0;
@@ -104,7 +97,7 @@ final class Version
     /**
      * Returns the version number.
      */
-    public function getVersionNumber() : int
+    public function getVersionNumber(): int
     {
         return $this->versionNumber;
     }
@@ -114,7 +107,7 @@ final class Version
      *
      * @return int[]
      */
-    public function getAlignmentPatternCenters() : array
+    public function getAlignmentPatternCenters(): array
     {
         return $this->alignmentPatternCenters;
     }
@@ -122,7 +115,7 @@ final class Version
     /**
      * Returns the total number of codewords.
      */
-    public function getTotalCodewords() : int
+    public function getTotalCodewords(): int
     {
         return $this->totalCodewords;
     }
@@ -130,7 +123,7 @@ final class Version
     /**
      * Calculates the dimension for the current version.
      */
-    public function getDimensionForVersion() : int
+    public function getDimensionForVersion(): int
     {
         return 17 + 4 * $this->versionNumber;
     }
@@ -138,7 +131,7 @@ final class Version
     /**
      * Returns the number of EC blocks for a specific EC level.
      */
-    public function getEcBlocksForLevel(ErrorCorrectionLevel $ecLevel) : EcBlocks
+    public function getEcBlocksForLevel(ErrorCorrectionLevel $ecLevel): EcBlocks
     {
         return $this->ecBlocks[$ecLevel->ordinal()];
     }
@@ -148,7 +141,7 @@ final class Version
      *
      * @throws InvalidArgumentException if dimension is not 1 mod 4
      */
-    public static function getProvisionalVersionForDimension(int $dimension) : self
+    public static function getProvisionalVersionForDimension(int $dimension): self
     {
         if (1 !== $dimension % 4) {
             throw new InvalidArgumentException('Dimension is not 1 mod 4');
@@ -162,7 +155,7 @@ final class Version
      *
      * @throws InvalidArgumentException if version number is out of range
      */
-    public static function getVersionForNumber(int $versionNumber) : self
+    public static function getVersionForNumber(int $versionNumber): self
     {
         if ($versionNumber < 1 || $versionNumber > 40) {
             throw new InvalidArgumentException('Version number must be between 1 and 40');
@@ -174,7 +167,7 @@ final class Version
     /**
      * Decodes version information from an integer and returns the version.
      */
-    public static function decodeVersionInformation(int $versionBits) : ?self
+    public static function decodeVersionInformation(int $versionBits): ?self
     {
         $bestDifference = PHP_INT_MAX;
         $bestVersion = 0;
@@ -202,7 +195,7 @@ final class Version
     /**
      * Builds the function pattern for the current version.
      */
-    public function buildFunctionPattern() : BitMatrix
+    public function buildFunctionPattern(): BitMatrix
     {
         $dimension = $this->getDimensionForVersion();
         $bitMatrix = new BitMatrix($dimension);
@@ -221,11 +214,14 @@ final class Version
             $i = $this->alignmentPatternCenters[$x] - 2;
 
             for ($y = 0; $y < $max; ++$y) {
-                if (($x === 0 && ($y === 0 || $y === $max - 1)) || ($x === $max - 1 && $y === 0)) {
+                if ($x === 0 && ($y === 0 || $y === $max - 1)) {
                     // No alignment patterns near the three finder paterns
                     continue;
                 }
-
+                if ($x === $max - 1 && $y === 0) {
+                    // No alignment patterns near the three finder paterns
+                    continue;
+                }
                 $bitMatrix->setRegion($this->alignmentPatternCenters[$y] - 2, $i, 5, 5);
             }
         }
@@ -248,7 +244,7 @@ final class Version
     /**
      * Returns a string representation for the version.
      */
-    public function __toString() : string
+    public function __toString(): string
     {
         return (string) $this->versionNumber;
     }
@@ -260,7 +256,7 @@ final class Version
      *
      * @return array<int, self>
      */
-    private static function versions() : array
+    private static function versions(): array
     {
         if (null !== self::$versions) {
             return self::$versions;

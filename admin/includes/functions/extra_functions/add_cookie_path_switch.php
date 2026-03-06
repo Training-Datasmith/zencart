@@ -1,24 +1,22 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2023 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: John 2022 Nov 06 Modified in v1.5.8a $
  */
-if (!defined('SESSION_USE_ROOT_COOKIE_PATH') || !defined('SESSION_ADD_PERIOD_PREFIX'))
-{
-  $sql = "SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " 
+if (!defined('SESSION_USE_ROOT_COOKIE_PATH') || !defined('SESSION_ADD_PERIOD_PREFIX')) {
+    $sql = 'SELECT configuration_group_id FROM ' . TABLE_CONFIGURATION_GROUP . " 
           WHERE configuration_group_title = 'Sessions'";
-  $result = $db->execute($sql);
-  if ($result->RecordCount() > 0)
-  {
-    $id = $result->fields['configuration_group_id'];
-  } else 
-  {
-    $id = 15;    
-  }
-  if (!defined('SESSION_USE_ROOT_COOKIE_PATH'))
-  {
-    $sql = "INSERT INTO " . TABLE_CONFIGURATION . " 
+    $result = $db->execute($sql);
+    if ($result->RecordCount() > 0) {
+        $id = $result->fields['configuration_group_id'];
+    } else {
+        $id = 15;
+    }
+    if (!defined('SESSION_USE_ROOT_COOKIE_PATH')) {
+        $sql = 'INSERT INTO ' . TABLE_CONFIGURATION . " 
            SET configuration_key = 'SESSION_USE_ROOT_COOKIE_PATH',
                 sort_order =  '999', 
                 configuration_title = 'Use root path for cookie path', 
@@ -27,11 +25,10 @@ if (!defined('SESSION_USE_ROOT_COOKIE_PATH') || !defined('SESSION_ADD_PERIOD_PRE
                 configuration_group_id = " . (int)$id . ",
                 set_function = 'zen_cfg_select_option(array(\'True\', \'False\'), '
                  " ;
-    $result = $db->execute($sql);
-  }
-  if (!defined('SESSION_ADD_PERIOD_PREFIX'))
-  {
-    $sql = "INSERT INTO " . TABLE_CONFIGURATION . " 
+        $result = $db->execute($sql);
+    }
+    if (!defined('SESSION_ADD_PERIOD_PREFIX')) {
+        $sql = 'INSERT INTO ' . TABLE_CONFIGURATION . " 
            SET configuration_key = 'SESSION_ADD_PERIOD_PREFIX',
                 sort_order =  '999', 
                 configuration_title = 'Add period prefix to cookie domain', 
@@ -40,6 +37,6 @@ if (!defined('SESSION_USE_ROOT_COOKIE_PATH') || !defined('SESSION_ADD_PERIOD_PRE
                 configuration_group_id = " . (int)$id . ",
                 set_function = 'zen_cfg_select_option(array(\'True\', \'False\'), '
                  " ;
-    $result = $db->execute($sql);
-  }
+        $result = $db->execute($sql);
+    }
 }

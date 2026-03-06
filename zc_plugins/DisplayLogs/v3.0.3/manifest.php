@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 return [
     'pluginVersion' => 'v3.0.3',
     'pluginName' => 'Display Logs',

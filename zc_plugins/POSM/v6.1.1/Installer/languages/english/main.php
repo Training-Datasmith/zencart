@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 define(
     'ZC_PLUGIN_POSM_INSTALL_REMOVE_PREVIOUS',
     'This version of <em>POSM</em> cannot be installed until you remove the files associated with the non-<code>zc_plugin</code>.'

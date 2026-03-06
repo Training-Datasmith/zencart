@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\PluginControl;
 use App\Models\PluginControlVersion;
 use Zencart\DbRepositories\PluginControlRepository;
@@ -16,10 +18,10 @@ class AutoZenTestPlugin
     public function __construct()
     {
         // test instantiating the plugin_manager, to ensure dependent classes can be loaded as expected.
-        $plugin_manager = new PluginManager(new PluginControlRepository, new PluginControlVersionRepository);
+        $plugin_manager = new PluginManager(new PluginControlRepository(), new PluginControlVersionRepository());
 
         // test alias
-        $plugin_manager_alias = new PluginManager(new PluginControl, new PluginControlVersion);
+        new PluginManager(new PluginControl(), new PluginControlVersion());
 
         // test that the plugin manager can successfully list known plugins, which confirms db connectivity.
         $plugin_info = $plugin_manager->getInstalledPlugins();

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -8,9 +10,9 @@
 
 namespace Zencart\PluginSupport;
 
-use Zencart\DbRepositories\LayoutBoxRepository;
 use queryFactory;
 use queryFactoryResult;
+use Zencart\DbRepositories\LayoutBoxRepository;
 
 /**
  * @since ZC v2.0.1
@@ -26,7 +28,7 @@ trait ScriptedInstallHelpers
      */
     protected function getConfigurationKeyDetails(string $key_name, bool $only_check_existence = false): array|bool
     {
-        $sql = "SELECT * FROM " . TABLE_CONFIGURATION . " WHERE configuration_key = '" . $this->dbConn->prepare_input($key_name) . "'";
+        $sql = 'SELECT * FROM ' . TABLE_CONFIGURATION . " WHERE configuration_key = '" . $this->dbConn->prepare_input($key_name) . "'";
         $result = $this->executeInstallerSelectQuery($sql, 1);
 
         // false if not found, or if existence-check fails
@@ -134,9 +136,9 @@ trait ScriptedInstallHelpers
         }
 
         $db = $this->dbConn;
-        $keys_list = implode("','", array_map(static fn($val) => $db->prepare_input($val), $key_names));
+        $keys_list = implode("','", array_map(static fn ($val) => $db->prepare_input($val), $key_names));
 
-        $sql = "DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . $keys_list . "')";
+        $sql = 'DELETE FROM ' . TABLE_CONFIGURATION . " WHERE configuration_key IN ('" . $keys_list . "')";
         $this->executeInstallerSelectQuery($sql);
 
         $rows = $this->dbConn->affectedRows();
@@ -153,11 +155,11 @@ trait ScriptedInstallHelpers
     {
         $config_group_title = $this->dbConn->prepare_input($config_group_title);
         $config_group_description = $this->dbConn->prepare_input($config_group_description);
-        $sort_order = (int)($sort_order ?? 0);
+        $sort_order ??= 0;
 
         $sql =
-            "SELECT configuration_group_id
-               FROM " . TABLE_CONFIGURATION_GROUP . "
+            'SELECT configuration_group_id
+               FROM ' . TABLE_CONFIGURATION_GROUP . "
               WHERE configuration_group_title = '$config_group_title'
               LIMIT 1";
         $check = $this->executeInstallerSelectQuery($sql);
@@ -166,18 +168,18 @@ trait ScriptedInstallHelpers
         }
 
         $sql =
-            "INSERT INTO " . TABLE_CONFIGURATION_GROUP . "
+            'INSERT INTO ' . TABLE_CONFIGURATION_GROUP . "
                 (configuration_group_title, configuration_group_description, sort_order, visible)
              VALUES
                 ('$config_group_title', '$config_group_description', $sort_order, 1)";
         $this->executeInstallerSql($sql);
 
-        $sql = "SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = '$config_group_title' LIMIT 1";
+        $sql = 'SELECT configuration_group_id FROM ' . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = '$config_group_title' LIMIT 1";
         $result = $this->executeInstallerSelectQuery($sql);
         $cgi = (int)$result->fields['configuration_group_id'];
 
         if (empty($sort_order)) {
-            $sql = "UPDATE " . TABLE_CONFIGURATION_GROUP . " SET sort_order = $cgi WHERE configuration_group_id = $cgi LIMIT 1";
+            $sql = 'UPDATE ' . TABLE_CONFIGURATION_GROUP . " SET sort_order = $cgi WHERE configuration_group_id = $cgi LIMIT 1";
             $this->executeInstallerSql($sql);
         }
 
@@ -220,7 +222,7 @@ trait ScriptedInstallHelpers
 
         // manually set sort order if none was provided:
         if (empty($properties['sort_order'])) {
-            $sql = "UPDATE " . TABLE_CONFIGURATION_GROUP . " SET sort_order = $insert_id WHERE configuration_group_id = $insert_id LIMIT 1";
+            $sql = 'UPDATE ' . TABLE_CONFIGURATION_GROUP . " SET sort_order = $insert_id WHERE configuration_group_id = $insert_id LIMIT 1";
             $this->executeInstallerSql($sql);
             $sql_data_array[] = ['fieldName' => 'sort_order', 'value' => $insert_id, 'type' => 'integer'];
         }
@@ -253,7 +255,7 @@ trait ScriptedInstallHelpers
             }
         }
 
-        $this->executeInstallerDbPerform(TABLE_CONFIGURATION_GROUP, $sql_data_array, 'UPDATE', "configuration_group_id = " . (int)$group_id);
+        $this->executeInstallerDbPerform(TABLE_CONFIGURATION_GROUP, $sql_data_array, 'UPDATE', 'configuration_group_id = ' . $group_id);
         $rows = $this->dbConn->affectedRows();
 
         $sql_data_array[] = ['fieldName' => 'configuration_group_id', 'value' => $group_id, 'type' => 'integer'];
@@ -269,9 +271,9 @@ trait ScriptedInstallHelpers
     {
         $rows = 0;
 
-        $sql = "SELECT * FROM " . TABLE_CONFIGURATION_GROUP;
+        $sql = 'SELECT * FROM ' . TABLE_CONFIGURATION_GROUP;
         if (is_numeric($group)) {
-            $sql .= " WHERE configuration_group_id = " . (int)$group;
+            $sql .= ' WHERE configuration_group_id = ' . (int)$group;
         } else {
             $sql .= " WHERE configuration_group_title = '" . $this->dbConn->prepare_input($group) . "'";
         }
@@ -280,12 +282,12 @@ trait ScriptedInstallHelpers
         $cgi = (int)($result->fields['configuration_group_id'] ?? 0);
 
         if ($cascadeDeleteKeysToo) {
-            $sql = "DELETE FROM " . TABLE_CONFIGURATION . " WHERE configuration_group_id = $cgi";
+            $sql = 'DELETE FROM ' . TABLE_CONFIGURATION . " WHERE configuration_group_id = $cgi";
             $this->executeInstallerSql($sql);
             $rows += $this->dbConn->affectedRows();
         }
 
-        $sql = "DELETE FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_id = " . (int)$cgi;
+        $sql = 'DELETE FROM ' . TABLE_CONFIGURATION_GROUP . ' WHERE configuration_group_id = ' . $cgi;
         $this->executeInstallerSql($sql);
         $rows += $this->dbConn->affectedRows();
 
@@ -299,9 +301,9 @@ trait ScriptedInstallHelpers
      */
     protected function getConfigurationGroupDetails(int|string $group, bool $only_check_existence = false): array|bool
     {
-        $sql = "SELECT * FROM " . TABLE_CONFIGURATION_GROUP;
+        $sql = 'SELECT * FROM ' . TABLE_CONFIGURATION_GROUP;
         if (is_numeric($group)) {
-            $sql .= " WHERE configuration_group_id = " . (int)$group;
+            $sql .= ' WHERE configuration_group_id = ' . (int)$group;
         } else {
             $sql .= " WHERE configuration_group_title = '" . $this->dbConn->prepare_input($group) . "'";
         }

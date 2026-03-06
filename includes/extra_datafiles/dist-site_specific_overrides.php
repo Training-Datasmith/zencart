@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * A collection of site-specific overrides for the storefront operation.
  *
@@ -86,7 +88,7 @@
 
 // -----
 // Product Listing: enable sorting by column heading
-// 
+//
 // true .... Display the legacy clickable column headings to sort the product listing (in addition to the sorter dropdown)
 // false ... Do not show the column headings; this is the default.
 //
@@ -94,7 +96,7 @@
 
 // -----
 // Identify whether the link to the 'order_status' page is included in the "Information" sidebox.
-// 
+//
 // true .... Display the link; this is the default.
 // false ... Do not show the link.
 //

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Detection;
 
-require_once dirname(__FILE__) . '/../standalone/autoloader.php';
+require_once __DIR__ . '/../standalone/autoloader.php';
 
 class MobileDetectStandalone extends MobileDetect
 {

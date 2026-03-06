@@ -1,17 +1,17 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: John 2025 Oct 22 Modified in v2.2.0 $
  */
-
 /**
  * Returns a string with conversions for security.
  *
  * @param ?string $string The string to be parsed
  * @param array|bool $translate contains a string to be translated, otherwise just quote is translated
  * @param bool $protected Do we run htmlspecialchars over the string
- * @return string
  * @since ZC v1.0.3
  */
 function zen_output_string(?string $string, array|bool $translate = false, bool $protected = false): string
@@ -39,7 +39,7 @@ function zen_output_string(?string $string, array|bool $translate = false, bool 
  */
 function zen_preserve_search_quotes(?string $search_string): string
 {
-    return urlencode($search_string);
+    return urlencode((string) $search_string);
 }
 
 /**
@@ -66,7 +66,7 @@ function zen_output_string_protected(?string $string): string
 function zen_sanitize_string(string $string): string|null
 {
     $string = preg_replace('/ +/', ' ', $string);
-    return preg_replace("/[<>]/", '_', $string);
+    return preg_replace('/[<>]/', '_', (string) $string);
 }
 
 /**
@@ -97,7 +97,6 @@ function zen_not_null(mixed $value): bool
  * @param  string  $string  The string to be broken up
  * @param  int  $len  The maximum length allowed
  * @param  ?string  $break_char  The character to use at the end of the broken line
- * @return string
  * @since ZC v1.0.3
  */
 function zen_break_string(?string $string, int $len, string $break_char = '-'): string
@@ -127,10 +126,6 @@ function zen_break_string(?string $string, int $len, string $break_char = '-'): 
  * Truncate a string to the specified length, optionally using a custom "more" suffix.
  * Note: the $more parameter still supports providing string 'true' to mean appending "...".
  *
- * @param  ?string  $str
- * @param  int|string  $len
- * @param  string  $more
- * @return string
  * @since ZC v1.0.3
  */
 function zen_trunc_string(?string $str = '', int|string $len = 150, string $more = '...'): string
@@ -179,31 +174,25 @@ function zen_trunc_string(?string $str = '', int|string $len = 150, string $more
  *
  * @param  string  $paragraph
  * @param  int  $size
- * @return string
  * @since ZC v1.3.0
  */
-function zen_truncate_paragraph($paragraph, $size = 100)
+function zen_truncate_paragraph($paragraph, $size = 100): string
 {
-    $zv_paragraph = "";
-    $word = explode(" ", $paragraph);
+    $zv_paragraph = '';
+    $word = explode(' ', $paragraph);
     $zv_total = count($word);
     if ($zv_total > $size) {
         for ($x = 0; $x < $size; $x++) {
-            $zv_paragraph = $zv_paragraph . $word[$x] . " ";
+            $zv_paragraph = $zv_paragraph . $word[$x] . ' ';
         }
-        $zv_paragraph = trim($zv_paragraph);
-    } else {
-        $zv_paragraph = trim($paragraph);
+        return trim($zv_paragraph);
     }
-    return $zv_paragraph;
+    return trim($paragraph);
 }
 
 /**
  * Get the number of times a word/character is present in a string
  *
- * @param string $string
- * @param string $needle
- * @return int
  * @since ZC v1.0.3
  */
 function zen_word_count(string $string, string $needle): int
@@ -217,17 +206,16 @@ function zen_word_count(string $string, string $needle): int
  * A sort of pseudo-serialize function
  * Used mainly by the Navigation class to store historical info
  *
- * @param  array  $array
- * @param  array|string  $exclude
- * @param  string  $equals
- * @param  string  $separator
- * @return string
  * @since ZC v1.0.3
  */
 function zen_array_to_string(array $array, array|string $exclude = '', string $equals = '=', string $separator = '&'): string
 {
-    if (!is_array($exclude)) $exclude = [];
-    if (!is_array($array)) $array = [];
+    if (!is_array($exclude)) {
+        $exclude = [];
+    }
+    if (!is_array($array)) {
+        $array = [];
+    }
 
     $get_string = '';
     unset($array['x'], $array['y']);
@@ -247,31 +235,32 @@ function zen_array_to_string(array $array, array|string $exclude = '', string $e
  * convert supplied string to UTF-8, dropping any symbols which cannot be translated easily
  * useful for submitting cleaned-up data to payment gateways or other external services, esp if the data was copy+pasted from windows docs via windows browser to store in database
  *
- * @param  string  $string
- * @return string
  * @since ZC v1.3.9a
  */
 function charsetConvertWinToUtf8(string $string): string
 {
-    if (function_exists('iconv')) $string = iconv("Windows-1252", "ISO-8859-1//IGNORE", $string);
-    $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
-    return $string;
+    if (function_exists('iconv')) {
+        $string = iconv('Windows-1252', 'ISO-8859-1//IGNORE', $string);
+    }
+    return htmlentities($string, ENT_QUOTES, 'UTF-8');
 }
 
 /**
  * Convert supplied string to/from entities between charsets, to sanitize data from inputs, especially APIs and gateways
  *
  * @param $string
- * @return string
  * @since ZC v1.3.9a
  */
 function charsetClean($string): string
 {
-    if (preg_replace('/[^a-z0-9]/', '', strtolower(CHARSET)) == 'utf8') return $string;
-    if (function_exists('iconv')) $string = iconv("Windows-1252", CHARSET . "//IGNORE", $string);
-    $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
-    $string = html_entity_decode($string, ENT_QUOTES, CHARSET);
-    return $string;
+    if (preg_replace('/[^a-z0-9]/', '', strtolower(CHARSET)) == 'utf8') {
+        return $string;
+    }
+    if (function_exists('iconv')) {
+        $string = iconv('Windows-1252', CHARSET . '//IGNORE', (string) $string);
+    }
+    $string = htmlentities((string) $string, ENT_QUOTES, 'UTF-8');
+    return html_entity_decode($string, ENT_QUOTES, CHARSET);
 }
 
 /**
@@ -282,18 +271,14 @@ function charsetClean($string): string
 function replace_accents($s): string
 {
     $skipPreg = (defined('OVERRIDE_REPLACE_ACCENTS_WITH_HTMLENTITIES') && OVERRIDE_REPLACE_ACCENTS_WITH_HTMLENTITIES == 'TRUE');
-    $s = htmlentities($s, ENT_COMPAT, CHARSET);
+    $s = htmlentities((string) $s, ENT_COMPAT, CHARSET);
     if (!$skipPreg) {
         $s = preg_replace('/&([a-zA-Z])(uml|acute|elig|grave|circ|tilde|cedil|ring|quest|slash|caron);/', '$1', $s);
     }
-    $s = html_entity_decode($s);
-    return $s;
+    return html_entity_decode((string) $s);
 }
 
 /**
- * @param  string  $given_html
- * @param  int  $quote_style
- * @return string
  * @since ZC v1.1.2
  */
 function zen_html_entity_decode(string $given_html, int $quote_style = ENT_QUOTES): string
@@ -313,20 +298,14 @@ function zen_decode_specialchars(array|string $string): array|string
     $string = str_replace('&gt;', '>', $string);
     $string = str_replace('&lt;', '<', $string);
     $string = str_replace('&#039;', "'", $string);
-    $string = str_replace('&quot;', "\"", $string);
-    $string = str_replace('&amp;', '&', $string);
-    return $string;
+    $string = str_replace('&quot;', '"', $string);
+    return str_replace('&amp;', '&', $string);
 }
 
 /**
  * Recursively apply htmlentities on the passed string
  * Useful for preparing json output and ajax responses
  *
- * @param  array|string  $mixed_value
- * @param  int  $flags
- * @param  string  $encoding
- * @param  bool  $double_encode
- * @return array|string
  * @since ZC v1.5.7
  */
 function htmlentities_recurse(array|string $mixed_value, int $flags = ENT_QUOTES, string $encoding = 'utf-8', bool $double_encode = true): array|string
@@ -365,23 +344,22 @@ function utf8_encode_recurse($mixed_value)
 /**
  * Remove common HTML from text for display as paragraph
  *
- * @param  string  $clean_it
- * @param  array|string  $extraTags
- * @return string
  * @since ZC v1.2.0d
  */
 function zen_clean_html(string $clean_it, array|string $extraTags = ''): string
 {
-    if (!is_array($extraTags)) $extraTags = [$extraTags];
+    if (!is_array($extraTags)) {
+        $extraTags = [$extraTags];
+    }
 
     // remove any embedded javascript
     $clean_it = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $clean_it ?? '');
 
-    $clean_it = preg_replace('/\r/', ' ', $clean_it);
-    $clean_it = preg_replace('/\t/', ' ', $clean_it);
-    $clean_it = preg_replace('/\n/', ' ', $clean_it);
+    $clean_it = preg_replace('/\r/', ' ', (string) $clean_it);
+    $clean_it = preg_replace('/\t/', ' ', (string) $clean_it);
+    $clean_it = preg_replace('/\n/', ' ', (string) $clean_it);
 
-    $clean_it = nl2br($clean_it);
+    $clean_it = nl2br((string) $clean_it);
 
     // update breaks with a space for text displays in all listings with descriptions
     $clean_it = preg_replace('~(<br ?/?>|</?p>)~', ' ', $clean_it);
@@ -394,14 +372,16 @@ function zen_clean_html(string $clean_it, array|string $extraTags = ''): string
     $taglist = ['strong', 'b', 'u', 'i', 'em'];
     $taglist = array_merge($taglist, (is_array($extraTags) ? $extraTags : [$extraTags]));
     foreach ($taglist as $tofind) {
-        if ($tofind != '') $clean_it = preg_replace("/<[\/\!]*?" . $tofind . "[^<>]*?>/si", ' ', $clean_it);
+        if ($tofind != '') {
+            $clean_it = preg_replace("/<[\/\!]*?" . $tofind . '[^<>]*?>/si', ' ', (string) $clean_it);
+        }
     }
 
     // remove any double-spaces created by cleanups:
-    $clean_it = preg_replace('/[ ]+/', ' ', $clean_it);
+    $clean_it = preg_replace('/[ ]+/', ' ', (string) $clean_it);
 
     // remove other html code to prevent problems on display of text
-    $clean_it = strip_tags($clean_it);
+    $clean_it = strip_tags((string) $clean_it);
     return $clean_it;
 }
 
@@ -416,7 +396,7 @@ function fixup_url(?string $url): string
         return '';
     }
     if (!preg_match('#^https?://#', $url)) {
-        $url = '//' . $url;
+        return '//' . $url;
     }
     return $url;
 }
@@ -428,7 +408,6 @@ function fixup_url(?string $url): string
  *
  * @param string  $data  The string to be parsed
  * @param string  $parse  The needle to find
- * @return string
  * @deprecated in v1.5.8: Use strtr() instead
  * @since ZC v1.0.3
  * @deleting in ZC v3.0.0
@@ -445,7 +424,8 @@ function zen_parse_input_field_data(string $data, $parse): string
  * @deprecated in v1.5.8: Just cast to int directly.
  * @deleting in ZC v3.0.0
  */
-function zen_string_to_int($string) {
+function zen_string_to_int($string): int
+{
     trigger_error('Call to deprecated function zen_string_to_int. Use a closure instead', E_USER_DEPRECATED);
     return (int)$string;
 }
@@ -455,8 +435,6 @@ function zen_string_to_int($string) {
  * Basically performs PHP's coercive string conversion to float or int based on its content,
  * to accommodate what strict_types mode cannot do.
  *
- * @param mixed $string
- * @return int|float
  * @since ZC v2.0.0
  */
 function zen_str_to_numeric(mixed $string): float|int
@@ -491,7 +469,6 @@ function zen_str_to_numeric(mixed $string): float|int
  * @param string $config_key Name of configuration_key constant
  * @param string|null $lang_define_prefix Language define prefix to be prepended for lookup
  * @param string|null $fallback Value to return if failures occur
- * @return string
  * @since ZC v2.0.0
  */
 function zen_get_translated_config_setting(string $config_key, ?string $lang_define_prefix = null, ?string $fallback = null): string

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -58,10 +60,10 @@ class Customer extends base
             if (WHOLESALE_PRICING_CONFIG !== 'false' && zen_is_logged_in() && !zen_in_guest_checkout()) {
                 global $db;
                 $wholesale = $db->Execute(
-                    "SELECT customers_whole
-                       FROM " . TABLE_CUSTOMERS . "
-                      WHERE customers_id = " . (int)$_SESSION['customer_id'] . "
-                      LIMIT 1"
+                    'SELECT customers_whole
+                       FROM ' . TABLE_CUSTOMERS . '
+                      WHERE customers_id = ' . (int)$_SESSION['customer_id'] . '
+                      LIMIT 1'
                 );
                 if (!$wholesale->EOF && $wholesale->fields['customers_whole'] !== '0') {
                     $wholesaleInfo = [
@@ -117,10 +119,10 @@ class Customer extends base
         global $db;
 
         $sql =
-            "SELECT customers_firstname, customers_lastname, customers_id, customers_email_address
-               FROM " . TABLE_CUSTOMERS . "
+            'SELECT customers_firstname, customers_lastname, customers_id, customers_email_address
+               FROM ' . TABLE_CUSTOMERS . '
               WHERE customers_email_address = :emailAddress
-                AND customers_authorization != " . self::AUTH_BANNED;
+                AND customers_authorization != ' . self::AUTH_BANNED;
 
         $sql = $db->bindVars($sql, ':emailAddress', $email_address, 'string');
         $check_customer = $db->Execute($sql, 1);
@@ -134,10 +136,10 @@ class Customer extends base
         }
         $token = zen_create_random_value($length);
 
-        $sql = "DELETE FROM " . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . " WHERE customer_id = :customerID";
+        $sql = 'DELETE FROM ' . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . ' WHERE customer_id = :customerID';
         $sql = $db->bindVars($sql, ':customerID', $check_customer->fields['customers_id'], 'integer');
         $db->Execute($sql);
-        $sql = "INSERT INTO " . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . " (customer_id, token) VALUES (:customerID, :token)";
+        $sql = 'INSERT INTO ' . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . ' (customer_id, token) VALUES (:customerID, :token)';
         $sql = $db->bindVars($sql, ':token', $token, 'string');
         $sql = $db->bindVars($sql, ':customerID', $check_customer->fields['customers_id'], 'integer');
         $db->Execute($sql);
@@ -155,8 +157,8 @@ class Customer extends base
 
         $token_valid_minutes = self::getPasswordResetTokenMinutesValid();
 
-        $sql = "SELECT c.customers_nick, c.customers_id
-                FROM   " . TABLE_CUSTOMERS . " c, " . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . " ct
+        $sql = 'SELECT c.customers_nick, c.customers_id
+                FROM   ' . TABLE_CUSTOMERS . ' c, ' . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . " ct
                 WHERE  ct.token = :reset_token AND c.customers_id = ct.customer_id AND ct.created_at > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL $token_valid_minutes MINUTE)";
         $sql = $db->bindVars($sql, ':reset_token', $reset_token, 'string');
         $result = $db->Execute($sql);
@@ -177,9 +179,9 @@ class Customer extends base
         $token_valid_minutes = self::getPasswordResetTokenMinutesValid();
 
         $sql =
-            "SELECT ct.*
-               FROM " . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . " ct
-                    INNER JOIN " . TABLE_CUSTOMERS . " c
+            'SELECT ct.*
+               FROM ' . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . ' ct
+                    INNER JOIN ' . TABLE_CUSTOMERS . " c
                         ON ct.customer_id = c.customers_id
               WHERE c.customers_email_address = :email_address
                 AND ct.created_at > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL $token_valid_minutes MINUTE)
@@ -197,7 +199,7 @@ class Customer extends base
     {
         $token_valid_minutes = defined('PASSWORD_RESET_TOKEN_MINUTES_VALID') ? (int)constant('PASSWORD_RESET_TOKEN_MINUTES_VALID') : 60;
         if ($token_valid_minutes < 1 || $token_valid_minutes > 1440) {
-            $token_valid_minutes = 60;
+            return 60;
         }
         return $token_valid_minutes;
     }
@@ -275,9 +277,9 @@ class Customer extends base
         global $db;
 
         $sql =
-            "SELECT customers_id, customers_password, customers_authorization
-               FROM " . TABLE_CUSTOMERS . "
-              WHERE customers_email_address = :emailAddress";
+            'SELECT customers_id, customers_password, customers_authorization
+               FROM ' . TABLE_CUSTOMERS . '
+              WHERE customers_email_address = :emailAddress';
         $sql = $db->bindVars($sql, ':emailAddress', $email, 'string');
         $result = $db->Execute($sql, 1);
 
@@ -307,7 +309,7 @@ class Customer extends base
         }
 
         // fire notifier to check whether login should be allowed?
-//@TODO        $this->notify('NOTIFY_?LOGIN_ATTEMPT', null, $is_logged_in);
+        //@TODO        $this->notify('NOTIFY_?LOGIN_ATTEMPT', null, $is_logged_in);
 
         // -----
         // Load the customer's information from the database and set the appropriate
@@ -321,21 +323,21 @@ class Customer extends base
         // @TODO - delete this if we collapse the Info table
         // enforce db integrity: make sure related record exists
         if (empty($this->data['date_account_created'])) {
-            $sql = "INSERT IGNORE INTO " . TABLE_CUSTOMERS_INFO . " (customers_info_id) VALUES (:customersID)";
+            $sql = 'INSERT IGNORE INTO ' . TABLE_CUSTOMERS_INFO . ' (customers_info_id) VALUES (:customersID)';
             $sql = $db->bindVars($sql, ':customersID', $customer_id, 'integer');
             $db->Execute($sql);
         }
 
         // update last login
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS_INFO . "
+            'UPDATE ' . TABLE_CUSTOMERS_INFO . '
                 SET customers_info_date_of_last_logon = now(),
                     customers_info_number_of_logons = IF(customers_info_number_of_logons, customers_info_number_of_logons+1, 1)
-              WHERE customers_info_id = " . (int)$customer_id;
+              WHERE customers_info_id = ' . (int)$customer_id;
         $db->Execute($sql);
 
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
+            'UPDATE ' . TABLE_CUSTOMERS . "
                 SET last_login_ip = '" . zen_db_input(zen_get_ip_address()) . "'
               WHERE customers_id = " . (int)$customer_id;
         $db->Execute($sql);
@@ -371,8 +373,8 @@ class Customer extends base
         global $db;
 
         $sql =
-            "DELETE FROM " . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . "
-              WHERE customer_id = :customerID";
+            'DELETE FROM ' . TABLE_CUSTOMER_PASSWORD_RESET_TOKENS . '
+              WHERE customer_id = :customerID';
         $sql = $db->bindVars($sql, ':customerID', $customers_id, 'integer');
         $db->Execute($sql);
     }
@@ -385,9 +387,9 @@ class Customer extends base
         global $db;
 
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
+            'UPDATE ' . TABLE_CUSTOMERS . '
                 SET welcome_email_sent = 1
-              WHERE customers_id = :customerID";
+              WHERE customers_id = :customerID';
         $sql = $db->bindVars($sql, ':customerID', $customers_id, 'integer');
         $db->Execute($sql, 1);
     }
@@ -401,8 +403,8 @@ class Customer extends base
         global $db;
 
         $sql =
-            "DELETE FROM " . TABLE_CUSTOMERS_AUTH_TOKENS . "
-              WHERE customers_id = :customerID";
+            'DELETE FROM ' . TABLE_CUSTOMERS_AUTH_TOKENS . '
+              WHERE customers_id = :customerID';
         $sql = $db->bindVars($sql, ':customerID', $customers_id, 'integer');
         $db->Execute($sql);
     }
@@ -414,7 +416,7 @@ class Customer extends base
     {
         $token_valid_minutes = (int)CUSTOMERS_ACTIVATION_TOKEN_MINUTES_VALID;
         if ($token_valid_minutes < 1 || $token_valid_minutes > 1440) {
-            $token_valid_minutes = 60;
+            return 60;
         }
         return $token_valid_minutes;
     }
@@ -430,10 +432,10 @@ class Customer extends base
 
         global $db;
         $sql =
-            "SELECT customers_authorization
-               FROM " . TABLE_CUSTOMERS . "
+            'SELECT customers_authorization
+               FROM ' . TABLE_CUSTOMERS . '
               WHERE customers_id = :customersID
-              LIMIT 1";
+              LIMIT 1';
 
         $sql = $db->bindVars($sql, ':customersID', $this->customer_id, 'integer');
         $check_customer = $db->ExecuteNoCache($sql);
@@ -458,10 +460,10 @@ class Customer extends base
         global $db;
 
         $sql =
-            "SELECT *
-               FROM " . TABLE_CUSTOMERS_AUTH_TOKENS . "
+            'SELECT *
+               FROM ' . TABLE_CUSTOMERS_AUTH_TOKENS . '
               WHERE customers_id = :customer_id
-              LIMIT 1";
+              LIMIT 1';
         $sql = $db->bindVars($sql, ':customer_id', $this->customer_id, 'integer');
         $result = $db->ExecuteNoCache($sql);
 
@@ -478,9 +480,9 @@ class Customer extends base
         $token_valid_minutes = self::getAuthTokenMinutesValid();
 
         $sql =
-            "SELECT cat.*
-               FROM   " . TABLE_CUSTOMERS_AUTH_TOKENS . " cat
-                    INNER JOIN " . TABLE_CUSTOMERS . " c
+            'SELECT cat.*
+               FROM   ' . TABLE_CUSTOMERS_AUTH_TOKENS . ' cat
+                    INNER JOIN ' . TABLE_CUSTOMERS . " c
                         ON c.customers_id = cat.customers_id
               WHERE cat.token = :reset_token
                 AND cat.created_at > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL $token_valid_minutes MINUTE)
@@ -511,10 +513,10 @@ class Customer extends base
         }
         $token = zen_create_random_value($length);
 
-        $sql = "DELETE FROM " . TABLE_CUSTOMERS_AUTH_TOKENS . " WHERE customers_id = :customerID";
+        $sql = 'DELETE FROM ' . TABLE_CUSTOMERS_AUTH_TOKENS . ' WHERE customers_id = :customerID';
         $sql = $db->bindVars($sql, ':customerID', $this->customer_id, 'integer');
         $db->Execute($sql);
-        $sql = "INSERT INTO " . TABLE_CUSTOMERS_AUTH_TOKENS . " (customers_id, email_address, token) VALUES (:customerID, :emailAddress, :token)";
+        $sql = 'INSERT INTO ' . TABLE_CUSTOMERS_AUTH_TOKENS . ' (customers_id, email_address, token) VALUES (:customerID, :emailAddress, :token)';
         $sql = $db->bindVars($sql, ':token', $token, 'string');
         $sql = $db->bindVars($sql, ':customerID', $this->customer_id, 'integer');
         $sql = $db->bindVars($sql, ':emailAddress', $this->data['customers_email_address'], 'string');
@@ -549,9 +551,9 @@ class Customer extends base
         }
 
         $sql =
-            "SELECT customers_id
-               FROM " . TABLE_CUSTOMERS . "
-              WHERE customers_id = " . (int)$customer_id;
+            'SELECT customers_id
+               FROM ' . TABLE_CUSTOMERS . '
+              WHERE customers_id = ' . (int)$customer_id;
 
         $result = $db->Execute($sql, 1);
 
@@ -606,9 +608,9 @@ class Customer extends base
         $this->data['addresses'] = $addresses;
 
         $sql =
-            "SELECT COUNT(*) AS number_of_reviews
-               FROM " . TABLE_REVIEWS . "
-              WHERE customers_id = " . (int)$customer_id;
+            'SELECT COUNT(*) AS number_of_reviews
+               FROM ' . TABLE_REVIEWS . '
+              WHERE customers_id = ' . (int)$customer_id;
         $result = $db->Execute($sql);
         $this->data['number_of_reviews'] = (int)$result->fields['number_of_reviews'];
 
@@ -647,11 +649,11 @@ class Customer extends base
                     customers_info_date_account_last_modified AS date_account_last_modified,
                     customers_info_date_of_last_logon AS date_of_last_login,
                     customers_info_number_of_logons AS number_of_logins
-               FROM " . TABLE_CUSTOMERS . " c
-                    LEFT JOIN " . TABLE_CUSTOMERS_INFO . " ci ON (c.customers_id = ci.customers_info_id)
-                    LEFT JOIN " . TABLE_COUPON_GV_CUSTOMER . " cgc ON (c.customers_id = cgc.customer_id)
-              WHERE c.customers_id = " . (int)$customer_id . "
-              LIMIT 1";
+               FROM " . TABLE_CUSTOMERS . ' c
+                    LEFT JOIN ' . TABLE_CUSTOMERS_INFO . ' ci ON (c.customers_id = ci.customers_info_id)
+                    LEFT JOIN ' . TABLE_COUPON_GV_CUSTOMER . ' cgc ON (c.customers_id = cgc.customer_id)
+              WHERE c.customers_id = ' . $customer_id . '
+              LIMIT 1';
         $result = $db->ExecuteNoCache($sql);
 
         $this->data = [];
@@ -706,9 +708,9 @@ class Customer extends base
     {
         global $db;
         $orders = $db->Execute(
-            "SELECT COUNT(*) AS count
-               FROM " . TABLE_ORDERS . "
-              WHERE customers_id = " . (int)$this->customer_id
+            'SELECT COUNT(*) AS count
+               FROM ' . TABLE_ORDERS . '
+              WHERE customers_id = ' . (int)$this->customer_id
         );
         return (int)$orders->fields['count'];
     }
@@ -724,10 +726,10 @@ class Customer extends base
         $lifetime_value = 0;
 
         $sql =
-            "SELECT o.orders_id, o.date_purchased, o.order_total AS order_total_raw, o.currency, o.currency_value, o.language_code
-               FROM " . TABLE_ORDERS . " o
-              WHERE customers_id = " . (int)$this->customer_id . "
-              ORDER BY date_purchased DESC";
+            'SELECT o.orders_id, o.date_purchased, o.order_total AS order_total_raw, o.currency, o.currency_value, o.language_code
+               FROM ' . TABLE_ORDERS . ' o
+              WHERE customers_id = ' . (int)$this->customer_id . '
+              ORDER BY date_purchased DESC';
         $results = $db->Execute($sql);
 
         $last_order = null;
@@ -757,9 +759,9 @@ class Customer extends base
     {
         global $db;
         $sql =
-            "SELECT group_name, group_percentage
-               FROM " . TABLE_GROUP_PRICING . "
-              WHERE group_id = " . (int)$this->data['customers_group_pricing'];
+            'SELECT group_name, group_percentage
+               FROM ' . TABLE_GROUP_PRICING . '
+              WHERE group_id = ' . (int)$this->data['customers_group_pricing'];
         $result = $db->Execute($sql);
 
         if ($result->RecordCount()) {
@@ -781,11 +783,11 @@ class Customer extends base
     {
         global $db;
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
-                SET customers_default_address_id = " . (int)$id . "
-              WHERE customers_id = " . (int)$this->customer_id;
+            'UPDATE ' . TABLE_CUSTOMERS . '
+                SET customers_default_address_id = ' . $id . '
+              WHERE customers_id = ' . (int)$this->customer_id;
         $db->Execute($sql);
-        $this->data['customers_default_address_id'] = (int)$id;
+        $this->data['customers_default_address_id'] = $id;
     }
 
     /**
@@ -843,13 +845,13 @@ class Customer extends base
         }
 
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
-                SET customers_authorization = " . (int)$status . ",
+            'UPDATE ' . TABLE_CUSTOMERS . '
+                SET customers_authorization = ' . $status . ",
                     activation_required = $activation_required
               WHERE customers_id = " . (int)$this->customer_id;
         $db->Execute($sql, 1);
 
-        $this->data['customers_authorization'] = (int)$status;
+        $this->data['customers_authorization'] = $status;
         $this->data['activation_required'] = $activation_required;
 
         self::clearAuthTokens((int)$this->customer_id);
@@ -868,19 +870,19 @@ class Customer extends base
         global $db;
 
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
-                SET customers_authorization = " . (int)self::AUTH_OK . ",
+            'UPDATE ' . TABLE_CUSTOMERS . '
+                SET customers_authorization = ' . self::AUTH_OK . ',
                     activation_required = 0
-              WHERE customers_id = " . (int)$customers_id;
+              WHERE customers_id = ' . $customers_id;
         $db->Execute($sql, 1);
 
         self::clearAuthTokens($customers_id);
 
         $customer = $db->ExecuteNoCache(
-            "SELECT *
-               FROM " . TABLE_CUSTOMERS . "
-              WHERE customers_id = " . (int)$customers_id . "
-              LIMIT 1"
+            'SELECT *
+               FROM ' . TABLE_CUSTOMERS . '
+              WHERE customers_id = ' . $customers_id . '
+              LIMIT 1'
         );
 
         return ($customer->EOF) ? [] : $customer->fields;
@@ -892,8 +894,8 @@ class Customer extends base
     public function resetCustomerCart(): void
     {
         global $db;
-        $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET . " WHERE customers_id = " . $this->customer_id);
-        $db->Execute("DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " WHERE customers_id = " . $this->customer_id);
+        $db->Execute('DELETE FROM ' . TABLE_CUSTOMERS_BASKET . ' WHERE customers_id = ' . $this->customer_id);
+        $db->Execute('DELETE FROM ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . ' WHERE customers_id = ' . $this->customer_id);
         $_SESSION['cart']->reset(true);
         $this->forceLogout();
     }
@@ -907,7 +909,7 @@ class Customer extends base
 
         if ($this->isSameAsLoggedIn()) {
             // clean out whos_online for this user's session
-            $db->Execute("DELETE FROM " . TABLE_WHOS_ONLINE . " WHERE customer_id = " . (int)$_SESSION['customer_id']);
+            $db->Execute('DELETE FROM ' . TABLE_WHOS_ONLINE . ' WHERE customer_id = ' . (int)$_SESSION['customer_id']);
 
             // @TODO - kill actual session from sessionhandler too? (eg: really boot them out)
 
@@ -932,10 +934,10 @@ class Customer extends base
         }
 
         $sql =
-            "SELECT c.*, ab.*
-               FROM " . TABLE_ADDRESS_BOOK . " ab
-                    LEFT JOIN " . TABLE_CUSTOMERS . " c USING (customers_id)
-              WHERE customers_id = " . (int)$customer_id;
+            'SELECT c.*, ab.*
+               FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                    LEFT JOIN ' . TABLE_CUSTOMERS . ' c USING (customers_id)
+              WHERE customers_id = ' . (int)$customer_id;
 
         return $db->Execute($sql);
     }
@@ -970,7 +972,7 @@ class Customer extends base
         }
 
         $sql =
-            "SELECT ab.*,
+            'SELECT ab.*,
                     entry_firstname AS firstname, entry_lastname AS lastname,
                     entry_company AS company, entry_street_address AS street_address,
                     entry_suburb AS suburb, entry_city AS city, entry_postcode AS postcode,
@@ -981,11 +983,11 @@ class Customer extends base
                     countries_name AS country_name,
                     countries_iso_code_3 AS country_iso,
                     countries_iso_code_2 AS country_iso_2
-               FROM " . TABLE_ADDRESS_BOOK . " ab
-                    INNER JOIN " . TABLE_COUNTRIES . " c ON (ab.entry_country_id = c.countries_id)
-                    LEFT JOIN " . TABLE_ZONES . " z ON (ab.entry_zone_id = z.zone_id AND z.zone_country_id = c.countries_id)
+               FROM ' . TABLE_ADDRESS_BOOK . ' ab
+                    INNER JOIN ' . TABLE_COUNTRIES . ' c ON (ab.entry_country_id = c.countries_id)
+                    LEFT JOIN ' . TABLE_ZONES . ' z ON (ab.entry_zone_id = z.zone_id AND z.zone_country_id = c.countries_id)
               WHERE customers_id = :customersID
-              ORDER BY firstname, lastname";
+              ORDER BY firstname, lastname';
 
         $sql = $db->bindVars($sql, ':customersID', $customer_id, 'integer');
         $results = $db->Execute($sql);
@@ -1022,17 +1024,17 @@ class Customer extends base
         $language = $_SESSION['languages_id'];
         global $db, $currencies;
         $sql =
-              "SELECT o.orders_id, o.date_purchased, o.delivery_name,
+              'SELECT o.orders_id, o.date_purchased, o.delivery_name,
                     o.order_total, o.currency, o.currency_value,
                     o.delivery_country, o.billing_name, o.billing_country,
                     o.orders_status, s.orders_status_name,
                     o.language_code
-              FROM " . TABLE_ORDERS . " o
-                    LEFT JOIN " . TABLE_ORDERS_STATUS . " s
+              FROM ' . TABLE_ORDERS . ' o
+                    LEFT JOIN ' . TABLE_ORDERS_STATUS . ' s
                         ON s.orders_status_id = o.orders_status
                        AND s.language_id = :languagesID
               WHERE o.customers_id = :customersID
-              ORDER BY orders_id DESC";
+              ORDER BY orders_id DESC';
         $sql = $db->bindVars($sql, ':customersID', $this->customer_id, 'integer');
         $sql = $db->bindVars($sql, ':languagesID', $language, 'integer');
         if ($returned_history_split !== null) {
@@ -1056,9 +1058,9 @@ class Customer extends base
             }
 
             $sql =
-                "SELECT COUNT(*) AS count
-                   FROM " . TABLE_ORDERS_PRODUCTS . "
-                  WHERE orders_id = " . (int)$result['orders_id'];
+                'SELECT COUNT(*) AS count
+                   FROM ' . TABLE_ORDERS_PRODUCTS . '
+                  WHERE orders_id = ' . (int)$result['orders_id'];
             $queryResult = $db->Execute($sql);
             $products_count = $queryResult->EOF ? 0 : $queryResult->fields['count'];
 
@@ -1099,9 +1101,9 @@ class Customer extends base
         global $db;
 
         $sql =
-            "SELECT COUNT(*) as total
-               FROM " . TABLE_ORDERS . "
-              WHERE customers_id = " . (int)$this->customer_id;
+            'SELECT COUNT(*) as total
+               FROM ' . TABLE_ORDERS . '
+              WHERE customers_id = ' . (int)$this->customer_id;
 
         $result = $db->Execute($sql);
 
@@ -1115,16 +1117,16 @@ class Customer extends base
     {
         global $db;
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
+            'UPDATE ' . TABLE_CUSTOMERS . '
                 SET customers_password = :password
-              WHERE customers_id = :customersID";
+              WHERE customers_id = :customersID';
         $sql = $db->bindVars($sql, ':customersID', $this->customer_id, 'integer');
         $sql = $db->bindVars($sql, ':password', zen_encrypt_password($new_password), 'string');
         $db->Execute($sql, 1);
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS_INFO . "
+            'UPDATE ' . TABLE_CUSTOMERS_INFO . '
                 SET customers_info_date_account_last_modified = now()
-              WHERE customers_info_id = :customersID";
+              WHERE customers_info_id = :customersID';
         $sql = $db->bindVars($sql, ':customersID', $this->customer_id, 'integer');
         $db->Execute($sql, 1);
 
@@ -1138,9 +1140,9 @@ class Customer extends base
     {
         global $db;
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
+            'UPDATE ' . TABLE_CUSTOMERS . '
                 SET customers_password = :password
-              WHERE customers_email_address = :emailAddress";
+              WHERE customers_email_address = :emailAddress';
         $sql = $db->bindVars($sql, ':emailAddress', $email_address, 'string');
         $sql = $db->bindVars($sql, ':password', zen_encrypt_password($new_password), 'string');
         $db->Execute($sql, 1);
@@ -1149,7 +1151,6 @@ class Customer extends base
     /**
      * Delete customer and all relations
      *
-     * @param bool $delete_reviews
      * @param bool $forget_only Instead of delete, simply obfuscate address/name data
      * @since ZC v1.5.8
      */
@@ -1159,19 +1160,19 @@ class Customer extends base
 
         if ($delete_reviews) {
             $reviews = $db->Execute(
-                "SELECT reviews_id
-                   FROM " . TABLE_REVIEWS . "
-                  WHERE customers_id = " . (int)$this->customer_id
+                'SELECT reviews_id
+                   FROM ' . TABLE_REVIEWS . '
+                  WHERE customers_id = ' . (int)$this->customer_id
             );
             foreach ($reviews as $review) {
                 $db->Execute(
-                    "DELETE FROM " . TABLE_REVIEWS_DESCRIPTION . "
-                      WHERE reviews_id = " . (int)$review['reviews_id']
+                    'DELETE FROM ' . TABLE_REVIEWS_DESCRIPTION . '
+                      WHERE reviews_id = ' . (int)$review['reviews_id']
                 );
             }
 
             $db->Execute(
-                "DELETE FROM " . TABLE_REVIEWS . "
+                'DELETE FROM ' . TABLE_REVIEWS . "
                   WHERE customers_id = '" . (int)$this->customer_id . "'"
             );
         } else {
@@ -1181,9 +1182,9 @@ class Customer extends base
                 $fields = "customers_name = '" . $text_anonymous . "'";
             }
             $db->Execute(
-                "UPDATE " . TABLE_REVIEWS . "
-                    SET " . $fields . "
-                  WHERE customers_id = " . (int)$this->customer_id
+                'UPDATE ' . TABLE_REVIEWS . '
+                    SET ' . $fields . '
+                  WHERE customers_id = ' . (int)$this->customer_id
             );
         }
 
@@ -1191,7 +1192,7 @@ class Customer extends base
 
         if ($forget_only) {
             $db->Execute(
-                "UPDATE " . TABLE_ADDRESS_BOOK . "
+                'UPDATE ' . TABLE_ADDRESS_BOOK . "
                     SET entry_gender = '',
                         entry_company = '',
                         entry_firstname = '',
@@ -1202,10 +1203,10 @@ class Customer extends base
             );
 
             $db->Execute(
-                "UPDATE " . TABLE_CUSTOMERS . "
+                'UPDATE ' . TABLE_CUSTOMERS . "
                     SET customers_gender = '',
                         customers_firstname = '" . $text_deleted . "',
-                        customers_lastname = '" . $text_deleted . " " . date("Y-m-d") . "',
+                        customers_lastname = '" . $text_deleted . ' ' . date('Y-m-d') . "',
                         customers_email_address = '" . $text_deleted . "',
                         customers_dob = '0001-01-01 00:00:00',
                         customers_newsletter = null,
@@ -1221,39 +1222,39 @@ class Customer extends base
             );
         } else {
             $db->Execute(
-                "DELETE FROM " . TABLE_ADDRESS_BOOK . "
-                  WHERE customers_id = " . (int)$this->customer_id
+                'DELETE FROM ' . TABLE_ADDRESS_BOOK . '
+                  WHERE customers_id = ' . (int)$this->customer_id
             );
 
             $db->Execute(
-                "DELETE FROM " . TABLE_CUSTOMERS . "
-                  WHERE customers_id = " . (int)$this->customer_id
+                'DELETE FROM ' . TABLE_CUSTOMERS . '
+                  WHERE customers_id = ' . (int)$this->customer_id
             );
 
             $db->Execute(
-                "DELETE FROM " . TABLE_CUSTOMERS_INFO . "
-                  WHERE customers_info_id = " . (int)$this->customer_id
+                'DELETE FROM ' . TABLE_CUSTOMERS_INFO . '
+                  WHERE customers_info_id = ' . (int)$this->customer_id
             );
         }
 
         $db->Execute(
-            "DELETE FROM " . TABLE_CUSTOMERS_BASKET . "
-              WHERE customers_id = " . (int)$this->customer_id
+            'DELETE FROM ' . TABLE_CUSTOMERS_BASKET . '
+              WHERE customers_id = ' . (int)$this->customer_id
         );
 
         $db->Execute(
-            "DELETE FROM " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . "
-              WHERE customers_id = " . (int)$this->customer_id
+            'DELETE FROM ' . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . '
+              WHERE customers_id = ' . (int)$this->customer_id
         );
 
         $db->Execute(
-            "DELETE FROM " . TABLE_WHOS_ONLINE . "
-              WHERE customer_id = " . (int)$this->customer_id
+            'DELETE FROM ' . TABLE_WHOS_ONLINE . '
+              WHERE customer_id = ' . (int)$this->customer_id
         );
 
         $db->Execute(
-            "DELETE FROM " . TABLE_PRODUCTS_NOTIFICATIONS . "
-              WHERE customers_id = " . (int)$this->customer_id
+            'DELETE FROM ' . TABLE_PRODUCTS_NOTIFICATIONS . '
+              WHERE customers_id = ' . (int)$this->customer_id
         );
 
         $this->clearPasswordResetTokens($this->customer_id);
@@ -1352,17 +1353,17 @@ class Customer extends base
         $this->notify('NOTIFY_MODULE_CREATE_ACCOUNT_ADDED_ADDRESS_BOOK_RECORD', array_merge(['address_id' => $address_id], $sql_data_array));
 
         $sql =
-            "UPDATE " . TABLE_CUSTOMERS . "
-                SET customers_default_address_id = " . (int)$address_id . "
-              WHERE customers_id = " . (int)$customer_id;
+            'UPDATE ' . TABLE_CUSTOMERS . '
+                SET customers_default_address_id = ' . (int)$address_id . '
+              WHERE customers_id = ' . (int)$customer_id;
         $db->Execute($sql, 1);
 
         $sql =
-            "INSERT INTO " . TABLE_CUSTOMERS_INFO . "
+            'INSERT INTO ' . TABLE_CUSTOMERS_INFO . '
                 (customers_info_id, customers_info_number_of_logons,
                  customers_info_date_account_created, customers_info_date_of_last_logon)
              VALUES
-                (" . (int)$customer_id . ", 1, now(), now())";
+                (' . (int)$customer_id . ', 1, now(), now())';
         $db->Execute($sql);
 
         $this->load($customer_id);
@@ -1379,10 +1380,10 @@ class Customer extends base
         $db->perform(TABLE_CUSTOMERS, $sql_data_array, 'update', 'customers_id = ' . (int)$this->customer_id . ' LIMIT 1');
 
         $db->Execute(
-            "UPDATE " . TABLE_CUSTOMERS_INFO . "
+            'UPDATE ' . TABLE_CUSTOMERS_INFO . '
                 SET customers_info_date_account_last_modified = now()
-              WHERE customers_info_id = " . (int)$this->customer_id . "
-              LIMIT 1"
+              WHERE customers_info_id = ' . (int)$this->customer_id . '
+              LIMIT 1'
         );
 
         $this->loadBaseCustomerInfo($this->customer_id);
@@ -1408,7 +1409,7 @@ class Customer extends base
             TABLE_ADDRESS_BOOK,
             $sql_data_array,
             'update',
-            "customers_id = " . (int)$this->customer_id . " AND address_book_id = " . (int)$address_book_id . " LIMIT 1"
+            'customers_id = ' . (int)$this->customer_id . ' AND address_book_id = ' . $address_book_id . ' LIMIT 1'
         );
     }
     // @TODO - add method for deleting duplicate identical address_book records?

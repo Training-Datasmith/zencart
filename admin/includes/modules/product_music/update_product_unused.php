@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * No longer needed for Zen Cart 1.5.8 and later.
  *

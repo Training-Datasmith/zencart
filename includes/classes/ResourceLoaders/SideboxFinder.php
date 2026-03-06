@@ -1,9 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
+
 namespace Zencart\ResourceLoaders;
 
 /**
@@ -11,11 +14,8 @@ namespace Zencart\ResourceLoaders;
  */
 class SideboxFinder
 {
-    private $filesystem;
-
-    public function __construct($filesystem)
+    public function __construct(private $filesystem)
     {
-        $this->filesystem = $filesystem;
     }
 
     /**
@@ -47,12 +47,11 @@ class SideboxFinder
     /**
      * @since ZC v1.5.8
      */
-    public function sideboxPath($sideboxInfo, string $templateDir, bool $withFullPath = false): bool|string
+    public function sideboxPath(array $sideboxInfo, string $templateDir, bool $withFullPath = false): bool|string
     {
         if (!empty($sideboxInfo['plugin_details'])) {
             $path = $this->sideboxPathInPlugin($sideboxInfo);
-            $path = ($withFullPath) ? DIR_FS_CATALOG . 'zc_plugins/' . $path . '/catalog/includes/modules/sideboxes/': ($path . '/');
-            return $path;
+            return ($withFullPath) ? DIR_FS_CATALOG . 'zc_plugins/' . $path . '/catalog/includes/modules/sideboxes/' : ($path . '/');
         }
         $baseDir = DIR_FS_CATALOG . DIR_WS_MODULES . 'sideboxes/';
         $rootPath = ($withFullPath) ? DIR_FS_CATALOG . DIR_WS_MODULES : '';
@@ -68,7 +67,7 @@ class SideboxFinder
     /**
      * @since ZC v1.5.8
      */
-    public function sideboxPathInPlugin($sideboxInfo): bool|string
+    public function sideboxPathInPlugin(array $sideboxInfo): bool|string
     {
         $baseDir = DIR_FS_CATALOG . 'zc_plugins/' . $sideboxInfo['plugin_details'] . '/'  . 'catalog/includes/modules/sideboxes/';
         if (file_exists($baseDir . $sideboxInfo['layout_box_name'])) {

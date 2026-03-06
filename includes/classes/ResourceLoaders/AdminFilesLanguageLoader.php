@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -8,8 +10,6 @@
 
 namespace Zencart\LanguageLoader;
 
-use Zencart\FileSystem\FileSystem;
-
 /**
  * @since ZC v1.5.8
  */
@@ -18,7 +18,7 @@ class AdminFilesLanguageLoader extends FilesLanguageLoader
     /**
      * @since ZC v1.5.8
      */
-    public function loadInitialLanguageDefines($mainLoader)
+    public function loadInitialLanguageDefines($mainLoader): void
     {
         $this->mainLoader = $mainLoader;
         $this->loadLanguageExtraDefinitions();

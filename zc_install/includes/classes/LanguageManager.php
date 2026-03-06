@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -56,20 +58,20 @@ class LanguageManager
         $this->makeConstants($defineList);
     }
 
-    public function loadDefineFile($lng, $file): mixed
+    public function loadDefineFile(string $lng, string $file): mixed
     {
         $defineList = [];
         $fp = DIR_FS_INSTALL . $this->langPath . $lng . '/' . $file . '.php';
         if (file_exists($fp)) {
-            $defineList = require $fp;
+            return require $fp;
         }
         return $defineList;
     }
 
-    public function makeConstants($defines): void
+    public function makeConstants(array $defines): void
     {
         foreach ($defines as $defineKey => $defineValue) {
-            preg_match_all('/%{2}([^%]+)%{2}/', $defineValue, $matches, PREG_PATTERN_ORDER);
+            preg_match_all('/%{2}([^%]+)%{2}/', (string) $defineValue, $matches, PREG_PATTERN_ORDER);
             if (count($matches[1])) {
                 foreach ($matches[1] as $index => $match) {
                     if (isset($defines[$match])) {

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * create_account header_php.php
  *
@@ -36,10 +38,10 @@ $antiSpamFieldName = $_SESSION['antispam_fieldname'] ?? 'should_be_empty';
 if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login_page)) {
     $process = true;
     $antiSpam = !empty($_POST[$antiSpamFieldName]) ? 'spam' : '';
-    if (!empty($_POST['firstname']) && preg_match('~https?://?~', $_POST['firstname'])) {
+    if (!empty($_POST['firstname']) && preg_match('~https?://?~', (string) $_POST['firstname'])) {
         $antiSpam = 'spam';
     }
-    if (!empty($_POST['lastname']) && preg_match('~https?://?~', $_POST['lastname'])) {
+    if (!empty($_POST['lastname']) && preg_match('~https?://?~', (string) $_POST['lastname'])) {
         $antiSpam = 'spam';
     }
 
@@ -100,7 +102,6 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
     $password = zen_db_prepare_input($_POST['password']);
     $confirmation = zen_db_prepare_input($_POST['confirmation']);
 
-
     if (DISPLAY_PRIVACY_CONDITIONS === 'true') {
         if (!isset($_POST['privacy_conditions']) || ($_POST['privacy_conditions'] !== '1')) {
             $error = true;
@@ -125,7 +126,7 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
 
     if (ACCOUNT_DOB === 'true') {
         if (ENTRY_DOB_MIN_LENGTH > 0 or !empty($_POST['dob'])) {
-            if (strlen($dob) >10 || zen_valid_date($dob) === false) {
+            if (strlen($dob) > 10 || zen_valid_date($dob) === false) {
                 $error = true;
                 $messageStack->add('create_account', ENTRY_DATE_OF_BIRTH_ERROR);
             }
@@ -138,7 +139,6 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
             $messageStack->add('create_account', ENTRY_COMPANY_ERROR);
         }
     }
-
 
     $nick_error = false;
     if (mb_strlen($email_address) < ENTRY_EMAIL_ADDRESS_MIN_LENGTH) {
@@ -176,7 +176,7 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
 
     // check Zen Cart for duplicate nickname
     if ($error === false && !empty($nick)) {
-        $sql = "SELECT * FROM " . TABLE_CUSTOMERS . " WHERE customers_nick = :nick:";
+        $sql = 'SELECT * FROM ' . TABLE_CUSTOMERS . ' WHERE customers_nick = :nick:';
         $check_nick_query = $db->bindVars($sql, ':nick:', $nick, 'string');
         $check_nick = $db->Execute($check_nick_query, 1);
         if (!$check_nick->EOF) {
@@ -197,21 +197,21 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
 
     if (ACCOUNT_STATE === 'true') {
         $check_query =
-            "SELECT COUNT(*) AS total
-               FROM " . TABLE_ZONES . "
-              WHERE zone_country_id = :zoneCountryID";
+            'SELECT COUNT(*) AS total
+               FROM ' . TABLE_ZONES . '
+              WHERE zone_country_id = :zoneCountryID';
         $check_query = $db->bindVars($check_query, ':zoneCountryID', $country, 'integer');
         $check = $db->Execute($check_query);
         $entry_state_has_zones = ($check->fields['total'] !== '0');
         if ($entry_state_has_zones === true) {
             $zone_query =
-                "SELECT DISTINCT zone_id, zone_name, zone_code
-                   FROM " . TABLE_ZONES . "
+                'SELECT DISTINCT zone_id, zone_name, zone_code
+                   FROM ' . TABLE_ZONES . '
                   WHERE zone_country_id = :zoneCountryID
-                    AND " .
+                    AND ' .
                         ((trim($state) !== '' && (int)$zone_id === 0) ? "(UPPER(zone_name) LIKE ':zoneState%' OR UPPER(zone_code) LIKE '%:zoneState%') OR " : '') .
-                        "zone_id = :zoneID
-                  ORDER BY zone_code ASC, zone_name";
+                        'zone_id = :zoneID
+                  ORDER BY zone_code ASC, zone_name';
 
             $zone_query = $db->bindVars($zone_query, ':zoneCountryID', $country, 'integer');
             $zone_query = $db->bindVars($zone_query, ':zoneState', strtoupper($state), 'noquotestring');
@@ -223,7 +223,7 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
             if ((int)$zone->RecordCount() > 1) {
                 $state_uppercased = strtoupper($state);
                 foreach ($zone as $next_zone) {
-                    if (strtoupper($next_zone['zone_code']) === $state_uppercased || strtoupper($next_zone['zone_name']) === $state_uppercased) {
+                    if (strtoupper((string) $next_zone['zone_code']) === $state_uppercased || strtoupper((string) $next_zone['zone_name']) === $state_uppercased) {
                         $found_exact_iso_match = true;
                         break;
                     }
@@ -283,10 +283,28 @@ if (isset($_POST['action']) && ($_POST['action'] === 'process') && !isset($login
         $customer = new Customer();
 
         $data = compact(
-            'firstname', 'lastname', 'email_address', 'nick', 'email_format', 'telephone', 'fax',
-            'newsletter', 'password', 'customers_authorization', 'customers_referral',
-            'gender', 'dob', 'company', 'street_address',
-            'suburb', 'city', 'zone_id', 'state', 'postcode', 'country', 'ip_address'
+            'firstname',
+            'lastname',
+            'email_address',
+            'nick',
+            'email_format',
+            'telephone',
+            'fax',
+            'newsletter',
+            'password',
+            'customers_authorization',
+            'customers_referral',
+            'gender',
+            'dob',
+            'company',
+            'street_address',
+            'suburb',
+            'city',
+            'zone_id',
+            'state',
+            'postcode',
+            'country',
+            'ip_address'
         );
 
         $result = $customer->create($data);

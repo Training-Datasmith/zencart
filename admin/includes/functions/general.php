@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -17,63 +19,60 @@
  * @return false|string
  * @since ZC v1.0.3
  */
-function zen_info_image($image, $alt, $width = '', $height = '', $params = '')
+function zen_info_image(?string $image, $alt, $width = '', $height = '', $params = '')
 {
     if (!empty($image) && (file_exists(DIR_FS_CATALOG_IMAGES . $image))) {
-        $image = zen_image(DIR_WS_CATALOG_IMAGES . $image, $alt, $width, $height, $params);
-    } else {
-        $image = TEXT_IMAGE_NONEXISTENT;
+        return zen_image(DIR_WS_CATALOG_IMAGES . $image, $alt, $width, $height, $params);
     }
 
-    return $image;
+    return TEXT_IMAGE_NONEXISTENT;
 }
-
 
 /**
  * @since ZC v1.0.3
  */
-function zen_tax_classes_pull_down($parameters, $selected = '')
+function zen_tax_classes_pull_down(string $parameters, $selected = ''): string
 {
     global $db;
     $select_string = '<select ' . $parameters . '>';
-    $classes = $db->Execute("SELECT tax_class_id, tax_class_title
-                             FROM " . TABLE_TAX_CLASS . "
-                             ORDER BY tax_class_title");
+    $classes = $db->Execute('SELECT tax_class_id, tax_class_title
+                             FROM ' . TABLE_TAX_CLASS . '
+                             ORDER BY tax_class_title');
 
     while (!$classes->EOF) {
         $select_string .= '<option value="' . $classes->fields['tax_class_id'] . '"';
-        if ($selected == $classes->fields['tax_class_id']) $select_string .= ' SELECTED';
+        if ($selected == $classes->fields['tax_class_id']) {
+            $select_string .= ' SELECTED';
+        }
         $select_string .= '>' . $classes->fields['tax_class_title'] . '</option>';
         $classes->MoveNext();
     }
-    $select_string .= '</select>';
 
-    return $select_string;
+    return $select_string . '</select>';
 }
-
 
 /**
  * @since ZC v1.0.3
  */
-function zen_geo_zones_pull_down($parameters, $selected = '')
+function zen_geo_zones_pull_down(string $parameters, $selected = ''): string
 {
     global $db;
     $select_string = '<select ' . $parameters . '>';
-    $zones = $db->Execute("SELECT geo_zone_id, geo_zone_name
-                                 FROM " . TABLE_GEO_ZONES . "
-                                 ORDER BY geo_zone_name");
+    $zones = $db->Execute('SELECT geo_zone_id, geo_zone_name
+                                 FROM ' . TABLE_GEO_ZONES . '
+                                 ORDER BY geo_zone_name');
 
     while (!$zones->EOF) {
         $select_string .= '<option value="' . $zones->fields['geo_zone_id'] . '"';
-        if ($selected == $zones->fields['geo_zone_id']) $select_string .= ' SELECTED';
+        if ($selected == $zones->fields['geo_zone_id']) {
+            $select_string .= ' SELECTED';
+        }
         $select_string .= '>' . $zones->fields['geo_zone_name'] . '</option>';
         $zones->MoveNext();
     }
-    $select_string .= '</select>';
 
-    return $select_string;
+    return $select_string . '</select>';
 }
-
 
 /**
  * @since ZC v1.0.3
@@ -81,17 +80,15 @@ function zen_geo_zones_pull_down($parameters, $selected = '')
 function zen_get_geo_zone_name($geo_zone_id)
 {
     global $db;
-    $zones = $db->Execute("SELECT geo_zone_name
-                           FROM " . TABLE_GEO_ZONES . "
-                           WHERE geo_zone_id = " . (int)$geo_zone_id);
+    $zones = $db->Execute('SELECT geo_zone_name
+                           FROM ' . TABLE_GEO_ZONES . '
+                           WHERE geo_zone_id = ' . (int)$geo_zone_id);
 
     if ($zones->RecordCount() < 1) {
-        $geo_zone_name = $geo_zone_id;
-    } else {
-        $geo_zone_name = $zones->fields['geo_zone_name'];
+        return $geo_zone_id;
     }
 
-    return $geo_zone_name;
+    return $zones->fields['geo_zone_name'];
 }
 
 /**
@@ -111,20 +108,20 @@ function zen_get_languages(): array
 /**
  * @since ZC v1.1.0
  */
-function zen_cfg_select_coupon_id($coupon_id, $key = '')
+function zen_cfg_select_coupon_id($coupon_id, ?string $key = '')
 {
     $coupon_array = [];
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
     $coupons = Coupon::getAllCouponsByName();
     $coupon_array[] = [
         'id' => '0',
-        'text' => 'None'
+        'text' => 'None',
     ];
 
     foreach ($coupons as $coupon) {
         $coupon_array[] = [
             'id' => $coupon['coupon_id'],
-            'text' => $coupon['coupon_name']
+            'text' => $coupon['coupon_name'],
         ];
     }
 
@@ -134,7 +131,7 @@ function zen_cfg_select_coupon_id($coupon_id, $key = '')
 /**
  * @since ZC v1.0.3
  */
-function zen_cfg_pull_down_country_list($country_id, $key = '')
+function zen_cfg_pull_down_country_list($country_id, ?string $key = '')
 {
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
     return zen_draw_pull_down_menu($name, zen_get_countries_for_admin_pulldown(), $country_id, 'class="form-control"');
@@ -143,7 +140,7 @@ function zen_cfg_pull_down_country_list($country_id, $key = '')
 /**
  * @since ZC v1.1.1
  */
-function zen_cfg_pull_down_country_list_none($country_id, $key = '')
+function zen_cfg_pull_down_country_list_none($country_id, ?string $key = '')
 {
     $country_array = zen_get_countries_for_admin_pulldown('None');
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
@@ -153,7 +150,7 @@ function zen_cfg_pull_down_country_list_none($country_id, $key = '')
 /**
  * @since ZC v1.0.3
  */
-function zen_cfg_pull_down_zone_list($zone_id, $key = '')
+function zen_cfg_pull_down_zone_list($zone_id, ?string $key = '')
 {
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
     $none = [['id' => 0, 'text' => TEXT_NONE]];
@@ -166,21 +163,21 @@ function zen_cfg_pull_down_zone_list($zone_id, $key = '')
  *
  * @since ZC v1.0.3
  */
-function zen_cfg_pull_down_tax_classes($tax_class_id, $key = '')
+function zen_cfg_pull_down_tax_classes($tax_class_id, ?string $key = '')
 {
     global $db;
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
 
-    $tax_class_array = array(array('id' => '0', 'text' => TEXT_NONE));
-    $tax_class = $db->Execute("SELECT tax_class_id, tax_class_title
-                               FROM " . TABLE_TAX_CLASS . "
-                               ORDER BY tax_class_title");
+    $tax_class_array = [['id' => '0', 'text' => TEXT_NONE]];
+    $tax_class = $db->Execute('SELECT tax_class_id, tax_class_title
+                               FROM ' . TABLE_TAX_CLASS . '
+                               ORDER BY tax_class_title');
 
     while (!$tax_class->EOF) {
-        $tax_class_array[] = array(
+        $tax_class_array[] = [
             'id' => $tax_class->fields['tax_class_id'],
-            'text' => $tax_class->fields['tax_class_title']
-        );
+            'text' => $tax_class->fields['tax_class_title'],
+        ];
         $tax_class->MoveNext();
     }
 
@@ -190,19 +187,19 @@ function zen_cfg_pull_down_tax_classes($tax_class_id, $key = '')
 /**
  * @since ZC v1.0.3
  */
-function zen_cfg_textarea($text, $key = '')
+function zen_cfg_textarea($text, ?string $key = '')
 {
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
-    return zen_draw_textarea_field($name, false, 60, 5, htmlspecialchars($text, ENT_COMPAT, CHARSET, FALSE), 'class="form-control"');
+    return zen_draw_textarea_field($name, false, 60, 5, htmlspecialchars((string) $text, ENT_COMPAT, CHARSET, false), 'class="form-control"');
 }
 
 /**
  * @since ZC v1.1.0
  */
-function zen_cfg_textarea_small($text, $key = '')
+function zen_cfg_textarea_small($text, ?string $key = '')
 {
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
-    return zen_draw_textarea_field($name, false, 35, 1, htmlspecialchars($text, ENT_COMPAT, CHARSET, FALSE), 'class="noEditor form-control"');
+    return zen_draw_textarea_field($name, false, 35, 1, htmlspecialchars((string) $text, ENT_COMPAT, CHARSET, false), 'class="noEditor form-control"');
 }
 
 /**
@@ -213,15 +210,14 @@ function zen_cfg_textarea_small($text, $key = '')
 function zen_cfg_get_zone_name($zone_id)
 {
     global $db;
-    $zone = $db->Execute("SELECT zone_name
-                          FROM " . TABLE_ZONES . "
-                          WHERE zone_id = " . (int)$zone_id);
+    $zone = $db->Execute('SELECT zone_name
+                          FROM ' . TABLE_ZONES . '
+                          WHERE zone_id = ' . (int)$zone_id);
 
     if ($zone->RecordCount() < 1) {
         return $zone_id;
-    } else {
-        return $zone->fields['zone_name'];
     }
+    return $zone->fields['zone_name'];
 }
 
 /**
@@ -232,9 +228,9 @@ function zen_cfg_pull_down_htmleditors($html_editor, $index = null)
     global $editors_list;
     $name = $index ? 'configuration[' . $index . ']' : 'configuration_value';
 
-    $editors_pulldown = array();
+    $editors_pulldown = [];
     foreach ($editors_list as $key => $value) {
-        $editors_pulldown[] = array('id' => $key, 'text' => $value['desc']);
+        $editors_pulldown[] = ['id' => $key, 'text' => $value['desc']];
     }
     return zen_draw_pull_down_menu($name, $editors_pulldown, $html_editor, 'class="form-control"');
 }
@@ -242,17 +238,17 @@ function zen_cfg_pull_down_htmleditors($html_editor, $index = null)
 /**
  * @since ZC v1.5.5
  */
-function zen_cfg_pull_down_exchange_rate_sources($source, $key = '')
+function zen_cfg_pull_down_exchange_rate_sources($source, ?string $key = '')
 {
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
-    $pulldown = array();
-    $pulldown[] = array('id' => TEXT_NONE, 'text' => TEXT_NONE);
+    $pulldown = [];
+    $pulldown[] = ['id' => TEXT_NONE, 'text' => TEXT_NONE];
     $funcs = get_defined_functions();
     $funcs = $funcs['user'];
     sort($funcs);
     foreach ($funcs as $func) {
         if (preg_match('/quote_(.*)_currency/', $func, $regs)) {
-            $pulldown[] = array('id' => $regs[1], 'text' => $regs[1]);
+            $pulldown[] = ['id' => $regs[1], 'text' => $regs[1]];
         }
     }
     return zen_draw_pull_down_menu($name, $pulldown, $source);
@@ -261,30 +257,30 @@ function zen_cfg_pull_down_exchange_rate_sources($source, $key = '')
 /**
  * @since ZC v1.3.7
  */
-function zen_cfg_password_input($value, $key = '')
+function zen_cfg_password_input($value, string $key = '')
 {
-    return zen_draw_password_field('configuration[' . $key . ']', $value, false, 'class="form-control"');
+    return zen_draw_password_field('configuration[' . $key . ']', $value, false);
 }
 
 /**
  * @since ZC v1.3.7
  */
-function zen_cfg_password_display($value)
+function zen_cfg_password_display($value): string
 {
-    return str_repeat('*', min(strlen($value), 16));
+    return str_repeat('*', min(strlen((string) $value), 16));
 }
 
 /**
  * @since ZC v1.0.3
  */
-function zen_cfg_select_option($select_array, $key_value, $key = '')
+function zen_cfg_select_option($select_array, $key_value, string $key = ''): string
 {
     $string = '';
 
     for ($i = 0, $n = count($select_array); $i < $n; $i++) {
         $name = (zen_not_null($key)) ? 'configuration[' . $key . ']' : 'configuration_value';
         $element_id = preg_replace('/[^a-z0-9_-]/', '-', strtolower($select_array[$i] . '-' . $name));
-        $string .= '<div class="radio"><label>' . zen_draw_radio_field($name, $select_array[$i], ($key_value == $select_array[$i]), '', 'id="' . $element_id . '" class="inputSelect"') . $select_array[$i] . '</label></div>';
+        $string .= '<div class="radio"><label>' . zen_draw_radio_field($name, $select_array[$i], ($key_value == $select_array[$i]), '') . $select_array[$i] . '</label></div>';
     }
 
     return $string;
@@ -293,7 +289,7 @@ function zen_cfg_select_option($select_array, $key_value, $key = '')
 /**
  * @since ZC v1.2.0d
  */
-function zen_cfg_select_drop_down($select_array, $key_value, $key = '')
+function zen_cfg_select_drop_down($select_array, $key_value, string $key = '')
 {
     $name = (zen_not_null($key)) ? 'configuration[' . $key . ']' : 'configuration_value';
     return zen_draw_pull_down_menu($name, $select_array, (int)$key_value, 'class="form-control"');
@@ -302,11 +298,13 @@ function zen_cfg_select_drop_down($select_array, $key_value, $key = '')
 /**
  * @since ZC v1.0.3
  */
-function zen_mod_select_option($select_array, $key_name, $key_value)
+function zen_mod_select_option($select_array, string $key_name, $key_value): string
 {
     $string = '';
     foreach ($select_array as $key => $value) {
-        if (is_int($key)) $key = $value;
+        if (is_int($key)) {
+            $key = $value;
+        }
         $string .= '<div class="radio"><label>' . zen_draw_radio_field('configuration[' . $key_name . ']', $key, ($key_value == $key ? true : false)) . $value . '</label></div>';
     }
 
@@ -325,7 +323,7 @@ function zen_get_system_information($privacy = false): array
     // determine database size stats
     $indsize = 0;
     $datsize = 0;
-    $results = $db->Execute("SHOW TABLE STATUS" . (DB_PREFIX === '' ? '' : " LIKE '" . str_replace('_', '\_', DB_PREFIX) . "%'"));
+    $results = $db->Execute('SHOW TABLE STATUS' . (DB_PREFIX === '' ? '' : " LIKE '" . str_replace('_', '\_', DB_PREFIX) . "%'"));
     foreach ($results as $result) {
         $datsize += $result['Data_length'];
         $indsize += $result['Index_length'];
@@ -338,15 +336,15 @@ function zen_get_system_information($privacy = false): array
     $mysql_slow_query_log_status = '';
     $result = $db->Execute("SHOW VARIABLES LIKE 'slow\_query\_log'");
     if (!$result->EOF) {
-       $mysql_slow_query_log_status = '0';
-       if (in_array($result->fields['Value'] ?? '', ['On', 'ON', '1',], false)) {
-         $mysql_slow_query_log_status = '1';
-       }
+        $mysql_slow_query_log_status = '0';
+        if (in_array($result->fields['Value'] ?? '', ['On', 'ON', '1',], false)) {
+            $mysql_slow_query_log_status = '1';
+        }
     }
     $result = $db->Execute("SHOW VARIABLES LIKE 'slow\_query\_log\_file'");
     $mysql_slow_query_log_file = $result->fields['Value'] ?? '';
 
-    $result = $db->Execute("select now() as datetime");
+    $result = $db->Execute('select now() as datetime');
     $mysql_date = $result->fields['datetime'] ?? '';
 
     $errnum = 0;
@@ -355,7 +353,7 @@ function zen_get_system_information($privacy = false): array
 
     // check to see if "exec()" is disabled in PHP -- if not, get additional info via command line
     $exec_disabled = false;
-    $php_disabled_functions = @ini_get("disable_functions");
+    $php_disabled_functions = @ini_get('disable_functions');
     if ($php_disabled_functions !== '') {
         if (in_array('exec', preg_split('/,/', str_replace(' ', '', $php_disabled_functions)))) {
             $exec_disabled = true;
@@ -364,7 +362,9 @@ function zen_get_system_information($privacy = false): array
     if (!$exec_disabled) {
         [$system, $host, $kernel] = ['', $_SERVER['SERVER_NAME'] ?? '', php_uname()];
         @exec('uname -a 2>&1', $output, $errnum);
-        if ($errnum == 0 && count($output)) [$system, $host, $kernel] = preg_split('/[\s,]+/', $output[0], 5);
+        if ($errnum == 0 && count($output)) {
+            [$system, $host, $kernel] = preg_split('/[\s,]+/', $output[0], 5);
+        }
         $output = '';
         if (DISPLAY_SERVER_UPTIME === 'true') {
             @exec('uptime 2>&1', $output, $errnum);
@@ -404,7 +404,7 @@ function zen_get_system_information($privacy = false): array
     ];
 
     if ($privacy) {
-        unset ($systemInfo['mysql_slow_query_log_file']);
+        unset($systemInfo['mysql_slow_query_log_file']);
     }
 
     return $systemInfo;
@@ -414,10 +414,10 @@ function zen_get_system_information($privacy = false): array
  * @deprecated @v2.2.0 Moved to non-admin includes since v2.2.0 - Use $order->delete() instead.
  * @param int $order_id Contains the order number of the order to be deleted.
  * @param bool|string $restock Should the items within the order be restocked into inventory. (Old method used 'on', now can be set to true.)
- * @return void
  * @since ZC v1.0.3
 */
-function zen_remove_order($order_id, $restock = false) {
+function zen_remove_order($order_id, bool|string $restock = false): void
+{
     $order = new order($order_id);
     $order->delete($restock);
 }
@@ -446,10 +446,12 @@ function zen_get_zone_class_title($zone_class_id)
         return TEXT_NONE;
     }
 
-    $classes = $db->Execute("select geo_zone_name
-                               from " . TABLE_GEO_ZONES . "
-                               where geo_zone_id = " . (int)$zone_class_id);
-    if ($classes->EOF) return '';
+    $classes = $db->Execute('select geo_zone_name
+                               from ' . TABLE_GEO_ZONES . '
+                               where geo_zone_id = ' . (int)$zone_class_id);
+    if ($classes->EOF) {
+        return '';
+    }
     return $classes->fields['geo_zone_name'];
 }
 
@@ -458,20 +460,20 @@ function zen_get_zone_class_title($zone_class_id)
  *
  * @since ZC v1.0.3
  */
-function zen_cfg_pull_down_zone_classes($zone_class_id, $key = '')
+function zen_cfg_pull_down_zone_classes($zone_class_id, ?string $key = '')
 {
     global $db;
     $name = (($key) ? 'configuration[' . $key . ']' : 'configuration_value');
 
     $zone_class_array = [['id' => '0', 'text' => TEXT_NONE]];
-    $zone_class = $db->Execute("select geo_zone_id, geo_zone_name
-                                from " . TABLE_GEO_ZONES . "
-                                order by geo_zone_name");
+    $zone_class = $db->Execute('select geo_zone_id, geo_zone_name
+                                from ' . TABLE_GEO_ZONES . '
+                                order by geo_zone_name');
 
     while (!$zone_class->EOF) {
         $zone_class_array[] = [
             'id' => $zone_class->fields['geo_zone_id'],
-            'text' => $zone_class->fields['geo_zone_name']
+            'text' => $zone_class->fields['geo_zone_name'],
         ];
         $zone_class->MoveNext();
     }
@@ -482,10 +484,10 @@ function zen_cfg_pull_down_zone_classes($zone_class_id, $key = '')
 /**
  * @since ZC v1.0.3
  */
-function zen_cfg_pull_down_order_statuses($order_status_id, $key = '')
+function zen_cfg_pull_down_order_statuses($order_status_id, ?string $key = '')
 {
     $name = ($key) ? 'configuration[' . $key . ']' : 'configuration_value';
-    return zen_draw_order_status_dropdown($name, $order_status_id, array('id' => 0, 'text' => TEXT_DEFAULT), 'class="form-control"');
+    return zen_draw_order_status_dropdown($name, $order_status_id, ['id' => 0, 'text' => TEXT_DEFAULT], 'class="form-control"');
 }
 
 /**
@@ -497,10 +499,10 @@ function zen_draw_order_status_dropdown($field_name, $default_value, $first_sele
 {
     global $db;
     $statuses = $db->Execute(
-        "SELECT orders_status_id AS `id`, orders_status_name AS `text`
-            FROM " . TABLE_ORDERS_STATUS . "
-            WHERE language_id = " . (int)$_SESSION['languages_id'] . "
-            ORDER BY sort_order ASC, orders_status_id ASC"
+        'SELECT orders_status_id AS `id`, orders_status_name AS `text`
+            FROM ' . TABLE_ORDERS_STATUS . '
+            WHERE language_id = ' . (int)$_SESSION['languages_id'] . '
+            ORDER BY sort_order ASC, orders_status_id ASC'
     );
     $statuses_array = [];
     if (is_array($first_selection)) {
@@ -509,12 +511,11 @@ function zen_draw_order_status_dropdown($field_name, $default_value, $first_sele
     foreach ($statuses as $status) {
         $statuses_array[] = [
             'id' => $status['id'],
-            'text' => "{$status['text']} [{$status['id']}]"
+            'text' => "{$status['text']} [{$status['id']}]",
         ];
     }
     return zen_draw_pull_down_menu($field_name, $statuses_array, $default_value, $parms);
 }
-
 
 /**
  * @TODO - move to language class
@@ -526,9 +527,9 @@ function zen_draw_order_status_dropdown($field_name, $default_value, $first_sele
 function zen_get_language_icon($lookup)
 {
     global $db;
-    $languages_icon = $db->Execute("SELECT directory, image FROM " . TABLE_LANGUAGES . "
+    $languages_icon = $db->Execute('SELECT directory, image FROM ' . TABLE_LANGUAGES . '
         WHERE
-        languages_id = " . (int)$lookup . "
+        languages_id = ' . (int)$lookup . "
         OR
         code = '" . zen_db_input($lookup) . "'
         LIMIT 1");
@@ -537,7 +538,6 @@ function zen_get_language_icon($lookup)
     }
     return zen_image(DIR_WS_CATALOG_LANGUAGES . $languages_icon->fields['directory'] . '/images/' . $languages_icon->fields['image'], $languages_icon->fields['directory']);
 }
-
 
 /**
  * lookup language directory name by id or code
@@ -550,9 +550,9 @@ function zen_get_language_icon($lookup)
 function zen_get_language_name($lookup)
 {
     global $db;
-    $check_language = $db->Execute("SELECT directory FROM " . TABLE_LANGUAGES . "
+    $check_language = $db->Execute('SELECT directory FROM ' . TABLE_LANGUAGES . '
         WHERE
-        languages_id = " . (int)$lookup . "
+        languages_id = ' . (int)$lookup . "
         OR
         code = '" . zen_db_input($lookup) . "'
         LIMIT 1");
@@ -563,7 +563,6 @@ function zen_get_language_name($lookup)
     return $check_language->fields['directory'];
 }
 
-
 /**
  * @since ZC v1.5.5
  */
@@ -571,12 +570,11 @@ function zen_get_configuration_group_value($lookup)
 {
     global $db;
     $r = $db->Execute(
-        "SELECT configuration_group_title FROM " . TABLE_CONFIGURATION_GROUP .
-        " WHERE configuration_group_id = " . (int)$lookup . " LIMIT 1"
+        'SELECT configuration_group_title FROM ' . TABLE_CONFIGURATION_GROUP .
+        ' WHERE configuration_group_id = ' . (int)$lookup . ' LIMIT 1'
     );
     return $r->EOF ? (int)$lookup : $r->fields['configuration_group_title'];
 }
-
 
 /**
  * Sets the status of a product review
@@ -588,37 +586,33 @@ function zen_set_reviews_status($review_id, $status)
 {
     global $db;
     if ($status == '1') {
-        return $db->Execute("update " . TABLE_REVIEWS . "
+        return $db->Execute('update ' . TABLE_REVIEWS . '
                            set status = 1
-                           where reviews_id = " . (int)$review_id);
-
-    } elseif ($status == '0') {
-        return $db->Execute("update " . TABLE_REVIEWS . "
-                           set status = 0
-                           where reviews_id = " . (int)$review_id);
-
-    } else {
-        return -1;
+                           where reviews_id = ' . (int)$review_id);
     }
+    if ($status == '0') {
+        return $db->Execute('update ' . TABLE_REVIEWS . '
+                           set status = 0
+                           where reviews_id = ' . (int)$review_id);
+    }
+    return -1;
 }
-
 
 /**
  * master category selection
  * @param int $product_id
  * @param bool $fullpath
- * @return array
  * @since ZC v1.2.0d
  */
-function zen_get_master_categories_pulldown($product_id, $fullpath = false)
+function zen_get_master_categories_pulldown($product_id, $fullpath = false): array
 {
     global $db;
     $master_category_array = [];
-    $master_categories_query = $db->Execute("SELECT ptc.products_id, cd.categories_name, cd.categories_id
-                                             FROM " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc
-                                             LEFT JOIN " . TABLE_CATEGORIES_DESCRIPTION . " cd ON cd.categories_id = ptc.categories_id
-                                             WHERE ptc.products_id = " . (int)$product_id . "
-                                             AND cd.language_id = " . (int)$_SESSION['languages_id']);
+    $master_categories_query = $db->Execute('SELECT ptc.products_id, cd.categories_name, cd.categories_id
+                                             FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc
+                                             LEFT JOIN ' . TABLE_CATEGORIES_DESCRIPTION . ' cd ON cd.categories_id = ptc.categories_id
+                                             WHERE ptc.products_id = ' . (int)$product_id . '
+                                             AND cd.language_id = ' . (int)$_SESSION['languages_id']);
     $master_category_array[] = [
         'id' => '0',
         'text' => TEXT_INFO_SET_MASTER_CATEGORIES_ID,
@@ -646,8 +640,7 @@ function zen_cfg_select_multioption(array $choices_array, string $stored_value, 
         $ticked = in_array($value, $chosen_already, true);
         $string .= '<div class="checkbox"><label>' . zen_draw_checkbox_field($name, $value, $ticked, 'id="' . strtolower($value . '-' . $name) . '"') . $value . '</label></div>' . "\n";
     }
-    $string .= zen_draw_hidden_field($name, '--none--');
-    return $string;
+    return $string . zen_draw_hidden_field($name, '--none--');
 }
 
 /**
@@ -657,33 +650,31 @@ function zen_cfg_select_multioption_pairs(array $choices_array, string $stored_v
 {
     $string = '';
     $name = (($config_key_name) ? 'configuration[' . $config_key_name . '][]' : 'configuration_value');
-    $chosen_already = explode(", ", $stored_value);
+    $chosen_already = explode(', ', $stored_value);
 
     foreach ($choices_array as $value) {
         // Account for cases where an = sign is used to allow key->value pairs where the value is friendly display text
-        $beforeEquals = strstr($value, '=', true);
+        $beforeEquals = strstr((string) $value, '=', true);
 
         // this entry's checkbox should be pre-selected if the key matches
         $ticked = (in_array($value, $chosen_already, true) || in_array($beforeEquals, $chosen_already, true));
 
         // determine the value to show (the part after the =; if no =, just the whole string)
-        $display_value = strpos($value, '=') !== false ? explode('=', $value, 2)[1] : $value;
+        $display_value = str_contains((string) $value, '=') ? explode('=', (string) $value, 2)[1] : $value;
 
         $string .= '<div class="checkbox"><label>' . zen_draw_checkbox_field($name, $value, $ticked, 'id="' . strtolower($value . '-' . $name) . '"') . $display_value . '</label></div>' . "\n";
     }
-
-    $string .= zen_draw_hidden_field($name, '--none--');
-    return $string;
+    return $string . zen_draw_hidden_field($name, '--none--');
 }
 
 /**
  * Function for configuration values that are read-only, e.g. a plugin's version number
  * @since ZC v1.5.8
  */
-function zen_cfg_read_only($text, $key = '')
+function zen_cfg_read_only($text, ?string $key = ''): string
 {
     $name = (!empty($key)) ? 'configuration[' . $key . ']' : 'configuration_value';
-    $text = htmlspecialchars_decode($text, ENT_COMPAT);
+    $text = htmlspecialchars_decode((string) $text, ENT_COMPAT);
 
     return $text . zen_draw_hidden_field($name, $text);
 }
@@ -692,13 +683,13 @@ function zen_cfg_read_only($text, $key = '')
  * @TODO can this be merged with another pulldown, not specific to coupon admin?
  * @since ZC v1.3.6
  */
-function zen_geo_zones_pull_down_coupon($parameters, $selected = '')
+function zen_geo_zones_pull_down_coupon(string $parameters, $selected = ''): string
 {
     global $db;
     $select_string = '<select ' . $parameters . '>';
-    $zones = $db->Execute("select geo_zone_id, geo_zone_name
-                                 from " . TABLE_GEO_ZONES . "
-                                 order by geo_zone_name");
+    $zones = $db->Execute('select geo_zone_id, geo_zone_name
+                                 from ' . TABLE_GEO_ZONES . '
+                                 order by geo_zone_name');
 
     if ($selected == 0) {
         $select_string .= '<option value=0 SELECTED>' . TEXT_NONE . '</option>';
@@ -708,13 +699,14 @@ function zen_geo_zones_pull_down_coupon($parameters, $selected = '')
 
     while (!$zones->EOF) {
         $select_string .= '<option value="' . $zones->fields['geo_zone_id'] . '"';
-        if ($selected == $zones->fields['geo_zone_id']) $select_string .= ' SELECTED';
+        if ($selected == $zones->fields['geo_zone_id']) {
+            $select_string .= ' SELECTED';
+        }
         $select_string .= '>' . $zones->fields['geo_zone_name'] . '</option>';
         $zones->MoveNext();
     }
-    $select_string .= '</select>';
 
-    return $select_string;
+    return $select_string . '</select>';
 }
 
 /**
@@ -724,36 +716,34 @@ function zen_geo_zones_pull_down_coupon($parameters, $selected = '')
 function zen_get_orders_comments($orders_id)
 {
     global $db;
-    $orders_comments_query = "SELECT osh.comments
-                              FROM " . TABLE_ORDERS_STATUS_HISTORY . " osh
-                              WHERE osh.orders_id = " . (int)$orders_id . "
+    $orders_comments_query = 'SELECT osh.comments
+                              FROM ' . TABLE_ORDERS_STATUS_HISTORY . ' osh
+                              WHERE osh.orders_id = ' . (int)$orders_id . '
                               ORDER BY osh.orders_status_history_id
-                              LIMIT 1";
+                              LIMIT 1';
     $orders_comments = $db->Execute($orders_comments_query);
-    if ($orders_comments->EOF) return '';
+    if ($orders_comments->EOF) {
+        return '';
+    }
     return $orders_comments->fields['comments'];
 }
-
 
 /**
  * Toggle ezpage to specified status
  *
- * @param int $pages_id
  * @param int $status 0|1
- * @param string $status_field
  * @since ZC v1.3.0
  */
-function zen_set_ezpage_status(int $pages_id, int $status, string $status_field)
+function zen_set_ezpage_status(int $pages_id, int $status, string $status_field): void
 {
     global $db;
     if ($status == '1' || $status == '0') {
-        zen_record_admin_activity('EZ-Page ID ' . (int)$pages_id . ' [' . $status_field . '] changed to ' . $status, 'info');
-        $db->Execute("UPDATE " . TABLE_EZPAGES . "
-                      SET " . zen_db_input($status_field) . " = " . (int)$status . "
-                      WHERE pages_id = " . (int)$pages_id);
+        zen_record_admin_activity('EZ-Page ID ' . $pages_id . ' [' . $status_field . '] changed to ' . $status, 'info');
+        $db->Execute('UPDATE ' . TABLE_EZPAGES . '
+                      SET ' . zen_db_input($status_field) . ' = ' . $status . '
+                      WHERE pages_id = ' . $pages_id);
     }
 }
-
 
 /**
  * Retrieve a list of order-status names for a pulldown menu
@@ -796,9 +786,12 @@ function zen_getOrdersStatuses(bool $keyed = false): array
 /**
  * @since ZC v1.5.8
  */
-function zen_get_customer_email_from_id($cid) {
-   global $db;
-   $query = $db->Execute("SELECT customers_email_address FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . (int)$cid);
-   if ($query->EOF) return '';
-   return $query->fields['customers_email_address'];
+function zen_get_customer_email_from_id($cid)
+{
+    global $db;
+    $query = $db->Execute('SELECT customers_email_address FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id = ' . (int)$cid);
+    if ($query->EOF) {
+        return '';
+    }
+    return $query->fields['customers_email_address'];
 }

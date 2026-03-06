@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * also_purchased_products.php
  *

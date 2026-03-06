@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * product_listing_alpha_sorter module
  *

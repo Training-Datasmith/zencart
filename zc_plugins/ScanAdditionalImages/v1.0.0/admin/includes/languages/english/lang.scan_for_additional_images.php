@@ -1,6 +1,8 @@
 <?php
 
-$define = [
+declare(strict_types=1);
+
+return [
     'HEADING_TITLE' => 'Scan for Additional Product Images to load into the Database',
     'TEXT_MAIN' => 'The way Zen Cart handles "additional" product images is to have one "main" image assigned to the product and then separately assign additional images to show alongside.<br>
 You have two ways to assign additional images to a product:<br>
@@ -52,5 +54,3 @@ Remember, to use these database-tracked images, your <strong>Admin-&gt;Configura
     'TEXT_HTTP_ERROR' => 'HTTP Error ',
     'TEXT_CANCELLED' => 'Cancelled by user.',
 ];
-
-return $define;

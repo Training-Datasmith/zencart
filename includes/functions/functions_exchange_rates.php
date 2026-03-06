@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -18,7 +20,7 @@ function zen_update_currencies(bool $outputMessagesToCommandLine = false): void
     global $db, $messageStack, $zco_notifier;
     @set_time_limit(600);
 
-    $results = $db->Execute("SELECT currencies_id, code, title, decimal_places FROM " . TABLE_CURRENCIES);
+    $results = $db->Execute('SELECT currencies_id, code, title, decimal_places FROM ' . TABLE_CURRENCIES);
 
     foreach ($results as $result) {
         $server_used = CURRENCY_SERVER_PRIMARY;
@@ -59,7 +61,7 @@ function zen_update_currencies(bool $outputMessagesToCommandLine = false): void
             if (!empty($rate)) {
                 $zco_notifier->notify('ADMIN_CURRENCY_EXCHANGE_RATE_SINGLE', $result['code'], $rate);
                 $db->Execute(
-                    "UPDATE " . TABLE_CURRENCIES . "
+                    'UPDATE ' . TABLE_CURRENCIES . "
                       SET value = '" . round((float)$rate, 8) . "', last_updated = now()
                       WHERE currencies_id = '" . (int)$result['currencies_id'] . "'"
                 );
@@ -92,10 +94,10 @@ function zen_update_currencies(bool $outputMessagesToCommandLine = false): void
  *
  * @param string $currencyCode requested
  * @param string $base currency code
- * @return int|float
+ * @return int
  * @since ZC v1.5.0
  */
-function quote_ecb_currency(string $currencyCode = '', string $base = DEFAULT_CURRENCY): float|int|string
+function quote_ecb_currency(string $currencyCode = '', string $base = DEFAULT_CURRENCY): int|string
 {
     if ($currencyCode === $base) {
         return 1;
@@ -111,22 +113,22 @@ function quote_ecb_currency(string $currencyCode = '', string $base = DEFAULT_CU
         }
     }
     $currencyArray = [];
-    $currencyArray['EUR'] = 1; // quoting ECB bank, so EUR is always = 1
-    $rate = 1;
+    $currencyArray['EUR'] = 1;
     $line = '';
     foreach ($XMLContent as $line) {
-        if (preg_match("/currency='([[:alpha:]]+)'/", $line, $reg)) {
-            if (preg_match("/rate='([[:graph:]]+)'/", $line, $rateVal)) {
-                $currencyArray[$reg[1]] = (float)$rateVal[1];
-            }
+        if (!preg_match("/currency='([[:alpha:]]+)'/", $line, $reg)) {
+            continue;
         }
+        if (!preg_match("/rate='([[:graph:]]+)'/", $line, $rateVal)) {
+            continue;
+        }
+        $currencyArray[$reg[1]] = (float)$rateVal[1];
     }
     // Check for valid data
     if (empty($currencyArray[$base]) || !isset($currencyArray[$currencyCode])) {
         return ''; // no valid value, so abort, else risk divide-by-zero
     }
-    $rate = (string)((float)$currencyArray[$currencyCode] / $currencyArray[$base]);
-    return $rate;
+    return (string)((float)$currencyArray[$currencyCode] / $currencyArray[$base]);
 }
 
 /**
@@ -134,10 +136,10 @@ function quote_ecb_currency(string $currencyCode = '', string $base = DEFAULT_CU
  *
  * @param string $currencyCode requested
  * @param string $base currency code
- * @return bool|float
+ * @return bool
  * @since ZC v1.5.0
  */
-function quote_boc_currency(string $currencyCode = '', string $base = DEFAULT_CURRENCY): float|bool|int|string
+function quote_boc_currency(string $currencyCode = '', string $base = DEFAULT_CURRENCY): bool|int|string
 {
     if ($currencyCode === $base) {
         return 1;
@@ -180,11 +182,10 @@ function quote_boc_currency(string $currencyCode = '', string $base = DEFAULT_CU
     return false;
 }
 
-
 /**
  * @since ZC v1.3.5
  */
-function doCurlCurrencyRequest($method, $url, $vars = ''): string
+function doCurlCurrencyRequest(string $method, string $url, string|array|null $vars = ''): string
 {
     return zenDoCurlRequest($url, $method, $vars);
 }

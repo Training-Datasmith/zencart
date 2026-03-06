@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2022 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -30,12 +32,12 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         }
     }
 
-    public function testUrlFunctionsExist()
+    public function testUrlFunctionsExist(): void
     {
         $this->assertTrue(function_exists('zen_catalog_href_link'), 'zen_catalog_href_link() did not exist');
         $reflect = new ReflectionFunction('zen_catalog_href_link');
         $this->assertEquals(3, $reflect->getNumberOfParameters());
-        $params = array('page', 'parameters', 'connection');
+        $params = ['page', 'parameters', 'connection'];
         foreach ($reflect->getParameters() as $param) {
             $this->assertTrue(in_array($param->getName(), $params));
         }
@@ -43,7 +45,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
         $this->assertTrue(function_exists('zen_href_link'), 'zen_href_link() did not exist');
         $reflect = new ReflectionFunction('zen_href_link');
         $this->assertEquals(4, $reflect->getNumberOfParameters());
-        $params = array('page', 'parameters', 'connection', 'add_session_id');
+        $params = ['page', 'parameters', 'connection', 'add_session_id'];
         foreach ($reflect->getParameters() as $param) {
             $this->assertTrue(in_array($param->getName(), $params));
         }
@@ -52,7 +54,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testUrlFunctionsExist
      */
-    public function testAdminPage()
+    public function testAdminPage(): void
     {
         $this->assertURLGenerated(
             zen_href_link(),
@@ -71,19 +73,17 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAddSessionWhenSidDefined()
+    public function testAddSessionWhenSidDefined(): void
     {
-        if (PHP_VERSION_ID >= 80401) {
-            $this->markTestSkipped('IgnoredAfterPHP841');
-        }
+        $this->markTestSkipped('IgnoredAfterPHP841');
         $GLOBALS['session_started'] = true;
         define('SID', 'zenadminid=1234567890');
         $this->assertURLGenerated(
-             zen_href_link(FILENAME_DEFAULT),
+            zen_href_link(FILENAME_DEFAULT),
             HTTP_SERVER . DIR_WS_ADMIN . '?zenadminid=1234567890'
         );
         $this->assertURLGenerated(
-             zen_href_link(FILENAME_DEFAULT, 'test=test'),
+            zen_href_link(FILENAME_DEFAULT, 'test=test'),
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_DEFAULT . '&amp;test=test&amp;zenadminid=1234567890'
         );
     }
@@ -91,7 +91,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAutoCorrectLeadingQuerySeparator()
+    public function testAutoCorrectLeadingQuerySeparator(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_DEFAULT, '&test=test'),
@@ -122,14 +122,14 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAutoCorrectTrailingQuerySeparator()
+    public function testAutoCorrectTrailingQuerySeparator(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_DEFAULT, 'test=test&'),
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_DEFAULT . '&amp;test=test'
         );
         $this->assertURLGenerated(
-           zen_href_link(FILENAME_DEFAULT, 'test=test&&'),
+            zen_href_link(FILENAME_DEFAULT, 'test=test&&'),
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_DEFAULT . '&amp;test=test'
         );
         $this->assertURLGenerated(
@@ -153,7 +153,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAutoCorrectMultipleAmpersandsInQuery()
+    public function testAutoCorrectMultipleAmpersandsInQuery(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_DEFAULT, 'test=test&&zen-cart=the-art-of-e-commerce'),
@@ -198,7 +198,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAutoCorrectAmpersandEntitiesInQuery()
+    public function testAutoCorrectAmpersandEntitiesInQuery(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_DEFAULT, 'test=test&amp;zen-cart=the-art-of-e-commerce'),
@@ -221,7 +221,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testAutoCorrectMixedAmpersandAndAmbersandEntitiesInQuery()
+    public function testAutoCorrectMixedAmpersandAndAmbersandEntitiesInQuery(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_DEFAULT, 'test=test&amp;&zen-cart=the-art-of-e-commerce'),
@@ -260,7 +260,7 @@ class AdminUrlGenerationTest extends zcUnitTestCase
     /**
      * @depends testAdminPage
      */
-    public function testConfigurationURLs()
+    public function testConfigurationURLs(): void
     {
         $this->assertURLGenerated(
             zen_href_link(FILENAME_CONFIGURATION),
@@ -279,11 +279,11 @@ class AdminUrlGenerationTest extends zcUnitTestCase
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_CONFIGURATION . '&amp;gID=1&amp;cID=1&amp;action=edit'
         );
         $this->assertURLGenerated(
-            zen_href_link(FILENAME_CONFIGURATION, array('gID' => '1', 'cID' => '1', 'action' => 'edit')),
+            zen_href_link(FILENAME_CONFIGURATION, ['gID' => '1', 'cID' => '1', 'action' => 'edit']),
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_CONFIGURATION . '&amp;gID=1&amp;cID=1&amp;action=edit'
         );
         $this->assertURLGenerated(
-            zen_href_link(FILENAME_CONFIGURATION, array('gID' => '1', 'cID' => '1', 'action' => 'save')),
+            zen_href_link(FILENAME_CONFIGURATION, ['gID' => '1', 'cID' => '1', 'action' => 'save']),
             HTTP_SERVER . DIR_WS_ADMIN . 'index.php?cmd=' . FILENAME_CONFIGURATION . '&amp;gID=1&amp;cID=1&amp;action=save'
         );
     }

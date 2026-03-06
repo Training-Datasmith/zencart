@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -8,7 +10,6 @@
 namespace Zencart\PluginSupport;
 
 use queryFactory;
-use Zencart\PluginSupport\PluginStatus;
 
 /**
  * @since ZC v1.5.7
@@ -17,7 +18,6 @@ class BasePluginInstaller
 {
     /**
      * $pluginDir is the directory where the plugin is located
-     * @var string
      */
     protected string $pluginDir;
 
@@ -28,10 +28,10 @@ class BasePluginInstaller
     /**
      * @since ZC v1.5.7
      */
-    public function processInstall($pluginKey, $version): bool
+    public function processInstall(string $pluginKey, string $version): bool
     {
         $this->pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $pluginKey . '/' . $version;
-        $this->loadInstallerLanguageFile('main.php', $this->pluginDir);
+        $this->loadInstallerLanguageFile('main.php');
         $this->pluginInstaller->setVersions($this->pluginDir, $pluginKey, $version);
         $this->pluginInstaller->executeInstallers($this->pluginDir);
         if ($this->errorContainer->hasErrors()) {
@@ -44,10 +44,10 @@ class BasePluginInstaller
     /**
      * @since ZC v1.5.7
      */
-    public function processUninstall($pluginKey, $version): bool
+    public function processUninstall(string $pluginKey, string $version): bool
     {
         $this->pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $pluginKey . '/' . $version;
-        $this->loadInstallerLanguageFile('main.php', $this->pluginDir);
+        $this->loadInstallerLanguageFile('main.php');
         $this->setPluginVersionStatus($pluginKey, '', PluginStatus::NOT_INSTALLED);
         $this->pluginInstaller->setVersions($this->pluginDir, $pluginKey, $version);
         $this->pluginInstaller->executeUninstallers($this->pluginDir);
@@ -60,10 +60,10 @@ class BasePluginInstaller
     /**
      * @since ZC v1.5.8
      */
-    public function processUpgrade($pluginKey, $version, $oldVersion): bool
+    public function processUpgrade(string $pluginKey, string $version, $oldVersion): bool
     {
         $this->pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $pluginKey . '/' . $version;
-        $this->loadInstallerLanguageFile('main.php', $this->pluginDir);
+        $this->loadInstallerLanguageFile('main.php');
         $this->pluginInstaller->setVersions($this->pluginDir, $pluginKey, $version, $oldVersion);
         $this->pluginInstaller->executeUpgraders($this->pluginDir, $oldVersion);
         if ($this->errorContainer->hasErrors()) {
@@ -95,7 +95,7 @@ class BasePluginInstaller
      */
     protected function setPluginVersionStatus($pluginKey, $version, $status): void
     {
-        $sql = "UPDATE " . TABLE_PLUGIN_CONTROL . " SET status = :status:, version = :version: WHERE unique_key = :uniqueKey:";
+        $sql = 'UPDATE ' . TABLE_PLUGIN_CONTROL . ' SET status = :status:, version = :version: WHERE unique_key = :uniqueKey:';
         $sql = $this->dbConn->bindVars($sql, ':status:', $status, 'integer');
         $sql = $this->dbConn->bindVars($sql, ':uniqueKey:', $pluginKey, 'string');
         $sql = $this->dbConn->bindVars($sql, ':version:', $version, 'string');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -34,9 +36,6 @@ abstract class Settings implements ArrayAccess, Countable
      * The array can be entries of $key=>$value and/or $key=>['value'=>$value, 'type'=>$type]
      * If $overwrite is false then existing $keys will be ignored.
      *
-     * @param array|null $settings_array
-     * @param bool $overwrite
-     * @return void
      * @since ZC v2.0.0
      */
     public function setFromArray(?array $settings_array = null, bool $overwrite = false): void
@@ -118,7 +117,7 @@ abstract class Settings implements ArrayAccess, Countable
     /**
      * @since ZC v2.0.0
      */
-    public function __isset($key)
+    public function __isset(string $key)
     {
         return $this->offsetExists($key);
     }
@@ -139,7 +138,7 @@ abstract class Settings implements ArrayAccess, Countable
     /**
      * @since ZC v2.0.0
      */
-    public function __set($setting, $value)
+    public function __set(string $setting, mixed $value)
     {
         $this->offsetSet($setting, $value);
     }
@@ -188,7 +187,7 @@ abstract class Settings implements ArrayAccess, Countable
     /**
      * @since ZC v2.0.0
      */
-    public function __get(string $key)
+    public function __get(string $key): mixed
     {
         if (!$this->offsetExists($key)) {
             return null;

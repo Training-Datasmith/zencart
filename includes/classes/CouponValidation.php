@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -8,7 +10,6 @@
 
 class CouponValidation
 {
-
     /**
      * Check whether the product is valid for the specified coupon, according to model/category/product restrictions assigned to the coupon
      * @since ZC v2.0.0
@@ -18,15 +19,13 @@ class CouponValidation
         global $db;
         global $zco_notifier;
 
-        $product_id = (int)$product_id;
-
-        $coupons_query = "SELECT * FROM " . TABLE_COUPON_RESTRICT . "
-                          WHERE coupon_id = " . (int)$coupon_id . "
-                          ORDER BY coupon_restrict ASC";
+        $coupons_query = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . '
+                          WHERE coupon_id = ' . $coupon_id . '
+                          ORDER BY coupon_restrict ASC';
 
         $coupons = $db->Execute($coupons_query);
 
-        $product_query = "SELECT * FROM " . TABLE_PRODUCTS . "
+        $product_query = 'SELECT * FROM ' . TABLE_PRODUCTS . "
                           WHERE products_id = $product_id";
 
         $product = $db->Execute($product_query);
@@ -67,8 +66,8 @@ class CouponValidation
 
         $allow_for_category = self::validate_for_category($product_id, $coupon_id);
         $allow_for_product = self::validate_for_product($product_id, $coupon_id);
-//    echo '#'.$product_id . '#' . $allow_for_category;
-//    echo '#'.$product_id . '#' . $allow_for_product;
+        //    echo '#'.$product_id . '#' . $allow_for_category;
+        //    echo '#'.$product_id . '#' . $allow_for_product;
         if ($allow_for_category === 'none') {
             if ($allow_for_product === 'none') {
                 return true;
@@ -114,16 +113,16 @@ class CouponValidation
         global $db;
         $productCatPath = zen_get_product_path($product_id);
         $catPathArray = array_reverse(explode('_', $productCatPath));
-        $sql = "SELECT count(*) AS total
-                FROM " . TABLE_COUPON_RESTRICT . "
+        $sql = 'SELECT count(*) AS total
+                FROM ' . TABLE_COUPON_RESTRICT . "
                 WHERE category_id = -1
                 AND coupon_restrict = 'Y'
-                AND coupon_id = " . (int)$coupon_id;
+                AND coupon_id = " . $coupon_id;
         $checkQuery = $db->Execute($sql, 1);
         foreach ($catPathArray as $catPath) {
-            $sql = "SELECT * FROM " . TABLE_COUPON_RESTRICT . "
-                    WHERE category_id = " . (int)$catPath . "
-                    AND coupon_id = " . (int)$coupon_id;
+            $sql = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . '
+                    WHERE category_id = ' . (int)$catPath . '
+                    AND coupon_id = ' . $coupon_id;
             $result = $db->Execute($sql, 1);
             if ($result->RecordCount()) {
                 if ($result->fields['coupon_restrict'] === 'N') {
@@ -148,9 +147,9 @@ class CouponValidation
     public static function is_coupon_valid_for_sales(int $product_id, int $coupon_id): bool
     {
         global $db;
-        $sql = "SELECT coupon_id, coupon_is_valid_for_sales
-                FROM " . TABLE_COUPONS . "
-                WHERE coupon_id = " . (int)$coupon_id;
+        $sql = 'SELECT coupon_id, coupon_is_valid_for_sales
+                FROM ' . TABLE_COUPONS . '
+                WHERE coupon_id = ' . $coupon_id;
 
         $result = $db->Execute($sql);
 
@@ -182,9 +181,9 @@ class CouponValidation
     public static function validate_for_product(int $product_id, int $coupon_id): bool|string
     {
         global $db;
-        $sql = "SELECT * FROM " . TABLE_COUPON_RESTRICT . "
-                WHERE product_id = " . (int)$product_id . "
-                AND coupon_id = " . (int)$coupon_id . " LIMIT 1";
+        $sql = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . '
+                WHERE product_id = ' . $product_id . '
+                AND coupon_id = ' . $coupon_id . ' LIMIT 1';
         $result = $db->Execute($sql);
         if ($result->RecordCount()) {
             if ($result->fields['coupon_restrict'] === 'N') {
@@ -205,16 +204,15 @@ class CouponValidation
      *
      * @param string $referrer The domain to check e.g. 'abc.com'
      * @param int $exclude_coupon_id Optional coupon_id to exclude/ignore (ie: "self" record)
-     * @return ?array
      * @since ZC v2.0.0
      */
     public static function referrer_already_assigned(string $referrer, ?int $exclude_coupon_id = null): ?array
     {
         global $db;
-        $sql = "SELECT c.coupon_id, coupon_code
-                FROM " . TABLE_COUPONS . " c
-                LEFT JOIN " . TABLE_COUPON_REFERRERS . " r ON (c.coupon_id = r.coupon_id)
-                WHERE referrer_domain = :referrer";
+        $sql = 'SELECT c.coupon_id, coupon_code
+                FROM ' . TABLE_COUPONS . ' c
+                LEFT JOIN ' . TABLE_COUPON_REFERRERS . ' r ON (c.coupon_id = r.coupon_id)
+                WHERE referrer_domain = :referrer';
         $sql = $db->bindVars($sql, ':referrer', $referrer, 'string');
         if (!empty($exclude_coupon_id)) {
             $sql .= " AND c.coupon_id <> $exclude_coupon_id";

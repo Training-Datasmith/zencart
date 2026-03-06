@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
@@ -15,19 +17,23 @@ trait Singleton
 {
     private static array $instances = [];
 
-    protected function __construct() { }
+    protected function __construct()
+    {
+    }
 
     /**
      * @since ZC v1.5.7
      */
-    protected function __clone() { }
+    protected function __clone()
+    {
+    }
 
     /**
      * @since ZC v2.2.0
      */
     public function __unserialize(array $data): void
     {
-        throw new \BadMethodCallException("Cannot unserialize singleton");
+        throw new \BadMethodCallException('Cannot unserialize singleton');
     }
 
     /**
@@ -35,7 +41,7 @@ trait Singleton
      */
     public function __wakeup()
     {
-        throw new Exception("Cannot unserialize singleton");
+        throw new Exception('Cannot unserialize singleton');
     }
 
     /**
@@ -43,9 +49,9 @@ trait Singleton
      */
     public static function getInstance()
     {
-        $cls = get_called_class(); // late-static-bound class name
+        $cls = static::class; // late-static-bound class name
         if (!isset(self::$instances[$cls])) {
-            self::$instances[$cls] = new static;
+            self::$instances[$cls] = new static();
         }
         return self::$instances[$cls];
     }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * functions_osh_update
  *
@@ -51,8 +53,8 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
     $send_extra_emails_to = (string)$send_extra_emails_to;
 
     $osh_info = $GLOBALS['db']->ExecuteNoCache(
-        "SELECT customers_name, customers_email_address, orders_status, date_purchased
-           FROM " . TABLE_ORDERS . "
+        'SELECT customers_name, customers_email_address, orders_status, date_purchased
+           FROM ' . TABLE_ORDERS . "
           WHERE orders_id = $orders_id
           LIMIT 1"
     );
@@ -91,7 +93,7 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
             $GLOBALS['zco_notifier']->notify('ZEN_UPDATE_ORDERS_HISTORY_STATUS_VALUES', ['orders_id' => $orders_id, 'new' => $orders_new_status, 'old' => $orders_current_status]);
 
             $GLOBALS['db']->Execute(
-                "UPDATE " . TABLE_ORDERS . "
+                'UPDATE ' . TABLE_ORDERS . "
                     SET orders_status = $orders_new_status,
                         last_modified = now()
                   WHERE orders_id = $orders_id
@@ -100,8 +102,8 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
 
             // PayPal Trans ID, if any
             $paypalLookup = $GLOBALS['db']->Execute(
-                "SELECT *
-                 FROM " . TABLE_PAYPAL . "
+                'SELECT *
+                 FROM ' . TABLE_PAYPAL . "
                  WHERE order_id = $orders_id
                  ORDER BY last_modified DESC, date_added DESC, parent_txn_id DESC, paypal_ipn_id DESC"
             );
@@ -137,7 +139,7 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
                 $email_order_message = defined('EMAIL_ORDER_UPDATE_MESSAGE') ? constant('EMAIL_ORDER_UPDATE_MESSAGE') : '';
                 $GLOBALS['zco_notifier']->notify('ZEN_UPDATE_ORDERS_HISTORY_SET_ORDER_UPDATE_MESSAGE', $orders_id, $email_order_message);
                 if (!empty($email_order_message)) {
-                 $email_text .= "\n\n" . $email_order_message . "\n\n";
+                    $email_text .= "\n\n" . $email_order_message . "\n\n";
                 }
                 $html_msg['EMAIL_ORDER_UPDATE_MESSAGE'] = $email_order_message;
 
@@ -186,8 +188,8 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
             if (empty($updated_by)) {
                 if (IS_ADMIN_FLAG === true && isset($_SESSION['admin_id'])) {
                     $updated_by = zen_updated_by_admin();
-                } else if (isset($_SESSION['emp_admin_id'])) {
-                   $updated_by = zen_updated_by_admin($_SESSION['emp_admin_id']);
+                } elseif (isset($_SESSION['emp_admin_id'])) {
+                    $updated_by = zen_updated_by_admin($_SESSION['emp_admin_id']);
                 } elseif (IS_ADMIN_FLAG === false && isset($_SESSION['customer_id'])) {
                     $updated_by = '';
                 } else {
@@ -201,12 +203,12 @@ function zen_update_orders_history($orders_id, $message = '', $updated_by = null
                 'date_added' => 'now()',
                 'customer_notified' => $notify_customer,
                 'comments' => $message,
-                'updated_by' => $updated_by
+                'updated_by' => $updated_by,
             ];
 
             $GLOBALS['zco_notifier']->notify('ZEN_UPDATE_ORDERS_HISTORY_BEFORE_INSERT', [], $osh_sql);
 
-            zen_db_perform (TABLE_ORDERS_STATUS_HISTORY, $osh_sql);
+            zen_db_perform(TABLE_ORDERS_STATUS_HISTORY, $osh_sql);
             $osh_id = $GLOBALS['db']->Insert_ID();
 
             $GLOBALS['zco_notifier']->notify('ZEN_UPDATE_ORDERS_HISTORY_AFTER_INSERT', $osh_id, $osh_sql, $paypalLookup);

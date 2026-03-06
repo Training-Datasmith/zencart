@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 //namespace Tests\Support;
 class CouponValidation
 {
-
     /**
      * Check whether the product is valid for the specified coupon, according to model/category/product restrictions assigned to the coupon
      */

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * BaconQrCode
  *
@@ -69,9 +71,9 @@ class FormatInformation
     /**
      * Error correction level.
      */
-    private ErrorCorrectionLevel $ecLevel;
+    private readonly ErrorCorrectionLevel $ecLevel;
 
-    private int $dataMask;
+    private readonly int $dataMask;
 
     protected function __construct(int $formatInfo)
     {
@@ -82,7 +84,7 @@ class FormatInformation
     /**
      * Checks how many bits are different between two integers.
      */
-    public static function numBitsDiffering(int $a, int $b) : int
+    public static function numBitsDiffering(int $a, int $b): int
     {
         $a ^= $b;
 
@@ -101,7 +103,7 @@ class FormatInformation
     /**
      * Decodes format information.
      */
-    public static function decodeFormatInformation(int $maskedFormatInfo1, int $maskedFormatInfo2) : ?self
+    public static function decodeFormatInformation(int $maskedFormatInfo1, int $maskedFormatInfo2): ?self
     {
         $formatInfo = self::doDecodeFormatInformation($maskedFormatInfo1, $maskedFormatInfo2);
 
@@ -120,7 +122,7 @@ class FormatInformation
     /**
      * Internal method for decoding format information.
      */
-    private static function doDecodeFormatInformation(int $maskedFormatInfo1, int $maskedFormatInfo2) : ?self
+    private static function doDecodeFormatInformation(int $maskedFormatInfo1, int $maskedFormatInfo2): ?self
     {
         $bestDifference = PHP_INT_MAX;
         $bestFormatInfo = 0;
@@ -162,7 +164,7 @@ class FormatInformation
     /**
      * Returns the error correction level.
      */
-    public function getErrorCorrectionLevel() : ErrorCorrectionLevel
+    public function getErrorCorrectionLevel(): ErrorCorrectionLevel
     {
         return $this->ecLevel;
     }
@@ -170,7 +172,7 @@ class FormatInformation
     /**
      * Returns the data mask.
      */
-    public function getDataMask() : int
+    public function getDataMask(): int
     {
         return $this->dataMask;
     }
@@ -178,7 +180,7 @@ class FormatInformation
     /**
      * Hashes the code of the EC level.
      */
-    public function hashCode() : int
+    public function hashCode(): int
     {
         return ($this->ecLevel->getBits() << 3) | $this->dataMask;
     }
@@ -186,7 +188,7 @@ class FormatInformation
     /**
      * Verifies if this instance equals another one.
      */
-    public function equals(self $other) : bool
+    public function equals(self $other): bool
     {
         return (
             $this->ecLevel === $other->ecLevel

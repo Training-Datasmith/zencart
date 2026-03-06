@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * search_header ("sidebox") - this is a search field that appears in the navigation header
  * (it's not really a "sidebox" per se).
@@ -9,10 +11,10 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 
-$search_header_status = $db->Execute("SELECT layout_box_name FROM " . TABLE_LAYOUT_BOXES . " WHERE (layout_box_status=1 OR layout_box_status_single=1) AND layout_template ='" . $template_dir . "' AND layout_box_name='search_header.php'");
+$search_header_status = $db->Execute('SELECT layout_box_name FROM ' . TABLE_LAYOUT_BOXES . " WHERE (layout_box_status=1 OR layout_box_status_single=1) AND layout_template ='" . $template_dir . "' AND layout_box_name='search_header.php'");
 
 if ($search_header_status->RecordCount() != 0) {
-    $show_search_header= true;
+    $show_search_header = true;
 }
 
 if (!empty($show_search_header)) {

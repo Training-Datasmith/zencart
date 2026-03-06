@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Common;
 
@@ -9,16 +10,16 @@ namespace BaconQrCode\Common;
  * This includes the number of data codewords, and the number of times a block with these parameters is used
  * consecutively in the QR code version's format.
  */
-final class EcBlock
+final readonly class EcBlock
 {
-    public function __construct(private readonly int $count, private readonly int $dataCodewords)
+    public function __construct(private int $count, private int $dataCodewords)
     {
     }
 
     /**
      * Returns how many times the block is used.
      */
-    public function getCount() : int
+    public function getCount(): int
     {
         return $this->count;
     }
@@ -26,7 +27,7 @@ final class EcBlock
     /**
      * Returns the number of data codewords.
      */
-    public function getDataCodewords() : int
+    public function getDataCodewords(): int
     {
         return $this->dataCodewords;
     }

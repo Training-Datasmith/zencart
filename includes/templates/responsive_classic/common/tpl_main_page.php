@@ -50,33 +50,31 @@ if (!defined('IS_ADMIN_FLAG')) {
 // $messageStack->add('main', 'this is a sample success message', 'success');
 /** eof DESIGNER TESTING ONLY */
 
-
-
 // the following statements can be modified as needed to set additional flags
-if (in_array($current_page_base,explode(",",'list_pages_to_skip_all_left_sideboxes_on_here,separated_by_commas,and_no_spaces')) ) {
-  $flag_disable_left = true;
+if (in_array($current_page_base, explode(',', 'list_pages_to_skip_all_left_sideboxes_on_here,separated_by_commas,and_no_spaces'))) {
+    $flag_disable_left = true;
 }
-if (in_array($current_page_base,explode(",",'list_pages_to_skip_all_right_sideboxes_on_here,separated_by_commas,and_no_spaces')) ) {
-  $flag_disable_right = true;
+if (in_array($current_page_base, explode(',', 'list_pages_to_skip_all_right_sideboxes_on_here,separated_by_commas,and_no_spaces'))) {
+    $flag_disable_right = true;
 }
 
 // ZCAdditions.com, Responsive Template Default (BOF-addition 1 of 1)
 if ($flag_disable_right or COLUMN_RIGHT_STATUS == '0') {
-  $box_width_right = preg_replace('/[^0-9]/', '', '0');
-  $box_width_right_new = '';
+    $box_width_right = preg_replace('/[^0-9]/', '', '0');
+    $box_width_right_new = '';
 } else {
-  $box_width_right = COLUMN_WIDTH_RIGHT;
-  $box_width_right = preg_replace('/[^0-9]/', '', $box_width_right);
-  $box_width_right_new = 'col' . $box_width_right;
+    $box_width_right = COLUMN_WIDTH_RIGHT;
+    $box_width_right = preg_replace('/[^0-9]/', '', $box_width_right);
+    $box_width_right_new = 'col' . $box_width_right;
 }
 
 if ($flag_disable_left or COLUMN_LEFT_STATUS == '0') {
-  $box_width_left = preg_replace('/[^0-9]/', '', '0');
-  $box_width_left_new = '';
+    $box_width_left = preg_replace('/[^0-9]/', '', '0');
+    $box_width_left_new = '';
 } else {
-  $box_width_left = COLUMN_WIDTH_LEFT;
-  $box_width_left = preg_replace('/[^0-9]/', '', $box_width_left);
-  $box_width_left_new = 'col' . $box_width_left;
+    $box_width_left = COLUMN_WIDTH_LEFT;
+    $box_width_left = preg_replace('/[^0-9]/', '', $box_width_left);
+    $box_width_left_new = 'col' . $box_width_left;
 }
 
 $side_columns_total = $box_width_left + $box_width_right;
@@ -84,35 +82,36 @@ $center_column = '970'; // This value should not be altered
 $center_column_width = $center_column - $side_columns_total;
 // ZCAdditions.com, Responsive Template Default (EOF-addition 1 of 1)
 
-
 $header_template = 'tpl_header.php';
 $footer_template = 'tpl_footer.php';
 $left_column_file = 'column_left.php';
 $right_column_file = 'column_right.php';
 $body_id = ($this_is_home_page) ? 'indexHome' : str_replace('_', '', $_GET['main_page']);
 ?>
-<body id="<?php echo $body_id . 'Body'; ?>"<?php if($zv_onload !='') echo ' onload="'.$zv_onload.'"'; ?> class="<?= 'tpl_' . $template_dir ?>">
+<body id="<?php echo $body_id . 'Body'; ?>"<?php if ($zv_onload != '') {
+    echo ' onload="'.$zv_onload.'"';
+} ?> class="<?= 'tpl_' . $template_dir ?>">
 <?php /* add any start-of-body-section code via an observer class */
 $zco_notifier->notify('NOTIFY_PAGE_BODY_BEGIN', $current_page);
 ?>
 
 <?php
- if ( $detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) {
-  echo '<div id="page">';
- } else if ( $detect->isTablet() || $_SESSION['layoutType'] == 'tablet' ){
-  echo '<div id="page">';
-  } else {
-//
-  }
+ if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') {
+     echo '<div id="page">';
+ } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
+     echo '<div id="page">';
+ } else {
+
+ }
 ?>
 
 <?php
   if (SHOW_BANNERS_GROUP_SET1 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET1)) {
-    if ($banner->RecordCount() > 0) {
-?>
+      if ($banner->RecordCount() > 0) {
+          ?>
 <div id="bannerOne" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
 <?php
-    }
+      }
   }
 ?>
 
@@ -123,27 +122,27 @@ $zco_notifier->notify('NOTIFY_PAGE_BODY_BEGIN', $current_page);
   *
   */
   if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_HEADER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in())) {
-    $flag_disable_header = true;
+      $flag_disable_header = true;
   }
-  require($template->get_template_dir('tpl_header.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_header.php');?>
+require($template->get_template_dir('tpl_header.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_header.php');?>
 
 <div id="contentMainWrapper">
 
 <?php
 if (COLUMN_LEFT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in()) || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_LEFT_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in()))) {
-  // global disable of column_left
-  $flag_disable_left = true;
+    // global disable of column_left
+    $flag_disable_left = true;
 }
 if (!$flag_disable_left) {
-?>
+    ?>
   <div class="<?php echo $box_width_left_new; ?>">
 <?php
- /**
-  * prepares and displays left column sideboxes
-  *
-  */
-  require(DIR_WS_MODULES . zen_get_module_directory('column_left.php'));
-?>
+     /**
+      * prepares and displays left column sideboxes
+      *
+      */
+      require(DIR_WS_MODULES . zen_get_module_directory('column_left.php'));
+    ?>
   </div>
 
 <?php
@@ -160,18 +159,22 @@ if (!$flag_disable_left) {
 
 <?php
   if (SHOW_BANNERS_GROUP_SET3 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET3)) {
-    if ($banner->RecordCount() > 0) {
-?>
+      if ($banner->RecordCount() > 0) {
+          ?>
     <div id="bannerThree" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
 <?php
-    }
+      }
   }
 ?>
 
 <!-- bof upload alerts -->
-<?php if ($messageStack->size('upload') > 0) echo $messageStack->output('upload'); ?>
+<?php if ($messageStack->size('upload') > 0) {
+    echo $messageStack->output('upload');
+} ?>
 <!-- eof upload alerts -->
-<?php if ($messageStack->size('main_content') > 0) echo $messageStack->output('main_content'); ?>
+<?php if ($messageStack->size('main_content') > 0) {
+    echo $messageStack->output('main_content');
+} ?>
 
 <?php
  /**
@@ -183,11 +186,11 @@ if (!$flag_disable_left) {
 
 <?php
   if (SHOW_BANNERS_GROUP_SET4 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET4)) {
-    if ($banner->RecordCount() > 0) {
-?>
+      if ($banner->RecordCount() > 0) {
+          ?>
     <div id="bannerFour" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
 <?php
-    }
+      }
   }
 ?>
   </div>
@@ -196,19 +199,19 @@ if (!$flag_disable_left) {
 <?php
 //if (COLUMN_RIGHT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and $_SESSION['customer_id'] == '') || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF == 'true' && $_SESSION['customers_authorization'] != 0)) {
 if (COLUMN_RIGHT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in()) || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in()))) {
-  // global disable of column_right
-  $flag_disable_right = true;
+    // global disable of column_right
+    $flag_disable_right = true;
 }
 if (!isset($flag_disable_right) || !$flag_disable_right) {
-?>
+    ?>
   <div class="<?php echo $box_width_right_new; ?>">
 <?php
- /**
-  * prepares and displays right column sideboxes
-  *
-  */
- require(DIR_WS_MODULES . zen_get_module_directory('column_right.php'));
-?>
+     /**
+      * prepares and displays right column sideboxes
+      *
+      */
+     require(DIR_WS_MODULES . zen_get_module_directory('column_right.php'));
+    ?>
   </div>
 
 <?php
@@ -223,20 +226,20 @@ if (!isset($flag_disable_right) || !$flag_disable_right) {
   *
   */
   if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_FOOTER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or $_SESSION['customer_id'] == '')) {
-    $flag_disable_footer = true;
+      $flag_disable_footer = true;
   }
-  require($template->get_template_dir('tpl_footer.php',DIR_WS_TEMPLATE, $current_page_base,'common'). '/tpl_footer.php');
+require($template->get_template_dir('tpl_footer.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_footer.php');
 ?>
 
 </div>
 <!--bof- banner #6 display -->
 <?php
   if (SHOW_BANNERS_GROUP_SET6 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET6)) {
-    if ($banner->RecordCount() > 0) {
-?>
+      if ($banner->RecordCount() > 0) {
+          ?>
 <div id="bannerSix" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
 <?php
-    }
+      }
   }
 ?>
 <!--eof- banner #6 display -->
@@ -245,25 +248,22 @@ if (!isset($flag_disable_right) || !$flag_disable_right) {
 
 
  <?php
-if  ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) {
-  echo '</div>';
-} else if ( $detect->isTablet() || $_SESSION['layoutType'] == 'tablet' ){
-  echo '</div>';
+if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') {
+    echo '</div>';
+} elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
+    echo '</div>';
 } else {
-  //
+
 }
 ?>
 
 
-<?php if  ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile' ) {
-  require($template->get_template_dir('tpl_modules_mobile_menu.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_mobile_menu.php');
-} else if ( $detect->isTablet() || $_SESSION['layoutType'] == 'tablet' ){
-  require($template->get_template_dir('tpl_modules_mobile_menu.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_mobile_menu.php');
-} else if ( $_SESSION['layoutType'] == 'full' ) {
-  //
-} else {
-  //
-}
+<?php if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') {
+    require($template->get_template_dir('tpl_modules_mobile_menu.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_mobile_menu.php');
+} elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
+    require($template->get_template_dir('tpl_modules_mobile_menu.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_mobile_menu.php');
+} else
+
 ?>
 
 <?php /* add any end-of-page code via an observer class */

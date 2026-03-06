@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -148,7 +149,7 @@ class Category
     /**
      * @since ZC v2.1.0
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         return $this->get($name);
     }
@@ -160,10 +161,10 @@ class Category
     {
         global $db;
 
-        $sql = "SELECT c.*, pt.product_type_id
-                FROM " . TABLE_CATEGORIES . " c 
-                LEFT JOIN " . TABLE_PRODUCT_TYPES_TO_CATEGORY . " pt ON (c.categories_id = pt.category_id)
-                WHERE categories_id = " . (int)$category_id;
+        $sql = 'SELECT c.*, pt.product_type_id
+                FROM ' . TABLE_CATEGORIES . ' c 
+                LEFT JOIN ' . TABLE_PRODUCT_TYPES_TO_CATEGORY . ' pt ON (c.categories_id = pt.category_id)
+                WHERE categories_id = ' . $category_id;
         $category = $db->Execute($sql, 1, true, 900);
 
         if ($category->EOF) {
@@ -178,10 +179,10 @@ class Category
          * Add $data['lang'][code] = [categories_name, categories_description, etc] for each language
          * @since ZC v2.1.0
          */
-        $sql = "SELECT *
-                FROM " . TABLE_CATEGORIES_DESCRIPTION . "
-                WHERE categories_id = " . (int)$category_id . "
-                ORDER BY language_id";
+        $sql = 'SELECT *
+                FROM ' . TABLE_CATEGORIES_DESCRIPTION . '
+                WHERE categories_id = ' . $category_id . '
+                ORDER BY language_id';
         $pd = $db->Execute($sql, null, true, 900);
         foreach ($pd as $result) {
             unset($result['categories_id']);
@@ -205,4 +206,3 @@ class Category
         $this->languages = $lng->get_language_list();  // [1 => 'en', 2 => 'fr']
     }
 }
-

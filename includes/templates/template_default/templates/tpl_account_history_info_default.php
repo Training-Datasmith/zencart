@@ -28,64 +28,62 @@ $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_HEADING', $order
         <th scope="col" id="myAccountProducts"><?php echo HEADING_PRODUCTS; ?></th>
 <?php
   if (isset($order->info['tax_groups']) && count($order->info['tax_groups']) > 1) {
-?>
+      ?>
         <th scope="col" id="myAccountTax"><?php echo HEADING_TAX; ?></th>
 <?php
- }
+  }
 ?>
         <th scope="col" id="myAccountTotal"><?php echo HEADING_TOTAL; ?></th>
 <?php
   if (is_array($extra_headings)) {
-    foreach ($extra_headings as $heading_info) {
-?>
+      foreach ($extra_headings as $heading_info) {
+          ?>
         <th scope="col"<?php echo empty($heading_info['params']) ? '' : " {$heading_info['params']}" ?>><?php echo $heading_info['text']; ?></th>
 <?php
-    }
+      }
   }
 ?>
     </tr>
 <?php
-  foreach($order->products as $op) {
-    $extra_data = [];
-    $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_DATA', [ 'order' => $order, 'orders_product' => $op ], $extra_data);
-  ?>
+  foreach ($order->products as $op) {
+      $extra_data = [];
+      $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_DATA', [ 'order' => $order, 'orders_product' => $op ], $extra_data);
+      ?>
     <tr>
         <td class="accountQuantityDisplay"><?php echo $op['qty'] . CART_QUANTITY_SUFFIX; ?></td>
         <td class="accountProductDisplay">
 <a href="<?php echo zen_href_link(zen_get_info_page($op['id']), 'products_id=' . $op['id']); ?>"><?php echo $op['name']; ?></a>
 <?php
-    if (isset($op['attributes']) && !empty($op['attributes'])) {
-      echo '<ul class="orderAttribsList">';
-      foreach($op['attributes'] as $attr) {
-        echo '<li>' . $attr['option'] . TEXT_OPTION_DIVIDER . nl2br(zen_output_string_protected($attr['value'])) . '</li>';
-      }
-        echo '</ul>';
-    }
-?>
+        if (isset($op['attributes']) && !empty($op['attributes'])) {
+            echo '<ul class="orderAttribsList">';
+            foreach ($op['attributes'] as $attr) {
+                echo '<li>' . $attr['option'] . TEXT_OPTION_DIVIDER . nl2br(zen_output_string_protected($attr['value'])) . '</li>';
+            }
+            echo '</ul>';
+        }
+      ?>
         </td>
 <?php
-    if (isset($order->info['tax_groups']) && count($order->info['tax_groups']) > 1) {
-?>
+          if (isset($order->info['tax_groups']) && count($order->info['tax_groups']) > 1) {
+              ?>
         <td class="accountTaxDisplay"><?php echo zen_display_tax_value($op['tax']) . '%' ?></td>
 <?php
-    }
-?>
+          }
+      ?>
         <td class="accountTotalDisplay">
         <?php
-         $ppe = zen_round(zen_add_tax($op['final_price'], $op['tax']), $currencies->get_decimal_places($order->info['currency']));
-         $ppt = $ppe * $op['qty'];
-        //        echo $currencies->format(zen_add_tax($op['final_price'], $op['tax']) * $op['qty'], true, $order->info['currency'], $order->info['currency_value']) . ($op['onetime_charges'] != 0 ? '<br>' . $currencies->format(zen_add_tax($op['onetime_charges'], $op['tax']), true, $order->info['currency'], $order->info['currency_value']) : '')
-        echo $currencies->format($ppt, true, $order->info['currency'], $order->info['currency_value']) . ($op['onetime_charges'] != 0 ? '<br>' . $currencies->format(zen_add_tax($op['onetime_charges'], $op['tax']), true, $order->info['currency'], $order->info['currency_value']) : '');
-        ?></td>
+               $ppe = zen_round(zen_add_tax($op['final_price'], $op['tax']), $currencies->get_decimal_places($order->info['currency']));
+      $ppt = $ppe * $op['qty'];
+      //        echo $currencies->format(zen_add_tax($op['final_price'], $op['tax']) * $op['qty'], true, $order->info['currency'], $order->info['currency_value']) . ($op['onetime_charges'] != 0 ? '<br>' . $currencies->format(zen_add_tax($op['onetime_charges'], $op['tax']), true, $order->info['currency'], $order->info['currency_value']) : '')
+      echo $currencies->format($ppt, true, $order->info['currency'], $order->info['currency_value']) . ($op['onetime_charges'] != 0 ? '<br>' . $currencies->format(zen_add_tax($op['onetime_charges'], $op['tax']), true, $order->info['currency'], $order->info['currency_value']) : '');
+      ?></td>
 <?php
-    if (!empty($extra_data)) {
-      foreach ($extra_data as $data_info) {
-?>
-        <td<?php echo empty($data_info['params']) ? '' : " {$data_info['params']}" ?>><?php echo $data_info['text']; ?></td>
-<?php
-      }
+    foreach ($extra_data as $data_info) {
+        ?>
+          <td<?php echo empty($data_info['params']) ? '' : " {$data_info['params']}" ?>><?php echo $data_info['text']; ?></td>
+  <?php
     }
-?>
+      ?>
     </tr>
 <?php
   }
@@ -94,8 +92,8 @@ $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_HEADING', $order
 <hr>
 <div id="orderTotals">
 <?php
-  foreach($order->totals as $ot) {
-?>
+  foreach ($order->totals as $ot) {
+      ?>
      <div class="amount larger forward"><?php echo $ot['text'] ?></div>
      <div class="lineTitle larger forward"><?php echo $ot['title'] ?></div>
 <br class="clearBoth">
@@ -109,19 +107,21 @@ $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_HEADING', $order
 /**
  * Used to display any downloads associated with the cutomers account
  */
-  if (DOWNLOAD_ENABLED == 'true') require($template->get_template_dir('tpl_modules_downloads.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_downloads.php');
+  if (DOWNLOAD_ENABLED == 'true') {
+      require($template->get_template_dir('tpl_modules_downloads.php', DIR_WS_TEMPLATE, $current_page_base, 'templates'). '/tpl_modules_downloads.php');
+  }
 ?>
 
 <?php
   $additional_content = false;
-  $zco_notifier->notify('NOTIFY_INVOICE_ADDITIONAL_DATA_MIDDLE', $order, $additional_content);
-    if ($additional_content !== false) {
-?>
+$zco_notifier->notify('NOTIFY_INVOICE_ADDITIONAL_DATA_MIDDLE', $order, $additional_content);
+if ($additional_content !== false) {
+    ?>
     <table class="table">
         <tr><td class="main additional_data" colspan="2"><?php echo $additional_content; ?></td></tr>
     </table>
 <?php
-    }
+}
 ?>
 
 <?php
@@ -129,58 +129,58 @@ $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_EXTRA_COLUMN_HEADING', $order
  * Used to loop thru and display order status information
  */
 if (!empty($order->statuses)) {
-?>
+    ?>
 <h2 id="orderHistoryStatus"><?php echo HEADING_ORDER_HISTORY; ?></h2>
 <table id="myAccountOrdersStatus">
     <tr class="tableHeading">
         <th scope="col" id="myAccountStatusDate"><?php echo TABLE_HEADING_STATUS_DATE; ?></th>
         <th scope="col" id="myAccountStatus"><?php echo TABLE_HEADING_STATUS_ORDER_STATUS; ?></th>
 <?php
-    $extra_headings = [];
+        $extra_headings = [];
     $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_OSH_HEADINGS', $order, $extra_headings);
     foreach ($extra_headings as $next_heading) {
-?>
+        ?>
         <th scope="col"><?= $next_heading ?></th>
 <?php
     }
-?>
+    ?>
         <th scope="col" id="myAccountStatusComments"><?php echo TABLE_HEADING_STATUS_COMMENTS; ?></th>
     </tr>
 <?php
-    // -----
-    // The *first* comment, made by the customer, is 'protected' from using HTML taga; all others are
-    // made by the admin or a 'known' entity and HTML is allowed.
-    //
-    $protected = true;
+        // -----
+        // The *first* comment, made by the customer, is 'protected' from using HTML taga; all others are
+        // made by the admin or a 'known' entity and HTML is allowed.
+        //
+        $protected = true;
     foreach ($order->statuses as $statuses) {
-?>
+        ?>
     <tr>
         <td><?php echo zen_date_short($statuses['date_added']); ?></td>
         <td><?php echo $statuses['orders_status_name']; ?></td>
 <?php
-        $extra_data = [];
+                $extra_data = [];
         $zco_notifier->notify('NOTIFY_ACCOUNT_HISTORY_INFO_OSH_DATA', $statuses, $extra_data);
         foreach ($extra_data as $next_data) {
             if ($protected === true) {
                 $next_data = zen_output_string_protected($next_data);
             }
-?>
+            ?>
         <td><?= $next_data ?></td>
 <?php
         }
-?>
+        ?>
         <td>
 <?php
-        if (!empty($statuses['comments'])) {
-           echo nl2br(zen_output_string($statuses['comments'], false, $protected));
-        }
-?>
+                if (!empty($statuses['comments'])) {
+                    echo nl2br(zen_output_string($statuses['comments'], false, $protected));
+                }
+        ?>
        </td>
     </tr>
 <?php
-        $protected = false;
+                $protected = false;
     }
-?>
+    ?>
 </table>
 <?php
 }
@@ -190,7 +190,7 @@ if (!empty($order->statuses)) {
 <div id="myAccountShipInfo" class="floatingBox back">
 <?php
   if (!empty($order->delivery['format_id'])) {
-?>
+      ?>
 <h3><?php echo HEADING_DELIVERY_ADDRESS; ?></h3>
 <address><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, ' ', '<br>'); ?></address>
 <?php
@@ -199,13 +199,13 @@ if (!empty($order->statuses)) {
 
 <?php
     if (!empty($order->info['shipping_method'])) {
-?>
+        ?>
 <h4><?php echo HEADING_SHIPPING_METHOD; ?></h4>
 <div><?php echo $order->info['shipping_method']; ?></div>
 <?php } else { ?>
 <div><?php echo TEXT_MISSING_SHIPPING_INFO; ?></div>
 <?php
-    }
+}
 ?>
 </div>
 

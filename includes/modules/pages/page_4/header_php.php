@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Page 4
  *
@@ -8,9 +10,8 @@
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 
-  require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
-  $breadcrumb->add(NAVBAR_TITLE);
+require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
+$breadcrumb->add(NAVBAR_TITLE);
 
 // include template specific file name defines
-  $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/', FILENAME_DEFINE_PAGE_4, 'false');
-?>
+$define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/', FILENAME_DEFINE_PAGE_4, 'false');

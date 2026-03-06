@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Database-Sniffer Class.
  *
@@ -52,7 +54,7 @@ class sniffer
     public function field_exists(string $table_name, string $field_name): bool
     {
         global $db;
-        $sql = "SHOW FIELDS FROM " . $db->prepare_input($table_name);
+        $sql = 'SHOW FIELDS FROM ' . $db->prepare_input($table_name);
         $result = $db->Execute($sql);
         foreach ($result as $record) {
             if ($record['Field'] === $field_name) {
@@ -68,7 +70,7 @@ class sniffer
     public function get_field_collation(string $table_name, string $field_name): ?string
     {
         global $db;
-        $sql = "SHOW FULL FIELDS FROM " . $db->prepare_input($table_name);
+        $sql = 'SHOW FULL FIELDS FROM ' . $db->prepare_input($table_name);
         $result = $db->Execute($sql);
         foreach ($result as $record) {
             if ($record['Field'] === $field_name) {
@@ -86,9 +88,9 @@ class sniffer
     public function field_type(string $table_name, string $field_name, string $field_type, bool $return_found = false): bool|string
     {
         global $db;
-        $sql = "SHOW FIELDS FROM " . $db->prepare_input($table_name);
+        $sql = 'SHOW FIELDS FROM ' . $db->prepare_input($table_name);
         $result = $db->Execute($sql);
-        foreach($result as $record) {
+        foreach ($result as $record) {
             if ($record['Field'] === $field_name) {
                 if ($record['Type'] === $field_type) {
                     return true; // exists and matches required type, so return with no error
@@ -108,7 +110,6 @@ class sniffer
      * @param string $table_name The table to query.
      * @param string $key_name The key to check.
      * @param int $key_value The value that key_name must equal.
-     * @return bool
      * @since ZC v2.0.0
      */
     public function rowExists(string $table_name, string $key_name, int $key_value): bool
@@ -130,7 +131,6 @@ class sniffer
      * @param string $table_name The table to query.
      * @param array $key_names The array of keys to check.
      * @param array $key_values The array of values that key_names must equal.
-     * @return bool
      * @since ZC v2.0.0
      */
     public function rowExistsComposite(string $table_name, array $key_names, array $key_values): bool
@@ -140,12 +140,11 @@ class sniffer
         $sql .= implode(
             ' AND ',
             array_map(
-                static function ($key, $value) {
+                static function ($key, int|string $value) {
                     global $db;
                     $bit = ':key = :value';
                     $bit = $db->bindVars($bit, ':key', $key, 'noquotestring');
-                    $bit = $db->bindVars($bit, ':value', $value, 'integer');
-                    return $bit;
+                    return $db->bindVars($bit, ':value', $value, 'integer');
                 },
                 $key_names,
                 $key_values

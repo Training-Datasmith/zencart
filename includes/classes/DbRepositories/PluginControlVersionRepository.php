@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -28,7 +30,7 @@ class PluginControlVersionRepository
     public function getByUniqueKey(string $uniqueKey): array
     {
         $results = $this->db->Execute(
-            "SELECT * FROM " . TABLE_PLUGIN_CONTROL_VERSIONS .
+            'SELECT * FROM ' . TABLE_PLUGIN_CONTROL_VERSIONS .
             " WHERE unique_key = '" . $this->db->prepare_input($uniqueKey) . "'"
         );
 
@@ -46,7 +48,7 @@ class PluginControlVersionRepository
     public function setAllInfs(int $infs): void
     {
         $this->db->Execute(
-            "UPDATE " . TABLE_PLUGIN_CONTROL_VERSIONS . " SET infs = " . (int)$infs
+            'UPDATE ' . TABLE_PLUGIN_CONTROL_VERSIONS . ' SET infs = ' . $infs
         );
     }
 
@@ -57,16 +59,16 @@ class PluginControlVersionRepository
     {
         foreach ($rows as $row) {
             $this->db->Execute(
-                "INSERT INTO " . TABLE_PLUGIN_CONTROL_VERSIONS . " (" .
-                "unique_key, author, version, zc_versions, infs" .
-                ") VALUES (" .
+                'INSERT INTO ' . TABLE_PLUGIN_CONTROL_VERSIONS . ' (' .
+                'unique_key, author, version, zc_versions, infs' .
+                ') VALUES (' .
                 "'" . $this->db->prepare_input((string)$row['unique_key']) . "', " .
                 "'" . $this->db->prepare_input((string)$row['author']) . "', " .
                 "'" . $this->db->prepare_input((string)$row['version']) . "', " .
                 "'" . $this->db->prepare_input((string)$row['zc_versions']) . "', " .
                 (int)$row['infs'] .
-                ") ON DUPLICATE KEY UPDATE " .
-                "infs = VALUES(infs)"
+                ') ON DUPLICATE KEY UPDATE ' .
+                'infs = VALUES(infs)'
             );
         }
     }
@@ -77,7 +79,7 @@ class PluginControlVersionRepository
     public function deleteByInfs(int $infs): void
     {
         $this->db->Execute(
-            "DELETE FROM " . TABLE_PLUGIN_CONTROL_VERSIONS . " WHERE infs = " . (int)$infs
+            'DELETE FROM ' . TABLE_PLUGIN_CONTROL_VERSIONS . ' WHERE infs = ' . $infs
         );
     }
 }

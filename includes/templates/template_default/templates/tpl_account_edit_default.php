@@ -14,7 +14,9 @@
 <div class="centerColumn" id="accountEditDefault">
 <?php echo zen_draw_form('account_edit', zen_href_link(FILENAME_ACCOUNT_EDIT, '', 'SSL'), 'post', 'onsubmit="return check_form(account_edit);"') . zen_draw_hidden_field('action', 'process'); ?>
 
-<?php if ($messageStack->size('account_edit') > 0) echo $messageStack->output('account_edit'); ?>
+<?php if ($messageStack->size('account_edit') > 0) {
+    echo $messageStack->output('account_edit');
+} ?>
 
 <fieldset>
 <legend><?php echo HEADING_TITLE; ?></legend>
@@ -23,8 +25,8 @@
 
 <?php
   if (ACCOUNT_GENDER == 'true') {
-?>
-<?php echo zen_draw_radio_field('gender', 'm', $male, 'id="gender-male"') . '<label class="radioButtonLabel" for="gender-male">' . MALE . '</label>' . zen_draw_radio_field('gender', 'f', $female, 'id="gender-female"') . '<label class="radioButtonLabel" for="gender-female">' . FEMALE . '</label>' . (!empty(ENTRY_GENDER_TEXT) ? '<span class="alert">' . ENTRY_GENDER_TEXT . '</span>': ''); ?>
+      ?>
+<?php echo zen_draw_radio_field('gender', 'm', $male, 'id="gender-male"') . '<label class="radioButtonLabel" for="gender-male">' . MALE . '</label>' . zen_draw_radio_field('gender', 'f', $female, 'id="gender-female"') . '<label class="radioButtonLabel" for="gender-female">' . FEMALE . '</label>' . (!empty(ENTRY_GENDER_TEXT) ? '<span class="alert">' . ENTRY_GENDER_TEXT . '</span>' : ''); ?>
 <br class="clearBoth">
 <?php
   }
@@ -40,7 +42,7 @@
 
 <?php
   if (ACCOUNT_DOB == 'true') {
-?>
+      ?>
 <label class="inputLabel" for="dob"><?php echo ENTRY_DATE_OF_BIRTH; ?></label>
 <?php echo zen_draw_input_field('dob', zen_date_short($account->fields['customers_dob']), 'id="dob" placeholder="' . ENTRY_DATE_OF_BIRTH_TEXT . '"' . (ACCOUNT_DOB == 'true' && (int)ENTRY_DOB_MIN_LENGTH != 0 ? ' required' : '')); ?>
 <br class="clearBoth">
@@ -57,40 +59,41 @@
 <br class="clearBoth">
 
 <?php
-if (ACCOUNT_FAX_NUMBER == 'true' ) {
-?>
+if (ACCOUNT_FAX_NUMBER == 'true') {
+    ?>
 <label class="inputLabel" for="fax"><?php echo ENTRY_FAX_NUMBER; ?></label>
 <?php echo zen_draw_input_field('fax', $account->fields['customers_fax'], 'id="fax" placeholder="' . ENTRY_FAX_NUMBER_TEXT . '"', 'tel'); ?>
 <br class="clearBoth">
 <?php
-  }
+}
 ?>
 
 <?php
   if (CUSTOMERS_REFERRAL_STATUS == 2 and $customers_referral == '') {
-?>
+      ?>
 <label class="inputLabel" for="customers-referral"><?php echo ENTRY_CUSTOMERS_REFERRAL; ?></label>
 <?php echo zen_draw_input_field('customers_referral', '', zen_set_field_length(TABLE_CUSTOMERS, 'customers_referral', 15) . ' id="customers-referral"'); ?>
 <br class="clearBoth">
 <?php } ?>
 
 <?php
-  if (CUSTOMERS_REFERRAL_STATUS == 2 and $customers_referral != '') {
-?>
+        if (CUSTOMERS_REFERRAL_STATUS == 2 and $customers_referral != '') {
+            ?>
 <label for="customers-referral-readonly"><?php echo ENTRY_CUSTOMERS_REFERRAL; ?></label>
-<?php echo $customers_referral; zen_draw_hidden_field('customers_referral', $customers_referral,'id="customers-referral-readonly"'); ?>
+<?php echo $customers_referral;
+            zen_draw_hidden_field('customers_referral', $customers_referral, 'id="customers-referral-readonly"'); ?>
 <br class="clearBoth">
 <?php } ?>
 </fieldset>
 
 <fieldset>
 <legend><?php echo ENTRY_EMAIL_PREFERENCE; ?></legend>
-<?php echo zen_draw_radio_field('email_format', 'HTML', $email_pref_html,'id="email-format-html"') . '<label class="radioButtonLabel" for="email-format-html">' . ENTRY_EMAIL_HTML_DISPLAY . '</label>' . zen_draw_radio_field('email_format', 'TEXT', $email_pref_text, 'id="email-format-text"') . '<label  class="radioButtonLabel" for="email-format-text">' . ENTRY_EMAIL_TEXT_DISPLAY . '</label>'; ?>
+<?php echo zen_draw_radio_field('email_format', 'HTML', $email_pref_html, 'id="email-format-html"') . '<label class="radioButtonLabel" for="email-format-html">' . ENTRY_EMAIL_HTML_DISPLAY . '</label>' . zen_draw_radio_field('email_format', 'TEXT', $email_pref_text, 'id="email-format-text"') . '<label  class="radioButtonLabel" for="email-format-text">' . ENTRY_EMAIL_TEXT_DISPLAY . '</label>'; ?>
 <br class="clearBoth">
 </fieldset>
 
-<div class="buttonRow back"><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_BACK , BUTTON_BACK_ALT) . '</a>'; ?></div>
-<div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_UPDATE , BUTTON_UPDATE_ALT); ?></div>
+<div class="buttonRow back"><?php echo '<a href="' . zen_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_BACK, BUTTON_BACK_ALT) . '</a>'; ?></div>
+<div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_UPDATE, BUTTON_UPDATE_ALT); ?></div>
 <br class="clearBoth">
 
 </form>

@@ -33,23 +33,23 @@ $currencies = new currencies();
         </thead>
         <tbody>
             <?php
-            $customers_query_raw = "SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
+            $customers_query_raw = 'SELECT c.customers_id, c.customers_firstname, c.customers_lastname,
                                            SUM(op.products_quantity * op.final_price) + SUM(op.onetime_charges) AS ordersum
-                                    FROM " . TABLE_CUSTOMERS . " c,
-                                         " . TABLE_ORDERS_PRODUCTS . " op,
-                                         " . TABLE_ORDERS . " o
+                                    FROM ' . TABLE_CUSTOMERS . ' c,
+                                         ' . TABLE_ORDERS_PRODUCTS . ' op,
+                                         ' . TABLE_ORDERS . ' o
                                     WHERE c.customers_id = o.customers_id
                                     AND o.orders_id = op.orders_id
                                     GROUP BY c.customers_id, c.customers_firstname, c.customers_lastname
-                                    ORDER BY ordersum DESC";
-            $customers_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $customers_query_raw, $customers_query_numrows);
+                                    ORDER BY ordersum DESC';
+$customers_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $customers_query_raw, $customers_query_numrows);
 // fix counted customers
-            $customers_query_m = $db->Execute("SELECT customers_id
-                                               FROM " . TABLE_ORDERS . "
-                                               GROUP BY customers_id");
-            $customers_query_numrows = $customers_query_m->RecordCount();
-            $customers = $db->Execute($customers_query_raw);
-            foreach ($customers as $customer) { ?>
+$customers_query_m = $db->Execute('SELECT customers_id
+                                               FROM ' . TABLE_ORDERS . '
+                                               GROUP BY customers_id');
+$customers_query_numrows = $customers_query_m->RecordCount();
+$customers = $db->Execute($customers_query_raw);
+foreach ($customers as $customer) { ?>
             <tr class="dataTableRow" onclick="document.location.href = '<?php echo zen_href_link(FILENAME_CUSTOMERS, 'cID=' . $customer['customers_id'], 'NONSSL'); ?>'">
               <td class="dataTableContent text-right"><?php echo $customer['customers_id']; ?>&nbsp;&nbsp;</td>
               <td class="dataTableContent"><a href="<?php echo zen_href_link(FILENAME_CUSTOMERS, 'cID=' . $customer['customers_id'], 'NONSSL'); ?>"><?php echo $customer['customers_firstname'] . ' ' . $customers->fields['customers_lastname']; ?></a></td>
@@ -60,7 +60,7 @@ $currencies = new currencies();
       </table>
       <table class="table">
         <tr>
-          <td><?php echo $customers_split->display_count($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, $_GET['page'], TEXT_DISPLAY_NUMBER_OF_CUSTOMERS); ?></td>
+          <td><?php echo $customers_split->display_count($customers_query_numrows); ?></td>
           <td class="text-right"><?php echo $customers_split->display_links($customers_query_numrows, MAX_DISPLAY_SEARCH_RESULTS_REPORTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page']); ?></td>
         </tr>
       </table>

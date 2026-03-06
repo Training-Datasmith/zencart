@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'use-mailserver' => false,
     'mailserver-port' => 1025,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * additional_images module
  *
@@ -28,14 +30,13 @@ if ($products_image !== '' && !empty($flag_show_product_info_additional_images))
     if (ADDITIONAL_IMAGES_HANDLING === 'Database') {
         $products_image_directory = DIR_WS_IMAGES;
         $images_array = (new Product((int)$_GET['products_id']))->get('additional_images') ?? [];
-        $images_array = array_map(static fn($f) => $f['image_filename'], $images_array);
+        $images_array = array_map(static fn (array $f) => $f['image_filename'], $images_array);
     } else {
         ['imgs' => $images_array, 'dir' => $products_image_directory] = zen_lookup_additional_images_from_filesystem($products_image);
     }
 }
 
 $GLOBALS['zco_notifier']->notify('NOTIFY_MODULES_ADDITIONAL_PRODUCT_IMAGES_LIST', null, $images_array);
-
 
 // Build output based on images found
 $num_images = count($images_array);
@@ -55,7 +56,7 @@ if ($num_images > 0) {
 
     for ($i = 0, $n = $num_images; $i < $n; $i++) {
         $file = $images_array[$i];
-        $products_image_extension = substr($file, strrpos($file, '.'));
+        $products_image_extension = substr((string) $file, strrpos((string) $file, '.'));
         $products_image_large = str_replace(DIR_WS_IMAGES, DIR_WS_IMAGES . 'large/', $products_image_directory) . str_replace($products_image_extension, '', $file) . IMAGE_SUFFIX_LARGE . $products_image_extension;
 
         // -----
@@ -70,7 +71,7 @@ if ($num_images > 0) {
         $products_image_large = ($flag_has_large ? $products_image_large : $products_image_directory . $file);
         $flag_display_large = (IMAGE_ADDITIONAL_DISPLAY_LINK_EVEN_WHEN_NO_LARGE === 'Yes' || $flag_has_large);
         $base_image = $products_image_directory . $file;
-        $thumb_slashes = zen_image(addslashes($base_image), addslashes($products_name), SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT);
+        $thumb_slashes = zen_image(addslashes($base_image), addslashes((string) $products_name), SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT);
 
         // -----
         // This notifier lets any image-handler "massage" the name of the current thumbnail image name (with appropriate
@@ -110,13 +111,11 @@ if ($num_images > 0) {
             $script_link,
             $link_parameters
         );
-        if ($script_link === false) {
-            $script_link = '<script>' . "\n" . 'document.write(\'' .
-                ($flag_display_large
-                    ? '<a href="javascript:popupWindow(\\\'' . str_replace($products_image_large, urlencode(addslashes($products_image_large)), $large_link) . '\\\')">' . $thumb_slashes . '<br>' . TEXT_CLICK_TO_ENLARGE . '</a>'
-                    : $thumb_slashes)
-                . '\');' . "\n" . '</script>';
-        }
+        $script_link = '<script>' . "\n" . 'document.write(\'' .
+            ($flag_display_large
+                ? '<a href="javascript:popupWindow(\\\'' . str_replace($products_image_large, urlencode(addslashes($products_image_large)), $large_link) . '\\\')">' . $thumb_slashes . '<br>' . TEXT_CLICK_TO_ENLARGE . '</a>'
+                : $thumb_slashes)
+            . '\');' . "\n" . '</script>';
 
         $noscript_link = '<noscript>' . ($flag_display_large
                 ? '<a href="' . zen_href_link(FILENAME_POPUP_IMAGE_ADDITIONAL, 'pID=' . $_GET['products_id'] . '&pic=' . $i . '&products_image_large_additional=' . $products_image_large) . '" target="_blank">' . $thumb_regular . '<br><span class="imgLinkAdditional">' . TEXT_CLICK_TO_ENLARGE . '</span></a>'

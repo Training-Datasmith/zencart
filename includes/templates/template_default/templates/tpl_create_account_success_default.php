@@ -23,7 +23,7 @@
  * Used to loop thru and display address book entries
  */
   foreach ($addressArray as $addresses) {
-?>
+      ?>
 <h3 class="addressBookDefaultName"><?php echo zen_output_string_protected($addresses['firstname'] . ' ' . $addresses['lastname']); ?></h3>
 
 <address><?php echo zen_address_format($addresses['format_id'], $addresses['address'], true, ' ', '<br>'); ?></address>

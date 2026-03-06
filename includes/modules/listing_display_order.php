@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * listing_display_order module to display sorter dropdown
  *
@@ -34,28 +36,28 @@ if (!isset($_GET['disp_order'])) {
 
 switch ((int)$_GET['disp_order']) {
     case 1:
-        $order_by = " ORDER BY pd.products_name";
+        $order_by = ' ORDER BY pd.products_name';
         break;
     case 2:
-        $order_by = " ORDER BY pd.products_name DESC";
+        $order_by = ' ORDER BY pd.products_name DESC';
         break;
     case 3:
-        $order_by = " ORDER BY p.products_price_sorter, pd.products_name";
+        $order_by = ' ORDER BY p.products_price_sorter, pd.products_name';
         break;
     case 4:
-        $order_by = " ORDER BY p.products_price_sorter DESC, pd.products_name";
+        $order_by = ' ORDER BY p.products_price_sorter DESC, pd.products_name';
         break;
     case 5:
-        $order_by = " ORDER BY p.products_model";
+        $order_by = ' ORDER BY p.products_model';
         break;
     case 6:
-        $order_by = " ORDER BY p.products_date_added DESC, pd.products_name";
+        $order_by = ' ORDER BY p.products_date_added DESC, pd.products_name';
         break;
     case 7:
-        $order_by = " ORDER BY p.products_date_added, pd.products_name";
+        $order_by = ' ORDER BY p.products_date_added, pd.products_name';
         break;
     case 8:
-        $order_by = $default_sort_order ??  " ORDER BY p.products_sort_order, pd.products_name ";
+        $order_by = $default_sort_order ??  ' ORDER BY p.products_sort_order, pd.products_name ';
         break;
     case 0:
         // reset
@@ -63,6 +65,6 @@ switch ((int)$_GET['disp_order']) {
         $disp_order = $disp_order_default;
         // no break here.
     default:
-        $order_by = " ORDER BY p.products_sort_order, pd.products_name";
+        $order_by = ' ORDER BY p.products_sort_order, pd.products_name';
         break;
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2024 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -34,14 +36,7 @@ $tpl_settings['TEMPLATE_NAME'] = 'Responsive Classic';
 //$tpl_settings['SHOW_BANNERS_GROUP_SET1'] = 'group1';
 //$tpl_settings['SHOW_BANNERS_GROUP_SET2'] = 'group2';
 
-
-
-
-
-/**********************/
-
 /** Other template-specific variables can be declared here */
-
 
 $grid_product_cards_classes = 'row row-clmns-3';
 $grid_product_classes_matrix = [

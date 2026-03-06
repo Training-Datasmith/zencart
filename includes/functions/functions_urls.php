@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * URL functions
  *
@@ -13,7 +15,7 @@
  * @param int $httpResponseCode
  * @since ZC v1.0.3
  */
-function zen_redirect($url, $httpResponseCode = null)
+function zen_redirect($url, $httpResponseCode = null): void
 {
     // -----
     // Enable an observer to override the redirect.  For instance, an AJAX
@@ -28,9 +30,7 @@ function zen_redirect($url, $httpResponseCode = null)
     }
 
     // @TODO - rework admin so this exclusion isn't necessary
-    if (IS_ADMIN_FLAG !== true) {
-        $url = zen_get_site_url_for_request($url);
-    }
+    $url = zen_get_site_url_for_request($url);
 
     $url = zen_cleanup_url_params($url, $for_redirect = true);
 
@@ -46,15 +46,15 @@ function zen_redirect($url, $httpResponseCode = null)
  * @return string
  * @since ZC v1.5.8
  */
-function zen_cleanup_url_params($url, $for_redirect = false)
+function zen_cleanup_url_params($url, $for_redirect = false): string|array|null
 {
     // clean up URL before executing it
     $url = preg_replace('/&{2,}/', '&', $url);
-    $url = preg_replace('/(&amp;)+/', '&amp;', $url);
+    $url = preg_replace('/(&amp;)+/', '&amp;', (string) $url);
 
     if ($for_redirect) {
         // header Location URLs should not have the &amp; in the address (it breaks things)
-        $url = preg_replace('/(&amp;)+/', '&', $url);
+        return preg_replace('/(&amp;)+/', '&', (string) $url);
     }
 
     return $url;
@@ -63,11 +63,10 @@ function zen_cleanup_url_params($url, $for_redirect = false)
 /**
  * Close session and set headers for page-redirect
  *
- * @param string $url
  * @param int $httpResponseCode
  * @since ZC v1.5.8
  */
-function zen_set_redirect_http_headers($url, $httpResponseCode = null)
+function zen_set_redirect_http_headers(string $url, $httpResponseCode = null): void
 {
     session_write_close();
     if (empty($httpResponseCode)) {
@@ -93,7 +92,7 @@ function zen_get_site_url_for_request($url)
     // Are we loading an SSL page?
     if ((ENABLE_SSL == 'true') && ($request_type == 'SSL')) {
         // yes, but a NONSSL url was supplied
-        if (substr($url, 0, strlen(HTTP_SERVER . DIR_WS_CATALOG)) == HTTP_SERVER . DIR_WS_CATALOG) {
+        if (str_starts_with($url, HTTP_SERVER . DIR_WS_CATALOG)) {
             // So, change it to SSL, based on site's configuration for SSL
             $url = HTTPS_SERVER . DIR_WS_HTTPS_CATALOG . substr($url, strlen(HTTP_SERVER . DIR_WS_CATALOG));
         }
@@ -102,11 +101,10 @@ function zen_get_site_url_for_request($url)
     return $url;
 }
 
-
 /**
  * @since ZC v1.0.3
  */
-function zen_get_top_level_domain(string $url) 
+function zen_get_top_level_domain(string $url)
 {
     if (strpos($url, '://')) {
         $url = parse_url($url);
@@ -115,15 +113,18 @@ function zen_get_top_level_domain(string $url)
     $domain_array = explode('.', $url);
     $domain_size = count($domain_array);
     if ($domain_size > 1) {
-        if (SESSION_USE_FQDN == 'True') return $url;
-        if (is_numeric($domain_array[$domain_size-2]) && is_numeric($domain_array[$domain_size-1])) {
+        if (SESSION_USE_FQDN == 'True') {
+            return $url;
+        }
+        if (is_numeric($domain_array[$domain_size - 2]) && is_numeric($domain_array[$domain_size - 1])) {
             return false;
         }
 
-        $tld = "";
-        foreach ($domain_array as $dPart)
-        {
-            if ($dPart != "www") $tld = $tld . "." . $dPart;
+        $tld = '';
+        foreach ($domain_array as $dPart) {
+            if ($dPart != 'www') {
+                $tld = $tld . '.' . $dPart;
+            }
         }
         return substr($tld, 1);
     }
@@ -139,20 +140,19 @@ function zen_back_link(bool $link_only = false, string $parameters = ''): string
 {
     if (count($_SESSION['navigation']->path) - 2 >= 0) {
         $back = count($_SESSION['navigation']->path) - 2;
-        $link = zen_href_link($_SESSION['navigation']->path[$back]['page'], zen_array_to_string($_SESSION['navigation']->path[$back]['get'], array('action')), $_SESSION['navigation']->path[$back]['mode']);
+        $link = zen_href_link($_SESSION['navigation']->path[$back]['page'], zen_array_to_string($_SESSION['navigation']->path[$back]['get'], ['action']), $_SESSION['navigation']->path[$back]['mode']);
     } else {
-        if (isset($_SERVER['HTTP_REFERER']) && preg_match("~^" . HTTP_SERVER . "~i", $_SERVER['HTTP_REFERER'])) {
+        if (isset($_SERVER['HTTP_REFERER']) && preg_match('~^' . HTTP_SERVER . '~i', (string) $_SERVER['HTTP_REFERER'])) {
             //if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], str_replace(array('http://', 'https://'), '', HTTP_SERVER) ) ) {
             $link = $_SERVER['HTTP_REFERER'];
         } else {
             $link = zen_href_link(FILENAME_DEFAULT);
         }
-        $_SESSION['navigation'] = new navigationHistory;
+        $_SESSION['navigation'] = new navigationHistory();
     }
 
     if ($link_only) {
         return $link;
-    } else {
-        return '<a href="' . $link . '"' . $parameters . '>';
     }
+    return '<a href="' . $link . '"' . $parameters . '>';
 }

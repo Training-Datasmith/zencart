@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace BaconQrCode\Common;
 
@@ -10,7 +11,7 @@ namespace BaconQrCode\Common;
  * set of blocks. It also holds the number of error-correction codewords per block since it will be the same across all
  * blocks within one version.
  */
-final class EcBlocks
+final readonly class EcBlocks
 {
     /**
      * List of EC blocks.
@@ -19,7 +20,7 @@ final class EcBlocks
      */
     private array $ecBlocks;
 
-    public function __construct(private readonly int $ecCodewordsPerBlock, EcBlock ...$ecBlocks)
+    public function __construct(private int $ecCodewordsPerBlock, EcBlock ...$ecBlocks)
     {
         $this->ecBlocks = $ecBlocks;
     }
@@ -27,7 +28,7 @@ final class EcBlocks
     /**
      * Returns the number of EC codewords per block.
      */
-    public function getEcCodewordsPerBlock() : int
+    public function getEcCodewordsPerBlock(): int
     {
         return $this->ecCodewordsPerBlock;
     }
@@ -35,7 +36,7 @@ final class EcBlocks
     /**
      * Returns the total number of EC block appearances.
      */
-    public function getNumBlocks() : int
+    public function getNumBlocks(): int
     {
         $total = 0;
 
@@ -49,7 +50,7 @@ final class EcBlocks
     /**
      * Returns the total count of EC codewords.
      */
-    public function getTotalEcCodewords() : int
+    public function getTotalEcCodewords(): int
     {
         return $this->ecCodewordsPerBlock * $this->getNumBlocks();
     }
@@ -59,7 +60,7 @@ final class EcBlocks
      *
      * @return EcBlock[]
      */
-    public function getEcBlocks() : array
+    public function getEcBlocks(): array
     {
         return $this->ecBlocks;
     }

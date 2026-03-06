@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -7,24 +9,13 @@
 
 namespace Zencart\ViewBuilders;
 
-use Zencart\Request\Request;
-
 /**
  * @since ZC v1.5.8
  */
 class SimpleDataFormatter
 {
-    protected $request;
-    protected $tableDefinition;
-    protected $resultSet;
-    protected $derivedItems;
-
-    public function __construct(Request $request, TableViewDefinition $tableViewDefinition, NativePaginator $resultSet, $derivedItems)
+    public function __construct(protected \Zencart\Request\Request $request, protected \Zencart\ViewBuilders\TableViewDefinition $tableDefinition, protected \Zencart\ViewBuilders\NativePaginator $resultSet, protected $derivedItems)
     {
-        $this->request = $request;
-        $this->tableDefinition = $tableViewDefinition;
-        $this->resultSet = $resultSet;
-        $this->derivedItems = $derivedItems;
     }
 
     /**
@@ -43,8 +34,9 @@ class SimpleDataFormatter
 
     /**
      * @since ZC v1.5.8
+     * @return array{value: mixed, class: mixed, original: mixed}[][]
      */
-    public function getTableData()
+    public function getTableData(): array
     {
         $tableData = [];
         $columns = $this->tableDefinition->getParameter('columns');
@@ -116,7 +108,7 @@ class SimpleDataFormatter
     {
         $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
         $params = $pagerVar . '=' . $this->request->input($pagerVar, 1);
-        $params .= "&" . $this->tableDefinition->colKeyName() . "=" . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
+        $params .= '&' . $this->tableDefinition->colKeyName() . '=' . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
         return zen_href_link($this->request->input('cmd'), $params);
     }
 
@@ -127,7 +119,7 @@ class SimpleDataFormatter
     {
         $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
         $params = $pagerVar . '=' . $this->request->input($pagerVar, 1);
-        $params .= "&" . $this->tableDefinition->colKeyName() . "=" . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
+        $params .= '&' . $this->tableDefinition->colKeyName() . '=' . $tableRow[$this->tableDefinition->getParameter('colKey')]['value'];
         return zen_href_link($this->request->input('cmd'), $params);
 
     }
@@ -170,8 +162,9 @@ class SimpleDataFormatter
 
     /**
      * @since ZC v1.5.8
+     * @return mixed[]
      */
-    public function getRowActions($tableRow)
+    public function getRowActions($tableRow): array
     {
         $rowActions = $this->tableDefinition->getRowActions();
         $processed = [];
@@ -186,17 +179,18 @@ class SimpleDataFormatter
      */
     public function hasButtonActions()
     {
-         $buttonActions = $this->getRawButtonActions();
-         if (count($buttonActions) == 0) {
-             return false;
-         }
-         return (count($buttonActions) > 0);
+        $buttonActions = $this->getRawButtonActions();
+        if (count($buttonActions) == 0) {
+            return false;
+        }
+        return (count($buttonActions) > 0);
     }
 
     /**
      * @since ZC v1.5.8
+     * @return mixed[]
      */
-    public function getButtonActions()
+    public function getButtonActions(): array
     {
         $buttonActions = $this->getRawButtonActions();
         $processed = [];
@@ -209,8 +203,9 @@ class SimpleDataFormatter
 
     /**
      * @since ZC v1.5.8
+     * @return mixed[]
      */
-    protected function getRawButtonActions()
+    protected function getRawButtonActions(): array
     {
         $buttonActions = $this->tableDefinition->getButtonActions();
         if (count($buttonActions) == 0) {
@@ -228,16 +223,15 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    protected function processButtonActionLink($buttonAction)
+    protected function processButtonActionLink(array $buttonAction): string
     {
-        $link = 'action=' . $buttonAction['action'];
-        return $link;
+        return 'action=' . $buttonAction['action'];
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function buttonPassesWhiteList($buttonAction)
+    protected function buttonPassesWhiteList(array $buttonAction): bool
     {
         $action = $this->request->input('action');
         if (!isset($buttonAction['whitelist'])) {
@@ -252,7 +246,7 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    protected function buttonPassesBlackList($buttonAction)
+    protected function buttonPassesBlackList(array $buttonAction): bool
     {
         $action = $this->request->input('action');
         if (!isset($buttonAction['blacklist'])) {
@@ -278,28 +272,29 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    protected function buildRowActionLink($rowAction, $tableRow)
+    protected function buildRowActionLink(array $rowAction, $tableRow): string
     {
         $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
         $link = $pagerVar . '=' . $this->request->input($pagerVar, 1);
         $link .= '&action='  . $rowAction['action'];
         $tableRowLink = $this->processRowActionTableRowLink($rowAction, $tableRow);
-        $tableRowLink = rtrim($tableRowLink, '&');
-        $link .= '&' . $tableRowLink;
-        return $link;
+        $tableRowLink = rtrim((string) $tableRowLink, '&');
+        return $link . ('&' . $tableRowLink);
     }
 
     /**
      * @since ZC v1.5.8
      */
-    protected function processRowActionTableRowLink($rowAction, $tableRow)
+    protected function processRowActionTableRowLink(array $rowAction, array $tableRow): string
     {
         $link = '';
         if (!isset($rowAction['linkParams'])) {
             return $link;
         }
         foreach ($rowAction['linkParams'] as $linkParams) {
-            if ($linkParams['source'] !== 'tableRow') continue;
+            if ($linkParams['source'] !== 'tableRow') {
+                continue;
+            }
             $link .= $linkParams['param'] . '=' . $tableRow[$linkParams['field']]['original'] . '&';
         }
         return $link;
@@ -308,9 +303,8 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    protected function getColHeaderMainClass($colDef)
+    protected function getColHeaderMainClass($colDef): string
     {
-        $mainClass = "dataTableHeadingContent";
-        return $mainClass;
+        return 'dataTableHeadingContent';
     }
 }

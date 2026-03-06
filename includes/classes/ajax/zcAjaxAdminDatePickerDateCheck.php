@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * zcAjaxAdminDateCheck
  *
@@ -14,7 +16,7 @@ class zcAjaxAdminDatePickerDateCheck extends base
      *
      * @since ZC v2.0.0
      */
-    public function check()
+    public function check(): string
     {
         // -----
         // Deny access unless running under the admin.
@@ -36,7 +38,7 @@ class zcAjaxAdminDatePickerDateCheck extends base
             $dt = DateTime::createFromFormat($local_fmt, $date_raw);
             $date_raw = false;
             if (!empty($dt)) {
-              $date_raw = $dt->format('Y-m-d');
+                $date_raw = $dt->format('Y-m-d');
             }
         }
         return ($date_raw !== false && zcDate::validateDate($date_raw) === true) ? 'true' : 'false';

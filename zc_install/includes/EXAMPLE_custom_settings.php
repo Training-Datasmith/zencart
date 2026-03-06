@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Custom Settings used by the CLI version of zc_install
  * NOTE: Not Currently Used
@@ -7,7 +9,7 @@
  * @copyright Copyright 2003-2018 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
-$zc_settings = array();
+$zc_settings = [];
 
 /**
  * Custom settings for CLI installer can be set here
@@ -17,7 +19,6 @@ $zc_settings = array();
  * If you are building a 1-click install, set your vendor name in the installer_method setting.  This will be stamped in the generated configure.php files for reference and future troubleshooting.
  */
 $zc_settings['installer_method'] = 'Automated Install';
-
 
 /**
  * Set the domain name for accessing this store.
@@ -136,5 +137,3 @@ $zc_settings['http_server_admin'] = 'https://www.example.com';
  * PLEASE use a RANDOM string/word. Don't use the same value on every site, as that completely defeats the value of not using 'admin' as the literal value.
  */
 $zc_settings['adminDir'] = 'admin';
-
-

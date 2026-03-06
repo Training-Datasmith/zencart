@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -7,14 +9,16 @@
  */
 class zcDate extends base
 {
-    protected
-        $useIntlDate = false,
-        $useStrftime = false,
-        $locale,                //- Only used when $this->useIntlDate is true
-        $strftime2date,         //- Only used when $this->useStrftime is false
-        $strftime2intl,         //- Only used when $this->useStrftime is false
-        $debug = false,
-        $dateObject;
+    protected $useIntlDate = false;
+    protected $useStrftime = false;
+    protected $locale;
+    protected //- Only used when $this->useIntlDate is true
+        $strftime2date;
+    protected //- Only used when $this->useStrftime is false
+        $strftime2intl;
+    protected //- Only used when $this->useStrftime is false
+        $debug = false;
+    protected $dateObject;
 
     // -----
     // Initial construction; initializes the conversion arrays and determines which PHP
@@ -81,7 +85,7 @@ class zcDate extends base
         ];
         $this->strftime2date = [
             'from' => array_keys($strftime2date),
-            'to' => array_values($strftime2date)
+            'to' => array_values($strftime2date),
         ];
 
         if ($this->useIntlDate === true) {
@@ -130,7 +134,7 @@ class zcDate extends base
             ];
             $this->strftime2intl = [
                 'from' => array_keys($strftime2intl),
-                'to' => array_values($strftime2intl)
+                'to' => array_values($strftime2intl),
             ];
         }
     }
@@ -142,7 +146,7 @@ class zcDate extends base
     /**
      * @since ZC v1.5.8
      */
-    public function enableDebug()
+    public function enableDebug(): void
     {
         $this->debug = true;
         $this->debug('Debug enabled: ' . PHP_EOL . var_export($this, true));
@@ -150,14 +154,13 @@ class zcDate extends base
     /**
      * @since ZC v1.5.8
      */
-    public function disableDebug()
+    public function disableDebug(): void
     {
         $this->debug = false;
     }
 
     /**
      * @param string $format  output method should start with a strftime-format string
-     * @param int    $timestamp
      * @param string|null $calendar_locale Optional calendar-related locale. eg: 'ja_JP@calendar=japanese'
      *
      * @return false|string
@@ -175,15 +178,15 @@ class zcDate extends base
         if ($this->useStrftime === true) {
             $converted_format = $format;
             $output = strftime($format, $timestamp);
-        // -----
-        // Otherwise, if there's no international date support, format the requested string using date.
-        //
+            // -----
+            // Otherwise, if there's no international date support, format the requested string using date.
+            //
         } elseif ($this->useIntlDate === false) {
             $converted_format = $this->convertFormat($format, $this->strftime2date);
             $output = date($converted_format, $timestamp);
-        // -----
-        // Otherwise, the string is to be formatted using the IntlDateFormatter ...
-        //
+            // -----
+            // Otherwise, the string is to be formatted using the IntlDateFormatter ...
+            //
         } else {
             // -----
             // If the locale has changes (as it might between the class construction and
@@ -222,7 +225,7 @@ class zcDate extends base
     /**
      * @since ZC v1.5.8
      */
-    protected function convertFormat(string $format, array $replacements)
+    protected function convertFormat(string $format, array $replacements): string
     {
         return str_replace($replacements['from'], $replacements['to'], $format);
     }

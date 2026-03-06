@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Template Settings
  *
@@ -28,11 +30,4 @@ $tpl_settings['TEMPLATE_NAME'] = 'Classic Contemporary Green';
 //$tpl_settings['SHOW_BANNERS_GROUP_SET1'] = 'group1';
 //$tpl_settings['SHOW_BANNERS_GROUP_SET2'] = 'group2';
 
-
-
-
-
-/**********************/
-
 /** Other template-specific variables can be declared here */
-

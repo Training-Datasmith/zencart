@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * column_right module
  *
@@ -8,13 +10,13 @@
  * @version $Id: highburyeye 2023 Sep 25 Modified in v2.0.0-alpha1 $
  */
 if (!defined('IS_ADMIN_FLAG')) {
-  die('Illegal Access');
+    die('Illegal Access');
 }
 use Zencart\DbRepositories\LayoutBoxRepository;
-use Zencart\ResourceLoaders\SideboxFinder;
 use Zencart\FileSystem\FileSystem;
+use Zencart\ResourceLoaders\SideboxFinder;
 
-$column_box_default='tpl_box_default_right.php';
+$column_box_default = 'tpl_box_default_right.php';
 // Check if there are boxes for the column
 global $db;
 $layoutBoxRepository = new LayoutBoxRepository($db);
@@ -22,7 +24,7 @@ $sideboxes = $layoutBoxRepository->getActiveForLocation(1, $template_dir, 100);
 
 $column_width = (int)BOX_WIDTH_RIGHT;
 foreach ($sideboxes as $sidebox) {
-    $boxFile = (new SideboxFinder(new FileSystem))->sideboxPath($sidebox, $template_dir, true);
+    $boxFile = (new SideboxFinder(new FileSystem()))->sideboxPath($sidebox, $template_dir, true);
     if ($boxFile !== false) {
         $box_id = zen_get_box_id($sidebox['layout_box_name']);
         include($boxFile . $sidebox['layout_box_name']);

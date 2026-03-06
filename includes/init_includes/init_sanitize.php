@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * sanitize the GET parameters
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -23,9 +25,7 @@ foreach ($_GET as $varname => $varvalue) {
     if (is_array($varvalue)) {
         $get_var_override = false;
         $zco_notifier->notify('NOTIFY_INIT_SANITIZE_GET_VAR_CHECK', ['name' => $varname, 'value' => $varvalue,], $get_var_override);
-        if ($get_var_override === false) {
-            zen_redirect(zen_href_link(FILENAME_DEFAULT));
-        }
+        zen_redirect(zen_href_link(FILENAME_DEFAULT));
     }
 }
 
@@ -91,7 +91,7 @@ $caseSensitiveKeysToMap = [
 foreach ($caseSensitiveKeysToMap as $key) {
     if (!isset($_GET[$key])) {
         foreach ($_GET as $mixedKey => $value) {
-            if (strtolower($mixedKey) === strtolower($key)) {
+            if (strtolower((string) $mixedKey) === strtolower($key)) {
                 $_GET[$key] = $value;
                 unset($_GET[$mixedKey]);
                 if (isset($_REQUEST[$mixedKey])) {
@@ -236,7 +236,7 @@ foreach ($saniGroup4 as $key) {
     if (isset($_GET[$key])) {
         $_GET[$key] = preg_replace('/[^\/0-9a-zA-Z_.-]/', '', $_GET[$key]);
         if (isset($_REQUEST[$key])) {
-            $_REQUEST[$key] = preg_replace('/[^\/0-9a-zA-Z_.-]/', '', $_REQUEST[$key]);
+            $_REQUEST[$key] = preg_replace('/[^\/0-9a-zA-Z_.-]/', '', (string) $_REQUEST[$key]);
         }
     }
 }
@@ -307,7 +307,7 @@ if (empty($_GET['main_page'])) {
 }
 
 $pageLoader = PageLoader::getInstance();
-$pageLoader->init($installedPlugins, $_GET['main_page'], new FileSystem);
+$pageLoader->init($installedPlugins, $_GET['main_page'], new FileSystem());
 
 $pageDir = $pageLoader->findModulePageDirectory();
 if ($pageDir === false) {

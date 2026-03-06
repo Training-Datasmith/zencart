@@ -13,9 +13,9 @@
 
 <div id="discountcouponInfoMainContent" class="content">
 <?php if ((DEFINE_DISCOUNT_COUPON_STATUS >= 1 and DEFINE_DISCOUNT_COUPON_STATUS <= 2) && $text_coupon_help == '') {
-  require($define_page);
- } else {
-  echo $text_coupon_help;
+    require($define_page);
+} else {
+    echo $text_coupon_help;
 } ?>
 </div>
 
@@ -23,7 +23,7 @@
 <fieldset>
 <legend><?php echo TEXT_DISCOUNT_COUPON_ID_INFO; ?></legend>
 <label class="inputLabel" for="lookup-discount-coupon"><?php echo TEXT_DISCOUNT_COUPON_ID; ?></label>
-<?php echo zen_draw_input_field('lookup_discount_coupon', (isset($_POST['lookup_discount_coupon'])) ? $_POST['lookup_discount_coupon'] : '', 'size="40" id="lookup-discount-coupon" autofocus', 'search');?>
+<?php echo zen_draw_input_field('lookup_discount_coupon', $_POST['lookup_discount_coupon'] ?? '', 'size="40" id="lookup-discount-coupon" autofocus', 'search');?>
 </fieldset>
 
 <?php if ($text_coupon_help == '') { ?>

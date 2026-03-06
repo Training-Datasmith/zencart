@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 // FIXME - move the last two strings into a shared file in next update
 $define = [
     'MODULE_ORDER_TOTAL_SHIPPING_TITLE' => 'Shipping',

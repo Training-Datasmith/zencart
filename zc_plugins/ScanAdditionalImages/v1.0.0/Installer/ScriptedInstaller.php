@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Zencart\PluginSupport\ScriptedInstaller as ScriptedInstallBase;
 
 class ScriptedInstaller extends ScriptedInstallBase
 {
-    protected function executeInstall()
+    protected function executeInstall(): bool
     {
         zen_deregister_admin_pages(['toolsScanForImages']);
         zen_register_admin_page('toolsScanForImages', 'BOX_TOOLS_SCAN_FOR_IMAGES', 'FILENAME_SCAN_FOR_ADDITIONAL_IMAGES', '', 'tools', 'Y', 20);
@@ -20,42 +22,41 @@ class ScriptedInstaller extends ScriptedInstallBase
         ];
         $this->addConfigurationKey('ADDITIONAL_IMAGES_HANDLING', $fields);
 
-        $sql = "UPDATE " . TABLE_CONFIGURATION . " SET sort_order = 25 WHERE configuration_key = 'IMAGES_AUTO_ADDED'";
+        $sql = 'UPDATE ' . TABLE_CONFIGURATION . " SET sort_order = 25 WHERE configuration_key = 'IMAGES_AUTO_ADDED'";
         $this->executeInstallerSql($sql);
-        $sql = "UPDATE " . TABLE_CONFIGURATION . " SET sort_order = 27 WHERE configuration_key = 'ADDITIONAL_IMAGES_MODE'";
+        $sql = 'UPDATE ' . TABLE_CONFIGURATION . " SET sort_order = 27 WHERE configuration_key = 'ADDITIONAL_IMAGES_MODE'";
         $this->executeInstallerSql($sql);
-        $sql = "UPDATE " . TABLE_CONFIGURATION . " SET configuration_title = 'Additional Images filename matching pattern', configuration_description = 'In Filename-Matching mode, you can use an &quot;_&quot; suffix in two formats:<br>&quot;strict&quot; = always use &quot;_&quot; suffix<br>&quot;legacy&quot; = only use &quot;_&quot; suffix in subdirectories<br>(Before v210 legacy was the default)<br>Default = strict' WHERE configuration_key = 'ADDITIONAL_IMAGES_MODE'";
+        $sql = 'UPDATE ' . TABLE_CONFIGURATION . " SET configuration_title = 'Additional Images filename matching pattern', configuration_description = 'In Filename-Matching mode, you can use an &quot;_&quot; suffix in two formats:<br>&quot;strict&quot; = always use &quot;_&quot; suffix<br>&quot;legacy&quot; = only use &quot;_&quot; suffix in subdirectories<br>(Before v210 legacy was the default)<br>Default = strict' WHERE configuration_key = 'ADDITIONAL_IMAGES_MODE'";
         $this->executeInstallerSql($sql);
 
-
-//        // alter product table to InnoDB if not already done
-//        $sql = "ALTER TABLE " . TABLE_PRODUCTS . " ENGINE=InnoDB";
-//        $this->executeInstallerSql($sql);
-//
-//        // create products_additional_images table
-//        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (
-//            id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-//            products_id INT(11) NOT NULL,
-//            additional_image VARCHAR(255) NOT NULL,
-//            sort_order INT(11) DEFAULT 0,
-//            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-//            FOREIGN KEY (products_id) REFERENCES " . TABLE_PRODUCTS . "(products_id) ON DELETE CASCADE
-//        ) ENGINE=InnoDB";
-//        $this->executeInstallerSql($sql);
+        //        // alter product table to InnoDB if not already done
+        //        $sql = "ALTER TABLE " . TABLE_PRODUCTS . " ENGINE=InnoDB";
+        //        $this->executeInstallerSql($sql);
+        //
+        //        // create products_additional_images table
+        //        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (
+        //            id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        //            products_id INT(11) NOT NULL,
+        //            additional_image VARCHAR(255) NOT NULL,
+        //            sort_order INT(11) DEFAULT 0,
+        //            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        //            FOREIGN KEY (products_id) REFERENCES " . TABLE_PRODUCTS . "(products_id) ON DELETE CASCADE
+        //        ) ENGINE=InnoDB";
+        //        $this->executeInstallerSql($sql);
 
         // create products_additional_images table
-        $sql = "CREATE TABLE IF NOT EXISTS " . TABLE_PRODUCTS_ADDITIONAL_IMAGES . " (
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . TABLE_PRODUCTS_ADDITIONAL_IMAGES . ' (
             id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             products_id INT(11) NOT NULL,
             additional_image VARCHAR(255) NOT NULL,
             sort_order INT(11) DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             INDEX idx_products_id (products_id)
-        ) ENGINE=MyISAM";
+        ) ENGINE=MyISAM';
         $this->executeInstallerSql($sql);
     }
 
-    protected function executeUninstall()
+    protected function executeUninstall(): bool
     {
         zen_deregister_admin_pages(['toolsScanForImages']);
 

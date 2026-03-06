@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -12,19 +14,8 @@ namespace Zencart\PluginSupport;
  */
 class SqlPatchInstaller
 {
-
     /**
-     * $dbConn is a database object 
-     * @var object
-     */
-    protected $dbConn;
-    /**
-     * $errorContainer is a PluginErrorContainer object
-     * @var object
-     */
-    protected $errorContainer;
-    /**
-     * $sqlFunctionMap is a list of acceptable SQL 
+     * $sqlFunctionMap is a list of acceptable SQL
      * @var array
      */
     protected $sqlFunctionMap = [
@@ -45,17 +36,27 @@ class SqlPatchInstaller
         ['find' => 'SELECT ', 'length' => 7, 'method' => 'select', 'tableParamsOffset' => 1],
     ];
 
-
-    public function __construct($dbConn, $errorContainer)
-    {
-        $this->dbConn = $dbConn;
-        $this->errorContainer = $errorContainer;
+    /**
+     * @param object $dbConn
+     * @param object $errorContainer
+     */
+    public function __construct(
+        /**
+         * $dbConn is a database object
+         */
+        protected $dbConn,
+        /**
+         * $errorContainer is a PluginErrorContainer object
+         */
+        protected $errorContainer
+    ) {
     }
 
     /**
      * @since ZC v1.5.7
+     * @return mixed[]
      */
-    public function parse($lines)
+    public function parse($lines): array
     {
         $builtLines = $this->getFullLines($lines);
         $paramLines = [];
@@ -68,7 +69,7 @@ class SqlPatchInstaller
     /**
      * @since ZC v1.5.7
      */
-    public function executePatchSql($paramLines)
+    public function executePatchSql($paramLines): void
     {
         $this->dbConn->dieOnErrors = false;
         foreach ($paramLines as $line) {
@@ -84,15 +85,16 @@ class SqlPatchInstaller
 
     /**
      * @since ZC v1.5.7
+     * @return string[]
      */
-    protected function getFullLines($lines)
+    protected function getFullLines($lines): array
     {
         $fullLine = '';
         $builtLines = [];
         foreach ($lines as $line) {
-            $line = str_replace('`', '', trim($line));
+            $line = str_replace('`', '', trim((string) $line));
             $fullLine .= ' ' . $line;
-            if (substr($line, -1) == ';') {
+            if (str_ends_with($line, ';')) {
                 $builtLines[] = ltrim($fullLine);
                 $fullLine = '';
             }
@@ -103,22 +105,22 @@ class SqlPatchInstaller
     /**
      * @since ZC v1.5.7
      */
-    protected function processLine($line)
+    protected function processLine(string $line)
     {
-        $params = explode(" ", (substr($line, -1) == ';') ? substr($line, 0, strlen($line) - 1) : $line);
+        $params = explode(' ', (str_ends_with($line, ';')) ? substr($line, 0, strlen($line) - 1) : $line);
         $type = $this->findSqlLineType(strtoupper($line));
 
         if (count($type) === 0) {
-             $this->errorContainer->addError(0, ERROR_NOT_FOUND_IN_SQL_FUNCTIONS_MAP. $line, true);
+            $this->errorContainer->addError(0, ERROR_NOT_FOUND_IN_SQL_FUNCTIONS_MAP. $line, true);
             return [];
         }
-        $method = 'processLine' . ucfirst($type['method']);
+        $method = 'processLine' . ucfirst((string) $type['method']);
         $newParams = $this->$method($params, $type);
         /*
          * if empty the line could not be correctly parsed
          */
         if (empty($newParams)) {
-             $this->errorContainer->addError(0, ERROR_INVALID_SYNTAX . $line, true);            
+            $this->errorContainer->addError(0, ERROR_INVALID_SYNTAX . $line, true);
         }
         return $newParams;
     }
@@ -130,7 +132,7 @@ class SqlPatchInstaller
     {
         $result = [];
         foreach ($this->sqlFunctionMap as $entry) {
-            if (substr($line, 0, $entry['length']) != $entry['find']) {
+            if (substr((string) $line, 0, $entry['length']) != $entry['find']) {
                 continue;
             }
             $result = $entry;
@@ -142,7 +144,7 @@ class SqlPatchInstaller
     /**
      * @since ZC v1.5.7
      */
-    protected function processLineBasic($params, $typeEntry)
+    protected function processLineBasic(array $params, array $typeEntry): array
     {
         $params[$typeEntry['tableParamsOffset']] = DB_PREFIX . $params[$typeEntry['tableParamsOffset']];
         return $params;
@@ -150,8 +152,9 @@ class SqlPatchInstaller
 
     /**
      * @since ZC v1.5.7
+     * @return mixed[]
      */
-    protected function processLineSelect($params, $typeEntry)
+    protected function processLineSelect(array $params, $typeEntry): array
     {
         $fromKey = array_search('FROM', $params);
         if ($fromKey === false) {
@@ -159,18 +162,16 @@ class SqlPatchInstaller
         }
         $params[$fromKey + 1] = DB_PREFIX . $params[$fromKey + 1];
         $joinKeys = array_keys($params, 'JOIN');
-        if (!empty($joinKeys)) {
-            foreach ($joinKeys as $fromKey) {
-                $params[$fromKey + 1] = DB_PREFIX . $params[$fromKey + 1];
-            }
+        foreach ($joinKeys as $fromKey) {
+            $params[$fromKey + 1] = DB_PREFIX . $params[$fromKey + 1];
         }
         return $params;
     }
-    
+
     /**
      * @since ZC v1.5.8
      */
-    protected function processLineIndex($params, $typeEntry)
+    protected function processLineIndex(array $params, $typeEntry): array
     {
         $fromKey = array_search('ON', $params);
         if ($fromKey === false) {
@@ -179,11 +180,11 @@ class SqlPatchInstaller
         $params[$fromKey + 1] = DB_PREFIX . $params[$fromKey + 1];
         return $params;
     }
-    
+
     /**
      * @since ZC v1.5.8
      */
-    protected function processLineRenameTable($params, $typeEntry)
+    protected function processLineRenameTable(array $params, array $typeEntry): array
     {
         $params[$typeEntry['tableParamsOffset']] = DB_PREFIX . $params[$typeEntry['tableParamsOffset']];
         $params[$typeEntry['tableParamsOffset'] + 2] = DB_PREFIX . $params[$typeEntry['tableParamsOffset'] + 2];

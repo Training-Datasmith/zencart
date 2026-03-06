@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Login Page
  *
@@ -49,7 +51,7 @@ if (($_GET['action'] ?? '') === 'process') {
         zen_log_hmac_login(['emailAddress' => $email_address, 'message' => 'EMP Automatic Login', 'action' => 'emp_automatic_login']);
     }
 
-    $password = zen_db_prepare_input(isset($_POST['password']) ? trim($_POST['password']) : '');
+    $password = zen_db_prepare_input(isset($_POST['password']) ? trim((string) $_POST['password']) : '');
 
     /* Privacy-policy-read does not need to be checked during "login"
     if (DISPLAY_PRIVACY_CONDITIONS == 'true') {
