@@ -656,12 +656,12 @@ unset($pos_options, $option_array, $pos_attributes);
 if ($posObserver->stringPos($sort_by, 'model-') === 0) {
     if ($sort_by === 'model-asc') {
         uasort($pos_product_options, static function (array $a, array $b): int {
-            $result = strcasecmp((string) $a['model'], (string) $b['model']);
+            $result = strcasecmp($a['model'], $b['model']);
             return $result <=> 0;
         });
     } else {
         uasort($pos_product_options, static function (array $a, array $b): int {
-            $result = strcasecmp((string) $b['model'], (string) $a['model']);
+            $result = strcasecmp($b['model'], $a['model']);
             return $result <=> 0;
         });
     }

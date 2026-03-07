@@ -203,7 +203,7 @@ foreach ($modules_found as $module_name => $module_file_dir) {
     $modules_for_display[$class]['grouping_sort'] = (int)($module->enabled ?? (bool)$check) * -1 . (is_numeric($module->sort_order ?? null) ? '0' : '1') . $modules_for_display[$class]['padded_sort_order'] . $modules_for_display[$class]['title'];
 }
 // sort by enabled status, sort_order then title
-uasort($modules_for_display, static fn ($a, $b): int => strnatcmp((string) $a['grouping_sort'], (string) $b['grouping_sort']));
+uasort($modules_for_display, static fn ($a, $b): int => strnatcmp($a['grouping_sort'], $b['grouping_sort']));
 
 // set mInfo for sidebox display by matching against the selected URI param, or pick the first enabled module, or the first overall module
 $class = $modules_for_display[$_GET['module'] ?? '']['class'] ?? array_first($modules_for_display)['class'];

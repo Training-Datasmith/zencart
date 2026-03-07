@@ -495,7 +495,7 @@ class queryFactory extends base
             case 'insert':
                 $insertString ??= 'INSERT';
                 $insertString .= " INTO $tableName (";
-                foreach ($tableData as $key => $value) {
+                foreach ($tableData as $value) {
                     if ($debug === true) {
                         echo $value['fieldName'] . '#';
                     }
@@ -571,13 +571,13 @@ class queryFactory extends base
         switch ($type) {
             case 'inConstructInteger':
                 $list = explode(',', (string) $value);
-                $newList = array_map(fn ($value) => (int)$value, $list);
+                $newList = array_map(fn ($value): int => (int)$value, $list);
 
                 return implode(',', $newList);
 
             case 'inConstructString':
                 $list = explode(',', (string) $value);
-                $newList = array_map(fn ($value) => '\'' . $this->prepare_input($value) . '\'', $list);
+                $newList = array_map(fn ($value): string => '\'' . $this->prepare_input($value) . '\'', $list);
 
                 return implode(',', $newList);
 
@@ -716,7 +716,7 @@ class queryFactory extends base
         echo '<div class="systemError">';
         if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
             echo $this->error_number . ' ' . $this->error_text;
-            echo '<br>in:<br>[' . (strstr((string) $this->zf_sql, 'db_cache') ? 'db_cache table' : $this->zf_sql) . ']<br>';
+            echo '<br>in:<br>[' . (strstr($this->zf_sql, 'db_cache') ? 'db_cache table' : $this->zf_sql) . ']<br>';
         } else {
             echo 'WARNING: An Error occurred, please let us know!';
         }

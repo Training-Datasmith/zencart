@@ -121,7 +121,7 @@ $zv_db_patch_ok = true;
 $result = $db->Execute('SELECT project_version_major, project_version_minor FROM ' . TABLE_PROJECT_VERSION . " WHERE project_version_key = 'Zen-Cart Database'");
 $zv_db_patch_level_found = $result->fields['project_version_major']. '.' . $result->fields['project_version_minor'];
 $zv_db_patch_level_expected = EXPECTED_DATABASE_VERSION_MAJOR . '.' . EXPECTED_DATABASE_VERSION_MINOR;
-if ($zv_db_patch_level_expected == '.' || ($zv_db_patch_level_found < $zv_db_patch_level_expected)) {
+if ($zv_db_patch_level_found < $zv_db_patch_level_expected) {
     $zv_db_patch_ok = false;
     $messageStack->add(WARNING_DATABASE_VERSION_OUT_OF_DATE, 'warning');
 }

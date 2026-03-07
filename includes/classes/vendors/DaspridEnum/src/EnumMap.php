@@ -262,7 +262,7 @@ final class EnumMap implements Serializable, IteratorAggregate
      */
     public function values(): array
     {
-        return array_values(array_map(fn ($value) => $this->unmaskNull($value), array_filter($this->values, fn ($value): bool => null !== $value)));
+        return array_values(array_map($this->unmaskNull(...), array_filter($this->values, fn ($value): bool => null !== $value)));
     }
 
     public function serialize(): string

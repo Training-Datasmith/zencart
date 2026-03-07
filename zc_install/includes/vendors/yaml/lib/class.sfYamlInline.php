@@ -88,7 +88,7 @@ class sfYamlInline
             case false === $value:
                 return 'false';
             case ctype_digit((string) $value):
-                return is_string($value) ? "'$value'" : (int) $value;
+                return is_string($value) ? "'$value'" : $value;
             case is_numeric($value):
                 return is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : (is_string($value) ? "'$value'" : $value);
             case str_contains((string) $value, "\n") || str_contains((string) $value, "\r"):
@@ -121,7 +121,7 @@ class sfYamlInline
         if (
             (1 == count($keys) && '0' == $keys[0])
             ||
-            (count($keys) > 1 && array_reduce($keys, fn (int $v, $w) => $v + $w, 0) == count($keys) * (count($keys) - 1) / 2)) {
+            (count($keys) > 1 && array_reduce($keys, fn (int $v, $w): int => $v + $w, 0) == count($keys) * (count($keys) - 1) / 2)) {
             $output = [];
             foreach ($value as $val) {
                 $output[] = self::dump($val);

@@ -1161,12 +1161,7 @@ class MobileDetect
         // test the alternate, too
         $altHeader = 'HTTP_' . $header;
 
-        //Test both the regular and the HTTP_ prefix
-        if (isset($this->httpHeaders[$header])) {
-            return $this->httpHeaders[$header];
-        }
-
-        return $this->httpHeaders[$altHeader] ?? null;
+        return $this->httpHeaders[$header] ?? $this->httpHeaders[$altHeader] ?? null;
     }
 
     public function getMobileHeaders(): array

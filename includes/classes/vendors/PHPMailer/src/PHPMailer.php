@@ -1293,10 +1293,8 @@ class PHPMailer
      *                        Previously this argument determined whether to use
      *                        the IMAP extension to parse the list and accepted a boolean value.
      * @param string $charset The charset to use when decoding the address list string.
-     *
-     * @return array
      */
-    public static function parseAddresses($addrstr, $useimap = null, $charset = self::CHARSET_ISO88591)
+    public static function parseAddresses($addrstr, $useimap = null, $charset = self::CHARSET_ISO88591): array
     {
         if ($useimap !== null) {
             trigger_error(self::lang('deprecated_argument') . '$useimap', E_USER_DEPRECATED);
@@ -2624,10 +2622,8 @@ class PHPMailer
      *
      * @param array $addr A 2-element indexed array, element 0 containing an address, element 1 containing a name like
      *                    ['joe@example.com', 'Joe User']
-     *
-     * @return string
      */
-    public function addrFormat(array $addr)
+    public function addrFormat(array $addr): string
     {
         if (!isset($addr[1]) || ($addr[1] === '')) { //No name provided
             return $this->secureHeader($addr[0]);
@@ -3574,7 +3570,7 @@ class PHPMailer
      *
      * @return string
      */
-    protected function encodeFile(string $path, $encoding = self::ENCODING_BASE64)
+    protected function encodeFile(string $path, string $encoding = self::ENCODING_BASE64)
     {
         try {
             if (!static::fileIsAccessible($path)) {
@@ -3764,7 +3760,7 @@ class PHPMailer
             // Always decode to UTF-8 to provide a consistent, modern output encoding.
             mb_internal_encoding($charset);
             // Decode the header value
-            $value = mb_decode_mimeheader((string) $value);
+            $value = mb_decode_mimeheader($value);
             mb_internal_encoding($origCharset);
         }
 
@@ -3849,7 +3845,7 @@ class PHPMailer
      *
      * @return string
      */
-    public function encodeQP($string)
+    public function encodeQP($string): string|array
     {
         return static::normalizeBreaks(quoted_printable_encode($string));
     }
@@ -4177,7 +4173,7 @@ class PHPMailer
     {
         $this->RecipientsQueue = array_filter(
             $this->RecipientsQueue,
-            static fn (array $params) => $params[0] !== $kind
+            static fn (array $params): bool => $params[0] !== $kind
         );
     }
 
@@ -4578,7 +4574,7 @@ class PHPMailer
      *
      * @see PHPMailer::html2text()
      */
-    public function msgHTML($message, string $basedir = '', $advanced = false)
+    public function msgHTML($message, string $basedir = '', $advanced = false): array|string
     {
         $cid_domain = 'phpmailer.0';
         if (filter_var($this->From, FILTER_VALIDATE_EMAIL)) {
@@ -4852,10 +4848,8 @@ class PHPMailer
      * Defaults to 'application/octet-stream', i.e.. arbitrary binary data.
      *
      * @param string $filename A file name or full path, does not need to exist as a file
-     *
-     * @return string
      */
-    public static function filenameToType($filename)
+    public static function filenameToType($filename): string
     {
         //In case the path is a URL, strip any query string before getting extension
         $qpos = strpos($filename, '?');
@@ -5169,7 +5163,7 @@ class PHPMailer
      *
      * @return string
      */
-    public function DKIM_Add(string $headers_line, string $subject, $body)
+    public function DKIM_Add(string $headers_line, string $subject, $body): string|array
     {
         $DKIMsignatureType = 'rsa-sha256'; //Signature & hash algorithms
         $DKIMcanonicalization = 'relaxed/simple'; //Canonicalization methods of header & body

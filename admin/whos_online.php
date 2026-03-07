@@ -95,8 +95,8 @@ $listingURL = zen_href_link(FILENAME_WHOS_ONLINE, zen_get_all_get_params(['q', '
             zen_icon('status-yellow') . '&nbsp;' . WHOS_ONLINE_INACTIVE_TEXT . '&nbsp;&nbsp;' .
             zen_icon('status-red') . '&nbsp;' . WHOS_ONLINE_ACTIVE_NO_CART_TEXT . '&nbsp;&nbsp;' .
             zen_icon('status-red-light') . '&nbsp;' . WHOS_ONLINE_INACTIVE_NO_CART_TEXT . '<br>' .
-            WHOS_ONLINE_INACTIVE_LAST_CLICK_TEXT . '&nbsp;' . (int)$wo->getTimerInactive() . 's' . '&nbsp;||&nbsp;' .
-            WHOS_ONLINE_INACTIVE_ARRIVAL_TEXT . '&nbsp;' . (int)$wo->getTimerDead() . 's&nbsp;' . WHOS_ONLINE_REMOVED_TEXT;
+            WHOS_ONLINE_INACTIVE_LAST_CLICK_TEXT . '&nbsp;' . $wo->getTimerInactive() . 's' . '&nbsp;||&nbsp;' .
+            WHOS_ONLINE_INACTIVE_ARRIVAL_TEXT . '&nbsp;' . $wo->getTimerDead() . 's&nbsp;' . WHOS_ONLINE_REMOVED_TEXT;
 ?>
         </div>
 
@@ -274,8 +274,8 @@ foreach ($whos_online as $item) {
                   . zen_icon('status-yellow') . ' Inactive cart &nbsp;&nbsp;'
                   . zen_icon('status-red') . ' Active no cart &nbsp;&nbsp;'
                   . zen_icon('status-red-light') . ' Inactive no cart '
-                  . '<br>Inactive is Last Click >= ' . (int)$wo->getTimerInactive() . 's'
-                  . ' &nbsp; || Inactive since arrival > ' . (int)$wo->getTimerDead() . 's will be removed';
+                  . '<br>Inactive is Last Click >= ' . $wo->getTimerInactive() . 's'
+                  . ' &nbsp; || Inactive since arrival > ' . $wo->getTimerDead() . 's will be removed';
       ?>
                     </td>
                   </tr>

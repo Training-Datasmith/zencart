@@ -43,10 +43,9 @@ class AdminRequestSanitizer extends base
     private string $arrayName;
 
     /**
-     * @return AdminRequestSanitizer
      * @since ZC v1.5.5a
      */
-    public static function getInstance()
+    public static function getInstance(): \AdminRequestSanitizer
     {
         if (!isset(self::$instance)) {
             self::$instance = new AdminRequestSanitizer();
@@ -108,19 +107,17 @@ class AdminRequestSanitizer extends base
     }
 
     /**
-     * @return array
      * @since ZC v1.5.5
      */
-    public function getGetKeysAlreadySanitized()
+    public function getGetKeysAlreadySanitized(): array
     {
         return $this->getKeysAlreadySanitized;
     }
 
     /**
-     * @return array
      * @since ZC v1.5.5
      */
-    public function getPostKeysAlreadySanitized()
+    public function getPostKeysAlreadySanitized(): array
     {
         return $this->postKeysAlreadySanitized;
     }
@@ -165,7 +162,7 @@ class AdminRequestSanitizer extends base
      * @param $doStrictSanitize
      * @since ZC v1.5.5a
      */
-    public function setDoStrictSanitization($doStrictSanitize): void
+    public function setDoStrictSanitization(bool $doStrictSanitize): void
     {
         $this->doStrictSanitization = $doStrictSanitize;
     }
@@ -241,7 +238,7 @@ class AdminRequestSanitizer extends base
      * @return bool]
      * @since ZC v1.5.5a
      */
-    private function findSanitizerFromRequestMethod($parameterName, $parameterDefinitions)
+    private function findSanitizerFromRequestMethod(int|string $parameterName, $parameterDefinitions)
     {
         $result = false;
         foreach ($parameterDefinitions as $parameterDefinition) {
@@ -922,7 +919,7 @@ class AdminRequestSanitizer extends base
      * @param $key
      * @since ZC v1.5.5b
      */
-    private function addKeyAlreadySanitized(string $type, $key): void
+    private function addKeyAlreadySanitized(string $type, int|string $key): void
     {
         if ($type == 'post' && !in_array($key, $this->postKeysAlreadySanitized)) {
             $this->postKeysAlreadySanitized[] = $key;
@@ -933,10 +930,9 @@ class AdminRequestSanitizer extends base
     }
 
     /**
-     * @param array $errorMessages
      * @since ZC v1.5.5
      */
-    private function errorLog($errorMessages = []): void
+    private function errorLog(array $errorMessages = []): void
     {
         $logDir = defined('DIR_FS_LOGS') ? DIR_FS_LOGS : DIR_FS_SQL_CACHE;
         $message = date('M-d-Y h:i:s') .

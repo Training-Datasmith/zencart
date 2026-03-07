@@ -222,11 +222,8 @@ switch ($_GET['action']) {
         }
         break;
 }
-
-if (!empty($contents)) {
-    $box = new box();
-    echo $box->infoBox($heading, $contents);
-}
+$box = new box();
+echo $box->infoBox($heading, $contents);
 ?>
         </div>
       </div>

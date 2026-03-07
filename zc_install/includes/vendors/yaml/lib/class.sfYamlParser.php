@@ -27,7 +27,6 @@ if (!defined('PREG_BAD_UTF8_OFFSET_ERROR')) {
  */
 class sfYamlParser
 {
-    protected $offset        = 0;
     protected $lines         = [];
     protected $currentLineNb = -1;
     protected $currentLine   = '';
@@ -38,9 +37,8 @@ class sfYamlParser
      *
      * @param integer $offset The offset of YAML document (used for line numbers in error messages)
      */
-    public function __construct($offset = 0)
+    public function __construct(protected $offset = 0)
     {
-        $this->offset = $offset;
     }
 
     /**

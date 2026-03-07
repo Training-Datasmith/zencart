@@ -94,7 +94,7 @@ if (isset($_POST['lookup_discount_coupon']) and $_POST['lookup_discount_coupon']
             }
             sort($cats);
             $mycats = [];
-            foreach ($cats as $key => $value) {
+            foreach ($cats as $value) {
                 $mycats[] = $value['link'];
             }
             $cats = '<ul id="couponCatRestrictions">' . '<li>' . implode('<li>', $mycats) . '</ul>';

@@ -776,7 +776,7 @@ class authorizenet_aim extends base
         }
         $stringToParse = preg_replace('/.{*}' . $this->encapChar . '$/', '', (string) $stringToParse);
 
-        return explode($this->encapChar . $this->delimiter . $this->encapChar, $stringToParse);
+        return explode($this->encapChar . $this->delimiter . $this->encapChar, (string) $stringToParse);
     }
     /**
      * Used to do any debug logging / tracking / storage as required.

@@ -41,7 +41,7 @@ function zen_is_whitelisted_admin_ip($ip = null): bool
 /**
  * @since ZC v1.0.3
  */
-function zen_round($value, $precision)
+function zen_round($value, $precision): float
 {
     $value = round($value * 10 ** $precision, 0);
     return $value / 10 ** $precision;

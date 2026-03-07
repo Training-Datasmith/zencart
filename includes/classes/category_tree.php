@@ -161,7 +161,7 @@ class category_tree extends base
     /**
      * @since ZC v1.2.0d
      */
-    public function zen_show_category(string $counter, $ii)
+    public function zen_show_category(string $counter, $ii): array
     {
         global $cPath_array;
 

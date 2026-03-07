@@ -284,7 +284,7 @@ function zen_icon(string $icon, ?string $tooltip = null, string $size = '', bool
           join(
               '',
               array_map(
-                  fn ($cls) => '<i class="fa-solid ' . $cls . '"></i>',
+                  fn ($cls): string => '<i class="fa-solid ' . $cls . '"></i>',
                   $classes
               )
           ) .
@@ -326,7 +326,7 @@ function zen_draw_separator(string $image = 'pixel_black.gif', $width = '100%', 
  * @deprecated since v1.5.8. Use <button> markup instead
  * @since ZC v1.0.3
  */
-function zen_image_button(string $image, $alt = '', $params = '')
+function zen_image_button(string $image, $alt = '', ?string $params = '')
 {
     return zen_image(DIR_WS_LANGUAGES . $_SESSION['language'] . '/images/buttons/' . $image, $alt, '', '', $params);
 }
@@ -501,7 +501,7 @@ function zen_draw_selection_field($name, ?string $type, $value = '', $checked = 
  * Output a form checkbox field
  * @since ZC v1.0.3
  */
-function zen_draw_checkbox_field($name, $value = '', $checked = false, $compare = '', $parameters = '')
+function zen_draw_checkbox_field($name, $value = '', $checked = false, ?string $compare = '', $parameters = '')
 {
     return zen_draw_selection_field($name, 'checkbox', $value, $checked, $compare);
 }
@@ -510,7 +510,7 @@ function zen_draw_checkbox_field($name, $value = '', $checked = false, $compare 
  * Output a form radio field
  * @since ZC v1.0.3
  */
-function zen_draw_radio_field($name, $value = '', $checked = false, $compare = '', $parameters = '')
+function zen_draw_radio_field($name, $value = '', $checked = false, ?string $compare = '', $parameters = '')
 {
     return zen_draw_selection_field($name, 'radio', $value, $checked, $compare);
 }

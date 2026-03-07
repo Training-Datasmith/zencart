@@ -127,7 +127,7 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    public function getResultSet()
+    public function getResultSet(): \Zencart\ViewBuilders\NativePaginator
     {
         return $this->resultSet;
     }
@@ -155,7 +155,7 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    public function hasRowActions()
+    public function hasRowActions(): bool
     {
         return $this->tableDefinition->hasRowActions();
     }
@@ -260,8 +260,9 @@ class SimpleDataFormatter
 
     /**
      * @since ZC v1.5.8
+     * @return mixed[]
      */
-    protected function processRowAction($rowAction, $tableRow)
+    protected function processRowAction(array $rowAction, $tableRow): array
     {
         $processed = $rowAction;
         $link = $this->buildRowActionLink($rowAction, $tableRow);
@@ -272,13 +273,13 @@ class SimpleDataFormatter
     /**
      * @since ZC v1.5.8
      */
-    protected function buildRowActionLink(array $rowAction, $tableRow): string
+    protected function buildRowActionLink(array $rowAction, array $tableRow): string
     {
         $pagerVar = $this->tableDefinition->getParameter('pagerVariable');
         $link = $pagerVar . '=' . $this->request->input($pagerVar, 1);
         $link .= '&action='  . $rowAction['action'];
         $tableRowLink = $this->processRowActionTableRowLink($rowAction, $tableRow);
-        $tableRowLink = rtrim((string) $tableRowLink, '&');
+        $tableRowLink = rtrim($tableRowLink, '&');
         return $link . ('&' . $tableRowLink);
     }
 

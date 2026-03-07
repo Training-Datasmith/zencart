@@ -14,9 +14,6 @@ class PosmViewAll extends base
 {
     public $options_names = [];
     public $options_values_names = [];
-
-    protected $sort_order;
-    protected $posm_stock_reorder_level;
     protected $pid;
     protected $view_all;
     protected $pid_options;
@@ -27,12 +24,9 @@ class PosmViewAll extends base
     // When the class is constructed, build up arrays that contain all option-name and option-value-name values used
     // within the currently-managed product option-combinations.
     //
-    public function __construct($posm_stock_reorder_level, $sort_order)
+    public function __construct(protected $posm_stock_reorder_level, protected $sort_order)
     {
         global $db;
-
-        $this->sort_order = $sort_order;
-        $this->posm_stock_reorder_level = $posm_stock_reorder_level;
         $names_list = $db->Execute(
             'SELECT DISTINCT posa.options_id, po.products_options_name as options_name, po.products_options_sort_order
                FROM ' . TABLE_PRODUCTS_OPTIONS_STOCK_ATTRIBUTES . ' posa

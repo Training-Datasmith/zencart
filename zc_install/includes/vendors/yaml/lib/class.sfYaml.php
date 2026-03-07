@@ -110,7 +110,7 @@ class sfYaml
      *
      * @return string A YAML string representing the original PHP array
      */
-    public static function dump($array, $inline = 2)
+    public static function dump($array, $inline = 2): string
     {
         //    require_once dirname(__FILE__).'/sfYamlDumper.php';
 

@@ -77,7 +77,7 @@ if (isset($_GET['action']) && ($_GET['action'] === 'send')) {
             // Assign email destination from array
             if (!empty($send_email_array)) {
                 $send_to_email = preg_replace('/>/', '', (string) $send_email_array[0]);
-                $send_to_email = trim(preg_replace('/</', '', $send_to_email));
+                $send_to_email = trim((string) preg_replace('/</', '', (string) $send_to_email));
                 $send_to_name  = trim((string) preg_replace('/\<[^*]*/', '', $send_to_array[$_POST['send_to']]));
             }
 

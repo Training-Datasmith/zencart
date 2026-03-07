@@ -262,7 +262,7 @@ if ($pos_report->get_order_count() === 0) {
             <td>&nbsp;</td>
 <?php
         $option_values_names_found = [];
-    foreach ($pos_report->getOptions() as $options_id => $info) {
+    foreach ($pos_report->getOptions() as $info) {
         ?>
             <td class="align-top"><table class="table table-condensed breakdown">
                 <tr>

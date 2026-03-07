@@ -129,7 +129,7 @@ class PluginManager
             return false; // @TODO or return original $plugins array?
         }
 
-        $present_zc_version = 'v' . preg_replace('/[^0-9.]/', '', (string) zen_get_zcversion());
+        $present_zc_version = 'v' . preg_replace('/[^0-9.]/', '', zen_get_zcversion());
 
         foreach ($results as $result) {
             $unique_key = $pluginsById[$result['id']]['unique_key'];

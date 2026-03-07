@@ -28,6 +28,6 @@ class base
         if ($camelFirst) {
             $rawName[0] = strtoupper((string) $rawName[0]);
         }
-        return preg_replace_callback('/[_-]([0-9,a-z])/', fn ($matches) => strtoupper((string) $matches[1]), (string) $rawName);
+        return preg_replace_callback('/[_-]([0-9,a-z])/', fn ($matches): string => strtoupper((string) $matches[1]), (string) $rawName);
     }
 }

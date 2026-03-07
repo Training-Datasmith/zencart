@@ -1699,7 +1699,7 @@ class shoppingCart extends base
      * @return float|bool value of Gift Vouchers in cart
      * @since ZC v1.2.0d
      */
-    public function gv_only()
+    public function gv_only(): float|int|string|false
     {
         return $this->get_content_type(true);
     }
@@ -2605,7 +2605,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_weight_category_sub($category_id)
+    public function in_cart_product_total_weight_category_sub($category_id): float|int
     {
         if (!zen_has_category_subcategories($category_id)) {
             return $this->in_cart_product_total_weight_category($category_id);
@@ -2629,7 +2629,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_price_category_sub($category_id)
+    public function in_cart_product_total_price_category_sub($category_id): float|int
     {
         if (!zen_has_category_subcategories($category_id)) {
             return $this->in_cart_product_total_price_category($category_id);
@@ -2653,7 +2653,7 @@ class shoppingCart extends base
      * @return float
      * @since ZC v1.5.5b
      */
-    public function in_cart_product_total_quantity_category_sub($category_id)
+    public function in_cart_product_total_quantity_category_sub($category_id): float|int
     {
         if (!zen_has_category_subcategories($category_id)) {
             return $this->in_cart_product_total_quantity_category($category_id);

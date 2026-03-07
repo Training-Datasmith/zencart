@@ -31,7 +31,7 @@ class Paginator extends \base
     protected float $number_of_pages;
     protected $number_of_rows_per_page;
     protected $number_of_rows;
-    protected $sql_query;
+    protected ?string $sql_query;
 
     /* class constructor */
     public function __construct(string $query, $max_rows, $count_key = '*', protected $page_name = 'page', $debug = false, $countQuery = '')

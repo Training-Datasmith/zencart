@@ -148,7 +148,7 @@ class zen_SiteMapTree
     /**
      * @since ZC v1.3.0
      */
-    public function buildTree()
+    public function buildTree(): string
     {
         return $this->buildBranch($this->root_category_id);
     }

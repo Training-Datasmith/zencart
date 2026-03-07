@@ -378,7 +378,7 @@ class paypaldp extends base
             }
         }
         // check other reasons for the module to be deactivated:
-        if ($this->enabled && (int)$this->zone > 0 && isset($order->billing['country']['id'])) {
+        if ($this->enabled && $this->zone > 0 && isset($order->billing['country']['id'])) {
             $check_flag = false;
             $sql = 'SELECT zone_id
               FROM ' . TABLE_ZONES_TO_GEO_ZONES . '
@@ -2664,7 +2664,7 @@ class paypaldp extends base
                 $continue_flag = 'Y';
             } elseif (strcasecmp((string) $enrolled, 'N') == 0) {
                 $cardType = $this->determineCardType($this->cc_card_number);
-                if (strcasecmp((string) $cardType, 'VISA') == 0 || strcasecmp((string) $cardType, 'JCB') == 0) {
+                if (strcasecmp($cardType, 'VISA') == 0 || strcasecmp($cardType, 'JCB') == 0) {
                     $continue_flag = 'Y';
                 }
             }
@@ -2800,7 +2800,7 @@ class paypaldp extends base
     /**
      * @since ZC v1.3.9a
      */
-    public function send3DSecureHttp(string $url, $data, string $debugData)
+    public function send3DSecureHttp(string $url, $data, string $debugData): bool|string
     {
         // verify that the URL uses a supported protocol.
         if ((str_starts_with($url, 'http://')) || (str_starts_with($url, 'https://'))) {
@@ -3029,23 +3029,23 @@ class paypaldp extends base
     {
         $cardNumber = preg_replace('/[^0-9]/', '', (string) $cardNumber);
         // NOTE: We check Solo before Maestro, and Maestro *before* we check Visa/Mastercard, so we don't have to rule-out numerous types from V/MC matching rules.
-        if (preg_match('/^(6334[5-9][0-9]|6767[0-9]{2})[0-9]{10}([0-9]{2,3}?)?$/', $cardNumber)) {
+        if (preg_match('/^(6334[5-9][0-9]|6767[0-9]{2})[0-9]{10}([0-9]{2,3}?)?$/', (string) $cardNumber)) {
             $cardType = 'SOLO';
-        } elseif (preg_match('/^(49369[8-9]|490303|6333[0-4][0-9]|6759[0-9]{2}|5[0678][0-9]{4}|6[0-9][02-9][02-9][0-9]{2})[0-9]{6,13}?$/', $cardNumber)) {
+        } elseif (preg_match('/^(49369[8-9]|490303|6333[0-4][0-9]|6759[0-9]{2}|5[0678][0-9]{4}|6[0-9][02-9][02-9][0-9]{2})[0-9]{6,13}?$/', (string) $cardNumber)) {
             $cardType = 'MAESTRO';
-        } elseif (preg_match('/^(49030[2-9]|49033[5-9]|4905[0-9]{2}|49110[1-2]|49117[4-9]|49918[0-2]|4936[0-9]{2}|564182|6333[0-4][0-9])[0-9]{10}([0-9]{2,3}?)?$/', $cardNumber)) {
+        } elseif (preg_match('/^(49030[2-9]|49033[5-9]|4905[0-9]{2}|49110[1-2]|49117[4-9]|49918[0-2]|4936[0-9]{2}|564182|6333[0-4][0-9])[0-9]{10}([0-9]{2,3}?)?$/', (string) $cardNumber)) {
             $cardType = 'MAESTRO'; // SWITCH is now Maestro
-        } elseif (preg_match('/^4[0-9]{12}([0-9]{3})?$/', $cardNumber)) {
+        } elseif (preg_match('/^4[0-9]{12}([0-9]{3})?$/', (string) $cardNumber)) {
             $cardType = 'VISA';
-        } elseif (preg_match('/^5[1-5][0-9]{14}$/', $cardNumber)) {
+        } elseif (preg_match('/^5[1-5][0-9]{14}$/', (string) $cardNumber)) {
             $cardType = 'MASTERCARD';
-        } elseif (preg_match('/^3[47][0-9]{13}$/', $cardNumber)) {
+        } elseif (preg_match('/^3[47][0-9]{13}$/', (string) $cardNumber)) {
             $cardType = 'AMEX';
-        } elseif (preg_match('/^3(0[0-5]|[68][0-9])[0-9]{11}$/', $cardNumber)) {
+        } elseif (preg_match('/^3(0[0-5]|[68][0-9])[0-9]{11}$/', (string) $cardNumber)) {
             $cardType = 'DINERS CLUB';
-        } elseif (preg_match('/^(6011[0-9]{12}|622[1-9][0-9]{12}|64[4-9][0-9]{13}|65[0-9]{14})$/', $cardNumber)) {
+        } elseif (preg_match('/^(6011[0-9]{12}|622[1-9][0-9]{12}|64[4-9][0-9]{13}|65[0-9]{14})$/', (string) $cardNumber)) {
             $cardType = 'DISCOVER';
-        } elseif (preg_match('/^(35(28|29|[3-8][0-9])[0-9]{12}|2131[0-9]{11}|1800[0-9]{11})$/', $cardNumber)) {
+        } elseif (preg_match('/^(35(28|29|[3-8][0-9])[0-9]{12}|2131[0-9]{11}|1800[0-9]{11})$/', (string) $cardNumber)) {
             $cardType = 'JCB';
         } else {
             $cardType = 'UNKNOWN';

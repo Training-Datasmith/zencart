@@ -1131,7 +1131,7 @@ function zen_get_attributes_qty_prices_onetime($string, $qty): int|string|array
  * @deprecated since 1.5.8 use zen_get_attributes_qty_prices_onetime()
  * @since ZC v1.2.0d
  */
-function zen_get_attributes_quantity_price($check_what, $check_for)
+function zen_get_attributes_quantity_price($check_what, $check_for): array|int|string
 {
     trigger_error('Call to deprecated function zen_get_attributes_quantity_price. Use zen_get_attributes_qty_prices_onetime() instead', E_USER_DEPRECATED);
 

@@ -78,7 +78,7 @@ class VersionServer
         }
 
         $ids = (string)$ids;
-        $keylist = implode(',', array_map(static fn ($value): int => (int)trim((string) $value), explode(',', $ids)));
+        $keylist = implode(',', array_map(static fn ($value): int => (int)trim($value), explode(',', $ids)));
 
         $type = '[' . (int)$ids . ']';
         if (str_contains($ids, ',')) {

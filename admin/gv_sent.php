@@ -106,11 +106,8 @@ if (isset($gInfo)) {
     } else {
         $contents[] = ['text' => '<br>' . TEXT_INFO_NOT_REDEEMED];
     }
-
-    if (!empty($contents)) {
-        $box = new box();
-        echo $box->infoBox($heading, $contents);
-    }
+    $box = new box();
+    echo $box->infoBox($heading, $contents);
 }
 ?>
           </div>

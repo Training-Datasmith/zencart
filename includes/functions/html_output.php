@@ -201,7 +201,7 @@ function zen_image_OLD($src, $title = '', $width = '', $height = '', ?string $pa
  * HTML image wrapper function
  * @since ZC v1.0.3
  */
-function zen_image($src, $title = '', $width = '', $height = '', ?string $parameters = '')
+function zen_image($src, $title = '', $width = '', $height = '', ?string $parameters = ''): string|false
 {
     global $template_dir, $zco_notifier;
 
@@ -316,7 +316,7 @@ function zen_image($src, $title = '', $width = '', $height = '', ?string $parame
  * Outputs a "submit" button in the selected language
  * @since ZC v1.0.3
  */
-function zen_image_submit(string $image, $alt = '', ?string $parameters = '', $sec_class = '')
+function zen_image_submit(string $image, $alt = '', ?string $parameters = '', $sec_class = ''): string
 {
     global $template, $current_page_base, $zco_notifier;
     if ((strtolower(IMAGE_USE_CSS_BUTTONS) === 'yes' || (strtolower(IMAGE_USE_CSS_BUTTONS) === 'found' && !file_exists(DIR_FS_CATALOG . DIR_WS_TEMPLATE . 'buttons/' . $_SESSION['language'] . '/' . $image))) && mb_strlen((string) $alt) < 30) {
@@ -641,7 +641,7 @@ function zen_draw_input_field($name, $value = '', ?string $parameters = '', ?str
  * Output a form password field
  * @since ZC v1.0.3
  */
-function zen_draw_password_field($name, $value = '', $parameters = 'maxlength="40"')
+function zen_draw_password_field($name, $value = '', ?string $parameters = 'maxlength="40"')
 {
     return zen_draw_input_field($name, $value, $parameters, 'password', false);
 }
@@ -714,7 +714,7 @@ function zen_draw_selection_field($name, ?string $type, $value = '', $checked = 
  * Output a form checkbox field
  * @since ZC v1.0.3
  */
-function zen_draw_checkbox_field($name, $value = '', $checked = false, $parameters = '')
+function zen_draw_checkbox_field($name, $value = '', $checked = false, ?string $parameters = '')
 {
     return zen_draw_selection_field($name, 'checkbox', $value, $checked, $parameters);
 }
@@ -723,7 +723,7 @@ function zen_draw_checkbox_field($name, $value = '', $checked = false, $paramete
  * Output a form radio field
  * @since ZC v1.0.3
  */
-function zen_draw_radio_field($name, $value = '', $checked = false, $parameters = '')
+function zen_draw_radio_field($name, $value = '', $checked = false, ?string $parameters = '')
 {
     return zen_draw_selection_field($name, 'radio', $value, $checked, $parameters);
 }
@@ -921,7 +921,7 @@ function zen_draw_pull_down_menu($name, $values, $default = '', ?string $paramet
  * Creates a pull-down list of countries
  * @since ZC v1.0.3
  */
-function zen_get_country_list($name, $selected = '', $parameters = '')
+function zen_get_country_list($name, $selected = '', ?string $parameters = '')
 {
     $countriesAtTopOfList = [];
     $countries_array = [['id' => '', 'text' => PULL_DOWN_DEFAULT]];

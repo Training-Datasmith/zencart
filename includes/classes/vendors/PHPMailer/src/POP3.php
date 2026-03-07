@@ -169,8 +169,6 @@ class POP3
      * @param string   $username
      * @param string   $password
      * @param int      $debug_level
-     *
-     * @return bool
      */
     public static function popBeforeSmtp(
         $host,
@@ -179,7 +177,7 @@ class POP3
         $username = '',
         $password = '',
         $debug_level = 0
-    ) {
+    ): bool {
         $pop = new self();
 
         return $pop->authorise($host, $port, $timeout, $username, $password, $debug_level);

@@ -87,7 +87,7 @@ if ($get_result->RecordCount() == 1 && $get_result->fields['category_id'] == '-1
 }
 sort($cats);
 $mycats = [];
-foreach ($cats as $key => $value) {
+foreach ($cats as $value) {
     $mycats[] = $value['name'];
 }
 $cats = '<ul id="couponCatRestrictions">' . '<li>' . implode('</li><li>', $mycats) . '</li></ul>';

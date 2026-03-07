@@ -19,7 +19,7 @@ declare(strict_types=1);
  * @return false|string
  * @since ZC v1.0.3
  */
-function zen_info_image(?string $image, $alt, $width = '', $height = '', $params = '')
+function zen_info_image(?string $image, $alt, $width = '', $height = '', ?string $params = '')
 {
     if (!empty($image) && (file_exists(DIR_FS_CATALOG_IMAGES . $image))) {
         return zen_image(DIR_WS_CATALOG_IMAGES . $image, $alt, $width, $height, $params);
@@ -495,7 +495,7 @@ function zen_cfg_pull_down_order_statuses($order_status_id, ?string $key = '')
  * optionally prefixed by a "please choose" selection.
  * @since ZC v1.5.7
  */
-function zen_draw_order_status_dropdown($field_name, $default_value, $first_selection = '', $parms = '')
+function zen_draw_order_status_dropdown($field_name, $default_value, $first_selection = '', ?string $parms = '')
 {
     global $db;
     $statuses = $db->Execute(

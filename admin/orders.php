@@ -208,7 +208,7 @@ if (!empty($action) && $order_exists === true) {
                 if ($chk_products_download_time->EOF) {
                     $zc_max_days = DOWNLOAD_MAX_DAYS == 0 ? 0 : zen_date_diff($order->info['date_purchased'], date('Y-m-d H:i:s')) + (int)DOWNLOAD_MAX_DAYS;
                     $update_downloads_query = 'UPDATE ' . TABLE_ORDERS_PRODUCTS_DOWNLOAD . '
-                                                    SET download_maxdays = ' . (int)$zc_max_days . ',
+                                                    SET download_maxdays = ' . $zc_max_days . ',
                                                             download_count = ' . (int)DOWNLOAD_MAX_COUNT . '
                                                     WHERE orders_id = ' . (int)$_GET['oID'] . '
                                                     AND orders_products_download_id = ' . (int)$_GET['download_reset_on'];
@@ -295,7 +295,7 @@ if (!empty($action) && $order_exists === true) {
                         if ($chk_products_download_time->EOF) {
                             $zc_max_days = DOWNLOAD_MAX_DAYS == 0 ? 0 : zen_date_diff($order->info['date_purchased'], date('Y-m-d H:i:s')) + (int)DOWNLOAD_MAX_DAYS;
                             $update_downloads_query = 'UPDATE ' . TABLE_ORDERS_PRODUCTS_DOWNLOAD . '
-                                                            SET download_maxdays = ' . (int)$zc_max_days . ',
+                                                            SET download_maxdays = ' . $zc_max_days . ',
                                                                     download_count = ' . (int)DOWNLOAD_MAX_COUNT . '
                                                             WHERE orders_id = ' . $oID . '
                                                             AND orders_products_download_id = ' . (int)$_GET['download_reset_on'];

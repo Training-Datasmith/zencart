@@ -133,7 +133,7 @@ class zcAjaxScanAdditionalImages
             foreach ($images as $file) {
                 $file = preg_replace('/^' . preg_quote($image_dir, '/') . '/i', '', (string) $file);
                 if (!is_dir($image_dir . $file)) {
-                    if (preg_match('/' . preg_quote($image_base, '/') . '/i', $file) === 1 && $file !== $products_image) {
+                    if (preg_match('/' . preg_quote($image_base, '/') . '/i', (string) $file) === 1 && $file !== $products_image) {
                         $matches[] = $file;
                     }
                 }

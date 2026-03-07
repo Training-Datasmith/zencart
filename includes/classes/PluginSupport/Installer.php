@@ -74,7 +74,7 @@ class Installer
     /**
      * @since ZC v1.5.8
      */
-    public function executeUpgraders($pluginDir, $oldVersion): void
+    public function executeUpgraders(string $pluginDir, $oldVersion): void
     {
         $this->executeScriptedUpgrader($pluginDir, $oldVersion);
     }
@@ -82,7 +82,7 @@ class Installer
     /**
      * @since ZC v1.5.7
      */
-    protected function executePatchInstaller($pluginDir): void
+    protected function executePatchInstaller(string $pluginDir): void
     {
         $patchFile = 'install.sql';
         $this->executePatchFile($pluginDir, $patchFile);
@@ -91,7 +91,7 @@ class Installer
     /**
      * @since ZC v1.5.7
      */
-    protected function executePatchUninstaller($pluginDir): void
+    protected function executePatchUninstaller(string $pluginDir): void
     {
         $patchFile = 'uninstall.sql';
         $this->executePatchFile($pluginDir, $patchFile);

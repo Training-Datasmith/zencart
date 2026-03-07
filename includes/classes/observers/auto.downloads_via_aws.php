@@ -171,7 +171,7 @@ class zcObserverDownloadsViaAws extends base
      * @param string $browser_extra_headers (mutable)
      * @since ZC v1.5.6
      */
-    protected function updateNotifyDownloadReadyToStart(&$class, $eventID, $ipaddress, &$service, &$origin_filename, &$browser_filename, &$source_directory, &$downloadFilesize, $mime_type, $fields, $browser_extra_headers)
+    protected function updateNotifyDownloadReadyToStart(&$class, $eventID, $ipaddress, &$service, &$origin_filename, &$browser_filename, &$source_directory, &$downloadFilesize, $mime_type, $fields, $browser_extra_headers): bool
     {
         // verify that the passed file is indeed intended for aws
         if ($source_directory != 'aws') {

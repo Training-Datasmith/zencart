@@ -252,7 +252,7 @@ foreach ($configuration as $item) {
         // if a plugin ignores the new $fieldName parameter and hardcodes 'configuration_value', dynamically rewrite the name and id attributes
         if (str_contains((string) $inputField, 'configuration_value')) {
             $inputField = preg_replace('/name=[\'"]configuration_value(\[\])?[\'"]/', 'name="' . $fieldName . '$1"', (string) $inputField);
-            $inputField = preg_replace('/id=[\'"]configuration_value[\'"]/', 'id="' . $fieldName . '"', $inputField);
+            $inputField = preg_replace('/id=[\'"]configuration_value[\'"]/', 'id="' . $fieldName . '"', (string) $inputField);
         }
 
         echo $inputField;

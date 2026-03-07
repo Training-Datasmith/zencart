@@ -43,7 +43,7 @@ if (!function_exists('convertToLocalTimeZone')) {
 /**
  * @since ZC v1.3.0
  */
-function ipn_debug_email($message, $email_address = '', $always_send = false, string $subjecttext = 'IPN DEBUG message')
+function ipn_debug_email($message, $email_address = '', $always_send = false, string $subjecttext = 'IPN DEBUG message'): string
 {
     static $paypal_error_counter;
     static $paypal_instance_id;
@@ -533,7 +533,7 @@ function ipn_create_order_update_array($txn_type): array
  * Debug to file
  * @since ZC v1.3.0
  */
-function ipn_fopen($filename)
+function ipn_fopen($filename): string|false
 {
     $response = '';
     $fp = @fopen($filename, 'rb');

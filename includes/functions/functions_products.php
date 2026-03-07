@@ -280,7 +280,7 @@ function zen_set_product_master_categories_id($product_id, $category_id): void
 function zen_get_linked_categories_for_product($product_id, $exclude = []): array
 {
     global $db;
-    $exclude = array_filter($exclude, fn ($record) => is_numeric($record) ? (int)$record : null);
+    $exclude = array_filter($exclude, fn ($record): ?int => is_numeric($record) ? (int)$record : null);
     $sql = 'SELECT categories_id
             FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . '
             WHERE products_id = ' . (int)$product_id;
@@ -519,7 +519,7 @@ function zen_get_products_stock(string|int $products_id): int|float
  * @param int $products_quantity Quantity to compare against
  * @since ZC v1.0.3
  */
-function zen_check_stock($products_id, $products_quantity): string
+function zen_check_stock(string|int $products_id, $products_quantity): string
 {
     global $zco_notifier;
 
@@ -672,7 +672,7 @@ function zen_get_products_allow_add_to_cart($product_id): string
  * NOTE: keys are looked up first in the product_type_layout table and if not found looked up in the configuration table.
  * @since ZC v1.2.0d
  */
-function zen_get_show_product_switch($lookup, $field, $prefix = 'SHOW_', $suffix = '_INFO', $field_prefix = '_', $field_suffix = ''): string
+function zen_get_show_product_switch($lookup, string $field, string $prefix = 'SHOW_', string $suffix = '_INFO', string $field_prefix = '_', string $field_suffix = ''): string
 {
     global $db;
     $keyName = zen_get_show_product_switch_name($lookup, $field, $prefix, $suffix, $field_prefix, $field_suffix);

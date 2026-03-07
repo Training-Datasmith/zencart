@@ -345,7 +345,7 @@ class SMTP
      * @param int    $timeout How long to wait for the connection to open
      * @param array  $options An array of options for stream_context_create()
      */
-    public function connect($host, $port = null, $timeout = 30, $options = []): bool
+    public function connect(string $host, $port = null, $timeout = 30, $options = []): bool
     {
         //Clear errors to avoid confusion
         $this->setError('');
@@ -992,10 +992,8 @@ class SMTP
      * and SMTPUTF8 is specified in RFC 6531.
      *
      * @param string $from Source address of this message
-     *
-     * @return bool
      */
-    public function mail(string $from)
+    public function mail(string $from): bool
     {
         $useVerp = ($this->do_verp ? ' XVERP' : '');
         $useSmtputf8 = ($this->do_smtputf8 ? ' SMTPUTF8' : '');
@@ -1037,10 +1035,8 @@ class SMTP
      * @param string $address The address the message is being sent to
      * @param string $dsn     Comma separated list of DSN notifications. NEVER, SUCCESS, FAILURE
      *                        or DELAY. If you specify NEVER all other notifications are ignored.
-     *
-     * @return bool
      */
-    public function recipient(string $address, $dsn = '')
+    public function recipient(string $address, $dsn = ''): bool
     {
         if (empty($dsn)) {
             $rcpt = 'RCPT TO:<' . $address . '>';
@@ -1094,7 +1090,7 @@ class SMTP
      *
      * @return bool True on success
      */
-    public function reset()
+    public function reset(): bool
     {
         return $this->sendCommand('RSET', 'RSET', 250);
     }
@@ -1179,10 +1175,8 @@ class SMTP
      * Implements RFC 821: SAML <SP> FROM:<reverse-path> <CRLF>.
      *
      * @param string $from The address the message is from
-     *
-     * @return bool
      */
-    public function sendAndMail($from)
+    public function sendAndMail($from): bool
     {
         return $this->sendCommand('SAML', "SAML FROM:$from", 250);
     }
@@ -1191,10 +1185,8 @@ class SMTP
      * Send an SMTP VRFY command.
      *
      * @param string $name The name to verify
-     *
-     * @return bool
      */
-    public function verify($name)
+    public function verify($name): bool
     {
         return $this->sendCommand('VRFY', "VRFY $name", [250, 251]);
     }
@@ -1202,10 +1194,8 @@ class SMTP
     /**
      * Send an SMTP NOOP command.
      * Used to keep keep-alives alive, doesn't actually do anything.
-     *
-     * @return bool
      */
-    public function noop()
+    public function noop(): bool
     {
         return $this->sendCommand('NOOP', 'NOOP', 250);
     }

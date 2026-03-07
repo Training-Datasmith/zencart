@@ -497,7 +497,7 @@ class paypal_curl extends base
      * Send a request to endpoint.
      * @since ZC v1.3.7
      */
-    public function _request(array $values, string $operation, $requestId = null)
+    public function _request(array $values, string $operation, $requestId = null): array|false
     {
         if ($this->_mode == 'NOTCONFIGURED') {
             return ['RESULT' => 'PayPal credentials not set. Cannot proceed.'];
@@ -720,7 +720,7 @@ class paypal_curl extends base
     {
         $values = $this->_parseNameValueList($response);
         $token = $values['TOKEN'] ?? '';
-        $token = preg_replace('/[^0-9.A-Z\-]/', '', urldecode($token));
+        $token = preg_replace('/[^0-9.A-Z\-]/', '', urldecode((string) $token));
         $success = false;
         if ($response) {
             if ((isset($values['RESULT']) && $values['RESULT'] == 0) || (isset($values['ACK']) && (strstr($values['ACK'], 'Success') || strstr($values['ACK'], 'SuccessWithWarning')) && !strstr($values['ACK'], 'Failure'))) {

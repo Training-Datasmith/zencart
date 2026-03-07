@@ -112,7 +112,7 @@ abstract class AbstractEnum implements \Stringable
             static::createValue($name, $constant[0], $constant[1]);
         }
 
-        uasort(self::$values[static::class], fn (self $a, self $b) => $a->ordinal() <=> $b->ordinal());
+        uasort(self::$values[static::class], fn (self $a, self $b): int => $a->ordinal() <=> $b->ordinal());
 
         self::$allValuesLoaded[static::class] = true;
         return self::$values[static::class];
@@ -249,6 +249,6 @@ abstract class AbstractEnum implements \Stringable
      */
     public function __toString(): string
     {
-        return $this->name;
+        return (string) $this->name;
     }
 }

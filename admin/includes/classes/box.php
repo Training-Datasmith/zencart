@@ -30,8 +30,8 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
 class box extends boxTableBlock
 {
-    private $heading;
-    private $contents;
+    private array|string $heading;
+    private array|string $contents;
 
     public function __construct()
     {

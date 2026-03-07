@@ -46,8 +46,6 @@ if (isset($flag_disable_header) && $flag_disable_header === true) {
      echo '<div class="header Fixed"><a href="#menu" title="Menu"><i class="fa-solid fa-bars"></i></a></div>';
  } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') {
      echo '<div class="header Fixed"><a href="#menu" title="Menu"><i class="fa-solid fa-bars"></i></a></div>';
- } else {
-
  }
 ?>
 
@@ -227,9 +225,7 @@ if (isset($flag_disable_header) && $flag_disable_header === true) {
   <div id="navMainSearch1" class="forward">
      <?php require(DIR_WS_MODULES . zen_get_module_sidebox_directory('search_header.php')); ?>
   </div>
-<?php  } elseif ($_SESSION['layoutType'] != 'full') {
-
-}
+<?php  }
 ?>
 
 <!--bof optional categories tabs navigation display-->

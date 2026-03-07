@@ -59,7 +59,7 @@ function zen_count_modules($modules = ''): int
 /**
  * @since ZC v1.0.3
  */
-function zen_count_payment_modules()
+function zen_count_payment_modules(): int
 {
     return zen_count_modules(MODULE_PAYMENT_INSTALLED);
 }
@@ -67,7 +67,7 @@ function zen_count_payment_modules()
 /**
  * @since ZC v1.0.3
  */
-function zen_count_shipping_modules()
+function zen_count_shipping_modules(): int
 {
     return zen_count_modules(MODULE_SHIPPING_INSTALLED);
 }

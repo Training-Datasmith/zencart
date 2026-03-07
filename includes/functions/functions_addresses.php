@@ -111,7 +111,7 @@ function zen_get_country_name($country_id, bool $activeOnly = true)
  * @param int $country_id If set limits to a single country
  * @since ZC v1.0.3
  */
-function zen_get_countries_with_iso_codes($country_id, bool $activeOnly = true)
+function zen_get_countries_with_iso_codes($country_id, bool $activeOnly = true): array
 {
     return zen_get_countries((int)$country_id, true, $activeOnly);
 }
@@ -361,7 +361,7 @@ function zen_address_format($address_format_id = 1, $incoming = [], $html = fals
  * @return mixed|string|string[]
  * @since ZC v1.0.3
  */
-function zen_address_label($customers_id, $address_id = 1, $html = false, $boln = '', $eoln = "\n")
+function zen_address_label($customers_id, $address_id = 1, $html = false, string $boln = '', string $eoln = "\n")
 {
     global $db, $zco_notifier;
     $sql = 'SELECT entry_firstname AS firstname, entry_lastname AS lastname,

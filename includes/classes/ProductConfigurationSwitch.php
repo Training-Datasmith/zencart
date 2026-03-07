@@ -16,21 +16,12 @@ class ProductConfigurationSwitch extends base
 {
     protected $layout_data = [];
     protected $configuration_data = [];
-    protected $prefix;
-    protected $suffix;
-    protected $field_prefix;
-    protected $field_suffix;
     protected $type_handler;
     protected $products_type;
 
-    public function __construct($lookup, string $prefix = 'SHOW_', string $suffix = '_INFO', string $field_prefix = '_', string $field_suffix = '')
+    public function __construct($lookup, protected string $prefix = 'SHOW_', protected string $suffix = '_INFO', protected string $field_prefix = '_', protected string $field_suffix = '')
     {
         global $db;
-
-        $this->prefix = $prefix;
-        $this->suffix = $suffix;
-        $this->field_prefix = $field_prefix;
-        $this->field_suffix = $field_suffix;
 
         $sql = 'SELECT products_type FROM ' . TABLE_PRODUCTS . ' WHERE products_id=' . (int)$lookup;
         $type_lookup = $db->Execute($sql, 1);
@@ -46,7 +37,7 @@ class ProductConfigurationSwitch extends base
 
         $this->type_handler = $show_key->fields['type_handler'];
 
-        $zv_key = strtoupper($prefix . $this->type_handler . $suffix . $field_prefix . '%' . $field_suffix);
+        $zv_key = strtoupper($this->prefix . $this->type_handler . $this->suffix . $this->field_prefix . '%' . $this->field_suffix);
 
         $sql = 'SELECT configuration_key, configuration_value FROM ' . TABLE_PRODUCT_TYPE_LAYOUT . " WHERE configuration_key LIKE '" . zen_db_input($zv_key) . "'";
         $zv_key_values = $db->Execute($sql);
@@ -69,10 +60,7 @@ class ProductConfigurationSwitch extends base
     public function getSwitch(string $field)
     {
         $switch = strtoupper($this->prefix . $this->type_handler . $this->suffix . $this->field_prefix . $field . $this->field_suffix);
-        if (isset($this->layout_data[$switch])) {
-            return $this->layout_data[$switch];
-        }
-        return $this->configuration_data[$switch] ?? false;
+        return $this->layout_data[$switch] ?? $this->configuration_data[$switch] ?? false;
     }
 
     /**
