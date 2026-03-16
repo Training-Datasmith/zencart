@@ -576,7 +576,7 @@ class authorizenet_aim extends base
     public function get_error(): array
     {
         return ['title' => MODULE_PAYMENT_AUTHORIZENET_AIM_TEXT_ERROR,
-                       'error' => stripslashes(urldecode((string) $_GET['error']))];
+                       'error' => htmlspecialchars(stripslashes(urldecode((string) $_GET['error'])), ENT_QUOTES, 'UTF-8')];
     }
     /**
      * Check to see whether module is installed

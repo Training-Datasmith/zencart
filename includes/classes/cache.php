@@ -152,14 +152,14 @@ class cache
                 if ($zp_fa === false) {
                     return false;
                 }
-                return unserialize(implode('', $zp_fa));
+                return unserialize(implode('', $zp_fa), ['allowed_classes' => false]);
             case 'database':
                 $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                 $zp_cache_result = $db->Execute($sql);
                 if ($zp_cache_result->EOF) {
                     return false;
                 }
-                return unserialize(base64_decode((string) $zp_cache_result->fields['cache_data']));
+                return unserialize(base64_decode((string) $zp_cache_result->fields['cache_data']), ['allowed_classes' => false]);
             case 'memory':
             case 'none':
             default:

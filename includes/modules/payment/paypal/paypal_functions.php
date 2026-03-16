@@ -90,7 +90,7 @@ function ipn_get_stored_session($session_stuff): bool
         ipn_debug_email('IPN ERROR :: Could not find stored session {' . $session_stuff[1] . '} in DB; thus cannot validate or re-create session as a transaction awaiting PayPal Website Payments Standard confirmation initiated by this store. Might be an Express Checkout or eBay transaction or some other action that triggers PayPal IPN notifications.');
         return false;
     }
-    $_SESSION = unserialize(base64_decode((string) $stored_session->fields['saved_session']));
+    $_SESSION = unserialize(base64_decode((string) $stored_session->fields['saved_session']), ['allowed_classes' => false]);
     return true;
 }
 /**

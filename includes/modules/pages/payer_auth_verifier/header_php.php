@@ -115,7 +115,7 @@ if ($_SESSION['3Dsecure_transactionId'] == '') {
         $_POST['paypalwpp_cc_checkcode'] = $authenticate_resp_array['cc3d_checkcode'];
         $_POST['paypalwpp_cc_expires_month'] = $authenticate_resp_array['cc3d_exp_month'];
         $_POST['paypalwpp_cc_expires_year'] = $authenticate_resp_array['cc3d_exp_year'];
-        $merchantData = unserialize($_SESSION['3Dsecure_merchantData']);
+        $merchantData = unserialize($_SESSION['3Dsecure_merchantData'], ['allowed_classes' => false]);
         $_POST['paypalwpp_cc_issue_month'] = $merchantData['im'];
         $_POST['paypalwpp_cc_issue_year'] = $merchantData['iy'];
         $_POST['paypalwpp_cc_issuenumber'] = $merchantData['in'];
