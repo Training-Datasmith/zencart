@@ -32,21 +32,42 @@ class breadcrumb extends base
         $this->reset();
     }
     /**
-     * @since ZC v1.0.3
+     * Clears all entries from the breadcrumb trail.
+     *
+     * @return void
+     * @since  ZC v1.0.3
      */
     public function reset(): void
     {
         $this->_trail = [];
     }
+
     /**
-     * @since ZC v1.0.3
+     * Appends an entry to the breadcrumb trail.
+     *
+     * @param  string  $title  Human-readable label for the breadcrumb item.
+     * @param  string  $link   URL for the breadcrumb link; empty string for plain-text items.
+     * @return void
+     * @since  ZC v1.0.3
      */
-    public function add($title, $link = ''): void
+    public function add(string $title, string $link = ''): void
     {
         $this->_trail[] = ['title' => $title, 'link' => $link];
     }
+
     /**
-     * @since ZC v1.0.3
+     * Renders the breadcrumb trail as an HTML string.
+     *
+     * Each item is wrapped in optional prefix/suffix markup. Linked items
+     * produce an <a> tag; the last item uses a plain text span when
+     * DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM is 'true'. The home entry uses
+     * a clean domain URL (not the main_page=index form).
+     *
+     * @param  string  $separator  HTML placed between breadcrumb items. Default: non-breaking space.
+     * @param  string  $prefix     HTML inserted before each item label/link.
+     * @param  string  $suffix     HTML inserted after each item label/link.
+     * @return string              The rendered breadcrumb HTML string.
+     * @since  ZC v1.0.3
      */
     public function trail(string $separator = '&nbsp;&nbsp;', string $prefix = '', string $suffix = ''): string
     {
@@ -77,26 +98,46 @@ class breadcrumb extends base
     /**
      * @since ZC v1.0.3
      */
-    public function last()
+    /**
+     * Returns the title of the last breadcrumb entry.
+     *
+     * @return string  The title of the final breadcrumb item.
+     * @since  ZC v1.0.3
+     */
+    public function last(): string
     {
         $trail_size = count($this->_trail);
         return $this->_trail[$trail_size - 1]['title'];
     }
+
     /**
-     * @since ZC v1.5.7c
+     * Removes the last entry from the breadcrumb trail.
+     *
+     * @return void
+     * @since  ZC v1.5.7c
      */
     public function remove_last(): void
     {
         $trail_size = count($this->_trail);
         unset($this->_trail[$trail_size - 1]);
     }
+
     /**
-     * @since ZC v1.5.7c
+     * Replaces the title and/or link of the last breadcrumb entry.
+     *
+     * If both $title and $link are null, the last entry is removed entirely
+     * (delegates to remove_last()). Passing only one updates only that field.
+     *
+     * @param  string|null  $title  New title for the last item, or null to leave unchanged.
+     * @param  string|null  $link   New URL for the last item, or null to leave unchanged.
+     * @return void
+     * @since  ZC v1.5.7c
      */
-    public function replace_last($title = null, $link = null)
+    public function replace_last(?string $title = null, ?string $link = null): void
     {
         if ($title === null && $link === null) {
-            return $this->remove_last();
+            $this->remove_last();
+            return;
         }
         $trail_size = count($this->_trail);
         if ($title !== null) {
@@ -106,24 +147,36 @@ class breadcrumb extends base
             $this->_trail[$trail_size - 1]['link'] = $link;
         }
     }
+
     /**
-     * @since ZC v1.5.7
+     * Returns whether the breadcrumb trail has no entries.
+     *
+     * @return bool  True if the trail is empty, false otherwise.
+     * @since  ZC v1.5.7
      */
     public function is_empty(): bool
     {
         return empty($this->_trail);
     }
+
     /**
-     * @since ZC v1.5.7
+     * Returns the number of entries in the breadcrumb trail.
+     *
+     * @return int  Number of breadcrumb items.
+     * @since  ZC v1.5.7
      */
     public function count(): int
     {
         return count($this->_trail);
     }
+
     /**
-     * @since ZC v1.5.8a
+     * Returns the raw breadcrumb trail array.
+     *
+     * @return array<int, array{title: string, link: string}>  All breadcrumb entries.
+     * @since  ZC v1.5.8a
      */
-    public function get_trail()
+    public function get_trail(): array
     {
         return $this->_trail;
     }
