@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Class pulldown
  *
@@ -10,7 +10,6 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  * @since ZC v1.5.8
  */
-
 abstract class pulldown extends base
 {
     protected string $attributes_join;
@@ -26,71 +25,59 @@ abstract class pulldown extends base
      * @var int
      */
     protected $count = 0;
-
     protected string $keywords;
     protected $keyword_search_fields;
     protected $results;
     protected $sort;
     protected $sql;
     protected array $values;
-
     /**
      *
      */
     public function __construct()
     {
         $this->exclude = [];
-
         $this->show_id = false;
-
         $this->set_selected = 0;
         $this->values = [];
-
         $this->keywords = '';
-
         $this->attributes_join = '';
-
         $this->condition = ' ';
-
         // default styling
         $this->parameters = '';
         //$this->parameters = 'required size="15" class="form-control" id="products_id"';
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function setDefault(int $id)
+    public function set_default(int $id)
     {
         $this->set_selected = $id;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function showID(bool $status)
+    public function show_id(bool $status)
     {
         $this->show_id = $status;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function setOptionFilter(int $filter_id)
+    public function set_option_filter(int $filter_id)
     {
-        $this->includeAttributes(true);
+        $this->include_attributes(true);
         $this->condition .= ' AND pa.options_id =' . $filter_id;
         return $this;
     }
-
     /**
      *
      * @return $this
@@ -101,13 +88,12 @@ abstract class pulldown extends base
         $this->exclude = $array;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function includeAttributes(bool $status)
+    public function include_attributes(bool $status)
     {
         $this->attributes_join = '';
         if ($status) {
@@ -115,69 +101,55 @@ abstract class pulldown extends base
         }
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function setSearchTerms(string $keywords)
+    public function set_search_terms(string $keywords)
     {
         $this->keywords = $keywords;
         return $this;
     }
-
     /**
      * @return mixed
      * @since ZC v1.5.8
      */
-    abstract protected function processSQL();
-
+    abstract protected function process_sql();
     /**
      * @return mixed
      * @since ZC v1.5.8
      */
-    abstract protected function setSQL();
-
+    abstract protected function set_sql();
     /**
      * @return void
      * @since ZC v1.5.8
      */
-    protected function runSQL()
+    protected function run_sql()
     {
         global $db;
-
         $this->sql .= $this->condition;
-
         if (empty($this->keywords)) {
-            $this->keywords = ($_REQUEST['keywords'] ?? '');
+            $this->keywords = $_REQUEST['keywords'] ?? '';
         }
-
         if (!empty($this->keywords)) {
-            $this->sql .= zen_build_keyword_where_clause(
-                $this->keyword_search_fields,
-                zen_db_input(zen_db_prepare_input($this->keywords))
-            );
+            $this->sql .= zen_build_keyword_where_clause($this->keyword_search_fields, zen_db_input(zen_db_prepare_input($this->keywords)));
         }
-
         $this->sql .= $this->sort;
         $this->results = $db->Execute($this->sql);
         $this->count = $this->results->count();
     }
-
     /**
      *
      * @return string
      * @since ZC v2.1.0
      */
-    public function generatePulldownHtml(string $name, string $parameters = '', bool $required = false)
+    public function generate_pulldown_html(string $name, string $parameters = '', bool $required = false)
     {
-        $this->processSQL();
-
+        $this->process_sql();
         if (empty($parameters)) {
             $parameters = $this->parameters;
         }
-
         return zen_draw_pull_down_menu($name, $this->values, $this->set_selected, $parameters, $required);
     }
 }

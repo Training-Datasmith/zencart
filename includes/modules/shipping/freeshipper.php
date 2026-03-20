@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -8,32 +8,27 @@ declare(strict_types=1);
  * @version $Id: lat9 2025 Oct 01 Modified in v2.2.0 $
  * @since ZC v1.1.0
  */
-
-class freeshipper extends ZenShipping
+class freeshipper extends Zen_Shipping
 {
     public function __construct()
     {
         $this->code = 'freeshipper';
         $this->title = MODULE_SHIPPING_FREESHIPPER_TEXT_TITLE;
         $this->description = MODULE_SHIPPING_FREESHIPPER_TEXT_DESCRIPTION;
-        $this->sort_order = defined('MODULE_SHIPPING_FREESHIPPER_SORT_ORDER') ? (int)MODULE_SHIPPING_FREESHIPPER_SORT_ORDER : null;
+        $this->sort_order = defined('MODULE_SHIPPING_FREESHIPPER_SORT_ORDER') ? (int) MODULE_SHIPPING_FREESHIPPER_SORT_ORDER : null;
         if (null === $this->sort_order) {
             return;
         }
-
         $this->icon = '';
         $this->tax_class = MODULE_SHIPPING_FREESHIPPER_TAX_CLASS;
-
         // enable only when entire cart is free shipping
         if (zen_get_shipping_enabled($this->code)) {
-            $this->enabled = (MODULE_SHIPPING_FREESHIPPER_STATUS === 'True');
+            $this->enabled = MODULE_SHIPPING_FREESHIPPER_STATUS === 'True';
         } else {
             $this->enabled = false;
         }
-
         $this->update_status();
     }
-
     /**
      * Perform various checks to see whether this module should be visible
      * @since ZC v1.5.7a
@@ -43,9 +38,7 @@ class freeshipper extends ZenShipping
         if ($this->enabled === false || IS_ADMIN_FLAG === true) {
             return;
         }
-
-        $this->checkEnabledForZone(MODULE_SHIPPING_FREESHIPPER_ZONE);
-
+        $this->check_enabled_for_zone(MODULE_SHIPPING_FREESHIPPER_ZONE);
         if ($this->enabled) {
             // -----
             // Give a watching observer the opportunity to disable the overall shipping module.
@@ -53,37 +46,21 @@ class freeshipper extends ZenShipping
             $this->notify('NOTIFY_SHIPPING_FREESHIPPER_UPDATE_STATUS', [], $this->enabled);
         }
     }
-
     /**
      * @since ZC v1.1.0
      */
     public function quote($method = ''): array
     {
         global $order;
-
-        $this->quotes = [
-            'id' => $this->code,
-            'module' => MODULE_SHIPPING_FREESHIPPER_TEXT_TITLE,
-            'methods' => [
-                [
-                    'id' => $this->code,
-                    'title' => MODULE_SHIPPING_FREESHIPPER_TEXT_WAY,
-                    'cost' => MODULE_SHIPPING_FREESHIPPER_COST + MODULE_SHIPPING_FREESHIPPER_HANDLING,
-                ],
-            ],
-        ];
-
+        $this->quotes = ['id' => $this->code, 'module' => MODULE_SHIPPING_FREESHIPPER_TEXT_TITLE, 'methods' => [['id' => $this->code, 'title' => MODULE_SHIPPING_FREESHIPPER_TEXT_WAY, 'cost' => MODULE_SHIPPING_FREESHIPPER_COST + MODULE_SHIPPING_FREESHIPPER_HANDLING]]];
         if ($this->tax_class > 0) {
             $this->quotes['tax'] = zen_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
         }
-
         if (!empty($this->icon)) {
             $this->quotes['icon'] = zen_image($this->icon, $this->title);
         }
-
         return $this->quotes;
     }
-
     /**
      * @since ZC v1.1.0
      */
@@ -92,11 +69,10 @@ class freeshipper extends ZenShipping
         global $db;
         if (!isset($this->_check)) {
             $check_query = $db->Execute('select configuration_value from ' . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_SHIPPING_FREESHIPPER_STATUS'");
-            $this->_check = $check_query->RecordCount();
+            $this->_check = $check_query->record_count();
         }
         return $this->_check;
     }
-
     /**
      * @since ZC v1.5.8
      */
@@ -106,21 +82,19 @@ class freeshipper extends ZenShipping
             return TEXT_DOWNLOADABLE_PRODUCTS_MISCONFIGURED;
         }
     }
-
     /**
      * @since ZC v1.1.0
      */
     public function install(): void
     {
         global $db;
-        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Free Shipping', 'MODULE_SHIPPING_FREESHIPPER_STATUS', 'True', 'Do you want to offer Free shipping?', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Free Shipping', 'MODULE_SHIPPING_FREESHIPPER_STATUS', 'True', 'Do you want to offer Free shipping?', '6', '0', 'zen_cfg_select_option(array(\\'True\\', \\'False\\'), ', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Free Shipping Cost', 'MODULE_SHIPPING_FREESHIPPER_COST', '0.00', 'What is the Shipping cost?', '6', '6', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Handling Fee', 'MODULE_SHIPPING_FREESHIPPER_HANDLING', '0', 'Handling fee for this shipping method.', '6', '0', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_SHIPPING_FREESHIPPER_TAX_CLASS', '0', 'Use the following tax class on the shipping fee.', '6', '0', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Shipping Zone', 'MODULE_SHIPPING_FREESHIPPER_ZONE', '0', 'If a zone is selected, only enable this shipping method for that zone.', '6', '0', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_SHIPPING_FREESHIPPER_SORT_ORDER', '0', 'Sort order of display.', '6', '0', now())");
     }
-
     /**
      * @since ZC v1.5.8
      */
@@ -128,7 +102,6 @@ class freeshipper extends ZenShipping
     {
         return ['link' => 'https://docs.zen-cart.com/user/shipping/free_shipping/'];
     }
-
     /**
      * @since ZC v1.1.0
      */

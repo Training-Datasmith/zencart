@@ -1,130 +1,69 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Renderer_Style;
 
-namespace BaconQrCode\Renderer\RendererStyle;
-
-use BaconQrCode\Exception\RuntimeException;
-use BaconQrCode\Renderer\Color\ColorInterface;
-use BaconQrCode\Renderer\Color\Gray;
-
+use Bacon_Qr_Code\Exception\RuntimeException;
+use Bacon_Qr_Code\Renderer\Color\Color_Interface;
+use Bacon_Qr_Code\Renderer\Color\Gray;
 final class Fill
 {
     private static ?Fill $default = null;
-
-    private function __construct(
-        private readonly ColorInterface  $backgroundColor,
-        private readonly ?ColorInterface $foregroundColor,
-        private readonly ?Gradient       $foregroundGradient,
-        private readonly EyeFill         $topLeftEyeFill,
-        private readonly EyeFill         $topRightEyeFill,
-        private readonly EyeFill $bottomLeftEyeFill
-    ) {
+    private function __construct(private readonly Color_Interface $background_color, private readonly ?Color_Interface $foreground_color, private readonly ?Gradient $foreground_gradient, private readonly Eye_Fill $top_left_eye_fill, private readonly Eye_Fill $top_right_eye_fill, private readonly Eye_Fill $bottom_left_eye_fill)
+    {
     }
-
     public static function default(): self
     {
-        return self::$default ?: self::$default = self::uniformColor(new Gray(100), new Gray(0));
+        return self::$default ?: self::$default = self::uniform_color(new Gray(100), new Gray(0));
     }
-
-    public static function withForegroundColor(
-        ColorInterface $backgroundColor,
-        ColorInterface $foregroundColor,
-        EyeFill $topLeftEyeFill,
-        EyeFill $topRightEyeFill,
-        EyeFill $bottomLeftEyeFill
-    ): self {
-        return new self(
-            $backgroundColor,
-            $foregroundColor,
-            null,
-            $topLeftEyeFill,
-            $topRightEyeFill,
-            $bottomLeftEyeFill
-        );
-    }
-
-    public static function withForegroundGradient(
-        ColorInterface $backgroundColor,
-        Gradient $foregroundGradient,
-        EyeFill $topLeftEyeFill,
-        EyeFill $topRightEyeFill,
-        EyeFill $bottomLeftEyeFill
-    ): self {
-        return new self(
-            $backgroundColor,
-            null,
-            $foregroundGradient,
-            $topLeftEyeFill,
-            $topRightEyeFill,
-            $bottomLeftEyeFill
-        );
-    }
-
-    public static function uniformColor(ColorInterface $backgroundColor, ColorInterface $foregroundColor): self
+    public static function with_foreground_color(Color_Interface $background_color, Color_Interface $foreground_color, Eye_Fill $top_left_eye_fill, Eye_Fill $top_right_eye_fill, Eye_Fill $bottom_left_eye_fill): self
     {
-        return new self(
-            $backgroundColor,
-            $foregroundColor,
-            null,
-            EyeFill::inherit(),
-            EyeFill::inherit(),
-            EyeFill::inherit()
-        );
+        return new self($background_color, $foreground_color, null, $top_left_eye_fill, $top_right_eye_fill, $bottom_left_eye_fill);
     }
-
-    public static function uniformGradient(ColorInterface $backgroundColor, Gradient $foregroundGradient): self
+    public static function with_foreground_gradient(Color_Interface $background_color, Gradient $foreground_gradient, Eye_Fill $top_left_eye_fill, Eye_Fill $top_right_eye_fill, Eye_Fill $bottom_left_eye_fill): self
     {
-        return new self(
-            $backgroundColor,
-            null,
-            $foregroundGradient,
-            EyeFill::inherit(),
-            EyeFill::inherit(),
-            EyeFill::inherit()
-        );
+        return new self($background_color, null, $foreground_gradient, $top_left_eye_fill, $top_right_eye_fill, $bottom_left_eye_fill);
     }
-
-    public function hasGradientFill(): bool
+    public static function uniform_color(Color_Interface $background_color, Color_Interface $foreground_color): self
     {
-        return null !== $this->foregroundGradient;
+        return new self($background_color, $foreground_color, null, Eye_Fill::inherit(), Eye_Fill::inherit(), Eye_Fill::inherit());
     }
-
-    public function getBackgroundColor(): ColorInterface
+    public static function uniform_gradient(Color_Interface $background_color, Gradient $foreground_gradient): self
     {
-        return $this->backgroundColor;
+        return new self($background_color, null, $foreground_gradient, Eye_Fill::inherit(), Eye_Fill::inherit(), Eye_Fill::inherit());
     }
-
-    public function getForegroundColor(): ColorInterface
+    public function has_gradient_fill(): bool
     {
-        if (null === $this->foregroundColor) {
+        return null !== $this->foreground_gradient;
+    }
+    public function get_background_color(): Color_Interface
+    {
+        return $this->background_color;
+    }
+    public function get_foreground_color(): Color_Interface
+    {
+        if (null === $this->foreground_color) {
             throw new RuntimeException('Fill uses a gradient, thus no foreground color is available');
         }
-
-        return $this->foregroundColor;
+        return $this->foreground_color;
     }
-
-    public function getForegroundGradient(): Gradient
+    public function get_foreground_gradient(): Gradient
     {
-        if (null === $this->foregroundGradient) {
+        if (null === $this->foreground_gradient) {
             throw new RuntimeException('Fill uses a single color, thus no foreground gradient is available');
         }
-
-        return $this->foregroundGradient;
+        return $this->foreground_gradient;
     }
-
-    public function getTopLeftEyeFill(): EyeFill
+    public function get_top_left_eye_fill(): Eye_Fill
     {
-        return $this->topLeftEyeFill;
+        return $this->top_left_eye_fill;
     }
-
-    public function getTopRightEyeFill(): EyeFill
+    public function get_top_right_eye_fill(): Eye_Fill
     {
-        return $this->topRightEyeFill;
+        return $this->top_right_eye_fill;
     }
-
-    public function getBottomLeftEyeFill(): EyeFill
+    public function get_bottom_left_eye_fill(): Eye_Fill
     {
-        return $this->bottomLeftEyeFill;
+        return $this->bottom_left_eye_fill;
     }
 }

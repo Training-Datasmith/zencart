@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Initialise database driver and connect
  * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
@@ -15,11 +15,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 /**
  * require the query_factory clsss based on the DB_TYPE
  */
-require('includes/classes/db/' .DB_TYPE . '/query_factory.php');
-$db = new queryFactory();
-
+require 'includes/classes/db/' . DB_TYPE . '/query_factory.php';
+$db = new Query_Factory();
 $down_for_maint_source = FILENAME_DATABASE_TEMPORARILY_DOWN;
-
 if (!defined('USE_PCONNECT')) {
     define('USE_PCONNECT', 'false');
 }
@@ -32,10 +30,9 @@ if (!$db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE
         exit;
     }
     if (file_exists($down_for_maint_source)) {
-        include($down_for_maint_source);
+        include $down_for_maint_source;
         exit(1);
     }
-
     if (defined('HTTP_SERVER') && defined('DIR_WS_CATALOG')) {
         header('location: ' . HTTP_SERVER . DIR_WS_CATALOG . $down_for_maint_source);
         exit(1);
@@ -44,19 +41,18 @@ if (!$db->connect(DB_SERVER, DB_SERVER_USERNAME, DB_SERVER_PASSWORD, DB_DATABASE
     //    header('location: mystoreisdown.html');
     exit(1);
 }
-
 // Do a quick sanity check that system tables exist
 if (defined('SQL_CACHE_METHOD') && SQL_CACHE_METHOD == 'database') {
     $sql = "SHOW TABLES LIKE '" . TABLE_DB_CACHE . "'";
 } else {
     $sql = "SHOW TABLES LIKE '" . TABLE_PROJECT_VERSION . "'";
 }
-$db->dieOnErrors = false;
+$db->die_on_errors = false;
 $result = $db->Execute($sql, false, false);
-if ($result->RecordCount() == 0) {
+if ($result->record_count() == 0) {
     if (defined('ERROR_DATABASE_MAINTENANCE_NEEDED')) {
         die(ERROR_DATABASE_MAINTENANCE_NEEDED);
     }
     die('<a href="https://docs.zen-cart.com/user/troubleshooting/error_71_maintenance_required/">https://docs.zen-cart.com/user/troubleshooting/error_71_maintenance_required/</a>');
 }
-$db->dieOnErrors = true;
+$db->die_on_errors = true;

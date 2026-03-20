@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Common;
 
-namespace BaconQrCode\Common;
-
-use DASPRiD\Enum\AbstractEnum;
-
+use Dasp_Ri_D\Enum\Abstract_Enum;
 /**
  * Enum representing various modes in which data can be encoded to bits.
  *
@@ -20,35 +18,30 @@ use DASPRiD\Enum\AbstractEnum;
  * @method static self FNC1_SECOND_POSITION()
  * @method static self HANZI()
  */
-final class Mode extends AbstractEnum
+final class Mode extends Abstract_Enum
 {
-    protected const TERMINATOR = [[0, 0, 0], 0x00];
-    protected const NUMERIC = [[10, 12, 14], 0x01];
-    protected const ALPHANUMERIC = [[9, 11, 13], 0x02];
-    protected const STRUCTURED_APPEND = [[0, 0, 0], 0x03];
-    protected const BYTE = [[8, 16, 16], 0x04];
-    protected const ECI = [[0, 0, 0], 0x07];
-    protected const KANJI = [[8, 10, 12], 0x08];
-    protected const FNC1_FIRST_POSITION = [[0, 0, 0], 0x05];
-    protected const FNC1_SECOND_POSITION = [[0, 0, 0], 0x09];
-    protected const HANZI = [[8, 10, 12], 0x0d];
-
+    protected const TERMINATOR = [[0, 0, 0], 0x0];
+    protected const NUMERIC = [[10, 12, 14], 0x1];
+    protected const ALPHANUMERIC = [[9, 11, 13], 0x2];
+    protected const STRUCTURED_APPEND = [[0, 0, 0], 0x3];
+    protected const BYTE = [[8, 16, 16], 0x4];
+    protected const ECI = [[0, 0, 0], 0x7];
+    protected const KANJI = [[8, 10, 12], 0x8];
+    protected const FNC1_FIRST_POSITION = [[0, 0, 0], 0x5];
+    protected const FNC1_SECOND_POSITION = [[0, 0, 0], 0x9];
+    protected const HANZI = [[8, 10, 12], 0xd];
     /**
      * @param int[] $characterCountBitsForVersions
      */
-    protected function __construct(
-        private readonly array $characterCountBitsForVersions,
-        private readonly int   $bits
-    ) {
+    protected function __construct(private readonly array $character_count_bits_for_versions, private readonly int $bits)
+    {
     }
-
     /**
      * Returns the number of bits used in a specific QR code version.
      */
-    public function getCharacterCountBits(Version $version): int
+    public function get_character_count_bits(Version $version): int
     {
-        $number = $version->getVersionNumber();
-
+        $number = $version->get_version_number();
         if ($number <= 9) {
             $offset = 0;
         } elseif ($number <= 26) {
@@ -56,14 +49,12 @@ final class Mode extends AbstractEnum
         } else {
             $offset = 2;
         }
-
-        return $this->characterCountBitsForVersions[$offset];
+        return $this->character_count_bits_for_versions[$offset];
     }
-
     /**
      * Returns the four bits used to encode this mode.
      */
-    public function getBits(): int
+    public function get_bits(): int
     {
         return $this->bits;
     }

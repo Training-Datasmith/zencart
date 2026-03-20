@@ -1,27 +1,23 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Eye;
 
-namespace BaconQrCode\Renderer\Eye;
-
-use BaconQrCode\Renderer\Path\Path;
-
+use Bacon_Qr_Code\Renderer\Path\Path;
 /**
  * Combines the style of two different eyes.
  */
-final readonly class CompositeEye implements EyeInterface
+final readonly class Composite_Eye implements Eye_Interface
 {
-    public function __construct(private EyeInterface $externalEye, private EyeInterface $internalEye)
+    public function __construct(private Eye_Interface $external_eye, private Eye_Interface $internal_eye)
     {
     }
-
-    public function getExternalPath(): Path
+    public function get_external_path(): Path
     {
-        return $this->externalEye->getExternalPath();
+        return $this->external_eye->get_external_path();
     }
-
-    public function getInternalPath(): Path
+    public function get_internal_path(): Path
     {
-        return $this->internalEye->getInternalPath();
+        return $this->internal_eye->get_internal_path();
     }
 }

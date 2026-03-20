@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * plugin_support.php
  *
@@ -12,7 +12,6 @@ declare(strict_types=1);
  *
  * @since ZC v1.5.3
  */
-
 /*
  * Developers in offline environments may want to change the ENABLE_VERSION_CHECKING default
  */
@@ -25,7 +24,6 @@ if (!defined('ENABLE_PLUGIN_VERSION_CHECKING')) {
 if (!defined('LOG_PLUGIN_VERSIONCHECK_FAILURES')) {
     define('LOG_PLUGIN_VERSIONCHECK_FAILURES', false);
 }
-
 /**
  * Check for updated version of a plugin
  *
@@ -50,30 +48,24 @@ if (!defined('LOG_PLUGIN_VERSIONCHECK_FAILURES')) {
 function plugin_version_check_for_updates(mixed $plugin_file_id = 0, string $version_string_to_compare = '', bool $strict_zc_version_compare = false): false|array
 {
     // for v1.5.7 and newer
-
     if ($plugin_file_id === 0) {
         return false;
     }
-
     if (false === ENABLE_PLUGIN_VERSION_CHECKING) {
         return false;
     }
-
     $new_version_available = false;
-    $versionServer = new VersionServer();
-    $data = json_decode($versionServer->getPluginVersion($plugin_file_id), true);
-
+    $version_server = new Version_Server();
+    $data = json_decode($version_server->get_plugin_version($plugin_file_id), true);
     if (null === $data || isset($data['error'])) {
         if (LOG_PLUGIN_VERSIONCHECK_FAILURES) {
             error_log('CURL error checking plugin versions: ' . print_r(!empty($data) ? $data : 'null', true));
         }
         return false;
     }
-
     if (!is_array($data)) {
         $data = json_decode((string) $data, true);
     }
-
     if (strcmp((string) $data[0]['latest_plugin_version'], $version_string_to_compare) > 0) {
         $new_version_available = true;
     }

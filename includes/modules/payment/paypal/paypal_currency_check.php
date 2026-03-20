@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /*
  * function to check if below 10000 usd limit
  * Returns true $amount if below the limit or the exchange rate cannot be found
@@ -12,19 +12,17 @@ declare(strict_types=1);
 /**
  * @since ZC v1.5.8a
  */
-function paypalUSDCheck($amount): bool
+function paypal_usd_check($amount): bool
 {
     global $currencies;
     if (IS_ADMIN_FLAG) {
         return true;
     }
     // Check if USD is defined as a currency
-
     if ($currencies->is_set('USD')) {
         $amount = $currencies->value($amount, true, 'USD');
     } else {
         $rate = 0;
-
         // Get the exchange rate functions to calculate USD exchange rate
         require_once DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_exchange_rates.php';
         $quote_function = 'quote_' . CURRENCY_SERVER_PRIMARY . '_currency';
@@ -37,12 +35,10 @@ function paypalUSDCheck($amount): bool
                 $rate = $quote_function('USD');
             }
         }
-
         // Use the system CURRENCY_UPLIFT_RATIO to adjust the rate
-        $multiplier = (defined('CURRENCY_UPLIFT_RATIO') && (int) CURRENCY_UPLIFT_RATIO != 0) ? CURRENCY_UPLIFT_RATIO : 1;
-
+        $multiplier = defined('CURRENCY_UPLIFT_RATIO') && (int) CURRENCY_UPLIFT_RATIO != 0 ? CURRENCY_UPLIFT_RATIO : 1;
         // Calculate the value in USD
-        $amount = ($amount * $rate * $multiplier);
+        $amount = $amount * $rate * $multiplier;
     }
     return $amount < 10000;
 }

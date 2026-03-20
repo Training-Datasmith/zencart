@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Renderer_Style;
 
-namespace BaconQrCode\Renderer\RendererStyle;
-
-use DASPRiD\Enum\AbstractEnum;
-
+use Dasp_Ri_D\Enum\Abstract_Enum;
 /**
  * @method static self VERTICAL()
  * @method static self HORIZONTAL()
@@ -13,7 +11,7 @@ use DASPRiD\Enum\AbstractEnum;
  * @method static self INVERSE_DIAGONAL()
  * @method static self RADIAL()
  */
-final class GradientType extends AbstractEnum
+final class Gradient_Type extends Abstract_Enum
 {
     protected const VERTICAL = null;
     protected const HORIZONTAL = null;

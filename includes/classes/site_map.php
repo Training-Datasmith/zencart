@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * site_map.php
  *
@@ -17,7 +17,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  *
  * @since ZC v1.3.0
  */
-class zen_SiteMapTree
+class Zen_site_Map_Tree
 {
     /**
      * The root category name
@@ -83,33 +83,26 @@ class zen_SiteMapTree
      * @var int
      */
     protected $spacer_multiplier = 1;
-
     public function __construct()
     {
         global $db;
         $this->data = [];
         $categories_query = 'select c.categories_id, cd.categories_name, c.parent_id
-                      from ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . " cd
-                      where c.categories_id = cd.categories_id
-                      and cd.language_id = '" . (int)$_SESSION['languages_id'] . "'
-                      and c.categories_status != '0'
-                      order by c.parent_id, c.sort_order, cd.categories_name";
+                      from ' . TABLE_CATEGORIES . ' c, ' . TABLE_CATEGORIES_DESCRIPTION . " cd\n                      where c.categories_id = cd.categories_id\n                      and cd.language_id = '" . (int) $_SESSION['languages_id'] . "'\n                      and c.categories_status != '0'\n                      order by c.parent_id, c.sort_order, cd.categories_name";
         $categories = $db->Execute($categories_query);
         while (!$categories->EOF) {
             $this->data[$categories->fields['parent_id']][$categories->fields['categories_id']] = ['name' => $categories->fields['categories_name'], 'count' => 0];
-            $categories->MoveNext();
+            $categories->move_next();
         }
     }
-
     /**
      * @since ZC v1.3.0
      */
-    public function buildBranch($parent_id, $level = 0, string $parent_link = ''): string
+    public function build_branch($parent_id, $level = 0, string $parent_link = ''): string
     {
-        $parent_id = (int)$parent_id;
-        $level = (int)$level;
+        $parent_id = (int) $parent_id;
+        $level = (int) $level;
         $result = $this->parent_group_start_string;
-
         if (isset($this->data[$parent_id])) {
             foreach ($this->data[$parent_id] as $category_id => $category) {
                 $category_link = $parent_link . $category_id;
@@ -117,39 +110,32 @@ class zen_SiteMapTree
                 if (isset($this->data[$category_id])) {
                     $result .= $this->parent_start_string;
                 }
-
                 if ($level == 0) {
                     $result .= $this->root_start_string;
                 }
                 $result .= str_repeat($this->spacer_string, $this->spacer_multiplier * $level) . '<a href="' . zen_href_link(FILENAME_DEFAULT, 'cPath=' . $category_link) . '">';
                 $result .= $category['name'];
                 $result .= '</a>';
-
                 if ($level == 0) {
                     $result .= $this->root_end_string;
                 }
-
                 if (isset($this->data[$category_id])) {
                     $result .= $this->parent_end_string;
                 }
-
                 //        $result .= $this->child_end_string;
-
-                if (isset($this->data[$category_id]) && (($this->max_level == '0') || ($this->max_level > $level + 1))) {
-                    $result .= $this->buildBranch($category_id, $level + 1, $category_link . '_');
+                if (isset($this->data[$category_id]) && ($this->max_level == '0' || $this->max_level > $level + 1)) {
+                    $result .= $this->build_branch($category_id, $level + 1, $category_link . '_');
                 }
                 $result .= $this->child_end_string;
-
             }
         }
-
         return $result . $this->parent_group_end_string;
     }
     /**
      * @since ZC v1.3.0
      */
-    public function buildTree(): string
+    public function build_tree(): string
     {
-        return $this->buildBranch($this->root_category_id);
+        return $this->build_branch($this->root_category_id);
     }
 }

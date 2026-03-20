@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * httpClient Class.
  *
@@ -20,21 +20,24 @@ if (!defined('IS_ADMIN_FLAG')) {
  *
  * @since ZC v1.0.3
  */
-class httpClient extends base
+class Http_Client extends base
 {
-    public $url; // array containing server URL, similar to parseurl() returned array
-    public $reply; // response code
-    public $replyString; // full response
-    public $protocolVersion = '1.1';
-    public $requestHeaders;
-    public $requestBody;
+    public $url;
+    // array containing server URL, similar to parseurl() returned array
+    public $reply;
+    // response code
+    public $reply_string;
+    // full response
+    public $protocol_version = '1.1';
+    public $request_headers;
+    public $request_body;
     public $socket = false;
     // proxy stuff
-    public $useProxy = false;
-    public $proxyHost;
-    public $proxyPort;
-    public $timeout = 8; // 8-second default timeout
-
+    public $use_proxy = false;
+    public $proxy_host;
+    public $proxy_port;
+    public $timeout = 8;
+    // 8-second default timeout
     /**
      * httpClient constructor
      * Note: when host and port are defined, the connection is immediate
@@ -45,20 +48,18 @@ class httpClient extends base
             $this->connect($host, $port);
         }
     }
-
     /**
      * turn on proxy support
      * @param proxyHost proxy host address eg "proxy.mycorp.com"
      * @param proxyPort proxy port usually 80 or 8080
      * @since ZC v1.0.3
      **/
-    public function setProxy($proxyHost, $proxyPort): void
+    public function set_proxy($proxy_host, $proxy_port): void
     {
-        $this->useProxy = true;
-        $this->proxyHost = $proxyHost;
-        $this->proxyPort = $proxyPort;
+        $this->use_proxy = true;
+        $this->proxy_host = $proxy_host;
+        $this->proxy_port = $proxy_port;
     }
-
     /**
      * setProtocolVersion
      * define the HTTP protocol version to use
@@ -67,15 +68,14 @@ class httpClient extends base
      * @return boolean false if the version number is bad, true if ok
      * @since ZC v1.0.3
      **/
-    public function setProtocolVersion($version): bool
+    public function set_protocol_version($version): bool
     {
-        if (($version > 0) && ($version <= 1.1)) {
-            $this->protocolVersion = $version;
+        if ($version > 0 && $version <= 1.1) {
+            $this->protocol_version = $version;
             return true;
         }
         return false;
     }
-
     /**
      * set a username and password to access a protected resource
      * Only "Basic" authentication scheme is supported yet
@@ -83,26 +83,24 @@ class httpClient extends base
      * @param password string - clear password
      * @since ZC v1.0.3
      **/
-    public function setCredentials(string $username, string $password): void
+    public function set_credentials(string $username, string $password): void
     {
-        $this->addHeader('Authorization', 'Basic ' . base64_encode($username . ':' . $password));
+        $this->add_header('Authorization', 'Basic ' . base64_encode($username . ':' . $password));
     }
-
     /**
      * define a set of HTTP headers to be sent to the server
      * header names are lowercased to avoid duplicated headers
      * @param headers hash array containing the headers as headerName => headerValue pairs
      * @since ZC v1.0.3
      **/
-    public function setHeaders($headers): void
+    public function set_headers($headers): void
     {
         if (is_array($headers)) {
             foreach ($headers as $name => $value) {
-                $this->requestHeaders[$name] = $value;
+                $this->request_headers[$name] = $value;
             }
         }
     }
-
     /**
      * addHeader
      * set a unique request header
@@ -110,22 +108,20 @@ class httpClient extends base
      * @param headerValue the header value, ( unencoded)
      * @since ZC v1.0.3
      **/
-    public function addHeader($headerName, $headerValue): void
+    public function add_header($header_name, $header_value): void
     {
-        $this->requestHeaders[$headerName] = $headerValue;
+        $this->request_headers[$header_name] = $header_value;
     }
-
     /**
      * removeHeader
      * unset a request header
      * @param headerName the header name
      * @since ZC v1.0.3
      **/
-    public function removeHeader($headerName): void
+    public function remove_header($header_name): void
     {
-        unset($this->requestHeaders[$headerName]);
+        unset($this->request_headers[$header_name]);
     }
-
     /**
      * Connect
      * open the connection to the server
@@ -141,10 +137,8 @@ class httpClient extends base
         if (!empty($port)) {
             $this->url['port'] = $port;
         }
-
         return true;
     }
-
     /**
      * Disconnect
      * close the connection to the  server
@@ -156,7 +150,6 @@ class httpClient extends base
             fclose($this->socket);
         }
     }
-
     /**
      * head
      * issue a HEAD request
@@ -166,17 +159,13 @@ class httpClient extends base
      **/
     public function Head($uri)
     {
-        $this->responseHeaders = $this->responseBody = '';
-
-        $uri = $this->makeUri($uri);
-
-        if ($this->sendCommand('HEAD ' . $uri . ' HTTP/' . $this->protocolVersion)) {
-            $this->processReply();
+        $this->response_headers = $this->response_body = '';
+        $uri = $this->make_uri($uri);
+        if ($this->send_command('HEAD ' . $uri . ' HTTP/' . $this->protocol_version)) {
+            $this->process_reply();
         }
-
         return $this->reply;
     }
-
     /**
      * get
      * issue a GET http request
@@ -186,17 +175,13 @@ class httpClient extends base
      **/
     public function Get($url)
     {
-        $this->responseHeaders = $this->responseBody = '';
-
-        $uri = $this->makeUri($url);
-
-        if ($this->sendCommand('GET ' . $uri . ' HTTP/' . $this->protocolVersion)) {
-            $this->processReply();
+        $this->response_headers = $this->response_body = '';
+        $uri = $this->make_uri($url);
+        if ($this->send_command('GET ' . $uri . ' HTTP/' . $this->protocol_version)) {
+            $this->process_reply();
         }
-
         return $this->reply;
     }
-
     /**
      * Post
      * issue a POST http request
@@ -209,31 +194,24 @@ class httpClient extends base
     // * $http->post( "/login.php", $params );
     public function Post($uri, $query_params = '')
     {
-        $uri = $this->makeUri($uri);
-
+        $uri = $this->make_uri($uri);
         if (is_array($query_params)) {
-            $postArray = [];
+            $post_array = [];
             foreach ($query_params as $k => $v) {
-                $postArray[] = urlencode((string) $k) . '=' . urlencode((string) $v);
+                $post_array[] = urlencode((string) $k) . '=' . urlencode((string) $v);
             }
-
-            $this->requestBody = implode('&', $postArray);
+            $this->request_body = implode('&', $post_array);
         }
-
         // set the content type for post parameters
-        $this->addHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        if ($this->sendCommand('POST ' . $uri . ' HTTP/' . $this->protocolVersion)) {
-            $this->processReply();
+        $this->add_header('Content-Type', 'application/x-www-form-urlencoded');
+        if ($this->send_command('POST ' . $uri . ' HTTP/' . $this->protocol_version)) {
+            $this->process_reply();
         }
-
-        $this->removeHeader('Content-Type');
-        $this->removeHeader('Content-Length');
-        $this->requestBody = '';
-
+        $this->remove_header('Content-Type');
+        $this->remove_header('Content-Length');
+        $this->request_body = '';
         return $this->reply;
     }
-
     /**
      * Put
      * Send a PUT request
@@ -246,16 +224,13 @@ class httpClient extends base
      **/
     public function Put($uri, $filecontent)
     {
-        $uri = $this->makeUri($uri);
-        $this->requestBody = $filecontent;
-
-        if ($this->sendCommand('PUT ' . $uri . ' HTTP/' . $this->protocolVersion)) {
-            $this->processReply();
+        $uri = $this->make_uri($uri);
+        $this->request_body = $filecontent;
+        if ($this->send_command('PUT ' . $uri . ' HTTP/' . $this->protocol_version)) {
+            $this->process_reply();
         }
-
         return $this->reply;
     }
-
     /**
      * getHeaders
      * return the response headers
@@ -263,11 +238,10 @@ class httpClient extends base
      * @return array headers received from server in the form headername => value
      * @since ZC v1.0.3
      **/
-    public function getHeaders()
+    public function get_headers()
     {
-        return $this->responseHeaders;
+        return $this->response_headers;
     }
-
     /**
      * getHeader
      * return the response header "headername"
@@ -275,11 +249,10 @@ class httpClient extends base
      * @return header value or NULL if no such header is defined
      * @since ZC v1.0.3
      **/
-    public function getHeader($headername)
+    public function get_header($headername)
     {
-        return $this->responseHeaders[$headername];
+        return $this->response_headers[$headername];
     }
-
     /**
      * getBody
      * return the response body
@@ -287,11 +260,10 @@ class httpClient extends base
      * @return string body content
      * @since ZC v1.0.3
      **/
-    public function getBody()
+    public function get_body()
     {
-        return $this->responseBody;
+        return $this->response_body;
     }
-
     /**
      * getStatus return the server response's status code
      * @return string a status code
@@ -303,22 +275,20 @@ class httpClient extends base
      * @see RFC2616 "Hypertext Transfer Protocol -- HTTP/1.1"
      * @since ZC v1.0.3
      **/
-    public function getStatus()
+    public function get_status()
     {
         return $this->reply;
     }
-
     /**
      * getStatusMessage return the full response status, of the form "CODE Message"
      * eg. "404 Document not found"
      * @return string the message
      * @since ZC v1.0.3
      **/
-    public function getStatusMessage()
+    public function get_status_message()
     {
-        return $this->replyString;
+        return $this->reply_string;
     }
-
     /**
      * send a request
      * data sent are in order
@@ -328,87 +298,72 @@ class httpClient extends base
      * @return string the server repsonse status code
      * @since ZC v1.0.3
      **/
-    public function sendCommand(string $command)
+    public function send_command(string $command)
     {
-        $this->responseHeaders = [];
-        $this->responseBody = '';
-
+        $this->response_headers = [];
+        $this->response_body = '';
         // connect if necessary
-        if (($this->socket == false) || (feof($this->socket))) {
-            if ($this->useProxy) {
-                $host = $this->proxyHost;
-                $port = $this->proxyPort;
+        if ($this->socket == false || feof($this->socket)) {
+            if ($this->use_proxy) {
+                $host = $this->proxy_host;
+                $port = $this->proxy_port;
             } else {
                 $host = $this->url['host'];
                 $port = $this->url['port'];
             }
-
             if (empty($port)) {
                 $port = 80;
             }
-
-            if (!$this->socket = @fsockopen($host, $port, $this->reply, $this->replyString, $this->timeout)) {
+            if (!$this->socket = @fsockopen($host, $port, $this->reply, $this->reply_string, $this->timeout)) {
                 return false;
             }
-
-            if (!empty($this->requestBody)) {
-                $this->addHeader('Content-Length', strlen((string) $this->requestBody));
+            if (!empty($this->request_body)) {
+                $this->add_header('Content-Length', strlen((string) $this->request_body));
             }
-
             $this->request = $command;
             $cmd = $command . "\r\n";
-            if (is_array($this->requestHeaders)) {
-                foreach ($this->requestHeaders as $k => $v) {
+            if (is_array($this->request_headers)) {
+                foreach ($this->request_headers as $k => $v) {
                     $cmd .= $k . ': ' . $v . "\r\n";
                 }
             }
-
-            if (!empty($this->requestBody)) {
-                $cmd .= "\r\n" . $this->requestBody;
+            if (!empty($this->request_body)) {
+                $cmd .= "\r\n" . $this->request_body;
             }
-
             // unset body (in case of successive requests)
-            $this->requestBody = '';
-
+            $this->request_body = '';
             fputs($this->socket, $cmd . "\r\n");
-
             return true;
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
-    public function processReply(): string
+    public function process_reply(): string
     {
-        $this->replyString = trim(fgets($this->socket, 1024));
-
-        if (preg_match('|^HTTP/\S+ (\d+) |i', $this->replyString, $a)) {
+        $this->reply_string = trim(fgets($this->socket, 1024));
+        if (preg_match('|^HTTP/\S+ (\d+) |i', $this->reply_string, $a)) {
             $this->reply = $a[1];
         } else {
             $this->reply = 'Bad Response';
         }
-
         //get response headers and body
-        $this->responseHeaders = $this->processHeader();
-        $this->responseBody = $this->processBody();
-
+        $this->response_headers = $this->process_header();
+        $this->response_body = $this->process_body();
         return $this->reply;
     }
-
     /**
      * processHeader() reads header lines from socket until the line equals $lastLine
      * @return array of headers with header names as keys and header content as values
      * @since ZC v1.0.3
      **/
-    public function processHeader($lastLine = "\r\n"): array
+    public function process_header($last_line = "\r\n"): array
     {
         $headers = [];
         $finished = false;
-
-        while ((!$finished) && (!feof($this->socket))) {
+        while (!$finished && !feof($this->socket)) {
             $str = fgets($this->socket, 1024);
-            $finished = ($str == $lastLine);
+            $finished = $str == $last_line;
             if (!$finished) {
                 [$hdr, $value] = preg_split('/: /', $str, 2);
                 // nasty workaround broken multiple same headers (eg. Set-Cookie headers) @FIXME
@@ -419,27 +374,23 @@ class httpClient extends base
                 }
             }
         }
-
         return $headers;
     }
-
     /**
      * processBody() reads the body from the socket
      * the body is the "real" content of the reply
      * @return string body content
      * @since ZC v1.0.3
      **/
-    public function processBody(): string
+    public function process_body(): string
     {
         $data = '';
         $counter = 0;
-
         do {
             $status = socket_get_status($this->socket);
             if ($status['eof'] == 1) {
                 break;
             }
-
             if ($status['unread_bytes'] > 0) {
                 $buffer = fread($this->socket, $status['unread_bytes']);
                 $counter = 0;
@@ -448,35 +399,29 @@ class httpClient extends base
                 $counter++;
                 usleep(2);
             }
-
             $data .= $buffer;
-        } while (($status['unread_bytes'] > 0) || ($counter++ < 10));
-
+        } while ($status['unread_bytes'] > 0 || $counter++ < 10);
         return $data;
     }
-
     /**
      * Calculate and return the URI to be sent ( proxy purpose )
      * @param the local URI
      * @return URI to be used in the HTTP request
      * @since ZC v1.0.3
      **/
-    public function makeUri($uri): string
+    public function make_uri($uri): string
     {
         $a = parse_url((string) $uri);
-
-        if ((isset($a['scheme'])) && (isset($a['host']))) {
+        if (isset($a['scheme']) && isset($a['host'])) {
             $this->url = $a;
         } else {
             unset($this->url['query']);
             unset($this->url['fragment']);
             $this->url = array_merge($this->url, $a);
         }
-
-        if ($this->useProxy) {
+        if ($this->use_proxy) {
             return 'http://' . $this->url['host'] . (empty($this->url['port']) ? '' : ':' . $this->url['port']) . $this->url['path'] . (empty($this->url['query']) ? '' : '?' . $this->url['query']);
         }
-
         return $this->url['path'] . (empty($this->url['query']) ? '' : '?' . $this->url['query']);
     }
 }

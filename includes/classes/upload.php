@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * upload Class.
  *
@@ -12,7 +12,6 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * upload Class.
  * This class is used to manage file uploads
@@ -24,7 +23,6 @@ if (!defined('IS_ADMIN_FLAG')) {
 if (!defined('UPLOAD_FILENAME_EXTENSIONS_LIST')) {
     define('UPLOAD_FILENAME_EXTENSIONS_LIST', 'jpg,jpeg,gif,png,eps,cdr,ai,pdf,tif,tiff,bmp,zip');
 }
-
 class upload extends base
 {
     protected $file;
@@ -34,34 +32,27 @@ class upload extends base
     protected $message_location;
     protected $permissions;
     protected $tmp_filename;
-
     public function __construct($file = '', $destination = '', $permissions = '644', $extensions = [])
     {
         $this->set_file($file);
         $this->set_destination($destination);
         $this->set_permissions($permissions);
-
         if (empty($extensions)) {
             $extensions = explode(' ', (string) preg_replace('/[.,;\s]+/', ' ', UPLOAD_FILENAME_EXTENSIONS_LIST));
         }
         $this->set_extensions($extensions);
-
         $this->set_output_messages('direct');
-
         if (!empty($this->file) && !empty($this->destination)) {
             $this->set_output_messages('session');
-
-            if (($this->parse() == true) && ($this->save() == true)) {
+            if ($this->parse() == true && $this->save() == true) {
                 return;
             }
-
             // self destruct
             foreach ($this as $key => $val) {
-                $this->$key = null;
+                $this->{$key} = null;
             }
         }
     }
-
     /**
      * @param string $key  - differentiates between different files uploaded
      * @return bool
@@ -73,59 +64,38 @@ class upload extends base
             return false;
         }
         if (zen_not_null($key)) {
-            $file = [
-                'name'     => $_FILES[$this->file]['name'][$key],
-                'type'     => $_FILES[$this->file]['type'][$key],
-                'size'     => $_FILES[$this->file]['size'][$key],
-                'tmp_name' => $_FILES[$this->file]['tmp_name'][$key],
-            ];
+            $file = ['name' => $_FILES[$this->file]['name'][$key], 'type' => $_FILES[$this->file]['type'][$key], 'size' => $_FILES[$this->file]['size'][$key], 'tmp_name' => $_FILES[$this->file]['tmp_name'][$key]];
         } else {
-            $file = [
-                'name'     => $_FILES[$this->file]['name'],
-                'type'     => $_FILES[$this->file]['type'],
-                'size'     => $_FILES[$this->file]['size'],
-                'tmp_name' => $_FILES[$this->file]['tmp_name'],
-            ];
+            $file = ['name' => $_FILES[$this->file]['name'], 'type' => $_FILES[$this->file]['type'], 'size' => $_FILES[$this->file]['size'], 'tmp_name' => $_FILES[$this->file]['tmp_name']];
         }
-
         if (!zen_not_null($file['tmp_name'])) {
             return false;
         }
         //if ($file['tmp_name'] == 'none') return false;
         //if (!is_uploaded_file($file['tmp_name'])) return false;
-
         if (!is_uploaded_file($file['tmp_name'])) {
             $this->message_stack(WARNING_NO_FILE_UPLOADED, 'warning');
-
             return false;
         }
-
-        if (zen_not_null($file['tmp_name']) && ($file['tmp_name'] != 'none') && is_uploaded_file($file['tmp_name'])) {
-            if (zen_not_null($file['size']) and ($file['size'] > MAX_FILE_UPLOAD_SIZE)) {
+        if (zen_not_null($file['tmp_name']) && $file['tmp_name'] != 'none' && is_uploaded_file($file['tmp_name'])) {
+            if (zen_not_null($file['size']) and $file['size'] > MAX_FILE_UPLOAD_SIZE) {
                 $this->message_stack(ERROR_FILE_TOO_BIG, 'error');
-
                 return false;
             }
-            if (str_ends_with((string) $file['name'], '.htaccess') || (sizeof($this->extensions) > 0 && !in_array(strtolower(substr((string) $file['name'], strrpos((string) $file['name'], '.') + 1)), $this->extensions))) {
+            if (str_ends_with((string) $file['name'], '.htaccess') || sizeof($this->extensions) > 0 && !in_array(strtolower(substr((string) $file['name'], strrpos((string) $file['name'], '.') + 1)), $this->extensions)) {
                 $this->message_stack(ERROR_FILETYPE_NOT_ALLOWED . ' .' . implode(', .', $this->extensions), 'error');
-
                 return false;
             }
-
             $this->set_file($file);
             $this->set_filename($file['name']);
             $this->set_tmp_filename($file['tmp_name']);
-
             return $this->check_destination();
-
         }
         if ($file['name'] != '' && $file['tmp_name'] != '') {
             $this->message_stack(WARNING_NO_FILE_UPLOADED, 'warning');
-
             return false;
         }
     }
-
     /**
      * @param bool $overwrite
      * @since ZC v1.0.3
@@ -134,32 +104,22 @@ class upload extends base
     {
         if (!$overwrite and file_exists($this->destination . $this->filename)) {
             $this->message_stack(TEXT_IMAGE_OVERWRITE_WARNING . $this->filename, 'caution');
-
             return true;
         }
-
         if (!str_ends_with((string) $this->destination, '/')) {
             $this->destination .= '/';
         }
-
         if (move_uploaded_file($this->file['tmp_name'], $this->destination . $this->filename)) {
-
             chmod($this->destination . $this->filename, $this->permissions);
-
             $this->message_stack(sprintf(SUCCESS_FILE_SAVED_SUCCESSFULLY, $this->filename), 'success');
-
             if (function_exists('zen_record_admin_activity')) {
                 zen_record_admin_activity(sprintf(SUCCESS_FILE_SAVED_SUCCESSFULLY, $this->filename), 'notice');
             }
-
             return true;
         }
-
         $this->message_stack(ERROR_FILE_NOT_SAVED, 'error');
-
         return false;
     }
-
     /**
      * @param string $file
      * @since ZC v1.0.3
@@ -168,7 +128,6 @@ class upload extends base
     {
         $this->file = $file;
     }
-
     /**
      * @param string $destination
      * @since ZC v1.0.3
@@ -177,7 +136,6 @@ class upload extends base
     {
         $this->destination = $destination;
     }
-
     /**
      * @param string $permissions
      * @since ZC v1.0.3
@@ -186,15 +144,13 @@ class upload extends base
     {
         $this->permissions = octdec($permissions);
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function set_filename(string $filename): void
     {
-        $this->filename = $this->sanitizeFileName($filename);
+        $this->filename = $this->sanitize_file_name($filename);
     }
-
     /**
      * @param string $filename
      * @since ZC v1.0.3
@@ -203,7 +159,6 @@ class upload extends base
     {
         $this->tmp_filename = $filename;
     }
-
     /**
      * @param array $extensions
      * @since ZC v1.0.3
@@ -220,7 +175,6 @@ class upload extends base
             $this->extensions = [];
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -232,13 +186,10 @@ class upload extends base
             } else {
                 $this->message_stack(sprintf(ERROR_DESTINATION_DOES_NOT_EXIST, $this->destination), 'error');
             }
-
             return false;
         }
-
         return true;
     }
-
     /**
      * @param string $location
      * @since ZC v1.0.3
@@ -250,46 +201,38 @@ class upload extends base
             default => 'direct',
         };
     }
-
     /**
      * @since ZC v1.5.5e
      */
     public function message_stack($msg = '', $type = '')
     {
-        global $messageStack;
-        if (!isset($messageStack) || !is_object($messageStack)) {
+        global $message_stack;
+        if (!isset($message_stack) || !is_object($message_stack)) {
             return false;
         }
         if (IS_ADMIN_FLAG === true) {
-            $messageStack->add_session($msg, $type);
-            $messageStack->add($msg, $type);
+            $message_stack->add_session($msg, $type);
+            $message_stack->add($msg, $type);
+        } else if ($this->message_location == 'direct') {
+            $message_stack->add_session('header', $msg, $type);
         } else {
-            if ($this->message_location == 'direct') {
-                $messageStack->add_session('header', $msg, $type);
-            } else {
-                $messageStack->add_session('upload', $msg, $type);
-            }
+            $message_stack->add_session('upload', $msg, $type);
         }
     }
-
     /**
      * @since ZC v2.2.0
      */
-    protected function sanitizeFileName(string $filename): string
+    protected function sanitize_file_name(string $filename): string
     {
         // Convert file-extension to lowercase
         $file_pieces = pathinfo($filename);
         $filename = $file_pieces['filename'] . '.' . strtolower($file_pieces['extension']);
-
         // Replace spaces with hyphens
         $filename = str_replace(' ', '-', $filename);
-
         // Remove special characters (keep alphanumerics, dashes, underscores, and dots)
         $filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $filename);
-
         // Replace multiple dots with a single dot
         $filename = preg_replace('/\.+/', '.', (string) $filename);
-
         return $filename;
     }
 }

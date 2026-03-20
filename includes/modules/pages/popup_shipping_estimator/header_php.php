@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * pop up shipping estimator
  *
@@ -10,6 +10,5 @@ declare(strict_types=1);
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
 $_SESSION['navigation']->remove_current_page();
-
-require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
-$flagShippingPopUp = true;
+require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
+$flag_shipping_pop_up = true;

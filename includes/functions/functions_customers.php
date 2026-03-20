@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * functions_customers
  *
@@ -9,24 +9,20 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * Return a customer greeting string based on login/guest condition
  * @since ZC v1.0.3
  */
 function zen_customer_greeting(): string
 {
-
     $greeting_string = sprintf(TEXT_GREETING_GUEST, zen_href_link(FILENAME_LOGIN, '', 'SSL'));
     if (zen_is_logged_in() && !zen_in_guest_checkout() && !empty($_SESSION['customer_first_name'])) {
         $greeting_string = sprintf(TEXT_GREETING_PERSONAL, zen_output_string_protected($_SESSION['customer_first_name']), zen_href_link(FILENAME_PRODUCTS_NEW));
     } elseif (STORE_STATUS != '0') {
         $greeting_string = TEXT_GREETING_GUEST_SHOWCASE;
     }
-
     return $greeting_string;
 }
-
 /**
  * @deprecated use $customer->getNumberOfOrders() directly
  *
@@ -36,10 +32,8 @@ function zen_customer_greeting(): string
 function zen_count_customer_orders(?int $customer_id = null, $check_session = true): int
 {
     $customer = new Customer($customer_id);
-
-    return $customer->getNumberOfOrders();
+    return $customer->get_number_of_orders();
 }
-
 /**
  * look up customer's default/primary address
  * @since ZC v1.3.8
@@ -47,20 +41,16 @@ function zen_count_customer_orders(?int $customer_id = null, $check_session = tr
 function zen_get_customers_address_primary(int $customer_id): int
 {
     $customer = new Customer($customer_id);
-
-    return $customer->getData('customers_default_address_id');
+    return $customer->get_data('customers_default_address_id');
 }
-
 /**
  * @since ZC v1.5.8
  */
 function zen_get_customer_address_book_entries(?int $customer_id = null): array
 {
     $customer = new Customer($customer_id);
-
-    return $customer->getFormattedAddressBookList($customer_id);
+    return $customer->get_formatted_address_book_list($customer_id);
 }
-
 /**
  * @deprecated use zen_get_customer_address_book_entries()
  * @since ZC v1.3.8
@@ -69,7 +59,6 @@ function zen_get_customers_address_book(?int $customer_id): array
 {
     return zen_get_customer_address_book_entries($customer_id);
 }
-
 /**
  * @param bool $check_session unused legacy param
  * @deprecated use Customer::getFormattedAddressBookList or zen_get_customer_address_book_entries()
@@ -79,7 +68,6 @@ function zen_count_customer_address_book_entries(?int $customer_id = null, $chec
 {
     return count(zen_get_customer_address_book_entries($customer_id));
 }
-
 /**
  * Concatenate customer first+last names into one string
  * @param $customer_id
@@ -88,17 +76,13 @@ function zen_count_customer_address_book_entries(?int $customer_id = null, $chec
 function zen_customers_name($customer_id): string
 {
     $customer = new Customer($customer_id);
-    $data = $customer->getData();
-
+    $data = $customer->get_data();
     if (empty($data)) {
         return '';
     }
-
     $name = $data['customers_firstname'] . ' ' . $data['customers_lastname'];
-
     return trim($name);
 }
-
 /**
  * @param int $customer_id_to_exclude pass this id to allow for changing the email address
  * @since ZC v1.5.8
@@ -106,50 +90,37 @@ function zen_customers_name($customer_id): string
 function zen_check_email_address_not_already_used(string $email, int $customer_id_to_exclude = 0): bool
 {
     global $db;
-
     $sql = 'SELECT customers_id
-            FROM ' . TABLE_CUSTOMERS . "
-            WHERE customers_email_address = '" . zen_db_input($email) . "'
-            AND customers_id != " . $customer_id_to_exclude;
+            FROM ' . TABLE_CUSTOMERS . "\n            WHERE customers_email_address = '" . zen_db_input($email) . "'\n            AND customers_id != " . $customer_id_to_exclude;
     $result = $db->Execute($sql);
-
     if ($result->EOF) {
         return true;
     }
-
     return false;
 }
-
 /**
  * validate customer matches session
  * @since ZC v1.3.6
  */
 function zen_get_customer_validate_session(int $customer_id): bool
 {
-    global $messageStack, $customer;
-
+    global $message_stack, $customer;
     if (!zen_is_logged_in()) {
         return false;
     }
-
     if (!isset($customer) || !is_a($customer, Customer::class)) {
         $customer = new Customer($customer_id);
     }
-
-    $banned = $customer->isBanned($customer_id);
-
-    if ($customer->isSameAsLoggedIn($customer_id) && !$banned) {
+    $banned = $customer->is_banned($customer_id);
+    if ($customer->is_same_as_logged_in($customer_id) && !$banned) {
         return true;
     }
-
     if ($banned) {
-        $customer->resetCustomerCart();
+        $customer->reset_customer_cart();
     }
-
-    $messageStack->add_session('header', ERROR_CUSTOMERS_ID_INVALID, 'error');
+    $message_stack->add_session('header', ERROR_CUSTOMERS_ID_INVALID, 'error');
     return false;
 }
-
 /**
  * This function identifies whether (true) or not (false) the current customer session is
  * associated with a guest-checkout process.
@@ -163,7 +134,6 @@ function zen_in_guest_checkout(): bool
     $zco_notifier->notify('NOTIFY_ZEN_IN_GUEST_CHECKOUT', null, $in_guest_checkout);
     return $in_guest_checkout;
 }
-
 /**
  * This function identifies whether (true) or not (false) a customer is currently logged into the site.
  * @alias Customer::someoneIsLoggedIn()
@@ -172,11 +142,10 @@ function zen_in_guest_checkout(): bool
 function zen_is_logged_in(): bool
 {
     global $zco_notifier;
-    $is_logged_in = (!empty($_SESSION['customer_id']));
+    $is_logged_in = !empty($_SESSION['customer_id']);
     $zco_notifier->notify('NOTIFY_ZEN_IS_LOGGED_IN', null, $is_logged_in);
     return $is_logged_in;
 }
-
 /**
  * This function determines if the proviced login-password is associated with a permitted
  * admin's admin-password, returning (bool)true if so.
@@ -189,28 +158,22 @@ function zen_validate_storefront_admin_login($password, $email_address): bool
 {
     global $db;
     $admin_authorized = false;
-
     // Before v1.5.7 Admin passwords might be 'sanitized', e.g. this&that becomes this&amp;that, so we'll check both versions.
     $pwd2 = htmlspecialchars($password, ENT_COMPAT, CHARSET);
-
     if (!empty(EMP_LOGIN_ADMIN_ID)) {
-        $check = $db->Execute(
-            'SELECT admin_id, admin_pass
+        $check = $db->Execute('SELECT admin_id, admin_pass
              FROM ' . TABLE_ADMIN . '
-             WHERE admin_id = ' . (int)EMP_LOGIN_ADMIN_ID . '
-             LIMIT 1'
-        );
+             WHERE admin_id = ' . (int) EMP_LOGIN_ADMIN_ID . '
+             LIMIT 1');
         if (!$check->EOF && (zen_validate_password($password, $check->fields['admin_pass']) || zen_validate_password($pwd2, $check->fields['admin_pass']))) {
             $admin_authorized = true;
             $_SESSION['emp_admin_login'] = true;
-            $_SESSION['emp_admin_id'] = (int)EMP_LOGIN_ADMIN_ID;
+            $_SESSION['emp_admin_id'] = (int) EMP_LOGIN_ADMIN_ID;
         }
     }
-
     if (!$admin_authorized && empty(EMP_LOGIN_ADMIN_PROFILE_ID)) {
         return false;
     }
-
     $profile_array = explode(',', str_replace(' ', '', EMP_LOGIN_ADMIN_PROFILE_ID));
     foreach ($profile_array as $index => $current_id) {
         if (empty($current_id)) {
@@ -219,21 +182,18 @@ function zen_validate_storefront_admin_login($password, $email_address): bool
     }
     if (count($profile_array)) {
         $profile_list = implode(',', $profile_array);
-        $admin_profiles = $db->Execute(
-            'SELECT admin_id, admin_pass
+        $admin_profiles = $db->Execute('SELECT admin_id, admin_pass
                FROM ' . TABLE_ADMIN . '
-              WHERE admin_profile IN (' . $profile_list . ')'
-        );
+              WHERE admin_profile IN (' . $profile_list . ')');
         foreach ($admin_profiles as $profile) {
-            $admin_authorized = (zen_validate_password($pwd2, $profile['admin_pass']) || zen_validate_password($pwd2, $profile['admin_pass']));
+            $admin_authorized = zen_validate_password($pwd2, $profile['admin_pass']) || zen_validate_password($pwd2, $profile['admin_pass']);
             if ($admin_authorized) {
                 $_SESSION['emp_admin_login'] = true;
-                $_SESSION['emp_admin_id'] = (int)$profile['admin_id'];
+                $_SESSION['emp_admin_id'] = (int) $profile['admin_id'];
                 break;
             }
         }
     }
-
     if ($admin_authorized) {
         $_SESSION['emp_customer_email_address'] = $email_address;
         $params['action'] = 'emp_admin_login';
@@ -243,23 +203,20 @@ function zen_validate_storefront_admin_login($password, $email_address): bool
     }
     return $admin_authorized;
 }
-
 /**
  * @since ZC v1.5.7
  */
-function zen_update_customers_secret($customerId): string
+function zen_update_customers_secret($customer_id): string
 {
     global $db;
-
     $hashable = openssl_random_pseudo_bytes(64);
     $secret = hash('sha256', $hashable);
     $sql = 'UPDATE ' . TABLE_CUSTOMERS . ' SET customers_secret = :secret: WHERE customers_id = :id:';
-    $sql = $db->bindVars($sql, ':secret:', $secret, 'string');
-    $sql = $db->bindVars($sql, ':id:', $customerId, 'integer');
+    $sql = $db->bind_vars($sql, ':secret:', $secret, 'string');
+    $sql = $db->bind_vars($sql, ':id:', $customer_id, 'integer');
     $db->Execute($sql);
     return $secret;
 }
-
 /**
  * @since ZC v1.5.7
  */
@@ -275,15 +232,13 @@ function zen_create_hmac_uri($data, $secret): string
         $params[$k] = $val;
     }
     ksort($params);
-    $hmacData = implode('&', $params);
+    $hmac_data = implode('&', $params);
     foreach ($data as $k => $val) {
         unset($params[$k]);
     }
-
-    $params['hmac'] = hash_hmac('sha256', $hmacData, $secret);
+    $params['hmac'] = hash_hmac('sha256', $hmac_data, $secret);
     return http_build_query($params);
 }
-
 /**
  * @since ZC v1.5.7
  */
@@ -294,21 +249,18 @@ function zen_is_hmac_login(): bool
     }
     return true;
 }
-
 /**
  * @since ZC v1.5.7
  */
 function zen_validate_hmac_login()
 {
-    global $db, $zenSessionId;
-
+    global $db, $zen_session_id;
     if (!isset($_POST['aid'], $_POST['cid'], $_POST['email_address'], $_POST['timestamp'])) {
         return false;
     }
-
     $data = $_REQUEST;
-    $unsetArray = ['action', 'main_page', 'securityToken', 'zenid', 'zenInstallerId', $zenSessionId];
-    foreach ($unsetArray as $entry) {
+    $unset_array = ['action', 'main_page', 'securityToken', 'zenid', 'zenInstallerId', $zen_session_id];
+    foreach ($unset_array as $entry) {
         unset($data[$entry]);
     }
     foreach ($data as $k => $val) {
@@ -319,49 +271,41 @@ function zen_validate_hmac_login()
         $val = str_replace('&', '%26', $val);
         $params[$k] = $val;
     }
-
     $sql = 'SELECT customers_secret FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id = :id: LIMIT 1';
-    $sql = $db->bindVars($sql, ':id:', $params['cid'], 'integer');
+    $sql = $db->bind_vars($sql, ':id:', $params['cid'], 'integer');
     $result = $db->Execute($sql);
     $secret = $result->fields['customers_secret'];
     $secret = hash('sha256', $secret . GLOBAL_AUTH_KEY);
-    $hmacOriginal = $data['hmac'];
+    $hmac_original = $data['hmac'];
     unset($params['hmac']);
     ksort($params);
-    $hmacData = implode('&', $params);
-
-    return hash_equals(hash_hmac('sha256', $hmacData, $secret), $hmacOriginal);
+    $hmac_data = implode('&', $params);
+    return hash_equals(hash_hmac('sha256', $hmac_data, $secret), $hmac_original);
 }
-
 /**
  * @since ZC v1.5.7
  */
 function zen_validate_hmac_timestamp(): bool
 {
-    $currentTime = time();
-    $hmacTime = (isset($_POST['timestamp'])) ? (int)$_POST['timestamp'] : 0;
-    return (($currentTime - $hmacTime) <= 20);
+    $current_time = time();
+    $hmac_time = isset($_POST['timestamp']) ? (int) $_POST['timestamp'] : 0;
+    return $current_time - $hmac_time <= 20;
 }
-
 /**
  * @since ZC v1.5.7
  */
-function zen_validate_hmac_admin_id($adminId): int|false
+function zen_validate_hmac_admin_id($admin_id): int|false
 {
     global $db;
-
     if (!empty(EMP_LOGIN_ADMIN_ID)) {
-        $check = $db->Execute(
-            'SELECT admin_id
+        $check = $db->Execute('SELECT admin_id
            FROM ' . TABLE_ADMIN . '
-          WHERE admin_id = ' . (int)EMP_LOGIN_ADMIN_ID . '
-          LIMIT 1'
-        );
-        if ($check->RecordCount() > 0 && (int)EMP_LOGIN_ADMIN_ID == (int)$adminId) {
-            return (int)$adminId;
+          WHERE admin_id = ' . (int) EMP_LOGIN_ADMIN_ID . '
+          LIMIT 1');
+        if ($check->record_count() > 0 && (int) EMP_LOGIN_ADMIN_ID == (int) $admin_id) {
+            return (int) $admin_id;
         }
     }
-
     $profile_array = explode(',', str_replace(' ', '', EMP_LOGIN_ADMIN_PROFILE_ID));
     foreach ($profile_array as $index => $current_id) {
         if (empty($current_id)) {
@@ -372,41 +316,21 @@ function zen_validate_hmac_admin_id($adminId): int|false
         return false;
     }
     $profile_list = implode(',', $profile_array);
-    $admin_profiles = $db->Execute(
-        'SELECT admin_id FROM ' . TABLE_ADMIN . '
-         WHERE admin_id = ' . (int)$adminId . ' AND admin_profile IN (' . $profile_list . ')'
-    );
-    if ($admin_profiles->RecordCount() > 0) {
-        return (int)$adminId;
+    $admin_profiles = $db->Execute('SELECT admin_id FROM ' . TABLE_ADMIN . '
+         WHERE admin_id = ' . (int) $admin_id . ' AND admin_profile IN (' . $profile_list . ')');
+    if ($admin_profiles->record_count() > 0) {
+        return (int) $admin_id;
     }
     return false;
 }
-
 /**
  * @since ZC v1.5.7
  */
 function zen_log_hmac_login(array $params): void
 {
-    $sql_data_array = [
-        'access_date' => 'now()',
-        'admin_id' => $_SESSION['emp_admin_id'],
-        'page_accessed' => 'login.php',
-        'page_parameters' => '',
-        'ip_address' => substr((string) $_SERVER['REMOTE_ADDR'], 0, 45),
-        'gzpost' => gzdeflate(json_encode(
-            [
-                'action' => $params['action'],
-                'customer_email_address' => $params['emailAddress'],
-                ]
-        ), 7),
-        'flagged' => 0,
-        'attention' => '',
-        'severity' => 'info',
-        'logmessage' => $params['message'],
-    ];
+    $sql_data_array = ['access_date' => 'now()', 'admin_id' => $_SESSION['emp_admin_id'], 'page_accessed' => 'login.php', 'page_parameters' => '', 'ip_address' => substr((string) $_SERVER['REMOTE_ADDR'], 0, 45), 'gzpost' => gzdeflate(json_encode(['action' => $params['action'], 'customer_email_address' => $params['emailAddress']]), 7), 'flagged' => 0, 'attention' => '', 'severity' => 'info', 'logmessage' => $params['message']];
     zen_db_perform(TABLE_ADMIN_ACTIVITY_LOG, $sql_data_array);
 }
-
 /**
  * @deprecated - use Customer object instead.
  *
@@ -415,10 +339,9 @@ function zen_log_hmac_login(array $params): void
 function zen_user_has_gv_balance($c_id)
 {
     trigger_error('Call to deprecated function zen_user_has_gv_balance. Use Customer object instead', E_USER_DEPRECATED);
-
     global $db;
-    $gv_result = $db->Execute('select amount from ' . TABLE_COUPON_GV_CUSTOMER . ' where customer_id = ' . (int)$c_id);
-    if ($gv_result->RecordCount() <= 0) {
+    $gv_result = $db->Execute('select amount from ' . TABLE_COUPON_GV_CUSTOMER . ' where customer_id = ' . (int) $c_id);
+    if ($gv_result->record_count() <= 0) {
         return 0;
     }
     if ($gv_result->fields['amount'] > 0) {

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Zen Cart Database Session Handler
  *
@@ -8,13 +8,12 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 namespace Zencart;
 
 /**
  * @since ZC v2.0.0
  */
-class SessionHandler implements \SessionHandlerInterface
+class Session_Handler implements \Session_Handler_Interface
 {
     /**
      * @inheritDoc
@@ -24,7 +23,6 @@ class SessionHandler implements \SessionHandlerInterface
     {
         return true;
     }
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -34,10 +32,8 @@ class SessionHandler implements \SessionHandlerInterface
         global $db;
         $sql = 'DELETE FROM ' . TABLE_SESSIONS . " WHERE sesskey = '" . zen_db_input($id) . "'";
         $db->Execute($sql);
-
         return true;
     }
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -47,10 +43,8 @@ class SessionHandler implements \SessionHandlerInterface
         global $db;
         $sql = 'DELETE FROM ' . TABLE_SESSIONS . ' WHERE expiry < ' . time();
         $db->Execute($sql);
-
-        return $db->affectedRows() ?? false;
+        return $db->affected_rows() ?? false;
     }
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -59,7 +53,6 @@ class SessionHandler implements \SessionHandlerInterface
     {
         return true;
     }
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -68,20 +61,14 @@ class SessionHandler implements \SessionHandlerInterface
     {
         global $db;
         $qid = 'SELECT value
-                FROM ' . TABLE_SESSIONS . "
-                WHERE sesskey = '" . zen_db_input($id) . "'
-                AND expiry > '" . time() . "'";
-
+                FROM ' . TABLE_SESSIONS . "\n                WHERE sesskey = '" . zen_db_input($id) . "'\n                AND expiry > '" . time() . "'";
         $value = $db->Execute($qid);
-
         if (!empty($value->fields['value'])) {
             $value->fields['value'] = base64_decode((string) $value->fields['value']);
             return $value->fields['value'];
         }
-
         return '';
     }
-
     /**
      * @inheritDoc
      * @since ZC v2.0.0
@@ -93,19 +80,15 @@ class SessionHandler implements \SessionHandlerInterface
             return false;
         }
         $data = base64_encode($data);
-
         global $SESS_LIFE;
         $expiry = time() + $SESS_LIFE;
-
         $sql = 'INSERT INTO ' . TABLE_SESSIONS . ' (sesskey, expiry, `value`)
                 VALUES (:zkey, :zexpiry, :zvalue)
                 ON DUPLICATE KEY UPDATE `value`=:zvalue, expiry=:zexpiry';
-
-        $sql = $db->bindVars($sql, ':zkey', $id, 'string');
-        $sql = $db->bindVars($sql, ':zexpiry', $expiry, 'integer');
-        $sql = $db->bindVars($sql, ':zvalue', $data, 'string');
+        $sql = $db->bind_vars($sql, ':zkey', $id, 'string');
+        $sql = $db->bind_vars($sql, ':zexpiry', $expiry, 'integer');
+        $sql = $db->bind_vars($sql, ':zvalue', $data, 'string');
         $result = $db->Execute($sql);
-
         return !empty($result->resource);
     }
 }

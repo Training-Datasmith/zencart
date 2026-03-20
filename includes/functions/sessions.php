@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Session functions
  *
@@ -12,9 +12,8 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 if (IS_ADMIN_FLAG === true) {
-    $SESS_LIFE = (int)SESSION_TIMEOUT_ADMIN;
+    $SESS_LIFE = (int) SESSION_TIMEOUT_ADMIN;
     // if strict is enabled, must be a max of 900
     if (PADSS_ADMIN_SESSION_TIMEOUT_ENFORCED != 0 && $SESS_LIFE > 900) {
         $SESS_LIFE = 900;
@@ -23,19 +22,17 @@ if (IS_ADMIN_FLAG === true) {
     // read PHP config
     $SESS_LIFE = get_cfg_var('session.gc_maxlifetime');
     // override if set
-    if (defined('SESSION_TIMEOUT_CATALOG') && (int)SESSION_TIMEOUT_CATALOG > 120) {
-        $SESS_LIFE = (int)SESSION_TIMEOUT_CATALOG;
+    if (defined('SESSION_TIMEOUT_CATALOG') && (int) SESSION_TIMEOUT_CATALOG > 120) {
+        $SESS_LIFE = (int) SESSION_TIMEOUT_CATALOG;
     }
     // if set toooo short, reset to default
-    if ((int)$SESS_LIFE < 120) {
+    if ((int) $SESS_LIFE < 120) {
         $SESS_LIFE = 1440;
     }
 }
-
 // Initialize session save-handler
-$zen_session_handler = new \Zencart\SessionHandler();
+$zen_session_handler = new \Zencart\Session_Handler();
 session_set_save_handler($zen_session_handler, true);
-
 /**
  * @since ZC v1.0.3
  */
@@ -45,7 +42,6 @@ function zen_session_start(): bool
     @ini_set('session.gc_maxlifetime', $SESS_LIFE);
     @ini_set('session.gc_probability', 1);
     @ini_set('session.gc_divisor', 2);
-
     if (preg_replace('/[a-zA-Z0-9,-]/', '', session_id()) !== '') {
         zen_session_id(\bin2hex(\random_bytes(16)));
     }
@@ -53,44 +49,36 @@ function zen_session_start(): bool
     if (!isset($_SESSION['securityToken'])) {
         $_SESSION['securityToken'] = \bin2hex(\random_bytes(16));
     }
-
     return $temp;
 }
-
 /**
  * @since ZC v1.0.3
  */
 function zen_session_id($sessid = ''): bool|string
 {
     if (!empty($sessid)) {
-        $tempSessid = $sessid;
-        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $tempSessid) != '') {
+        $temp_sessid = $sessid;
+        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $temp_sessid) != '') {
             $sessid = \bin2hex(\random_bytes(16));
         }
-
         return session_id($sessid);
     }
-
     return session_id();
 }
-
 /**
  * @since ZC v1.0.3
  */
 function zen_session_name($name = ''): bool|string
 {
     if (!empty($name)) {
-        $tempName = $name;
-        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $tempName) == '') {
+        $temp_name = $name;
+        if (preg_replace('/[a-zA-Z0-9,-]/', '', (string) $temp_name) == '') {
             return session_name($name);
         }
-
         return false;
     }
-
     return session_name();
 }
-
 /**
  * @since ZC v1.5.2
  */
@@ -98,7 +86,6 @@ function zen_session_write_close(): void
 {
     session_write_close();
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -106,7 +93,6 @@ function zen_session_destroy(): bool
 {
     return session_destroy();
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -115,10 +101,8 @@ function zen_session_save_path($path = ''): string|false
     if (!empty($path)) {
         return session_save_path($path);
     }
-
     return session_save_path();
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -126,11 +110,11 @@ function zen_session_recreate(): void
 {
     global $http_domain, $https_domain;
     if ($http_domain === $https_domain) {
-        $saveSession = $_SESSION;
-        $oldSessID   = session_id();
+        $save_session = $_SESSION;
+        $old_sess_id = session_id();
         session_regenerate_id();
-        $newSessID = session_id();
-        $_SESSION = $saveSession;
-        whos_online_session_recreate($oldSessID, $newSessID);
+        $new_sess_id = session_id();
+        $_SESSION = $save_session;
+        whos_online_session_recreate($old_sess_id, $new_sess_id);
     }
 }

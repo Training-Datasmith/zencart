@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHP Upgrade Template Page
  *
@@ -12,7 +13,7 @@
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License v2.0
  * @version $Id: Scott C Wilson 2024 Jun 03 Modified in v2.1.0-alpha1 $
  */
-$relPath = (file_exists('includes/templates/template_default/images/logo.gif')) ? '' : '../';
+$rel_path = file_exists('includes/templates/template_default/images/logo.gif') ? '' : '../';
 include 'includes/version.php';
 ?>
 <!DOCTYPE html>
@@ -217,12 +218,18 @@ include 'includes/version.php';
 
   <body>
   <div class="container">
-    <img src="<?php echo $relPath; ?>includes/templates/template_default/images/logo.gif" alt="Zen Cart&reg; Header Logo" title="Zen Cart&reg; Header Logo" class="h_image">
+    <img src="<?php 
+echo $rel_path;
+?>includes/templates/template_default/images/logo.gif" alt="Zen Cart&reg; Header Logo" title="Zen Cart&reg; Header Logo" class="h_image">
     <h1>Welcome to Zen Cart<sup>&reg;</sup></h1>
     <div>
       <h2>We would love to have you use Zen Cart ... however your server is incompatible.</h2>
-        <p>Your PHP version (<?php echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;?>) is too old to support the modern PHP capabilities required.</p>
-        <p>You are currently using Zen Cart version <?php echo PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR; ?>.</p>
+        <p>Your PHP version (<?php 
+echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
+?>) is too old to support the modern PHP capabilities required.</p>
+        <p>You are currently using Zen Cart version <?php 
+echo PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
+?>.</p>
         <p>In order to proceed with Zen Cart you must upgrade your PHP version.</p>
         <p><a href="https://www.zen-cart.com/requirements" rel="noopener" target="_blank">Please refer to our website</a> for the PHP versions supported.</p>
         <br><br>
@@ -246,7 +253,9 @@ include 'includes/version.php';
           OSI Certified is a certification mark of the Open Source Initiative.
         <p>
         <p class="zenData">
-          Copyright 2003 - <?php echo date('Y'); ?> Zen Ventures, LLC
+          Copyright 2003 - <?php 
+echo date('Y');
+?> Zen Ventures, LLC
           <br><br>
           Zen Cart&reg;
           <br>

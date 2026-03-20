@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * functions_lookups.php
  * Lookup Functions for various core activities related to countries, prices, products, product types, etc
@@ -10,7 +10,6 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * get the type_handler value for the specified product_type
  * @param int $product_type
@@ -19,20 +18,17 @@ declare(strict_types=1);
 function zen_get_handler_from_type($product_type): string
 {
     global $db;
-
     // this is a fallback safety to protect against damaged (inaccessible) data caused by incorrect code in custom product types
-    if ((int)$product_type === 0) {
+    if ((int) $product_type === 0) {
         $product_type = 1;
     }
-
-    $sql = 'SELECT type_handler FROM ' . TABLE_PRODUCT_TYPES . ' WHERE type_id = ' . (int)$product_type;
+    $sql = 'SELECT type_handler FROM ' . TABLE_PRODUCT_TYPES . ' WHERE type_id = ' . (int) $product_type;
     $handler = $db->Execute($sql);
     if ($handler->EOF) {
-        throw new ValueError('ERROR: Invalid type_handler. Your product_type settings are wrong, incomplete, or damaged.');
+        throw new Value_Error('ERROR: Invalid type_handler. Your product_type settings are wrong, incomplete, or damaged.');
     }
     return $handler->fields['type_handler'];
 }
-
 /**
  * Get a list of product page names that identify buyable products.
  * This allows us to mark a page as containing a product which can
@@ -44,13 +40,12 @@ function zen_get_buyable_product_type_handlers(): array
     global $db;
     $sql = 'SELECT type_handler from ' . TABLE_PRODUCT_TYPES . " WHERE allow_add_to_cart = 'Y'";
     $results = $db->Execute($sql);
-    $retVal = [];
+    $ret_val = [];
     foreach ($results as $result) {
-        $retVal[] = $result['type_handler'] . '_info';
+        $ret_val[] = $result['type_handler'] . '_info';
     }
-    return $retVal;
+    return $ret_val;
 }
-
 /*
  * List manufacturers (returned in an array)
  */
@@ -63,7 +58,6 @@ function zen_get_manufacturers($manufacturers_array = [], $only_those_with_produ
     if (!is_array($manufacturers_array)) {
         $manufacturers_array = [];
     }
-
     if (!empty($only_those_with_products)) {
         $manufacturers_query = 'SELECT DISTINCT m.manufacturers_id, m.manufacturers_name
                               FROM ' . TABLE_MANUFACTURERS . ' m
@@ -76,19 +70,12 @@ function zen_get_manufacturers($manufacturers_array = [], $only_those_with_produ
                               FROM ' . TABLE_MANUFACTURERS . '
                               ORDER BY manufacturers_name';
     }
-
     $manufacturers = $db->Execute($manufacturers_query);
-
     foreach ($manufacturers as $manufacturer) {
-        $manufacturers_array[] = [
-            'id' => $manufacturer['manufacturers_id'],
-            'text' => $manufacturer['manufacturers_name'],
-        ];
+        $manufacturers_array[] = ['id' => $manufacturer['manufacturers_id'], 'text' => $manufacturer['manufacturers_name']];
     }
-
     return $manufacturers_array;
 }
-
 ////
 // Return the manufacturers URL in the needed language
 // TABLES: manufacturers_info
@@ -100,14 +87,13 @@ function zen_get_manufacturer_url($manufacturer_id, $language_id)
     global $db;
     $manufacturer = $db->Execute('SELECT manufacturers_url
                                   FROM ' . TABLE_MANUFACTURERS_INFO . '
-                                  WHERE manufacturers_id = ' . (int)$manufacturer_id . '
-                                  AND languages_id = ' . (int)$language_id);
+                                  WHERE manufacturers_id = ' . (int) $manufacturer_id . '
+                                  AND languages_id = ' . (int) $language_id);
     if ($manufacturer->EOF) {
         return '';
     }
     return $manufacturer->fields['manufacturers_url'];
 }
-
 /**
  *  configuration key value lookup
  * @since ZC v1.1.0
@@ -116,13 +102,12 @@ function zen_get_configuration_key_value(string $lookup)
 {
     global $db;
     $configuration_query = $db->Execute('select configuration_value from ' . TABLE_CONFIGURATION . " where configuration_key='" . zen_db_input($lookup) . "' LIMIT 1");
-    $lookup_value = ($configuration_query->EOF) ? '' : $configuration_query->fields['configuration_value'];
+    $lookup_value = $configuration_query->EOF ? '' : $configuration_query->fields['configuration_value'];
     if (empty($lookup_value)) {
         return '<span class="lookupAttention">' . $lookup . '</span>';
     }
     return $lookup_value;
 }
-
 /**
  * Product Types -- configuration key value lookup in TABLE_PRODUCT_TYPE_LAYOUT
  * Used to determine keys/flags used on a per-product-type basis for template-use, etc
@@ -131,14 +116,13 @@ function zen_get_configuration_key_value(string $lookup)
 function zen_get_configuration_key_value_layout(string $lookup, $type = 1)
 {
     global $db;
-    $configuration_query = $db->Execute('select configuration_value from ' . TABLE_PRODUCT_TYPE_LAYOUT . " where configuration_key='" . zen_db_input($lookup) . "' and product_type_id='" . (int)$type . "'");
+    $configuration_query = $db->Execute('select configuration_value from ' . TABLE_PRODUCT_TYPE_LAYOUT . " where configuration_key='" . zen_db_input($lookup) . "' and product_type_id='" . (int) $type . "'");
     $lookup_value = $configuration_query->fields['configuration_value'];
-    if (!($lookup_value)) {
+    if (!$lookup_value) {
         return '<span class="lookupAttention">' . $lookup . '</span>';
     }
     return $lookup_value;
 }
-
 /*
  * Get accepted credit cards
  * There needs to be a define on the accepted credit card in the language file credit_cards.php example: TEXT_CC_ENABLED_VISA
@@ -158,7 +142,7 @@ function zen_get_cc_enabled(string $text_image = 'TEXT_', string $cc_seperate = 
             if (defined($check_it)) {
                 $cc_check_accepted .= constant($check_it) . $cc_seperate;
             }
-            $cc_check_accepted_query->MoveNext();
+            $cc_check_accepted_query->move_next();
         }
     } else {
         // build a table
@@ -169,7 +153,7 @@ function zen_get_cc_enabled(string $text_image = 'TEXT_', string $cc_seperate = 
             if (defined($check_it)) {
                 $cc_check_accepted .= '<td class="ccenabled">' . constant($check_it) . '</td>' . "\n";
             }
-            $cc_check_accepted_query->MoveNext();
+            $cc_check_accepted_query->move_next();
             $cc_counter++;
             if ($cc_counter >= $cc_make_columns) {
                 $cc_check_accepted .= '</tr>' . "\n" . '<tr class="ccenabled">' . "\n";
@@ -180,7 +164,6 @@ function zen_get_cc_enabled(string $text_image = 'TEXT_', string $cc_seperate = 
     }
     return $cc_check_accepted;
 }
-
 /**
  *  stop regular behavior based on customer/store settings
  *  Used to disable various activities if store is in an operating mode that should prevent those activities
@@ -205,12 +188,11 @@ function zen_run_normal(): bool
         // customer must be logged in to browse
         CUSTOMERS_APPROVAL_AUTHORIZATION != '0' && !zen_is_logged_in() => false,
         // customer must be logged in to browse
-        CUSTOMERS_APPROVAL_AUTHORIZATION != '0' && isset($_SESSION['customers_authorization']) && (int)$_SESSION['customers_authorization'] > 0 => false,
+        CUSTOMERS_APPROVAL_AUTHORIZATION != '0' && isset($_SESSION['customers_authorization']) && (int) $_SESSION['customers_authorization'] > 0 => false,
         // proceed normally
         default => true,
     };
 }
-
 /**
  * Look up whether to show prices, based on customer-authorization levels
  *
@@ -234,12 +216,11 @@ function zen_check_show_prices(): bool
     if (CUSTOMERS_APPROVAL_AUTHORIZATION !== '1' && CUSTOMERS_APPROVAL_AUTHORIZATION !== '2') {
         return true;
     }
-    if (zen_is_logged_in() === false || ((int)$_SESSION['customers_authorization'] !== 0 && (int)$_SESSION['customers_authorization'] !== 3)) {
+    if (zen_is_logged_in() === false || (int) $_SESSION['customers_authorization'] !== 0 && (int) $_SESSION['customers_authorization'] !== 3) {
         return false;
     }
     return true;
 }
-
 /**
  * check to see if database stored GET terms are in the URL as $_GET parameters
  * This is used to determine which filters should be applied
@@ -250,7 +231,6 @@ function zen_check_url_get_terms(): bool
     global $db;
     $sql = 'SELECT * FROM ' . TABLE_GET_TERMS_TO_FILTER;
     $query_result = $db->Execute($sql);
-
     foreach ($query_result as $row) {
         if (isset($_GET[$row['get_term_name']]) && zen_not_null($_GET[$row['get_term_name']])) {
             return true;
@@ -258,7 +238,6 @@ function zen_check_url_get_terms(): bool
     }
     return false;
 }
-
 /**
  * Returns the status id number of an order-status, based on the name
  * @return int|false (false if not found)
@@ -270,15 +249,11 @@ function zen_get_orders_status_id_from_name(string $status_name): int|false
     if (empty($status_name)) {
         return false;
     }
-
     $sql = 'SELECT orders_status_id
-            FROM ' . TABLE_ORDERS_STATUS . "
-            WHERE LOWER(orders_status_name) = '" . zen_db_input(strtolower($status_name)) . "'";
+            FROM ' . TABLE_ORDERS_STATUS . "\n            WHERE LOWER(orders_status_name) = '" . zen_db_input(strtolower($status_name)) . "'";
     $result = $db->Execute($sql, 1);
-
     return $result->EOF ? false : $result->fields['orders_status_id'];
 }
-
 /**
  * Returns the "name" associated with the specified orders_status_id.
  * @return string
@@ -290,19 +265,16 @@ function zen_get_orders_status_name(int $order_status_id, int $language_id = 0)
     if (empty($language_id)) {
         $language_id = $_SESSION['languages_id'];
     }
-
     $sql = 'SELECT orders_status_name
             FROM ' . TABLE_ORDERS_STATUS . '
             WHERE orders_status_id = ' . $order_status_id . '
-            AND language_id = ' . (int)$language_id;
+            AND language_id = ' . (int) $language_id;
     $result = $db->Execute($sql);
-
     if ($result->EOF) {
         return '';
     }
     return $result->fields['orders_status_name'];
 }
-
 /**
  * Used by Admin configuration dropdown selectors
  * @TODO collapse with zen_get_orders_status_name()
@@ -312,26 +284,22 @@ function zen_get_orders_status_name(int $order_status_id, int $language_id = 0)
 function zen_get_order_status_name(int $order_status_id, int $language_id = 0)
 {
     global $db;
-
     if ($order_status_id < 1) {
         return TEXT_DEFAULT;
     }
-
     if (empty($language_id)) {
         $language_id = $_SESSION['languages_id'];
     }
-
     $sql = 'SELECT orders_status_name
             FROM ' . TABLE_ORDERS_STATUS . '
             WHERE orders_status_id = ' . $order_status_id . '
-            AND language_id = ' . (int)$language_id;
+            AND language_id = ' . (int) $language_id;
     $result = $db->Execute($sql);
     if ($result->EOF) {
         return 'ERROR: INVALID STATUS ID: ' . $order_status_id;
     }
     return $result->fields['orders_status_name'] . ' [' . $order_status_id . ']';
 }
-
 /**
  * @since ZC v2.1.0
  */
@@ -374,10 +342,8 @@ function zen_lookup_admin_menu_language_override(string $lookup_type, ?string $l
             $lookup = strtoupper('ADMIN_PLUGIN_MANAGER_DESCRIPTION_FOR_' . $str);
             break;
     }
-
     if (isset($lookup) && defined($lookup)) {
         return constant($lookup);
     }
-
     return $fallback;
 }

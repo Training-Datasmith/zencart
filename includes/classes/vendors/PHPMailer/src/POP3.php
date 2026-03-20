@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * PHPMailer POP-Before-SMTP Authentication Class.
  * PHP Version 5.5.
@@ -20,8 +19,7 @@ declare(strict_types=1);
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-namespace PHPMailer\PHPMailer;
+namespace Php_Mailer\Php_Mailer;
 
 /**
  * PHPMailer POP-Before-SMTP Authentication Class.
@@ -50,21 +48,18 @@ class POP3
      * @deprecated This constant will be removed in PHPMailer 8.0. Use `PHPMailer::VERSION` instead.
      */
     public const VERSION = '7.0.2';
-
     /**
      * Default POP3 port number.
      *
      * @var int
      */
     public const DEFAULT_PORT = 110;
-
     /**
      * Default timeout in seconds.
      *
      * @var int
      */
     public const DEFAULT_TIMEOUT = 30;
-
     /**
      * POP3 class debug output mode.
      * Debug output level.
@@ -76,75 +71,64 @@ class POP3
      * @var int
      */
     public $do_debug = self::DEBUG_OFF;
-
     /**
      * POP3 mail server hostname.
      *
      * @var string
      */
     public $host;
-
     /**
      * POP3 port number.
      *
      * @var int
      */
     public $port;
-
     /**
      * POP3 Timeout Value in seconds.
      *
      * @var int
      */
     public $tval;
-
     /**
      * POP3 username.
      *
      * @var string
      */
     public $username;
-
     /**
      * POP3 password.
      *
      * @var string
      */
     public $password;
-
     /**
      * Resource handle for the POP3 connection socket.
      *
      * @var resource
      */
     protected $pop_conn;
-
     /**
      * Are we connected?
      *
      * @var bool
      */
     protected $connected = false;
-
     /**
      * Error container.
      *
      * @var array
      */
     protected $errors = [];
-
     /**
      * Line break constant.
      */
     public const LE = "\r\n";
-
     /**
      * Debug level for no output.
      *
      * @var int
      */
     public const DEBUG_OFF = 0;
-
     /**
      * Debug level to show server -> client messages
      * also shows clients connection errors or errors from server
@@ -152,14 +136,12 @@ class POP3
      * @var int
      */
     public const DEBUG_SERVER = 1;
-
     /**
      * Debug level to show client -> server and server -> client messages.
      *
      * @var int
      */
     public const DEBUG_CLIENT = 2;
-
     /**
      * Simple static wrapper for all-in-one POP before SMTP.
      *
@@ -170,19 +152,11 @@ class POP3
      * @param string   $password
      * @param int      $debug_level
      */
-    public static function popBeforeSmtp(
-        $host,
-        $port = false,
-        $timeout = false,
-        $username = '',
-        $password = '',
-        $debug_level = 0
-    ): bool {
+    public static function pop_before_smtp($host, $port = false, $timeout = false, $username = '', $password = '', $debug_level = 0): bool
+    {
         $pop = new self();
-
         return $pop->authorise($host, $port, $timeout, $username, $password, $debug_level);
     }
-
     /**
      * Authenticate with a POP3 server.
      * A connect, login, disconnect sequence
@@ -221,16 +195,13 @@ class POP3
             $login_result = $this->login($this->username, $this->password);
             if ($login_result) {
                 $this->disconnect();
-
                 return true;
             }
         }
         //We need to disconnect regardless of whether the login succeeded
         $this->disconnect();
-
         return false;
     }
-
     /**
      * Connect to a POP3 server.
      *
@@ -244,56 +215,49 @@ class POP3
         if ($this->connected) {
             return true;
         }
-
         //On Windows this will raise a PHP Warning error if the hostname doesn't exist.
         //Rather than suppress it with @fsockopen, capture it cleanly instead
         set_error_handler(function (): void {
-            call_user_func_array($this->catchWarning(...), func_get_args());
+            call_user_func_array($this->catch_warning(...), func_get_args());
         });
-
         if (false === $port) {
             $port = static::DEFAULT_PORT;
         }
-
         //Connect to the POP3 server
         $errno = 0;
         $errstr = '';
         $this->pop_conn = fsockopen(
-            $host, //POP3 Host
-            $port, //Port #
-            $errno, //Error Number
-            $errstr, //Error Message
+            $host,
+            //POP3 Host
+            $port,
+            //Port #
+            $errno,
+            //Error Number
+            $errstr,
+            //Error Message
             $tval
-        ); //Timeout (seconds)
+        );
+        //Timeout (seconds)
         //Restore the error handler
         restore_error_handler();
-
         //Did we connect?
         if (false === $this->pop_conn) {
             //It would appear not...
-            $this->setError(
-                "Failed to connect to server $host on port $port. errno: $errno; errstr: $errstr"
-            );
-
+            $this->set_error("Failed to connect to server {$host} on port {$port}. errno: {$errno}; errstr: {$errstr}");
             return false;
         }
-
         //Increase the stream time-out
         stream_set_timeout($this->pop_conn, $tval, 0);
-
         //Get the POP3 server response
-        $pop3_response = $this->getResponse();
+        $pop3_response = $this->get_response();
         //Check for the +OK
-        if ($this->checkResponse($pop3_response)) {
+        if ($this->check_response($pop3_response)) {
             //The connection is established and the POP3 server is talking
             $this->connected = true;
-
             return true;
         }
-
         return false;
     }
-
     /**
      * Log in to the POP3 server.
      * Does not support APOP (RFC 2828, 4949).
@@ -304,7 +268,7 @@ class POP3
     public function login($username = '', $password = ''): bool
     {
         if (!$this->connected) {
-            $this->setError('Not connected to POP3 server');
+            $this->set_error('Not connected to POP3 server');
             return false;
         }
         if (empty($username)) {
@@ -313,22 +277,19 @@ class POP3
         if (empty($password)) {
             $password = $this->password;
         }
-
         //Send the Username
-        $this->sendString("USER $username" . static::LE);
-        $pop3_response = $this->getResponse();
-        if ($this->checkResponse($pop3_response)) {
+        $this->send_string("USER {$username}" . static::LE);
+        $pop3_response = $this->get_response();
+        if ($this->check_response($pop3_response)) {
             //Send the Password
-            $this->sendString("PASS $password" . static::LE);
-            $pop3_response = $this->getResponse();
-            if ($this->checkResponse($pop3_response)) {
+            $this->send_string("PASS {$password}" . static::LE);
+            $pop3_response = $this->get_response();
+            if ($this->check_response($pop3_response)) {
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Disconnect from the POP3 server.
      */
@@ -338,17 +299,14 @@ class POP3
         if ($this->pop_conn === false) {
             return;
         }
-
-        $this->sendString('QUIT' . static::LE);
-
+        $this->send_string('QUIT' . static::LE);
         // RFC 1939 shows POP3 server sending a +OK response to the QUIT command.
         // Try to get it.  Ignore any failures here.
         try {
-            $this->getResponse();
+            $this->get_response();
         } catch (Exception) {
             //Do nothing
         }
-
         //The QUIT command may cause the daemon to exit, which will kill our connection
         //So ignore errors here
         try {
@@ -356,12 +314,10 @@ class POP3
         } catch (Exception) {
             //Do nothing
         }
-
         // Clean up attributes.
         $this->connected = false;
-        $this->pop_conn  = false;
+        $this->pop_conn = false;
     }
-
     /**
      * Get a response from the POP3 server.
      *
@@ -369,16 +325,14 @@ class POP3
      *
      * @return string
      */
-    protected function getResponse($size = 128): string|false
+    protected function get_response($size = 128): string|false
     {
         $response = fgets($this->pop_conn, $size);
         if ($this->do_debug >= self::DEBUG_SERVER) {
             echo 'Server -> Client: ', $response;
         }
-
         return $response;
     }
-
     /**
      * Send raw data to the POP3 server.
      *
@@ -386,43 +340,38 @@ class POP3
      *
      * @return int
      */
-    protected function sendString($string): int|false
+    protected function send_string($string): int|false
     {
         if ($this->pop_conn) {
-            if ($this->do_debug >= self::DEBUG_CLIENT) { //Show client messages when debug >= 2
+            if ($this->do_debug >= self::DEBUG_CLIENT) {
+                //Show client messages when debug >= 2
                 echo 'Client -> Server: ', $string;
             }
-
             return fwrite($this->pop_conn, $string, strlen($string));
         }
-
         return 0;
     }
-
     /**
      * Checks the POP3 server response.
      * Looks for for +OK or -ERR.
      *
      * @param string $string
      */
-    protected function checkResponse($string): bool
+    protected function check_response($string): bool
     {
         if (!str_starts_with($string, '+OK')) {
-            $this->setError("Server reported an error: $string");
-
+            $this->set_error("Server reported an error: {$string}");
             return false;
         }
-
         return true;
     }
-
     /**
      * Add an error to the internal error store.
      * Also display debug output if it's enabled.
      *
      * @param string $error
      */
-    protected function setError($error)
+    protected function set_error($error)
     {
         $this->errors[] = $error;
         if ($this->do_debug >= self::DEBUG_SERVER) {
@@ -433,17 +382,15 @@ class POP3
             echo '</pre>';
         }
     }
-
     /**
      * Get an array of error messages, if any.
      *
      * @return array
      */
-    public function getErrors()
+    public function get_errors()
     {
         return $this->errors;
     }
-
     /**
      * POP3 connection error handler.
      *
@@ -452,11 +399,8 @@ class POP3
      * @param string $errfile
      * @param int    $errline
      */
-    protected function catchWarning($errno, $errstr, $errfile, $errline)
+    protected function catch_warning($errno, $errstr, $errfile, $errline)
     {
-        $this->setError(
-            'Connecting to the POP3 server raised a PHP warning:' .
-            "errno: $errno errstr: $errstr; errfile: $errfile; errline: $errline"
-        );
+        $this->set_error('Connecting to the POP3 server raised a PHP warning:' . "errno: {$errno} errstr: {$errstr}; errfile: {$errfile}; errline: {$errline}");
     }
 }

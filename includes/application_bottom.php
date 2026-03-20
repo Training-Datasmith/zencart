@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * application_bottom.php
  * Common actions carried out at the end of each page invocation.
@@ -13,36 +13,33 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 //  @todo icwtodo Development debug code
 // do not remove for now
 if (defined('DEV_SHOW_APPLICATION_BOTTOM_DEBUG') && DEV_SHOW_APPLICATION_BOTTOM_DEBUG == true) {
-    $langLoaded = $languageLoader->getLanguageFilesLoaded();
-    echo '$langLoaded = ' . str_replace("\n", '<br>', var_export($langLoaded, true));
-
+    $lang_loaded = $language_loader->get_language_files_loaded();
+    echo '$langLoaded = ' . str_replace("\n", '<br>', var_export($lang_loaded, true));
     $files = get_included_files();
-    $langFiles = [];
+    $lang_files = [];
     $pattern = DIR_WS_LANGUAGES;
     foreach ($files as $file) {
-        $shortFile = str_replace(['\\', DIR_FS_CATALOG], ['/', ''], $file);
-        if (in_array($shortFile, $langLoaded['legacy'])) {
+        $short_file = str_replace(['\\', DIR_FS_CATALOG], ['/', ''], $file);
+        if (in_array($short_file, $lang_loaded['legacy'])) {
             continue;
         }
-        if (in_array($file, $langLoaded['legacy'])) {
+        if (in_array($file, $lang_loaded['legacy'])) {
             continue;
         }
-        if (in_array($shortFile, $langLoaded['arrays'])) {
+        if (in_array($short_file, $lang_loaded['arrays'])) {
             continue;
         }
-        if (in_array($file, $langLoaded['arrays'])) {
+        if (in_array($file, $lang_loaded['arrays'])) {
             continue;
         }
-        if (str_starts_with($shortFile, $pattern)) {
-            $langFiles[] = $file;
+        if (str_starts_with($short_file, $pattern)) {
+            $lang_files[] = $file;
         }
     }
-    echo '<br>Other $langFiles = ' . str_replace("\n", '<br>', var_export($langFiles, true));
+    echo '<br>Other $langFiles = ' . str_replace("\n", '<br>', var_export($lang_files, true));
 }
-
 // close session (store variables)
 session_write_close();

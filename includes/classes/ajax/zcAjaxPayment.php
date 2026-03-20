@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * zcAjaxPayment
  *
@@ -9,102 +9,80 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  * @since ZC v1.5.4
  */
-
-use Zencart\LanguageLoader\LanguageLoaderFactory;
-
-class zcAjaxPayment extends base
+use Zencart\Language_Loader\Language_Loader_Factory;
+class Zc_Ajax_Payment extends base
 {
     /**
      * Test whether the selected payment module "does" the "CollectsCardDataOnsite" method
      * @since ZC v1.5.4
      */
-    public function doesCollectsCardDataOnsite(): array
+    public function does_collects_card_data_onsite(): array
     {
-        require_once(DIR_WS_CLASSES.'payment.php');
-        $retVal = false;
+        require_once DIR_WS_CLASSES . 'payment.php';
+        $ret_val = false;
         $payment = new payment($_POST['paymentValue']);
         if (isset($payment->selected_module)) {
-            if ($payment->paymentClass->collectsCardDataOnsite === true) {
-                $retVal = true;
+            if ($payment->payment_class->collects_card_data_onsite === true) {
+                $ret_val = true;
             }
         }
-        return ([
-            'data' => $retVal,
-        ]);
+        return ['data' => $ret_val];
     }
-
     /**
      * Build replacement confirmation page, which doesn't transmit sensitive CHD
      * @since ZC v1.5.4
      */
-    public function prepareConfirmation(): array
+    public function prepare_confirmation(): array
     {
-        global $messageStack, $template, $breadcrumb, $template_dir_select, $template_dir, $language_page_directory, $currencies, $order, $zco_notifier, $db, $current_page_base, $order_total_modules, $credit_covers;
+        global $message_stack, $template, $breadcrumb, $template_dir_select, $template_dir, $language_page_directory, $currencies, $order, $zco_notifier, $db, $current_page_base, $order_total_modules, $credit_covers;
         $_GET['main_page'] = $current_page_base = $current_page = FILENAME_CHECKOUT_CONFIRMATION;
         if ($_SESSION['cart']->count_contents() <= 0) {
             zen_redirect(zen_href_link(FILENAME_TIME_OUT));
         }
         if (!zen_is_logged_in()) {
-            $_SESSION['navigation']->set_snapshot([
-                'mode' => 'SSL',
-                'page' => FILENAME_CHECKOUT_PAYMENT,
-            ]);
+            $_SESSION['navigation']->set_snapshot(['mode' => 'SSL', 'page' => FILENAME_CHECKOUT_PAYMENT]);
             zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
-        } else {
-            // validate customer
-            if (zen_get_customer_validate_session($_SESSION['customer_id']) == false) {
-                $_SESSION['navigation']->set_snapshot();
-                zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
-            }
+        } else if (zen_get_customer_validate_session($_SESSION['customer_id']) == false) {
+            $_SESSION['navigation']->set_snapshot();
+            zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
         }
-
         // avoid hack attempts during the checkout procedure by checking the internal cartID
-        if (isset($_SESSION['cart']->cartID) && $_SESSION['cartID']) {
-            if ($_SESSION['cart']->cartID != $_SESSION['cartID']) {
+        if (isset($_SESSION['cart']->cart_id) && $_SESSION['cartID']) {
+            if ($_SESSION['cart']->cart_id != $_SESSION['cartID']) {
                 zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
             }
         }
-
         // if no shipping method has been selected, redirect the customer to the shipping method selection page
         if (!isset($_SESSION['shipping'])) {
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
         }
-        if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free'
-          && $_SESSION['cart']->get_content_type() != 'virtual'
-          && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING') && MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING == 'true'
-          && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER') && $_SESSION['cart']->show_total() < MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER) {
+        if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free' && $_SESSION['cart']->get_content_type() != 'virtual' && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING') && MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING == 'true' && defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER') && $_SESSION['cart']->show_total() < MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER) {
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
         }
-
         if (isset($_POST['payment'])) {
             $_SESSION['payment'] = $_POST['payment'];
         }
-
         $_SESSION['comments'] = $_POST['comments'];
-
         if (DISPLAY_CONDITIONS_ON_CHECKOUT == 'true') {
             $_SESSION['conditions'] = $_POST['conditions'] ?? null;
         }
         // load the selected payment module
-        require(DIR_WS_CLASSES.'payment.php');
+        require DIR_WS_CLASSES . 'payment.php';
         $payment_modules = new payment($_POST['payment']);
         $payment_modules->update_status();
-        if (($_POST['payment'] == '' || !is_object($payment_modules->paymentClass)) && $credit_covers === false) {
-            $messageStack->add_session('checkout_payment', ERROR_NO_PAYMENT_MODULE_SELECTED, 'error');
+        if (($_POST['payment'] == '' || !is_object($payment_modules->payment_class)) && $credit_covers === false) {
+            $message_stack->add_session('checkout_payment', ERROR_NO_PAYMENT_MODULE_SELECTED, 'error');
         }
-        $GLOBALS[$_POST['payment']] = $payment_modules->paymentClass;
-
-        require(DIR_WS_CLASSES.'order.php');
+        $GLOBALS[$_POST['payment']] = $payment_modules->payment_class;
+        require DIR_WS_CLASSES . 'order.php';
         $order = new order();
         // load the selected shipping module
-        require(DIR_WS_CLASSES.'shipping.php');
+        require DIR_WS_CLASSES . 'shipping.php';
         $shipping_modules = new shipping($_SESSION['shipping']);
-
-        require(DIR_WS_CLASSES.'order_total.php');
+        require DIR_WS_CLASSES . 'order_total.php';
         $order_total_modules = new order_total();
         $order_total_modules->collect_posts();
         $order_total_modules->pre_confirmation_check();
-
         if (!isset($credit_covers)) {
             $credit_covers = false;
         }
@@ -112,102 +90,83 @@ class zcAjaxPayment extends base
             unset($_SESSION['payment']);
             $_SESSION['payment'] = '';
         }
-
         if (is_array($payment_modules->modules)) {
             $payment_modules->pre_confirmation_check();
         }
-
-        if ($messageStack->size('checkout_payment') > 0) {
+        if ($message_stack->size('checkout_payment') > 0) {
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
         }
-
         // Stock Check
-        $flagAnyOutOfStock = false;
+        $flag_any_out_of_stock = false;
         $stock_check = [];
         if (STOCK_CHECK == 'true') {
             for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
                 if ($stock_check[$i] = zen_check_stock($order->products[$i]['id'], $order->products[$i]['qty'])) {
-                    $flagAnyOutOfStock = true;
+                    $flag_any_out_of_stock = true;
                 }
             }
             // Out of Stock
-            if ((STOCK_ALLOW_CHECKOUT != 'true') && ($flagAnyOutOfStock == true)) {
+            if (STOCK_ALLOW_CHECKOUT != 'true' && $flag_any_out_of_stock == true) {
                 zen_redirect(zen_href_link(FILENAME_SHOPPING_CART));
             }
         }
-
         // update customers_referral with $_SESSION['gv_id']
         if (!empty($_SESSION['cc_id'])) {
             $discount_coupon_query = 'SELECT coupon_code
-                            FROM '.TABLE_COUPONS.'
+                            FROM ' . TABLE_COUPONS . '
                             WHERE coupon_id = :couponID';
-
-            $discount_coupon_query = $db->bindVars($discount_coupon_query, ':couponID', $_SESSION['cc_id'], 'integer');
+            $discount_coupon_query = $db->bind_vars($discount_coupon_query, ':couponID', $_SESSION['cc_id'], 'integer');
             $discount_coupon = $db->Execute($discount_coupon_query);
-
             $customers_referral_query = 'SELECT customers_referral
-                               FROM '.TABLE_CUSTOMERS.'
+                               FROM ' . TABLE_CUSTOMERS . '
                                WHERE customers_id = :customersID';
-
-            $customers_referral_query = $db->bindVars($customers_referral_query, ':customersID', $_SESSION['customer_id'], 'integer');
+            $customers_referral_query = $db->bind_vars($customers_referral_query, ':customersID', $_SESSION['customer_id'], 'integer');
             $customers_referral = $db->Execute($customers_referral_query);
-
             // only use discount coupon if set by coupon
             if ($customers_referral->fields['customers_referral'] == '' and CUSTOMERS_REFERRAL_STATUS == 1) {
-                $sql = 'UPDATE '.TABLE_CUSTOMERS.'
+                $sql = 'UPDATE ' . TABLE_CUSTOMERS . '
             SET customers_referral = :customersReferral
             WHERE customers_id = :customersID';
-
-                $sql = $db->bindVars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
-                $sql = $db->bindVars($sql, ':customersReferral', $discount_coupon->fields['coupon_code'], 'string');
+                $sql = $db->bind_vars($sql, ':customersID', $_SESSION['customer_id'], 'integer');
+                $sql = $db->bind_vars($sql, ':customersReferral', $discount_coupon->fields['coupon_code'], 'string');
                 $db->Execute($sql);
             } else {
                 // do not update referral was added before
             }
         }
-
         if (isset(${$_SESSION['payment']}->form_action_url)) {
             $form_action_url = ${$_SESSION['payment']}->form_action_url;
         } else {
             $form_action_url = zen_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL');
         }
-
         // if shipping-edit button should be overridden, do so
-        $editShippingButtonLink = zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL');
+        $edit_shipping_button_link = zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL');
         if (!empty($_SESSION['payment']) && !empty(${$_SESSION['payment']}) && is_object(${$_SESSION['payment']}) && method_exists(${$_SESSION['payment']}, 'alterShippingEditButton')) {
-            $theLink = ${$_SESSION['payment']}->alterShippingEditButton();
-            if ($theLink) {
-                $editShippingButtonLink = $theLink;
+            $the_link = ${$_SESSION['payment']}->alter_shipping_edit_button();
+            if ($the_link) {
+                $edit_shipping_button_link = $the_link;
             }
         }
         // deal with billing address edit button
-        $flagDisablePaymentAddressChange = false;
-        if (isset(${$_SESSION['payment']}->flagDisablePaymentAddressChange)) {
-            $flagDisablePaymentAddressChange = ${$_SESSION['payment']}->flagDisablePaymentAddressChange;
+        $flag_disable_payment_address_change = false;
+        if (isset(${$_SESSION['payment']}->flag_disable_payment_address_change)) {
+            $flag_disable_payment_address_change = ${$_SESSION['payment']}->flag_disable_payment_address_change;
         }
-
         $current_page_base = FILENAME_CHECKOUT_CONFIRMATION;
-        $languageLoaderFactory = new LanguageLoaderFactory();
-        $languageLoader = $languageLoaderFactory->make('catalog', [], $current_page, $template_dir);
-        $languageLoader->loadInitialLanguageDefines();
-        $languageLoader->finalizeLanguageDefines();
-
-        require_once(DIR_WS_MODULES.zen_get_module_directory('require_languages.php'));
-        require_once(DIR_WS_MODULES.zen_get_module_directory('meta_tags.php'));
+        $language_loader_factory = new Language_Loader_Factory();
+        $language_loader = $language_loader_factory->make('catalog', [], $current_page, $template_dir);
+        $language_loader->load_initial_language_defines();
+        $language_loader->finalize_language_defines();
+        require_once DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
+        require_once DIR_WS_MODULES . zen_get_module_directory('meta_tags.php');
         $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_CHECKOUT_SHIPPING, '', 'SSL'));
         $breadcrumb->add(NAVBAR_TITLE_2);
-
-        $breadCrumbHtml = $breadcrumb->trail(BREAD_CRUMBS_SEPARATOR);
-        $body_code = DIR_FS_CATALOG.$template->get_template_dir('tpl_ajax_checkout_confirmation_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates').'/tpl_ajax_checkout_confirmation_default.php';
+        $bread_crumb_html = $breadcrumb->trail(BREAD_CRUMBS_SEPARATOR);
+        $body_code = DIR_FS_CATALOG . $template->get_template_dir('tpl_ajax_checkout_confirmation_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_ajax_checkout_confirmation_default.php';
         ob_start();
-        require_once($body_code);
-        $confirmationHtml = ob_get_clean();
+        require_once $body_code;
+        $confirmation_html = ob_get_clean();
         ob_flush();
-
-        return ([
-            'breadCrumbHtml' => $breadCrumbHtml,
-            'confirmationHtml' => $confirmationHtml,
-            'pageTitle' => META_TAG_TITLE,
-        ]);
+        return ['breadCrumbHtml' => $bread_crumb_html, 'confirmationHtml' => $confirmation_html, 'pageTitle' => META_TAG_TITLE];
     }
 }

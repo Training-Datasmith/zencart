@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
-namespace DASPRiD\Enum\Exception;
+declare (strict_types=1);
+namespace Dasp_Ri_D\Enum\Exception;
 
 use Throwable;
-
-interface ExceptionInterface extends Throwable
+interface Exception_Interface extends Throwable
 {
 }

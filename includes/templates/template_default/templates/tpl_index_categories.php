@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Page Template
  *
@@ -13,98 +14,126 @@
  */
 ?>
 <div class="centerColumn" id="indexCategories">
-<?php if ($show_welcome == true) { ?>
-<h1 id="indexCategoriesHeading"><?php echo HEADING_TITLE_NESTED; ?></h1>
+<?php 
+if ($show_welcome == true) {
+    ?>
+<h1 id="indexCategoriesHeading"><?php 
+    echo HEADING_TITLE_NESTED;
+    ?></h1>
 
-<?php if (SHOW_CUSTOMER_GREETING == 1) { ?>
-<h2 class="greeting"><?php echo zen_customer_greeting(); ?></h2>
-<?php } ?>
+<?php 
+    if (SHOW_CUSTOMER_GREETING == 1) {
+        ?>
+<h2 class="greeting"><?php 
+        echo zen_customer_greeting();
+        ?></h2>
+<?php 
+    }
+    ?>
 
-<?php if (DEFINE_MAIN_PAGE_STATUS >= 1 and DEFINE_MAIN_PAGE_STATUS <= 2) { ?>
-<div id="indexCategoriesMainContent" class="content"><?php
-/**
- * require the html_define for the index/categories page
- */
-  include($define_page);
-?>
+<?php 
+    if (DEFINE_MAIN_PAGE_STATUS >= 1 and DEFINE_MAIN_PAGE_STATUS <= 2) {
+        ?>
+<div id="indexCategoriesMainContent" class="content"><?php 
+        /**
+         * require the html_define for the index/categories page
+         */
+        include $define_page;
+        ?>
 </div>
-<?php } ?>
+<?php 
+    }
+    ?>
 
-<?php } else { //show_welcome ?>
+<?php 
+} else {
+    //show_welcome 
+    ?>
 
-<h1 id="indexCategoriesHeading"><?php echo $current_categories_name; ?></h1>
-<?php } ?>
+<h1 id="indexCategoriesHeading"><?php 
+    echo $current_categories_name;
+    ?></h1>
+<?php 
+}
+?>
 
-<?php
+<?php 
 if (PRODUCT_LIST_CATEGORIES_IMAGE_STATUS_TOP == 'true') {
+    // categories_image
+    if ($categories_image = zen_get_categories_image($current_category_id)) {
+        ?>
+<div id="categoryImgListing" class="categoryImg"><?php 
+        echo zen_image(DIR_WS_IMAGES . $categories_image, '', SUBCATEGORY_IMAGE_TOP_WIDTH, SUBCATEGORY_IMAGE_TOP_HEIGHT);
+        ?></div>
+<?php 
+    }
+}
 // categories_image
-  if ($categories_image = zen_get_categories_image($current_category_id)) {
-?>
-<div id="categoryImgListing" class="categoryImg"><?php echo zen_image(DIR_WS_IMAGES . $categories_image, '', SUBCATEGORY_IMAGE_TOP_WIDTH, SUBCATEGORY_IMAGE_TOP_HEIGHT); ?></div>
-<?php
-  }
-} // categories_image
 ?>
 
-<?php
+<?php 
 // categories_description
-    if ($current_categories_description != '') {
+if ($current_categories_description != '') {
+    ?>
+<div id="categoryDescription" class="catDescContent"><?php 
+    echo $current_categories_description;
+    ?></div>
+<?php 
+}
+// categories_description 
 ?>
-<div id="categoryDescription" class="catDescContent"><?php echo $current_categories_description;  ?></div>
-<?php } // categories_description ?>
 <!-- BOF: Display grid of available sub-categories, if any -->
-<?php
-  if (PRODUCT_LIST_CATEGORY_ROW_STATUS == 0) {
+<?php 
+if (PRODUCT_LIST_CATEGORY_ROW_STATUS == 0) {
     // do nothing
-  } else {
+} else {
     // display subcategories
-/**
- * require the code to display the sub-categories-grid, if any exist
- */
-   require($template->get_template_dir('tpl_modules_category_row.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_category_row.php');
-  }
+    /**
+     * require the code to display the sub-categories-grid, if any exist
+     */
+    require $template->get_template_dir('tpl_modules_category_row.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_modules_category_row.php';
+}
 ?>
 <!-- EOF: Display grid of available sub-categories -->
-<?php
+<?php 
 $show_display_category = $db->Execute(SQL_SHOW_PRODUCT_INFO_CATEGORY);
-
 while (!$show_display_category->EOF) {
-  // //  echo 'I found ' . zen_get_module_directory(FILENAME_UPCOMING_PRODUCTS);
+    // //  echo 'I found ' . zen_get_module_directory(FILENAME_UPCOMING_PRODUCTS);
+    ?>
 
-?>
+<?php 
+    if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_FEATURED_PRODUCTS') {
+        /**
+         * display the Featured Products Center Box
+         */
+        require $template->get_template_dir('tpl_modules_featured_products.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_modules_featured_products.php';
+    }
+    ?>
 
-<?php if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_FEATURED_PRODUCTS') { ?>
-<?php
-/**
- * display the Featured Products Center Box
- */
-?>
-<?php require($template->get_template_dir('tpl_modules_featured_products.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_featured_products.php'); ?>
-<?php } ?>
+<?php 
+    if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_SPECIALS_PRODUCTS') {
+        /**
+         * display the Special Products Center Box
+         */
+        require $template->get_template_dir('tpl_modules_specials_default.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_modules_specials_default.php';
+    }
+    ?>
 
-<?php if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_SPECIALS_PRODUCTS') { ?>
-<?php
-/**
- * display the Special Products Center Box
- */
-?>
-<?php require($template->get_template_dir('tpl_modules_specials_default.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_specials_default.php'); ?>
-<?php } ?>
+<?php 
+    if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_NEW_PRODUCTS') {
+        /**
+         * display the New Products Center Box
+         */
+        require $template->get_template_dir('tpl_modules_whats_new.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_modules_whats_new.php';
+    }
+    ?>
 
-<?php if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_NEW_PRODUCTS') { ?>
-<?php
-/**
- * display the New Products Center Box
- */
-?>
-<?php require($template->get_template_dir('tpl_modules_whats_new.php',DIR_WS_TEMPLATE, $current_page_base,'templates'). '/tpl_modules_whats_new.php'); ?>
-<?php } ?>
-
-<?php if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_UPCOMING') { ?>
-<?php include(DIR_WS_MODULES . zen_get_module_directory(FILENAME_UPCOMING_PRODUCTS)); ?>
-<?php } ?>
-<?php
-  $show_display_category->MoveNext();
-} // !EOF
+<?php 
+    if ($show_display_category->fields['configuration_key'] == 'SHOW_PRODUCT_INFO_CATEGORY_UPCOMING') {
+        include DIR_WS_MODULES . zen_get_module_directory(FILENAME_UPCOMING_PRODUCTS);
+    }
+    $show_display_category->move_next();
+}
+// !EOF
 ?>
 </div>

@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Exception;
 
-namespace BaconQrCode\Exception;
-
-final class RuntimeException extends \RuntimeException implements ExceptionInterface
+final class RuntimeException extends \RuntimeException implements Exception_Interface
 {
 }

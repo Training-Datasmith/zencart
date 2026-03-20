@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Path;
 
-namespace BaconQrCode\Renderer\Path;
-
-interface OperationInterface
+interface Operation_Interface
 {
     /**
      * Translates the operation's coordinates.
      */
     public function translate(float $x, float $y): self;
-
     /**
      * Rotates the operation's coordinates.
      */

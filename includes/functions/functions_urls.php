@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * URL functions
  *
@@ -8,14 +8,13 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * Redirect to another page or site
  * @param $url
  * @param int $httpResponseCode
  * @since ZC v1.0.3
  */
-function zen_redirect($url, $httpResponseCode = null): void
+function zen_redirect($url, $http_response_code = null): void
 {
     // -----
     // Enable an observer to override the redirect.  For instance, an AJAX
@@ -24,21 +23,16 @@ function zen_redirect($url, $httpResponseCode = null): void
     //
     $request_handled = false;
     global $zco_notifier;
-    $zco_notifier->notify('NOTIFY_ZEN_REDIRECT', ['url' => $url, 'httpResponseCode' => $httpResponseCode], $request_handled);
+    $zco_notifier->notify('NOTIFY_ZEN_REDIRECT', ['url' => $url, 'httpResponseCode' => $http_response_code], $request_handled);
     if ($request_handled === true) {
         return;
     }
-
     // @TODO - rework admin so this exclusion isn't necessary
     $url = zen_get_site_url_for_request($url);
-
     $url = zen_cleanup_url_params($url, $for_redirect = true);
-
-    zen_set_redirect_http_headers($url, $httpResponseCode);
-
-    exit();
+    zen_set_redirect_http_headers($url, $http_response_code);
+    exit;
 }
-
 /**
  * Normalize URL ampersand parameters to prevent duplicates and re-encodings
  * @param string $url
@@ -51,31 +45,27 @@ function zen_cleanup_url_params($url, $for_redirect = false): string|array|null
     // clean up URL before executing it
     $url = preg_replace('/&{2,}/', '&', $url);
     $url = preg_replace('/(&amp;)+/', '&amp;', (string) $url);
-
     if ($for_redirect) {
         // header Location URLs should not have the &amp; in the address (it breaks things)
         return preg_replace('/(&amp;)+/', '&', (string) $url);
     }
-
     return $url;
 }
-
 /**
  * Close session and set headers for page-redirect
  *
  * @param int $httpResponseCode
  * @since ZC v1.5.8
  */
-function zen_set_redirect_http_headers(string $url, $httpResponseCode = null): void
+function zen_set_redirect_http_headers(string $url, $http_response_code = null): void
 {
     session_write_close();
-    if (empty($httpResponseCode)) {
+    if (empty($http_response_code)) {
         header('Location: ' . $url);
     } else {
-        header('Location: ' . $url, true, (int)$httpResponseCode);
+        header('Location: ' . $url, true, (int) $http_response_code);
     }
 }
-
 /**
  * Get appropriate HTTPS_SERVER vs HTTP_SERVER and subdirs based on $request_type of current page
  * Typically used within zen_redirect function
@@ -90,17 +80,15 @@ function zen_get_site_url_for_request($url)
 {
     global $request_type;
     // Are we loading an SSL page?
-    if ((ENABLE_SSL == 'true') && ($request_type == 'SSL')) {
+    if (ENABLE_SSL == 'true' && $request_type == 'SSL') {
         // yes, but a NONSSL url was supplied
         if (str_starts_with($url, HTTP_SERVER . DIR_WS_CATALOG)) {
             // So, change it to SSL, based on site's configuration for SSL
             $url = HTTPS_SERVER . DIR_WS_HTTPS_CATALOG . substr($url, strlen(HTTP_SERVER . DIR_WS_CATALOG));
         }
     }
-
     return $url;
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -119,19 +107,16 @@ function zen_get_top_level_domain(string $url)
         if (is_numeric($domain_array[$domain_size - 2]) && is_numeric($domain_array[$domain_size - 1])) {
             return false;
         }
-
         $tld = '';
-        foreach ($domain_array as $dPart) {
-            if ($dPart != 'www') {
-                $tld = $tld . '.' . $dPart;
+        foreach ($domain_array as $d_part) {
+            if ($d_part != 'www') {
+                $tld = $tld . '.' . $d_part;
             }
         }
         return substr($tld, 1);
     }
-
     return false;
 }
-
 /**
  * Generate A HREF link for an HTML-based "Back" button, determined from user's session browsing history
  * @since ZC v1.0.3
@@ -148,9 +133,8 @@ function zen_back_link(bool $link_only = false, string $parameters = ''): string
         } else {
             $link = zen_href_link(FILENAME_DEFAULT);
         }
-        $_SESSION['navigation'] = new navigationHistory();
+        $_SESSION['navigation'] = new Navigation_History();
     }
-
     if ($link_only) {
         return $link;
     }

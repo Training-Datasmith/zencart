@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Payment Class.
  *
@@ -9,14 +9,12 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-use Zencart\FileSystem\FileSystem;
-use Zencart\ResourceLoaders\ModuleFinder;
-use Zencart\Traits\NotifierManager;
-
+use Zencart\File_System\File_System;
+use Zencart\Resource_Loaders\Module_Finder;
+use Zencart\Traits\Notifier_Manager;
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * Payment Class.
  * This class interfaces with payment modules
@@ -25,12 +23,11 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
 class payment
 {
-    use NotifierManager;
-
+    use Notifier_Manager;
     /**
      * $doesCollectsCardDataOnsite is a flag to indicate if card details are collected on site
      */
-    public bool $doesCollectsCardDataOnsite;
+    public bool $does_collects_card_data_onsite;
     /**
      * $form_action_url is the URL to process the payment or not set for local processing
      */
@@ -43,44 +40,36 @@ class payment
      * $paymentClass is a payment class
      * @var class
      */
-    public $paymentClass;
+    public $payment_class;
     /**
      * $selected_module is the selected payment module
      */
     public string $selected_module;
-
     public function __construct(?string $module = '')
     {
-        global $language, $credit_covers, $messageStack, $languageLoader, $installedPlugins;
-
-        $this->doesCollectsCardDataOnsite = false;
-
+        global $language, $credit_covers, $message_stack, $language_loader, $installed_plugins;
+        $this->does_collects_card_data_onsite = false;
         if (defined('MODULE_PAYMENT_INSTALLED') && !empty(MODULE_PAYMENT_INSTALLED)) {
             $this->modules = explode(';', (string) MODULE_PAYMENT_INSTALLED);
         }
         $this->notify('NOTIFY_PAYMENT_CLASS_GET_INSTALLED_MODULES', $module);
-
         if (empty($this->modules)) {
             return;
         }
-
         // -----
         // Locate all payment modules, looking in both /includes/modules/payment
         // and for those provided by zc_plugins.  Note that any module provided by a
         // zc_plugin overrides the processing present in any 'base' file.
         //
-        $moduleFinder = new ModuleFinder('payment', new FileSystem());
-        $modules_found = $moduleFinder->findFromFilesystem($installedPlugins);
-
+        $module_finder = new Module_Finder('payment', new File_System());
+        $modules_found = $module_finder->find_from_filesystem($installed_plugins);
         $include_modules = [];
-
         if (!empty($module) && in_array($module . '.php', $this->modules) && isset($modules_found[$module . '.php'])) {
             $this->selected_module = $module;
-
             $include_modules[] = ['class' => $module, 'file' => $module . '.php'];
         } else {
             // Free Payment Only shows
-            $freecharger_enabled = (defined('MODULE_PAYMENT_FREECHARGER_STATUS') && MODULE_PAYMENT_FREECHARGER_STATUS === 'True' && isset($modules_found['freecharger.php']));
+            $freecharger_enabled = defined('MODULE_PAYMENT_FREECHARGER_STATUS') && MODULE_PAYMENT_FREECHARGER_STATUS === 'True' && isset($modules_found['freecharger.php']);
             if ($freecharger_enabled && $_SESSION['cart']->show_total() == 0 && (!isset($_SESSION['shipping']['cost']) || $_SESSION['shipping']['cost'] == 0)) {
                 $this->selected_module = $module;
                 $include_modules[] = ['class' => 'freecharger', 'file' => 'freecharger.php'];
@@ -98,36 +87,31 @@ class payment
                 }
             }
         }
-
         for ($i = 0, $n = count($include_modules); $i < $n; $i++) {
             $next_module = $include_modules[$i];
-
-            if (!$languageLoader->loadModuleLanguageFile($next_module['file'], 'payment')) {
+            if (!$language_loader->load_module_language_file($next_module['file'], 'payment')) {
                 $lang_file = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/', $next_module['file'], 'false');
-                if (is_object($messageStack)) {
+                if (is_object($message_stack)) {
                     if (IS_ADMIN_FLAG === false) {
-                        $messageStack->add('checkout_payment', WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
+                        $message_stack->add('checkout_payment', WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
                     } else {
-                        $messageStack->add_session(WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
+                        $message_stack->add_session(WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
                     }
                 }
                 continue;
             }
-
             include_once DIR_FS_CATALOG . $modules_found[$next_module['file']] . $next_module['file'];
-
-            $this->paymentClass = new $next_module['class']();
+            $this->payment_class = new $next_module['class']();
             $this->notify('NOTIFY_PAYMENT_MODULE_ENABLE');
-            if ($this->paymentClass->enabled) {
-                $GLOBALS[$next_module['class']] = $this->paymentClass;
-                if (!empty($this->paymentClass->collectsCardDataOnsite)) {
-                    $this->doesCollectsCardDataOnsite = true;
+            if ($this->payment_class->enabled) {
+                $GLOBALS[$next_module['class']] = $this->payment_class;
+                if (!empty($this->payment_class->collects_card_data_onsite)) {
+                    $this->does_collects_card_data_onsite = true;
                 }
             } else {
                 unset($include_modules[$i]);
             }
         }
-
         $include_modules = array_values($include_modules);
         // if there is only one payment method, select it as default because in
         // checkout_confirmation.php the $payment variable is being assigned the
@@ -137,19 +121,16 @@ class payment
                 $_SESSION['payment'] = $include_modules[0]['class'];
             }
         }
-
         if (!empty($module) && in_array($module, $this->modules) && isset($GLOBALS[$module]->form_action_url)) {
             $this->form_action_url = $GLOBALS[$module]->form_action_url;
         }
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function checkCreditCovered(): bool
+    public function check_credit_covered(): bool
     {
         global $credit_covers;
-
         $credit_is_covered = false;
         if (isset($credit_covers) && $credit_covers === true) {
             $credit_is_covered = true;
@@ -158,7 +139,6 @@ class payment
         }
         return $credit_is_covered;
     }
-
     // -----
     // This protected method is used by various public methods to
     // perform common determination of whether the currently-selected
@@ -167,7 +147,7 @@ class payment
     /**
      * @since ZC v2.1.0
      */
-    protected function isPaymentModuleMethodPresent(string $method): bool
+    protected function is_payment_module_method_present(string $method): bool
     {
         if (empty($this->selected_module) || !is_array($this->modules) || !is_object($GLOBALS[$this->selected_module])) {
             return false;
@@ -177,7 +157,6 @@ class payment
         }
         return true;
     }
-
     /**
      * The update_status() method is needed in the checkout_confirmation.php page
      * due to a chicken and egg problem with the payment class and order class.
@@ -190,12 +169,11 @@ class payment
      */
     public function update_status()
     {
-        if ($this->isPaymentModuleMethodPresent('update_status') === false) {
+        if ($this->is_payment_module_method_present('update_status') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->update_status();
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -204,51 +182,29 @@ class payment
         if (!is_array($this->modules) || empty($this->selection())) {
             return '';
         }
-
-        $js = '<script>' . "\n" .
-            'function check_form() {' . "\n" .
-            '  var error = 0;' . "\n" .
-            '  var error_message = "' . JS_ERROR . '";' . "\n" .
-            '  var payment_value = null;' . "\n" .
-            '  if (document.checkout_payment.payment) {' . "\n" .
-            '    if (document.checkout_payment.payment.length) {' . "\n" .
-            '      for (var i=0; i<document.checkout_payment.payment.length; i++) {' . "\n" .
-            '        if (document.checkout_payment.payment[i].checked) {' . "\n" .
-            '          payment_value = document.checkout_payment.payment[i].value;' . "\n" .
-            '        }' . "\n" .
-            '      }' . "\n" .
-            '    } else if (document.checkout_payment.payment.checked) {' . "\n" .
-            '      payment_value = document.checkout_payment.payment.value;' . "\n" .
-            '    } else if (document.checkout_payment.payment.value) {' . "\n" .
-            '      payment_value = document.checkout_payment.payment.value;' . "\n" .
-            '    }' . "\n" .
-            '  }' . "\n\n";
-
+        $js = '<script>' . "\n" . 'function check_form() {' . "\n" . '  var error = 0;' . "\n" . '  var error_message = "' . JS_ERROR . '";' . "\n" . '  var payment_value = null;' . "\n" . '  if (document.checkout_payment.payment) {' . "\n" . '    if (document.checkout_payment.payment.length) {' . "\n" . '      for (var i=0; i<document.checkout_payment.payment.length; i++) {' . "\n" . '        if (document.checkout_payment.payment[i].checked) {' . "\n" . '          payment_value = document.checkout_payment.payment[i].value;' . "\n" . '        }' . "\n" . '      }' . "\n" . '    } else if (document.checkout_payment.payment.checked) {' . "\n" . '      payment_value = document.checkout_payment.payment.value;' . "\n" . '    } else if (document.checkout_payment.payment.value) {' . "\n" . '      payment_value = document.checkout_payment.payment.value;' . "\n" . '    }' . "\n" . '  }' . "\n\n";
         foreach ($this->modules as $value) {
             $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (!empty($GLOBALS[$class]->enabled)) {
                 $js .= $GLOBALS[$class]->javascript_validation();
             }
         }
-
-        $js .=  "\n" . '  if (payment_value == null && submitter != 1) {' . "\n";
-        $js .=  '    error_message = error_message + "' . JS_ERROR_NO_PAYMENT_MODULE_SELECTED . '";' . "\n";
-        $js .=  '    error = 1;' . "\n";
-        $js .=  '  }' . "\n\n";
-        $js .=  '  if (error == 1 && submitter != 1) {' . "\n";
-        $js .=  '    alert(error_message);' . "\n";
-        $js .=  '    return false;' . "\n";
-        $js .=  '  } else {' . "\n";
-        $js .=  ' var result = true; '  . "\n";
-        if ($this->doesCollectsCardDataOnsite === true && PADSS_AJAX_CHECKOUT === '1') {
+        $js .= "\n" . '  if (payment_value == null && submitter != 1) {' . "\n";
+        $js .= '    error_message = error_message + "' . JS_ERROR_NO_PAYMENT_MODULE_SELECTED . '";' . "\n";
+        $js .= '    error = 1;' . "\n";
+        $js .= '  }' . "\n\n";
+        $js .= '  if (error == 1 && submitter != 1) {' . "\n";
+        $js .= '    alert(error_message);' . "\n";
+        $js .= '    return false;' . "\n";
+        $js .= '  } else {' . "\n";
+        $js .= ' var result = true; ' . "\n";
+        if ($this->does_collects_card_data_onsite === true && PADSS_AJAX_CHECKOUT === '1') {
             $js .= '      result = !(doesCollectsCardDataOnsite(payment_value));' . "\n";
         }
-        $js .=  ' if (result == false) doCollectsCardDataOnsite();' . "\n";
-        $js .=  '    return result;' . "\n";
-
+        $js .= ' if (result == false) doCollectsCardDataOnsite();' . "\n";
+        $js .= '    return result;' . "\n";
         return $js . ('  }' . "\n" . '}' . "\n" . '</script>' . "\n");
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -257,22 +213,15 @@ class payment
         if (!is_array($this->modules)) {
             return [];
         }
-
         $selection_array = [];
         foreach ($this->modules as $value) {
             $class = pathinfo((string) $value, PATHINFO_FILENAME);
             if (empty($GLOBALS[$class]->enabled)) {
                 continue;
             }
-
             $selection = $GLOBALS[$class]->selection();
-
-            if (!empty($GLOBALS[$class]->collectsCardDataOnsite)) {
-                $selection['fields'][] = [
-                    'title' => '',
-                    'field' => zen_draw_hidden_field($class . '_collects_onsite', 'true', 'id="' . $class . '_collects_onsite"'),
-                    'tag' => '',
-                ];
+            if (!empty($GLOBALS[$class]->collects_card_data_onsite)) {
+                $selection['fields'][] = ['title' => '', 'field' => zen_draw_hidden_field($class . '_collects_onsite', 'true', 'id="' . $class . '_collects_onsite"'), 'tag' => ''];
             }
             if (is_array($selection)) {
                 $selection_array[] = $selection;
@@ -280,7 +229,6 @@ class payment
         }
         return $selection_array;
     }
-
     /**
      * @since ZC v1.3.7
      */
@@ -289,7 +237,6 @@ class payment
         if (!is_array($this->modules)) {
             return false;
         }
-
         $result = false;
         foreach ($this->modules as $value) {
             $class = pathinfo((string) $value, PATHINFO_FILENAME);
@@ -303,21 +250,18 @@ class payment
         }
         return $result;
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function pre_confirmation_check(): void
     {
         global $credit_covers, $payment_modules;
-
         if (empty($this->selected_module) || !is_array($this->modules)) {
             return;
         }
         if (!is_object($GLOBALS[$this->selected_module]) || $GLOBALS[$this->selected_module]->enabled != true) {
             return;
         }
-
         if ($credit_covers) {
             $GLOBALS[$this->selected_module]->enabled = false;
             $GLOBALS[$this->selected_module] = null;
@@ -326,120 +270,108 @@ class payment
             $GLOBALS[$this->selected_module]->pre_confirmation_check();
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function confirmation(): array
     {
         $default = ['title' => '', 'fields' => []];
-        if ($this->isPaymentModuleMethodPresent('confirmation') === false) {
+        if ($this->is_payment_module_method_present('confirmation') === false) {
             return $default;
         }
-
         $confirmation = $GLOBALS[$this->selected_module]->confirmation();
         if (!is_array($confirmation)) {
             return $default;
         }
-
         // use array_merge here to normalize the response - ie: so that both title/fields indices are populated even if the module doesn't return either of them
         return array_merge($default, $confirmation);
     }
-
     /**
      * @since ZC v1.5.4
      */
     public function process_button_ajax()
     {
-        if ($this->isPaymentModuleMethodPresent('process_button_ajax') === false) {
+        if ($this->is_payment_module_method_present('process_button_ajax') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->process_button_ajax();
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function process_button()
     {
-        if ($this->isPaymentModuleMethodPresent('process_button') === false) {
+        if ($this->is_payment_module_method_present('process_button') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->process_button();
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function before_process()
     {
-        if ($this->isPaymentModuleMethodPresent('before_process') === false) {
+        if ($this->is_payment_module_method_present('before_process') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->before_process();
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function after_process()
     {
-        if ($this->isPaymentModuleMethodPresent('after_process') === false) {
+        if ($this->is_payment_module_method_present('after_process') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->after_process();
     }
-
     /**
      * @since ZC v1.2.2d
      */
     public function after_order_create($zf_order_id)
     {
-        if ($this->isPaymentModuleMethodPresent('after_order_create') === false) {
+        if ($this->is_payment_module_method_present('after_order_create') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->after_order_create($zf_order_id);
     }
-
     /**
      * @since ZC v1.2.2d
      */
     public function admin_notification($zf_order_id)
     {
-        if ($this->isPaymentModuleMethodPresent('admin_notification') === false) {
+        if ($this->is_payment_module_method_present('admin_notification') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->admin_notification($zf_order_id);
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function get_error()
     {
-        if ($this->isPaymentModuleMethodPresent('get_error') === false) {
+        if ($this->is_payment_module_method_present('get_error') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->get_error();
     }
-
     /**
      * @since ZC v1.5.1
      */
     public function get_checkout_confirm_form_replacement(): array
     {
-        if ($this->isPaymentModuleMethodPresent('get_checkout_confirm_form_replacement') === false) {
+        if ($this->is_payment_module_method_present('get_checkout_confirm_form_replacement') === false) {
             return [false, ''];
         }
         return $GLOBALS[$this->selected_module]->get_checkout_confirm_form_replacement();
     }
-
     /**
      * @since ZC v1.5.6c
      */
     public function clear_payment()
     {
-        if ($this->isPaymentModuleMethodPresent('clear_payment') === false) {
+        if ($this->is_payment_module_method_present('clear_payment') === false) {
             return;
         }
         return $GLOBALS[$this->selected_module]->clear_payment();

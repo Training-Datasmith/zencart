@@ -1,172 +1,146 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Oct 25 Modified in v2.2.0 $
  */
+namespace Zencart\Plugin_Manager;
 
-namespace Zencart\PluginManager;
-
-use Zencart\DbRepositories\PluginControlRepository;
-use Zencart\DbRepositories\PluginControlVersionRepository;
-use Zencart\PluginSupport\PluginStatus;
-
+use Zencart\Db_Repositories\Plugin_Control_Repository;
+use Zencart\Db_Repositories\Plugin_Control_Version_Repository;
+use Zencart\Plugin_Support\Plugin_Status;
 /**
  * @since ZC v1.5.7
  */
-class PluginManager
+class Plugin_Manager
 {
-    public function __construct(
-        private readonly PluginControlRepository $pluginControl,
-        private readonly PluginControlVersionRepository $pluginControlVersion
-    ) {
+    public function __construct(private readonly Plugin_Control_Repository $plugin_control, private readonly Plugin_Control_Version_Repository $plugin_control_version)
+    {
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function inspectAndUpdate(): void
+    public function inspect_and_update(): void
     {
-        $pluginsFromFilesystem = $this->getPluginsFromFileSystem();
-        $this->updateDbPlugins($pluginsFromFilesystem);
+        $plugins_from_filesystem = $this->get_plugins_from_file_system();
+        $this->update_db_plugins($plugins_from_filesystem);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getInstalledPlugins(): array
+    public function get_installed_plugins(): array
     {
-        return $this->pluginControl->getInstalledPlugins(PluginStatus::ENABLED);
+        return $this->plugin_control->get_installed_plugins(Plugin_Status::ENABLED);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getPluginVersionDirectory(string $pluginName, array $installedPlugins): ?string
+    public function get_plugin_version_directory(string $plugin_name, array $installed_plugins): ?string
     {
-        if (!array_key_exists($pluginName, $installedPlugins)) {
+        if (!array_key_exists($plugin_name, $installed_plugins)) {
             return null;
         }
-
-        return DIR_FS_CATALOG . 'zc_plugins/' . $pluginName . '/' . $installedPlugins[$pluginName]['version'] . '/';
+        return DIR_FS_CATALOG . 'zc_plugins/' . $plugin_name . '/' . $installed_plugins[$plugin_name]['version'] . '/';
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function isUpgradeAvailable(string $uniqueKey, string $currentVersion): bool|int|null
+    public function is_upgrade_available(string $unique_key, string $current_version): bool|int|null
     {
-        if (empty($currentVersion)) {
+        if (empty($current_version)) {
             return false;
         }
-        $versionList = $this->getVersionsForUpgrade($uniqueKey, $currentVersion);
-        return count($versionList);
+        $version_list = $this->get_versions_for_upgrade($unique_key, $current_version);
+        return count($version_list);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getVersionsForUpgrade(string $uniqueKey, string $currentVersion): array
+    public function get_versions_for_upgrade(string $unique_key, string $current_version): array
     {
-        if (empty($currentVersion)) {
+        if (empty($current_version)) {
             return [];
         }
-        $versions = $this->getPluginVersions($uniqueKey);
-        $versionList = [];
+        $versions = $this->get_plugin_versions($unique_key);
+        $version_list = [];
         foreach ($versions as $version) {
-            if (version_compare($version['version'], $currentVersion, '<=')) {
+            if (version_compare($version['version'], $current_version, '<=')) {
                 continue;
             }
-            $versionList[$version['version']] = $version['version'];
+            $version_list[$version['version']] = $version['version'];
         }
-        return $versionList;
+        return $version_list;
     }
-
     /**
      * @since ZC v2.0.0
      */
-    public function isNewDownloadAvailable(int|string|null $pluginId, string $currentVersion): bool|array
+    public function is_new_download_available(int|string|null $plugin_id, string $current_version): bool|array
     {
-        if (empty($pluginId)) {
+        if (empty($plugin_id)) {
             return false;
         }
-        return plugin_version_check_for_updates($pluginId, $currentVersion);
+        return plugin_version_check_for_updates($plugin_id, $current_version);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getPluginsAfterCheckingForNewVersionsOnline(): bool|array
+    public function get_plugins_after_checking_for_new_versions_online(): bool|array
     {
-        $plugins = $this->getPluginsFromDb();
-
+        $plugins = $this->get_plugins_from_db();
         // new array for reverse-lookup after getting results back
-        $pluginsById = [];
-
+        $plugins_by_id = [];
         $ids_csv = '';
         foreach ($plugins as $plugin) {
-            $pluginsById[$plugin['zc_contrib_id']] = $plugin;
-            $ids_csv .= (int)trim((string) $plugin['zc_contrib_id']) . ',';
+            $plugins_by_id[$plugin['zc_contrib_id']] = $plugin;
+            $ids_csv .= (int) trim((string) $plugin['zc_contrib_id']) . ',';
         }
-
-        $results = $this->getLatestPluginVersionsOnline($ids_csv);
-
+        $results = $this->get_latest_plugin_versions_online($ids_csv);
         // if no results or invalid format, abort
         // @TODO - is this the right return type? or should we return the unaltered $plugins array?
         if (empty($results)) {
             return false;
         }
-
         // make sure $results is the actual array we want to iterate over, and not a sub-array
         if (is_array($results) && !isset($results[0]['id']) && isset($results[0][0]['id'])) {
             $results = $results[0];
         }
-
         if (!isset($results[0]['id'])) {
-            return false; // @TODO or return original $plugins array?
+            return false;
+            // @TODO or return original $plugins array?
         }
-
         $present_zc_version = 'v' . preg_replace('/[^0-9.]/', '', zen_get_zcversion());
-
         foreach ($results as $result) {
-            $unique_key = $pluginsById[$result['id']]['unique_key'];
-
-            if (version_compare($pluginsById[$result['id']]['version'], $result['latest_plugin_version'], '<')) {
+            $unique_key = $plugins_by_id[$result['id']]['unique_key'];
+            if (version_compare($plugins_by_id[$result['id']]['version'], $result['latest_plugin_version'], '<')) {
                 $plugins[$unique_key]['new_online_version_exists'] = true;
                 $plugins[$unique_key]['latest_plugin_version'] = $result['latest_plugin_version'];
                 $plugins[$unique_key]['zcversions'] = $result['zcversions'];
-
                 if (in_array($present_zc_version, $result['zcversions'], $strict = false)) {
                     $plugins[$unique_key]['new_plugin_exists_for_this_zc_version'] = true;
                 }
             }
         }
-
         return $plugins;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function getLatestPluginVersionsOnline(string $plugin_ids_csv = '0'): array|false
+    protected function get_latest_plugin_versions_online(string $plugin_ids_csv = '0'): array|false
     {
         if (empty(trim($plugin_ids_csv, ','))) {
             return false;
         }
-
-        $versionServer = new \VersionServer();
-        $data = json_decode($versionServer->getPluginVersion($plugin_ids_csv), true);
-
+        $version_server = new \Version_Server();
+        $data = json_decode($version_server->get_plugin_version($plugin_ids_csv), true);
         if (null === $data || isset($data['error'])) {
             if (LOG_PLUGIN_VERSIONCHECK_FAILURES) {
                 error_log('CURL error checking plugin versions (in batch): ' . print_r(!empty($data) ? $data : 'null', true));
             }
             return false;
         }
-
         if (!is_array($data)) {
             try {
                 $data = json_decode((string) $data, true);
@@ -177,166 +151,138 @@ class PluginManager
                 return false;
             }
         }
-
         return $data;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function getPluginVersions(string $uniqueKey): array
+    protected function get_plugin_versions(string $unique_key): array
     {
-        return $this->pluginControlVersion->getByUniqueKey($uniqueKey);
+        return $this->plugin_control_version->get_by_unique_key($unique_key);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function getPluginsFromFileSystem(): array
+    protected function get_plugins_from_file_system(): array
     {
-        $pluginDir = DIR_FS_CATALOG . 'zc_plugins';
-        $pluginList = [];
-        if (!is_dir($pluginDir)) {
-            return $pluginList;
+        $plugin_dir = DIR_FS_CATALOG . 'zc_plugins';
+        $plugin_list = [];
+        if (!is_dir($plugin_dir)) {
+            return $plugin_list;
         }
-        $dir = new \DirectoryIterator($pluginDir);
+        $dir = new \Directory_Iterator($plugin_dir);
         foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDot()) {
+            if ($fileinfo->is_dot()) {
                 continue;
             }
-            if (!$fileinfo->isDir()) {
+            if (!$fileinfo->is_dir()) {
                 continue;
             }
-            $versionInfo = $this->getPluginVersionDirectories($fileinfo);
-            if (count($versionInfo) === 0) {
+            $version_info = $this->get_plugin_version_directories($fileinfo);
+            if (count($version_info) === 0) {
                 continue;
             }
-            $pluginList = $this->mergeInVersionInfo($pluginList, $fileinfo->getFilename(), $versionInfo);
+            $plugin_list = $this->merge_in_version_info($plugin_list, $fileinfo->get_filename(), $version_info);
         }
-        return $pluginList;
+        return $plugin_list;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function getPluginVersionDirectories(\DirectoryIterator $parent): array
+    protected function get_plugin_version_directories(\Directory_Iterator $parent): array
     {
-        $versionList = [];
-        $dir = new \DirectoryIterator($parent->getPathName());
+        $version_list = [];
+        $dir = new \Directory_Iterator($parent->get_path_name());
         foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDot()) {
+            if ($fileinfo->is_dot()) {
                 continue;
             }
-            if (!$fileinfo->isDir()) {
+            if (!$fileinfo->is_dir()) {
                 continue;
             }
-            if (!file_exists($fileinfo->getPathname() . '/manifest.php')) {
-                continue; //@todo consider throwing exception/trigger_error here
+            if (!file_exists($fileinfo->get_pathname() . '/manifest.php')) {
+                continue;
+                //@todo consider throwing exception/trigger_error here
             }
-            $manifest = require $fileinfo->getPathname() . '/manifest.php';
-            $versionList[$fileinfo->getFilename()] = $manifest;
+            $manifest = require $fileinfo->get_pathname() . '/manifest.php';
+            $version_list[$fileinfo->get_filename()] = $manifest;
             if ($_SESSION['languages_code'] !== 'en') {
-                $this->loadPluginLanguageConstants($fileinfo->getPathname());
+                $this->load_plugin_language_constants($fileinfo->get_pathname());
             }
         }
-        return $versionList;
+        return $version_list;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getPluginsFromDb(): array
+    public function get_plugins_from_db(): array
     {
-        return $this->pluginControl->getAll();
+        return $this->plugin_control->get_all();
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function updateDbPlugins(array $pluginsFromFilesystem): void
+    protected function update_db_plugins(array $plugins_from_filesystem): void
     {
-        $this->updatePluginControl($pluginsFromFilesystem);
+        $this->update_plugin_control($plugins_from_filesystem);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function updatePluginControl(array $pluginsFromFilesystem): void
+    protected function update_plugin_control(array $plugins_from_filesystem): void
     {
         // Mark all existing plugins as not found on filesystem
-        $this->pluginControl->setAllInfs(0);
-        $this->pluginControlVersion->setAllInfs(0);
-
-        $insertValues = [];
-        $versionInsertValues = [];
-        foreach ($pluginsFromFilesystem as $uniqueKey => $plugin) {
-            $pluginVersion = $plugin['versions'][0];
-            $versionInsertValues = $this->processUpdatePluginControlVersions($uniqueKey, $pluginsFromFilesystem, $versionInsertValues);
-            $insertValues[] =
-                [
-                    'unique_key' => $uniqueKey,
-                    'name' => $plugin[$pluginVersion]['pluginName'],
-                    'description' => $plugin[$pluginVersion]['pluginDescription'],
-                    'type' => '',
-                    'status' => PluginStatus::NOT_INSTALLED,
-                    'author' => $plugin[$pluginVersion]['pluginAuthor'],
-                    'version' => '',
-                    'zc_versions' => '',
-                    'infs' => 1,
-                    'zc_contrib_id' => $plugin[$pluginVersion]['pluginId'],
-                ];
+        $this->plugin_control->set_all_infs(0);
+        $this->plugin_control_version->set_all_infs(0);
+        $insert_values = [];
+        $version_insert_values = [];
+        foreach ($plugins_from_filesystem as $unique_key => $plugin) {
+            $plugin_version = $plugin['versions'][0];
+            $version_insert_values = $this->process_update_plugin_control_versions($unique_key, $plugins_from_filesystem, $version_insert_values);
+            $insert_values[] = ['unique_key' => $unique_key, 'name' => $plugin[$plugin_version]['pluginName'], 'description' => $plugin[$plugin_version]['pluginDescription'], 'type' => '', 'status' => Plugin_Status::NOT_INSTALLED, 'author' => $plugin[$plugin_version]['pluginAuthor'], 'version' => '', 'zc_versions' => '', 'infs' => 1, 'zc_contrib_id' => $plugin[$plugin_version]['pluginId']];
         }
         // Insert new, and update existing, plugins
-        $this->pluginControl->upsertMany($insertValues);
-        $this->pluginControlVersion->upsertMany($versionInsertValues);
+        $this->plugin_control->upsert_many($insert_values);
+        $this->plugin_control_version->upsert_many($version_insert_values);
         // Remove any plugins no longer found on filesystem
-        $this->pluginControl->deleteByInfs(0);
-        $this->pluginControlVersion->deleteByInfs(0);
+        $this->plugin_control->delete_by_infs(0);
+        $this->plugin_control_version->delete_by_infs(0);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function processUpdatePluginControlVersions(string $uniqueKey, array $pluginsFromFilesystem, array $versionInsertValues): array
+    protected function process_update_plugin_control_versions(string $unique_key, array $plugins_from_filesystem, array $version_insert_values): array
     {
-        $currentPlugin = $pluginsFromFilesystem[$uniqueKey];
-        foreach ($currentPlugin as $version => $versionInfo) {
+        $current_plugin = $plugins_from_filesystem[$unique_key];
+        foreach ($current_plugin as $version => $version_info) {
             if ($version === 'versions') {
                 continue;
             }
-            $versionInsertValues[] = [
-                'unique_key' => $uniqueKey,
-                'author' => $versionInfo['pluginAuthor'],
-                'version' => $version,
-                'zc_versions' => json_encode($versionInfo['zcVersions']),
-                'infs' => 1,
-            ];
+            $version_insert_values[] = ['unique_key' => $unique_key, 'author' => $version_info['pluginAuthor'], 'version' => $version, 'zc_versions' => json_encode($version_info['zcVersions']), 'infs' => 1];
         }
-        return $versionInsertValues;
+        return $version_insert_values;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    protected function mergeInVersionInfo(array $pluginList, string $uniqueKey, array $versionInfo): array
+    protected function merge_in_version_info(array $plugin_list, string $unique_key, array $version_info): array
     {
-        $versionList = [];
-        foreach ($versionInfo as $version => $detail) {
-            $pluginList[$uniqueKey][$version] = $detail;
-            $versionList[] = $version;
+        $version_list = [];
+        foreach ($version_info as $version => $detail) {
+            $plugin_list[$unique_key][$version] = $detail;
+            $version_list[] = $version;
         }
-        usort($versionList, version_compare(...));
-        $versionList = array_reverse($versionList);
-        $pluginList[$uniqueKey]['versions'] = $versionList;
-        return $pluginList;
+        usort($version_list, version_compare(...));
+        $version_list = array_reverse($version_list);
+        $plugin_list[$unique_key]['versions'] = $version_list;
+        return $plugin_list;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getPluginVersionsForPlugin(string $uniqueKey): array
+    public function get_plugin_versions_for_plugin(string $unique_key): array
     {
-        $results = $this->pluginControlVersion->getByUniqueKey($uniqueKey);
+        $results = $this->plugin_control_version->get_by_unique_key($unique_key);
         $versions = [];
         foreach ($results as $result) {
             $versions[$result['version']] = $result;
@@ -344,49 +290,49 @@ class PluginManager
         ksort($versions);
         return array_reverse($versions);
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function getPluginVersionsToClean(string $uniqueKey, string $version): array
+    public function get_plugin_versions_to_clean(string $unique_key, string $version): array
     {
-        $versions = $this->getPluginVersionsForPlugin($uniqueKey);
+        $versions = $this->get_plugin_versions_for_plugin($unique_key);
         unset($versions[$version]);
         return $versions;
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function hasPluginVersionsToClean(string $uniqueKey, string $version): ?int
+    public function has_plugin_versions_to_clean(string $unique_key, string $version): ?int
     {
-        return count($this->getPluginVersionsToClean($uniqueKey, $version));
+        return count($this->get_plugin_versions_to_clean($unique_key, $version));
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function getPluginControl(): PluginControlRepository
+    public function get_plugin_control(): Plugin_Control_Repository
     {
-        return $this->pluginControl;
+        return $this->plugin_control;
     }
-
     /**
      * @since ZC v2.2.0
      */
-    protected function loadPluginLanguageConstants(string $pluginpath): void // Load plugins names and description when they are not installed or de-activated
+    protected function load_plugin_language_constants(string $pluginpath): void
     {
         $pluginpath = str_replace('\\', '/', $pluginpath);
-        $filePath = [];
-        foreach ($this->getInstalledPlugins() as $plugin) { // make an array of all installed plugins paths
-            $filePath[$plugin['unique_key']] = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'];
+        $file_path = [];
+        foreach ($this->get_installed_plugins() as $plugin) {
+            // make an array of all installed plugins paths
+            $file_path[$plugin['unique_key']] = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'];
         }
-        if (!in_array($pluginpath, $filePath)) {
+        if (!in_array($pluginpath, $file_path)) {
             $explodedpath = explode('/', $pluginpath);
-            $pluginuniquekey = strtoupper($explodedpath[count($explodedpath) - 2]); // retrieve plugin's unique key
-            $pluginconstantspath = $pluginpath . '/admin/includes/languages/' . $_SESSION['language'] . '/extra_definitions/lang.menu.php'; // The language constant file 'lang.menu.php' must be in this folder
+            $pluginuniquekey = strtoupper($explodedpath[count($explodedpath) - 2]);
+            // retrieve plugin's unique key
+            $pluginconstantspath = $pluginpath . '/admin/includes/languages/' . $_SESSION['language'] . '/extra_definitions/lang.menu.php';
+            // The language constant file 'lang.menu.php' must be in this folder
             if (is_file($pluginconstantspath)) {
-                $pluginsconstants = require_once $pluginconstantspath; // Load language override constants definitions
+                $pluginsconstants = require_once $pluginconstantspath;
+                // Load language override constants definitions
                 if (!is_array($pluginsconstants) || empty($pluginsconstants)) {
                     return;
                 }

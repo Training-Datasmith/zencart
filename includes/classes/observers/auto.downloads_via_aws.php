@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * This observer class is intended to allow downloadable files to be served
  * from Amazon AWS S3 buckets, and also automatically expire the links
@@ -14,7 +13,7 @@ declare(strict_types=1);
  *
  * @since ZC v1.5.6
  */
-class zcObserverDownloadsViaAws extends base
+class Zc_Observer_Downloads_Via_Aws extends base
 {
     // this is where you can configure your AWS settings:
     // --------------------------------------------------
@@ -31,20 +30,17 @@ class zcObserverDownloadsViaAws extends base
      * @var string
      */
     private $aws_secret = 'MY_AMAZON_S3_SECRET_XXXXXXXXX';
-
     /**
      * This is used to calculate a link that's good for 30 seconds,
      * which is plenty of time for it to get started, & prevents
      * unauthorized sharing and theft. Default is 30 seconds.
      */
     private int $link_expiry_time = 30;
-
     /**
      * URL to Amazon S3 server
      * @var string URL
      */
     private string $aws_server = 'https://s3.amazonaws.com';
-
     /**
      * Class constructor
      */
@@ -57,16 +53,13 @@ class zcObserverDownloadsViaAws extends base
         if ($this->aws_secret === 'MY_AMAZON_S3_SECRET_XXXXXXXXX' && defined('AMAZON_S3_ACCESS_SECRET')) {
             $this->aws_secret = AMAZON_S3_ACCESS_SECRET;
         }
-
         // if not configured, then don't activate
         if ($this->aws_key === 'MY_AMAZON_S3_ACCESS_KEY' || $this->aws_key === '' || $this->aws_secret === '' || $this->aws_secret === 'MY_AMAZON_S3_SECRET_XXXXXXXXX') {
             return;
         }
-
         // attach listener
         $this->attach($this, ['NOTIFY_CHECK_DOWNLOAD_HANDLER', 'NOTIFY_DOWNLOAD_READY_TO_START', 'NOTIFY_MODULE_DOWNLOAD_TEMPLATE_DETAILS', 'NOTIFY_TEST_DOWNLOADABLE_FILE_EXISTS']);
     }
-
     /**
      * Parse the file details for display on template page
      *
@@ -75,7 +68,7 @@ class zcObserverDownloadsViaAws extends base
      * @param array $data array passed by reference
      * @since ZC v1.5.6
      */
-    protected function updateNotifyModuleDownloadTemplateDetails(&$class, $eventID, $array, array &$data)
+    protected function update_notify_module_download_template_details(&$class, $event_id, $array, array &$data)
     {
         // available fields:
         //   $data['service'] = 'local'
@@ -92,27 +85,20 @@ class zcObserverDownloadsViaAws extends base
         //   $data['products_name']
         //   $data['orders_products_download_id'] = id for URL link
         //   $data['download_count']
-
-        $file_parts = $this->parseFileParts($data['filename']);
-
+        $file_parts = $this->parse_file_parts($data['filename']);
         if ($file_parts === false) {
             return;
         }
         if ($file_parts[0] != 'aws') {
             return;
         }
-
         $data['service'] = $file_parts[0];
-
         // use just the filename portion, skipping the bucket name for customer-facing display purposes
         $data['filename'] = substr((string) $file_parts[1], strrpos((string) $file_parts[1], '/') + 1);
-
         $data['filesize'] = isset($file_parts[2]) ? number_format($file_parts[2], 0) : '';
         $data['filesize_units'] = '';
-
-        $data['is_downloadable'] = $data['file_exists'] = $this->testFileExists();
+        $data['is_downloadable'] = $data['file_exists'] = $this->test_file_exists();
     }
-
     /**
      * This observer should set $handler to blank if it fails to validate whether $filename exists on the external service.
      * If validation passes, simply set $handler to the service name (first chars before first colon in filename) (or do nothing since it's probably already correct).
@@ -123,15 +109,13 @@ class zcObserverDownloadsViaAws extends base
      * @param string $handler  name of external service handler
      * @since ZC v1.5.6
      */
-    protected function updateNotifyTestDownloadableFileExists(&$class, $eventID, $filename, &$handler)
+    protected function update_notify_test_downloadable_file_exists(&$class, $event_id, $filename, &$handler)
     {
-        $result = $this->testFileExists();
-
+        $result = $this->test_file_exists();
         if ($result === false) {
             $handler = '';
         }
     }
-
     /**
      *
      * @param string $eventID name of the observer event fired
@@ -143,18 +127,17 @@ class zcObserverDownloadsViaAws extends base
      * @param boolean $file_exists (mutable)
      * @since ZC v1.5.6
      */
-    protected function updateNotifyCheckDownloadHandler(&$class, $eventID, $var, &$fields, &$origin_filename, &$browser_filename, &$source_directory, &$file_exists, &$service, &$isExpired, &$download_timestamp)
+    protected function update_notify_check_download_handler(&$class, $event_id, $var, &$fields, &$origin_filename, &$browser_filename, &$source_directory, &$file_exists, &$service, &$is_expired, &$download_timestamp)
     {
-        $file_parts = $this->parseFileParts($origin_filename);
+        $file_parts = $this->parse_file_parts($origin_filename);
         if ($file_parts[0] == 'aws') {
-            $origin_filename  = $file_parts[1];
+            $origin_filename = $file_parts[1];
             $browser_filename = substr((string) $origin_filename, strrpos((string) $origin_filename, '/') + 1);
             $source_directory = $file_parts[0];
             $file_exists = true;
             $service = $file_parts[0];
         }
     }
-
     /**
      * This fires when the download module wants to redirect to the external download service
      * So, this method parses the passed file, obtains the URL, and does the redirect
@@ -171,30 +154,26 @@ class zcObserverDownloadsViaAws extends base
      * @param string $browser_extra_headers (mutable)
      * @since ZC v1.5.6
      */
-    protected function updateNotifyDownloadReadyToStart(&$class, $eventID, $ipaddress, &$service, &$origin_filename, &$browser_filename, &$source_directory, &$downloadFilesize, $mime_type, $fields, $browser_extra_headers): bool
+    protected function update_notify_download_ready_to_start(&$class, $event_id, $ipaddress, &$service, &$origin_filename, &$browser_filename, &$source_directory, &$download_filesize, $mime_type, $fields, $browser_extra_headers): bool
     {
         // verify that the passed file is indeed intended for aws
         if ($source_directory != 'aws') {
-            $file_parts = $this->parseFileParts($origin_filename);
+            $file_parts = $this->parse_file_parts($origin_filename);
             if ($file_parts[0] != 'aws') {
                 return false;
             }
-            $origin_filename  = $file_parts[1];
+            $origin_filename = $file_parts[1];
             $browser_filename = substr((string) $origin_filename, strrpos((string) $origin_filename, '/') + 1);
             $source_directory = $file_parts[0];
-            $downloadFilesize = $file_parts[2];
+            $download_filesize = $file_parts[2];
         }
-
         // prepare AWS URL
-        $url = $this->buildRedirectUrl($origin_filename);
-
+        $url = $this->build_redirect_url($origin_filename);
         // redirect to external download script
         header('HTTP/1.1 303 See Other');
         zen_redirect($url);
-
         zen_exit();
     }
-
     /**
      * parse file details to determine if its download should be handled by AWS
      * If AWS, the filename will use colons as delimiters ... aws:bucket/filename:filesize
@@ -202,38 +181,29 @@ class zcObserverDownloadsViaAws extends base
      * @param string $filename
      * @since ZC v1.5.6
      */
-    private function parseFileParts($filename): false|array
+    private function parse_file_parts($filename): false|array
     {
-
         $file_parts = explode(':', $filename);
-
         if (count($file_parts) === 1) {
             return false;
         }
-
         return $file_parts;
     }
-
     /**
      * Prepare signed expiring URL for AWS redirect
      *
      * @return string $url
      * @since ZC v1.5.6
      */
-    private function buildRedirectUrl(string $bucketAndFilename): string
+    private function build_redirect_url(string $bucket_and_filename): string
     {
-
         // this calculates a link that's good for 30 seconds, which is plenty of time for it to get started, and prevents theft
         $expires = time() + $this->link_expiry_time;
-
-        $raw_request = "GET\n\n\n" . $expires . "\n/" . $bucketAndFilename;
-        $sig = urlencode(base64_encode((hash_hmac('sha1', $raw_request, $this->aws_secret, true))));
-
+        $raw_request = "GET\n\n\n" . $expires . "\n/" . $bucket_and_filename;
+        $sig = urlencode(base64_encode(hash_hmac('sha1', $raw_request, $this->aws_secret, true)));
         $params = 'AWSAccessKeyId=' . $this->aws_key . '&Expires=' . $expires . '&Signature=' . $sig;
-
-        return $this->aws_server . '/' . $bucketAndFilename . '?' . $params;
+        return $this->aws_server . '/' . $bucket_and_filename . '?' . $params;
     }
-
     /**
      * Use AWS SDK to test whether the bucket+file (designated by $filename) exists
      * If it does not exist, return false
@@ -241,11 +211,10 @@ class zcObserverDownloadsViaAws extends base
      * @return boolean Result of SDK test
      * @since ZC v1.5.6
      */
-    private function testFileExists(): bool
+    private function test_file_exists(): bool
     {
         // @TODO: could optionally add an AWS SDK call to actually check that the object (bucket+file) exists
         // but for now we're simply assuming that it does
         return true;
     }
-
 }

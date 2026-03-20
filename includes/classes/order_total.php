@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * File contains the order-totals-processing class ("order-total")
  *
@@ -9,10 +9,9 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-use Zencart\FileSystem\FileSystem;
-use Zencart\ResourceLoaders\ModuleFinder;
-use Zencart\Traits\NotifierManager;
-
+use Zencart\File_System\File_System;
+use Zencart\Resource_Loaders\Module_Finder;
+use Zencart\Traits\Notifier_Manager;
 /**
  * order-total class
  *
@@ -23,53 +22,44 @@ use Zencart\Traits\NotifierManager;
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 class order_total
 {
-    use NotifierManager;
-
+    use Notifier_Manager;
     /**
      * $modules is an array of installed order totals module names
      */
     public array $modules;
-
     /**
      * $module_order_total_installed indicates whether/not at least
      * one order-total module is installed.
      */
     protected bool $module_order_total_installed = false;
-
     // class constructor
     public function __construct()
     {
-        global $messageStack, $languageLoader, $installedPlugins;
-
+        global $message_stack, $language_loader, $installed_plugins;
         if (defined('MODULE_ORDER_TOTAL_INSTALLED') && MODULE_ORDER_TOTAL_INSTALLED !== '') {
             // -----
             // Locate all order_total modules, looking in both /includes/modules/order_total
             // and for those provided by zc_plugins.  Note that any module provided by a
             // zc_plugin overrides the processing present in any 'base' file.
             //
-            $moduleFinder = new ModuleFinder('order_total', new FileSystem());
-            $modules_found = $moduleFinder->findFromFilesystem($installedPlugins);
-
+            $module_finder = new Module_Finder('order_total', new File_System());
+            $modules_found = $module_finder->find_from_filesystem($installed_plugins);
             $module_list = explode(';', (string) MODULE_ORDER_TOTAL_INSTALLED);
-
             foreach ($module_list as $value) {
-                if (!$languageLoader->loadModuleLanguageFile($value, 'order_total')) {
-                    $language_dir = (IS_ADMIN_FLAG === false) ? DIR_WS_LANGUAGES : (DIR_FS_CATALOG . DIR_WS_LANGUAGES);
+                if (!$language_loader->load_module_language_file($value, 'order_total')) {
+                    $language_dir = IS_ADMIN_FLAG === false ? DIR_WS_LANGUAGES : DIR_FS_CATALOG . DIR_WS_LANGUAGES;
                     $lang_file = zen_get_file_directory($language_dir . $_SESSION['language'] . '/modules/order_total/', $value, 'false');
-
-                    if (is_object($messageStack)) {
+                    if (is_object($message_stack)) {
                         if (IS_ADMIN_FLAG === false) {
-                            $messageStack->add('header', WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
+                            $message_stack->add('header', WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
                         } else {
-                            $messageStack->add_session(WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
+                            $message_stack->add_session(WARNING_COULD_NOT_LOCATE_LANG_FILE . $lang_file, 'caution');
                         }
                     }
                     continue;
                 }
-
                 if (isset($modules_found[$value])) {
                     include_once DIR_FS_CATALOG . $modules_found[$value] . $value;
                     $class = pathinfo($value, PATHINFO_FILENAME);
@@ -80,14 +70,12 @@ class order_total
             }
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function process(): array
     {
         global $order;
-
         $order_total_array = [];
         if ($this->module_order_total_installed === true) {
             $this->notify('NOTIFY_ORDER_TOTAL_PROCESS_STARTS', ['order_info' => $order->info]);
@@ -96,51 +84,35 @@ class order_total
                 if (!isset($GLOBALS[$class])) {
                     continue;
                 }
-
                 $GLOBALS[$class]->process();
                 $this->notify('NOTIFY_ORDER_TOTAL_PROCESS_NEXT', ['class' => $class, 'order_info' => $order->info, 'ot_output' => $GLOBALS[$class]->output]);
                 if (empty($GLOBALS[$class]->output)) {
                     continue;
                 }
-
                 foreach ($GLOBALS[$class]->output as $next_element) {
                     if (!empty($next_element['title']) && !empty($next_element['text'])) {
-                        $order_total_array[] = [
-                            'code' => $GLOBALS[$class]->code,
-                            'title' => $next_element['title'],
-                            'text' => $next_element['text'],
-                            'value' => $next_element['value'],
-                            'sort_order' => $GLOBALS[$class]->sort_order,
-                        ];
+                        $order_total_array[] = ['code' => $GLOBALS[$class]->code, 'title' => $next_element['title'], 'text' => $next_element['text'], 'value' => $next_element['value'], 'sort_order' => $GLOBALS[$class]->sort_order];
                     }
                 }
             }
         }
-
         return $order_total_array;
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function output(bool $return_html = false): string
     {
         global $template, $current_page_base;
-
         $output_string = '';
         if ($this->module_order_total_installed === true) {
             foreach ($this->modules as $value) {
                 $class = pathinfo((string) $value, PATHINFO_FILENAME);
-
                 // ideally, the first part of this IF statement should be dropped, and the ELSE portion is all that should be kept
                 if ($return_html == true) {
                     $class_code = str_replace('_', '-', $GLOBALS[$class]->code);
                     foreach ($GLOBALS[$class]->output as $next_output) {
-                        $output_string .=
-                            '              <tr>' . "\n" .
-                            '                <td align="right" class="' . $class_code . '-Text">' . $next_output['title'] . '</td>' . "\n" .
-                            '                <td align="right" class="' . $class_code . '-Amount">' . $next_output['text'] . '</td>' . "\n" .
-                            '              </tr>';
+                        $output_string .= '              <tr>' . "\n" . '                <td align="right" class="' . $class_code . '-Text">' . $next_output['title'] . '</td>' . "\n" . '                <td align="right" class="' . $class_code . '-Amount">' . $next_output['text'] . '</td>' . "\n" . '              </tr>';
                     }
                 } else {
                     // use a template file for output instead of hard-coded HTML
@@ -151,7 +123,6 @@ class order_total
         }
         return $output_string;
     }
-
     //
     // This function is called in checkout payment after display of payment methods. It actually calls
     // two credit class functions.
@@ -182,7 +153,6 @@ class order_total
         }
         return $selection_array;
     }
-
     // update_credit_account is called in checkout process on a per product basis. Its purpose
     // is to decide whether each product in the cart should add something to a credit account.
     // e.g. for the Gift Voucher it checks whether the product is a Gift voucher and then adds the amount
@@ -203,7 +173,6 @@ class order_total
             }
         }
     }
-
     // This function is called in checkout confirmation.
     // Its main use is for credit classes that use the credit_selection() method. This is usually for
     // entering redeem codes(Gift Vouchers/Discount Coupons). This function is used to validate these codes.
@@ -227,7 +196,6 @@ class order_total
             }
         }
     }
-
     // pre_confirmation_check is called on checkout confirmation. Its function is to decide whether the
     // credits available are greater than the order total. If they are then a variable (credit_covers) is set to
     // true. This is used to bypass the payment method. In other words if the Gift Voucher is more than the order
@@ -236,34 +204,32 @@ class order_total
     /**
      * @since ZC v1.0.3
      */
-    public function pre_confirmation_check(bool|string $returnOrderTotalOnly = false)
+    public function pre_confirmation_check(bool|string $return_order_total_only = false)
     {
         global $order, $credit_covers;
-
         if ($this->module_order_total_installed === true) {
-            $orderInfoSaved = $order->info;
-            $this->notify('NOTIFY_ORDER_TOTAL_PRE_CONFIRMATION_CHECK_STARTS', ['order_info' => $orderInfoSaved]);
+            $order_info_saved = $order->info;
+            $this->notify('NOTIFY_ORDER_TOTAL_PRE_CONFIRMATION_CHECK_STARTS', ['order_info' => $order_info_saved]);
             foreach ($this->modules as $value) {
                 $class = pathinfo((string) $value, PATHINFO_FILENAME);
                 $GLOBALS[$class]->process();
                 $this->notify('NOTIFY_ORDER_TOTAL_PRE_CONFIRMATION_CHECK_NEXT', ['class' => $class, 'order_info' => $order->info, 'ot_output' => $GLOBALS[$class]->output]);
                 $GLOBALS[$class]->output = [];
             }
-            $reCalculatedOrderTotal = $order->info['total'];
-            $orderInfo = $order->info;
-            if ($reCalculatedOrderTotal <= 0.009 && !(isset($_SESSION['payment']) && $_SESSION['payment'] === 'freecharger')) {
+            $re_calculated_order_total = $order->info['total'];
+            $order_info = $order->info;
+            if ($re_calculated_order_total <= 0.008999999999999999 && !(isset($_SESSION['payment']) && $_SESSION['payment'] === 'freecharger')) {
                 $credit_covers = true;
             }
-            $order->info = $orderInfoSaved;
-            if (is_string($returnOrderTotalOnly)) {
-                return $orderInfo;
+            $order->info = $order_info_saved;
+            if (is_string($return_order_total_only)) {
+                return $order_info;
             }
-            if ($returnOrderTotalOnly === true) {
-                return $reCalculatedOrderTotal;
+            if ($return_order_total_only === true) {
+                return $re_calculated_order_total;
             }
         }
     }
-
     // this function is called in checkout process. it tests whether a decision was made at checkout payment to use
     // the credit amount be applied aginst the order. If so some action is taken. E.g. for a Gift voucher the account
     // is reduced the order total amount.
@@ -282,7 +248,6 @@ class order_total
             }
         }
     }
-
     // Called in checkout process to clear session variables created by each credit class module.
     //
     /**
@@ -299,7 +264,6 @@ class order_total
             }
         }
     }
-
     // Called at various times. This function calulates the total value of the order that the
     // credit will be applied against. This varies depending on whether the credit class applies
     // to shipping & tax

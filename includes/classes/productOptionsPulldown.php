@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Class productOptionsPulldown
  *
@@ -10,8 +10,7 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  * @since ZC v1.5.8
  */
-
-class productOptionsPulldown extends pulldown
+class Product_Options_Pulldown extends pulldown
 {
     /**
      *
@@ -19,54 +18,39 @@ class productOptionsPulldown extends pulldown
     public function __construct()
     {
         parent::__construct();
-
         $this->sort = ' ORDER BY products_options_name';
-
-        $this->keyword_search_fields = [
-            'products_options_name',
-        ];
+        $this->keyword_search_fields = ['products_options_name'];
     }
-
     /**
      * @return mixed|void
      * @since ZC v1.5.8
      */
-    protected function setSQL()
+    protected function set_sql()
     {
         $this->sql = 'SELECT products_options_id, products_options_name
                                     FROM ' . TABLE_PRODUCTS_OPTIONS . '
                                     WHERE language_id = ' . $_SESSION['languages_id'];
     }
-
     /**
      * @return mixed|void
      * @since ZC v1.5.8
      */
-    protected function processSQL()
+    protected function process_sql()
     {
-        $this->setSQL();
-        $this->runSQL();
-
-        $this->values[] = [
-            'id' => '',
-            'text' => PLEASE_SELECT,
-        ];
-
+        $this->set_sql();
+        $this->run_sql();
+        $this->values[] = ['id' => '', 'text' => PLEASE_SELECT];
         foreach ($this->results as $result) {
-            $this->values[] = [
-                'id' => $result['products_options_id'],
-                'text' => $this->optionText($result),
-            ];
+            $this->values[] = ['id' => $result['products_options_id'], 'text' => $this->option_text($result)];
         }
     }
-
     /**
      * @param $optionValue
      *
      * @since ZC v1.5.8
      */
-    private function optionText(array $optionValue): string
+    private function option_text(array $option_value): string
     {
-        return '(' . $optionValue['products_options_id'] . ') ' . $optionValue['products_options_name'];
+        return '(' . $option_value['products_options_id'] . ') ' . $option_value['products_options_name'];
     }
 }

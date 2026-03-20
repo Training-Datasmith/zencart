@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * site_map header_php.php
  *
@@ -9,13 +9,12 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2020 Jul 10 Modified in v1.5.8-alpha $
  */
-
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_START_SITE_MAP');
 /**
  * load language files
  */
-require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
+require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 $breadcrumb->add(NAVBAR_TITLE);
 // include template specific file name defines
 $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/html_includes/', FILENAME_DEFINE_SITE_MAP, 'false');
@@ -23,6 +22,6 @@ $define_page = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] .
  * load the site map class
  */
 require DIR_WS_CLASSES . 'site_map.php';
-$zen_SiteMapTree = new zen_SiteMapTree();
+$zen_site_map_tree = new Zen_site_Map_Tree();
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_SITE_MAP');

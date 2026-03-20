@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Color;
 
-namespace BaconQrCode\Renderer\Color;
-
-interface ColorInterface
+interface Color_Interface
 {
     /**
      * Converts the color to RGB.
      */
-    public function toRgb(): Rgb;
-
+    public function to_rgb(): Rgb;
     /**
      * Converts the color to CMYK.
      */
-    public function toCmyk(): Cmyk;
-
+    public function to_cmyk(): Cmyk;
     /**
      * Converts the color to gray.
      */
-    public function toGray(): Gray;
+    public function to_gray(): Gray;
 }

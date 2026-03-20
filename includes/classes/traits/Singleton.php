@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 30 Modified in v2.2.0 $
  */
-
 namespace Zencart\Traits;
 
 /**
@@ -16,18 +15,15 @@ namespace Zencart\Traits;
 trait Singleton
 {
     private static array $instances = [];
-
     protected function __construct()
     {
     }
-
     /**
      * @since ZC v1.5.7
      */
     protected function __clone()
     {
     }
-
     /**
      * @since ZC v2.2.0
      */
@@ -35,7 +31,6 @@ trait Singleton
     {
         throw new \BadMethodCallException('Cannot unserialize singleton');
     }
-
     /**
      * @since ZC v1.5.7
      */
@@ -43,13 +38,13 @@ trait Singleton
     {
         throw new Exception('Cannot unserialize singleton');
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public static function getInstance()
+    public static function get_instance()
     {
-        $cls = static::class; // late-static-bound class name
+        $cls = static::class;
+        // late-static-bound class name
         if (!isset(self::$instances[$cls])) {
             self::$instances[$cls] = new static();
         }

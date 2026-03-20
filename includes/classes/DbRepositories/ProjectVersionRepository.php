@@ -1,43 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2026 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
+namespace Zencart\Db_Repositories;
 
-namespace Zencart\DbRepositories;
-
-use queryFactory;
-
+use Query_Factory;
 /**
  * Native queryFactory-backed accessor for TABLE_PROJECT_VERSION.
  *
  * @since ZC v2.2.0
  */
-class ProjectVersionRepository
+class Project_Version_Repository
 {
-    public function __construct(private readonly queryFactory $db)
+    public function __construct(private readonly Query_Factory $db)
     {
     }
-
     /**
      * @since ZC v2.2.0
      */
-    public function getByKey(string $projectVersionKey): ?array
+    public function get_by_key(string $project_version_key): ?array
     {
-        $projectVersionKey = $this->db->prepare_input($projectVersionKey);
-        $result = $this->db->Execute(
-            'SELECT project_version_major, project_version_minor, project_version_patch1, project_version_patch2,' .
-            ' project_version_patch1_source, project_version_patch2_source' .
-            ' FROM ' . TABLE_PROJECT_VERSION .
-            " WHERE project_version_key = '" . $projectVersionKey . "' LIMIT 1"
-        );
-
+        $project_version_key = $this->db->prepare_input($project_version_key);
+        $result = $this->db->Execute('SELECT project_version_major, project_version_minor, project_version_patch1, project_version_patch2,' . ' project_version_patch1_source, project_version_patch2_source' . ' FROM ' . TABLE_PROJECT_VERSION . " WHERE project_version_key = '" . $project_version_key . "' LIMIT 1");
         if ($result->EOF) {
             return null;
         }
-
         return $result->fields;
     }
 }

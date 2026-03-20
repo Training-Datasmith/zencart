@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Header code file for the customer's Account page
  *
@@ -11,22 +11,16 @@ declare(strict_types=1);
  */
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_START_ACCOUNT');
-
 if (!zen_is_logged_in()) {
     $_SESSION['navigation']->set_snapshot();
     zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
-
-require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
-
+require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 $breadcrumb->add(NAVBAR_TITLE);
-
 $customer = new Customer();
-$ordersArray = $customer->getOrderHistory($max = 3);
-
-$gv_balance = $customer->getData('gv_balance');
+$orders_array = $customer->get_order_history($max = 3);
+$gv_balance = $customer->get_data('gv_balance');
 $customer_has_gv_balance = !empty($gv_balance);
 $customer_gv_balance = !is_null($gv_balance) ? $currencies->format($gv_balance) : false;
-
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_ACCOUNT');

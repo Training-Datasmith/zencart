@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Dasp_Ri_D\Enum;
 
-namespace DASPRiD\Enum;
-
-use DASPRiD\Enum\Exception\ExpectationException;
-use DASPRiD\Enum\Exception\IllegalArgumentException;
+use Dasp_Ri_D\Enum\Exception\Expectation_Exception;
+use Dasp_Ri_D\Enum\Exception\Illegal_Argument_Exception;
 use IteratorAggregate;
 use Serializable;
 use Traversable;
-
 /**
  * A specialized map implementation for use with enum type keys.
  *
@@ -23,20 +21,18 @@ use Traversable;
  * Iterators returned by the collection views are not consistent: They may or may not show the effects of modifications
  * to the map that occur while the iteration is in progress.
  */
-final class EnumMap implements Serializable, IteratorAggregate
+final class Enum_Map implements Serializable, IteratorAggregate
 {
     /**
      * The class name of the key.
      */
-    private readonly string $keyType;
-
+    private readonly string $key_type;
     /**
      * All of the constants comprising the enum, cached for performance.
      *
      * @var array<int, AbstractEnum>
      */
-    private $keyUniverse;
-
+    private $key_universe;
     /**
      * Array representation of this map. The ith element is the value to which universe[i] is currently mapped, or null
      * if it isn't mapped to anything, or NullValue if it's mapped to null.
@@ -44,9 +40,7 @@ final class EnumMap implements Serializable, IteratorAggregate
      * @var array<int, mixed>
      */
     private array $values;
-
     private int $size = 0;
-
     /**
      * Creates a new enum map.
      *
@@ -55,49 +49,37 @@ final class EnumMap implements Serializable, IteratorAggregate
      * @param bool $allowNullValues whether to allow null values
      * @throws IllegalArgumentException when key type does not extend AbstractEnum
      */
-    public function __construct(string $keyType, /**
-     * The type of the value.
-     */
-        private readonly string $valueType, private readonly bool $allowNullValues)
+    public function __construct(
+        string $key_type,
+        /**
+         * The type of the value.
+         */
+        private readonly string $value_type,
+        private readonly bool $allow_null_values
+    )
     {
-        if (! is_subclass_of($keyType, AbstractEnum::class)) {
-            throw new IllegalArgumentException(sprintf(
-                'Class %s does not extend %s',
-                $keyType,
-                AbstractEnum::class
-            ));
+        if (!is_subclass_of($key_type, Abstract_Enum::class)) {
+            throw new Illegal_Argument_Exception(sprintf('Class %s does not extend %s', $key_type, Abstract_Enum::class));
         }
-
-        $this->keyType = $keyType;
-        $this->keyUniverse = $keyType::values();
-        $this->values = array_fill(0, count($this->keyUniverse), null);
+        $this->key_type = $key_type;
+        $this->key_universe = $key_type::values();
+        $this->values = array_fill(0, count($this->key_universe), null);
     }
-
     public function __serialize(): array
     {
         $values = [];
-
         foreach ($this->values as $ordinal => $value) {
             if (null === $value) {
                 continue;
             }
-
-            $values[$ordinal] = $this->unmaskNull($value);
+            $values[$ordinal] = $this->unmask_null($value);
         }
-
-        return [
-            'keyType' => $this->keyType,
-            'valueType' => $this->valueType,
-            'allowNullValues' => $this->allowNullValues,
-            'values' => $values,
-        ];
+        return ['keyType' => $this->key_type, 'valueType' => $this->value_type, 'allowNullValues' => $this->allow_null_values, 'values' => $values];
     }
-
     public function __unserialize(array $data): void
     {
         $this->unserialize(serialize($data));
     }
-
     /**
      * Checks whether the map types match the supplied ones.
      *
@@ -108,33 +90,18 @@ final class EnumMap implements Serializable, IteratorAggregate
      * @throws ExpectationException when supplied value type mismatches local value type
      * @throws ExpectationException when the supplied map allows null values, abut should not
      */
-    public function expect(string $keyType, string $valueType, bool $allowNullValues): void
+    public function expect(string $key_type, string $value_type, bool $allow_null_values): void
     {
-        if ($keyType !== $this->keyType) {
-            throw new ExpectationException(sprintf(
-                'Callee expected an EnumMap with key type %s, but got %s',
-                $keyType,
-                $this->keyType
-            ));
+        if ($key_type !== $this->key_type) {
+            throw new Expectation_Exception(sprintf('Callee expected an EnumMap with key type %s, but got %s', $key_type, $this->key_type));
         }
-
-        if ($valueType !== $this->valueType) {
-            throw new ExpectationException(sprintf(
-                'Callee expected an EnumMap with value type %s, but got %s',
-                $keyType,
-                $this->keyType
-            ));
+        if ($value_type !== $this->value_type) {
+            throw new Expectation_Exception(sprintf('Callee expected an EnumMap with value type %s, but got %s', $key_type, $this->key_type));
         }
-
-        if ($allowNullValues !== $this->allowNullValues) {
-            throw new ExpectationException(sprintf(
-                'Callee expected an EnumMap with nullable flag %s, but got %s',
-                ($allowNullValues ? 'true' : 'false'),
-                ($this->allowNullValues ? 'true' : 'false')
-            ));
+        if ($allow_null_values !== $this->allow_null_values) {
+            throw new Expectation_Exception(sprintf('Callee expected an EnumMap with nullable flag %s, but got %s', $allow_null_values ? 'true' : 'false', $this->allow_null_values ? 'true' : 'false'));
         }
     }
-
     /**
      * Returns the number of key-value mappings in this map.
      */
@@ -142,24 +109,21 @@ final class EnumMap implements Serializable, IteratorAggregate
     {
         return $this->size;
     }
-
     /**
      * Returns true if this map maps one or more keys to the specified value.
      */
-    public function containsValue($value): bool
+    public function contains_value($value): bool
     {
-        return in_array($this->maskNull($value), $this->values, true);
+        return in_array($this->mask_null($value), $this->values, true);
     }
-
     /**
      * Returns true if this map contains a mapping for the specified key.
      */
-    public function containsKey(AbstractEnum $key): bool
+    public function contains_key(Abstract_Enum $key): bool
     {
-        $this->checkKeyType($key);
+        $this->check_key_type($key);
         return null !== $this->values[$key->ordinal()];
     }
-
     /**
      * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
      *
@@ -172,12 +136,11 @@ final class EnumMap implements Serializable, IteratorAggregate
      *
      * @return mixed
      */
-    public function get(AbstractEnum $key)
+    public function get(Abstract_Enum $key)
     {
-        $this->checkKeyType($key);
-        return $this->unmaskNull($this->values[$key->ordinal()]);
+        $this->check_key_type($key);
+        return $this->unmask_null($this->values[$key->ordinal()]);
     }
-
     /**
      * Associates the specified value with the specified key in this map.
      *
@@ -187,55 +150,45 @@ final class EnumMap implements Serializable, IteratorAggregate
      *               (a null return can also indicate that the map previously associated null with the specified key.)
      * @throws IllegalArgumentException when the passed values does not match the internal value type
      */
-    public function put(AbstractEnum $key, $value)
+    public function put(Abstract_Enum $key, $value)
     {
-        $this->checkKeyType($key);
-
-        if (! $this->isValidValue($value)) {
-            throw new IllegalArgumentException(sprintf('Value is not of type %s', $this->valueType));
+        $this->check_key_type($key);
+        if (!$this->is_valid_value($value)) {
+            throw new Illegal_Argument_Exception(sprintf('Value is not of type %s', $this->value_type));
         }
-
         $index = $key->ordinal();
-        $oldValue = $this->values[$index];
-        $this->values[$index] = $this->maskNull($value);
-
-        if (null === $oldValue) {
+        $old_value = $this->values[$index];
+        $this->values[$index] = $this->mask_null($value);
+        if (null === $old_value) {
             ++$this->size;
         }
-
-        return $this->unmaskNull($oldValue);
+        return $this->unmask_null($old_value);
     }
-
     /**
      * Removes the mapping for this key frm this map if present.
      *
      * @return mixed the previous value associated with the specified key, or null if there was no mapping for the key.
      *               (a null return can also indicate that the map previously associated null with the specified key.)
      */
-    public function remove(AbstractEnum $key)
+    public function remove(Abstract_Enum $key)
     {
-        $this->checkKeyType($key);
-
+        $this->check_key_type($key);
         $index = $key->ordinal();
-        $oldValue = $this->values[$index];
+        $old_value = $this->values[$index];
         $this->values[$index] = null;
-
-        if (null !== $oldValue) {
+        if (null !== $old_value) {
             --$this->size;
         }
-
-        return $this->unmaskNull($oldValue);
+        return $this->unmask_null($old_value);
     }
-
     /**
      * Removes all mappings from this map.
      */
     public function clear(): void
     {
-        $this->values = array_fill(0, count($this->keyUniverse), null);
+        $this->values = array_fill(0, count($this->key_universe), null);
         $this->size = 0;
     }
-
     /**
      * Compares the specified map with this map for quality.
      *
@@ -246,14 +199,11 @@ final class EnumMap implements Serializable, IteratorAggregate
         if ($this === $other) {
             return true;
         }
-
         if ($this->size !== $other->size) {
             return false;
         }
-
         return $this->values === $other->values;
     }
-
     /**
      * Returns the values contained in this map.
      *
@@ -262,79 +212,63 @@ final class EnumMap implements Serializable, IteratorAggregate
      */
     public function values(): array
     {
-        return array_values(array_map($this->unmaskNull(...), array_filter($this->values, fn ($value): bool => null !== $value)));
+        return array_values(array_map($this->unmask_null(...), array_filter($this->values, fn($value): bool => null !== $value)));
     }
-
     public function serialize(): string
     {
         return serialize($this->__serialize());
     }
-
     public function unserialize($serialized): void
     {
         $data = unserialize($serialized);
         $this->__construct($data['keyType'], $data['valueType'], $data['allowNullValues']);
-
-        foreach ($this->keyUniverse as $key) {
+        foreach ($this->key_universe as $key) {
             if (array_key_exists($key->ordinal(), $data['values'])) {
                 $this->put($key, $data['values'][$key->ordinal()]);
             }
         }
     }
-
     public function getIterator(): Traversable
     {
-        foreach ($this->keyUniverse as $key) {
+        foreach ($this->key_universe as $key) {
             if (null === $this->values[$key->ordinal()]) {
                 continue;
             }
-
-            yield $key => $this->unmaskNull($this->values[$key->ordinal()]);
+            yield $key => $this->unmask_null($this->values[$key->ordinal()]);
         }
     }
-
-    private function maskNull($value)
+    private function mask_null($value)
     {
         if (null === $value) {
-            return NullValue::instance();
+            return Null_Value::instance();
         }
-
         return $value;
     }
-
-    private function unmaskNull($value)
+    private function unmask_null($value)
     {
-        if ($value instanceof NullValue) {
+        if ($value instanceof Null_Value) {
             return null;
         }
-
         return $value;
     }
-
     /**
      * @throws IllegalArgumentException when the passed key does not match the internal key type
      */
-    private function checkKeyType(AbstractEnum $key): void
+    private function check_key_type(Abstract_Enum $key): void
     {
-        if ($key::class !== $this->keyType) {
-            throw new IllegalArgumentException(sprintf(
-                'Object of type %s is not the same type as %s',
-                $key::class,
-                $this->keyType
-            ));
+        if ($key::class !== $this->key_type) {
+            throw new Illegal_Argument_Exception(sprintf('Object of type %s is not the same type as %s', $key::class, $this->key_type));
         }
     }
-
-    private function isValidValue($value): bool
+    private function is_valid_value($value): bool
     {
         if (null === $value) {
-            if ($this->allowNullValues) {
+            if ($this->allow_null_values) {
                 return true;
             }
-
             return false;
         }
-        return match ($this->valueType) {
+        return match ($this->value_type) {
             'mixed' => true,
             'bool', 'boolean' => is_bool($value),
             'int', 'integer' => is_int($value),
@@ -342,7 +276,7 @@ final class EnumMap implements Serializable, IteratorAggregate
             'string' => is_string($value),
             'object' => is_object($value),
             'array' => is_array($value),
-            default => $value instanceof $this->valueType,
+            default => $value instanceof $this->value_type,
         };
     }
 }

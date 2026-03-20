@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Common Template - tpl_tabular_display.php
  *
@@ -10,42 +11,44 @@
  * @version $Id: DrByte 2021 Jan 15 Modified in v1.5.8-alpha $
  */
 $zco_notifier->notify('NOTIFY_TPL_TABULAR_DISPLAY_START', $current_page_base, $list_box_contents);
-
-$cell_scope = (empty($cell_scope)) ? 'col' : $cell_scope;
-$cell_title = (empty($cell_title)) ? 'list' : $cell_title;
+$cell_scope = empty($cell_scope) ? 'col' : $cell_scope;
+$cell_title = empty($cell_title) ? 'list' : $cell_title;
 ?>
-<table id="<?php echo 'cat' . $cPath . 'Table'; ?>" class="tabTable">
-<?php
+<table id="<?php 
+echo 'cat' . $c_path . 'Table';
+?>" class="tabTable">
+<?php 
 foreach ($list_box_contents as $row => $cols) {
     $r_params = '';
     if (isset($list_box_contents[$row]['params'])) {
         $r_params .= ' ' . $list_box_contents[$row]['params'];
     }
     ?>
-    <tr<?php echo $r_params; ?>>
-<?php
-        foreach ($cols as $num => $col) {
-            $c_params = '';
-            $cell_type = ($row == 0) ? 'th' : 'td';
-            if (isset($col['params'])) {
-                $c_params .= ' ' . $col['params'];
-            }
-            if (!empty($col['align'])) {
-                $c_params .= ' align="' . $col['align'] . '"';
-            }
-
-            if ($cell_type == 'th') {
-                $c_params .= ' scope="' . $cell_scope . '" id="' . $cell_title . 'Cell' . $row . '-' . $num.'"';
-            }
-            if (isset($col['text'])) {
-                echo '<' . $cell_type . $c_params . '>' . $col['text'] . '</' . $cell_type . '>'  . "\n";
-            }
+    <tr<?php 
+    echo $r_params;
+    ?>>
+<?php 
+    foreach ($cols as $num => $col) {
+        $c_params = '';
+        $cell_type = $row == 0 ? 'th' : 'td';
+        if (isset($col['params'])) {
+            $c_params .= ' ' . $col['params'];
         }
+        if (!empty($col['align'])) {
+            $c_params .= ' align="' . $col['align'] . '"';
+        }
+        if ($cell_type == 'th') {
+            $c_params .= ' scope="' . $cell_scope . '" id="' . $cell_title . 'Cell' . $row . '-' . $num . '"';
+        }
+        if (isset($col['text'])) {
+            echo '<' . $cell_type . $c_params . '>' . $col['text'] . '</' . $cell_type . '>' . "\n";
+        }
+    }
     ?>
     </tr>
-<?php
+<?php 
 }
 ?>
 </table>
-<?php
+<?php 
 $zco_notifier->notify('NOTIFY_TPL_TABULAR_DISPLAY_END', $current_page_base, $list_box_contents);

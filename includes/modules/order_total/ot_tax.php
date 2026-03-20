@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * ot_tax order-total module
  *
@@ -10,16 +9,15 @@ declare(strict_types=1);
  * @license   http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * @since ZC v1.0.3
  */
 class ot_tax
 {
     /**
-    * $_check is used to check the configuration key set up
-    * @var int
-    */
+     * $_check is used to check the configuration key set up
+     * @var int
+     */
     protected $_check;
     /**
      * $code determines the internal 'code' name used to designate "this" order total module
@@ -46,7 +44,6 @@ class ot_tax
      * @var array
      */
     public $output = [];
-
     public function __construct()
     {
         $this->code = 'ot_tax';
@@ -56,22 +53,19 @@ class ot_tax
         if (null === $this->sort_order) {
             return;
         }
-
         $this->output = [];
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function process(): void
     {
         global $order, $currencies;
-
-        $taxDescription = '';
-        $taxValue = 0;
+        $tax_description = '';
+        $tax_value = 0;
         if (STORE_TAX_DISPLAY_STATUS === '1') {
-            $taxAddress = zen_get_tax_locations();
-            $result = zen_get_all_tax_descriptions($taxAddress['country_id'], $taxAddress['zone_id']);
+            $tax_address = zen_get_tax_locations();
+            $result = zen_get_all_tax_descriptions($tax_address['country_id'], $tax_address['zone_id']);
             if (count($result) !== 0) {
                 foreach ($result as $description) {
                     if (!isset($order->info['tax_groups'][$description])) {
@@ -85,29 +79,18 @@ class ot_tax
         }
         foreach ($order->info['tax_groups'] as $key => $value) {
             if (SHOW_SPLIT_TAX_CHECKOUT === 'true') {
-                if ($value > 0 || (abs($value) < PHP_FLOAT_EPSILON && STORE_TAX_DISPLAY_STATUS === '1')) {
-                    $this->output[] = [
-                        'title' => ((is_numeric($key) && $key == 0) ? TEXT_UNKNOWN_TAX_RATE : $key) . ':',
-                        'text' => $currencies->format($value, true, $order->info['currency'], $order->info['currency_value']),
-                        'value' => $value,
-                    ];
+                if ($value > 0 || abs($value) < PHP_FLOAT_EPSILON && STORE_TAX_DISPLAY_STATUS === '1') {
+                    $this->output[] = ['title' => (is_numeric($key) && $key == 0 ? TEXT_UNKNOWN_TAX_RATE : $key) . ':', 'text' => $currencies->format($value, true, $order->info['currency'], $order->info['currency_value']), 'value' => $value];
                 }
-            } else {
-                if ($value > 0 || (abs($value) < PHP_FLOAT_EPSILON && STORE_TAX_DISPLAY_STATUS === '1')) {
-                    $taxDescription .= ((is_numeric($key) && $key == 0) ? TEXT_UNKNOWN_TAX_RATE : $key) . ' + ';
-                    $taxValue += $value;
-                }
+            } else if ($value > 0 || abs($value) < PHP_FLOAT_EPSILON && STORE_TAX_DISPLAY_STATUS === '1') {
+                $tax_description .= (is_numeric($key) && $key == 0 ? TEXT_UNKNOWN_TAX_RATE : $key) . ' + ';
+                $tax_value += $value;
             }
         }
-        if (SHOW_SPLIT_TAX_CHECKOUT !== 'true' && ($taxValue > 0 || STORE_TAX_DISPLAY_STATUS === '1')) {
-            $this->output[] = [
-                'title' => mb_substr($taxDescription, 0, mb_strlen($taxDescription) - 3) . ':',
-                'text' => $currencies->format($taxValue, true, $order->info['currency'], $order->info['currency_value']),
-                'value' => $taxValue,
-            ];
+        if (SHOW_SPLIT_TAX_CHECKOUT !== 'true' && ($tax_value > 0 || STORE_TAX_DISPLAY_STATUS === '1')) {
+            $this->output[] = ['title' => mb_substr($tax_description, 0, mb_strlen($tax_description) - 3) . ':', 'text' => $currencies->format($tax_value, true, $order->info['currency'], $order->info['currency_value']), 'value' => $tax_value];
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -116,12 +99,10 @@ class ot_tax
         global $db;
         if (!isset($this->_check)) {
             $check_query = $db->Execute('select configuration_value from ' . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_ORDER_TOTAL_TAX_STATUS'");
-            $this->_check = $check_query->RecordCount();
+            $this->_check = $check_query->record_count();
         }
-
         return $this->_check;
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -129,17 +110,15 @@ class ot_tax
     {
         return ['MODULE_ORDER_TOTAL_TAX_STATUS', 'MODULE_ORDER_TOTAL_TAX_SORT_ORDER'];
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function install(): void
     {
         global $db;
-        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_TAX_STATUS', 'true', '', '6', '1','zen_cfg_select_option(array(\'true\'), ', now())");
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('This module is installed', 'MODULE_ORDER_TOTAL_TAX_STATUS', 'true', '', '6', '1','zen_cfg_select_option(array(\\'true\\'), ', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ORDER_TOTAL_TAX_SORT_ORDER', '300', 'Sort order of display.', '6', '2', now())");
     }
-
     /**
      * @since ZC v1.0.3
      */

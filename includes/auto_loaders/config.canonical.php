@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * autoloader activation point for canonical url handling script
  *
@@ -14,5 +14,4 @@ if (!defined('IS_ADMIN_FLAG')) {
 /**
  * point 161 was selected specifically based on dependancies
  */
-$autoLoadConfig[161][] = ['autoType' => 'init_script',
-                               'loadFile' => 'init_canonical.php'];
+$auto_load_config[161][] = ['autoType' => 'init_script', 'loadFile' => 'init_canonical.php'];

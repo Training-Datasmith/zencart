@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Back-compat shim: App\Models\PluginControl is an alias of
  * Zencart\DbRepositories\PluginControlRepository.
@@ -13,7 +13,6 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id:  Modified in v2.2.0 $
  */
-
 namespace App\Models;
 
 /**
@@ -21,4 +20,4 @@ namespace App\Models;
  *
  * @deprecated Use \Zencart\DbRepositories\PluginControlRepository instead.
  */
-class_alias(\Zencart\DbRepositories\PluginControlRepository::class, __NAMESPACE__ . '\\PluginControl');
+class_alias(\Zencart\Db_Repositories\Plugin_Control_Repository::class, __NAMESPACE__ . '\PluginControl');

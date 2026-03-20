@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -25,7 +26,9 @@ $('#contentMainWrapper').addClass('onerow-fluid');
      'margin': 'auto'
  });
 
-<?php if ($detect->isMobile() && !$detect->isTablet() || $_SESSION['layoutType'] == 'mobile') { ?>
+<?php 
+if ($detect->is_mobile() && !$detect->is_tablet() || $_SESSION['layoutType'] == 'mobile') {
+    ?>
 
 $('.leftBoxContainer').css('width', '');
 $('.rightBoxContainer').css('width', '');
@@ -70,7 +73,9 @@ $('input#telephone').clone().attr('type','tel').insertAfter('input#telephone').p
 $('input#dob').clone().attr('type','date').insertAfter('input#dob').prev().remove();
 $('input#fax').clone().attr('type','tel').insertAfter('input#fax').prev().remove();
 
-<?php } elseif ($detect->isTablet() || $_SESSION['layoutType'] == 'tablet') { ?>
+<?php 
+} elseif ($detect->is_tablet() || $_SESSION['layoutType'] == 'tablet') {
+    ?>
 $('#mainWrapper').css({
      'max-width': '100%',
      'margin': 'auto'
@@ -109,7 +114,9 @@ $('#whatsnew').css({  });
 $('#whosonline').css({  });
 
 
-<?php } elseif ($_SESSION['layoutType'] == 'full') { ?>
+<?php 
+} elseif ($_SESSION['layoutType'] == 'full') {
+    ?>
 
  $('#mainWrapper').css({
      'width': '100%',
@@ -124,13 +131,17 @@ $('#whosonline').css({  });
      'margin': 'auto'
  });
 
-<?php } else { ?>
+<?php 
+} else {
+    ?>
 
 $('.leftBoxContainer').css('width', '');
 $('.rightBoxContainer').css('width', '');
 $('#mainWrapper').css('margin', 'auto');
 
-<?php } ?>
+<?php 
+}
+?>
 $('a[href="#top"]').click(function(){
 $('html, body').animate({scrollTop:0}, 'slow');
 return false;

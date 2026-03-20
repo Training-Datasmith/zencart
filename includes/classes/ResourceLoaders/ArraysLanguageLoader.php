@@ -1,134 +1,120 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
-
-namespace Zencart\LanguageLoader;
+namespace Zencart\Language_Loader;
 
 /**
  * @since ZC v1.5.8
  */
-class ArraysLanguageLoader extends BaseLanguageLoader
+class Arrays_Language_Loader extends Base_Language_Loader
 {
-    protected $mainLoader;
-
+    protected $main_loader;
     /**
      * @since ZC v1.5.8
      */
-    public function makeConstants($defines): bool
+    public function make_constants($defines): bool
     {
         if (!is_array($defines)) {
             return false;
         }
-
         $constants_made = false;
-        foreach ($defines as $defineKey => $defineValue) {
-            if (defined($defineKey)) {
+        foreach ($defines as $define_key => $define_value) {
+            if (defined($define_key)) {
                 $constants_made = true;
                 continue;
             }
-            preg_match_all('/%{2}([^%]+)%{2}/', (string) $defineValue, $matches, PREG_PATTERN_ORDER);
+            preg_match_all('/%{2}([^%]+)%{2}/', (string) $define_value, $matches, PREG_PATTERN_ORDER);
             if (count($matches[1])) {
                 foreach ($matches[1] as $index => $match) {
                     if (isset($defines[$match])) {
-                        $defineValue = str_replace($matches[0][$index], $defines[$match], $defineValue);
+                        $define_value = str_replace($matches[0][$index], $defines[$match], $define_value);
                     }
                 }
             }
-
-            define($defineKey, $defineValue);
+            define($define_key, $define_value);
             $constants_made = true;
         }
         return $constants_made;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function getLanguageDefines(): array
+    public function get_language_defines(): array
     {
-        return $this->languageDefines;
+        return $this->language_defines;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadArraysFromDirectory(string $rootPath, string $language, string $extraPath): array
+    protected function load_arrays_from_directory(string $root_path, string $language, string $extra_path): array
     {
-        $path = $rootPath . $language . $extraPath;
-        $fileList = $this->fileSystem->listFilesFromDirectory($path, '~^lang\.(.*)\.php$~i');
-        return $this->processArrayFileList($path, $fileList);
+        $path = $root_path . $language . $extra_path;
+        $file_list = $this->file_system->list_files_from_directory($path, '~^lang\.(.*)\.php$~i');
+        return $this->process_array_file_list($path, $file_list);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function pluginLoadArraysFromDirectory(string $language, string $extraPath, string $context = 'admin'): array
+    protected function plugin_load_arrays_from_directory(string $language, string $extra_path, string $context = 'admin'): array
     {
-        $defineList = [];
-        foreach ($this->pluginList as $plugin) {
-            $pluginDir = $this->zcPluginsDir . $plugin['unique_key'] . '/' . $plugin['version'] . '/' . $context . '/includes/languages/';
-            $defines = $this->loadArraysFromDirectory($pluginDir, $language, $extraPath);
-            $defineList = array_merge($defineList, $defines);
+        $define_list = [];
+        foreach ($this->plugin_list as $plugin) {
+            $plugin_dir = $this->zc_plugins_dir . $plugin['unique_key'] . '/' . $plugin['version'] . '/' . $context . '/includes/languages/';
+            $defines = $this->load_arrays_from_directory($plugin_dir, $language, $extra_path);
+            $define_list = array_merge($define_list, $defines);
         }
-        return $defineList;
+        return $define_list;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function processArrayFileList(string $path, array $fileList): array
+    protected function process_array_file_list(string $path, array $file_list): array
     {
-        $defineList = [];
-        foreach ($fileList as $file) {
-            $defines = $this->loadArrayDefineFile($path . '/' . $file);
-            $defineList = array_merge($defineList, $defines);
+        $define_list = [];
+        foreach ($file_list as $file) {
+            $defines = $this->load_array_define_file($path . '/' . $file);
+            $define_list = array_merge($define_list, $defines);
         }
-        return $defineList;
+        return $define_list;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function loadExtraLanguageFiles(string $rootPath, string $language, string $fileName, string $extraPath = ''): void
+    public function load_extra_language_files(string $root_path, string $language, string $file_name, string $extra_path = ''): void
     {
         // -----
         // Any $extraPath specified, if not an empty string, must start with a '/' and not end with one.
         //
-        $extraPath = trim($extraPath, '/');
-        if ($extraPath !== '') {
-            $extraPath = '/' . $extraPath;
+        $extra_path = trim($extra_path, '/');
+        if ($extra_path !== '') {
+            $extra_path = '/' . $extra_path;
         }
-
-        $defineListMain = $this->loadDefinesFromArrayFile($rootPath, $language, $fileName, $extraPath);
-
-        $extraPath .= '/' . $this->templateDir;
-        $defineListTemplate = $this->loadDefinesFromArrayFile($rootPath, $language, $fileName, $extraPath);
-
-        $defineList = array_merge($defineListMain, $defineListTemplate);
-        $this->makeConstants($defineList);
+        $define_list_main = $this->load_defines_from_array_file($root_path, $language, $file_name, $extra_path);
+        $extra_path .= '/' . $this->template_dir;
+        $define_list_template = $this->load_defines_from_array_file($root_path, $language, $file_name, $extra_path);
+        $define_list = array_merge($define_list_main, $define_list_template);
+        $this->make_constants($define_list);
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function loadModuleLanguageFile(string $fileName, string $module_type): bool
+    public function load_module_language_file(string $file_name, string $module_type): bool
     {
         // -----
         // First, gather the 'base' 'english' language file for the given order_total/payment/shipping module. If
         // the current session's language is **other than** 'english', the file for that language (if present)
         // overwrites any of the 'english' language constants.
         //
-        $defineList = $this->loadModuleDefinesFromArrayFile($this->fallback, $fileName, $module_type);
+        $define_list = $this->load_module_defines_from_array_file($this->fallback, $file_name, $module_type);
         if ($_SESSION['language'] !== $this->fallback) {
-            $defineList = array_merge($defineList, $this->loadModuleDefinesFromArrayFile($_SESSION['language'], $fileName, $module_type));
+            $define_list = array_merge($define_list, $this->load_module_defines_from_array_file($_SESSION['language'], $file_name, $module_type));
         }
-
         // -----
         // Next, gather any 'english' language file from all zc_plugin's 'base' modules' directory; if the
         // current session's language is **other than** 'english', see if any file for that language is
@@ -136,13 +122,12 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         //
         // Any language definitions found in the plugins' files overwrite any previously-loaded ones.
         //
-        $defineListPlugins = $this->pluginLoadDefinesFromArrayFile($this->fallback, $fileName, 'catalog', '/modules/' . $module_type);
-        $defineList = array_merge($defineList, $defineListPlugins);
+        $define_list_plugins = $this->plugin_load_defines_from_array_file($this->fallback, $file_name, 'catalog', '/modules/' . $module_type);
+        $define_list = array_merge($define_list, $define_list_plugins);
         if ($_SESSION['language'] !== $this->fallback) {
-            $defineListPlugins = $this->pluginLoadDefinesFromArrayFile($_SESSION['language'], $fileName, 'catalog', '/modules/' . $module_type);
-            $defineList = array_merge($defineList, $defineListPlugins);
+            $define_list_plugins = $this->plugin_load_defines_from_array_file($_SESSION['language'], $file_name, 'catalog', '/modules/' . $module_type);
+            $define_list = array_merge($define_list, $define_list_plugins);
         }
-
         // -----
         // Next, gather any 'english' language file from all zc_plugin's 'default' modules' directory; if the
         // current session's language is **other than** 'english', see if any file for that language is
@@ -150,109 +135,98 @@ class ArraysLanguageLoader extends BaseLanguageLoader
         //
         // Any language definitions found in the plugins' files overwrite any previously-loaded ones.
         //
-        $defineListPlugins = $this->pluginLoadDefinesFromArrayFile($this->fallback, $fileName, 'catalog', '/modules/' . $module_type . '/default');
-        $defineList = array_merge($defineList, $defineListPlugins);
+        $define_list_plugins = $this->plugin_load_defines_from_array_file($this->fallback, $file_name, 'catalog', '/modules/' . $module_type . '/default');
+        $define_list = array_merge($define_list, $define_list_plugins);
         if ($_SESSION['language'] !== $this->fallback) {
-            $defineListPlugins = $this->pluginLoadDefinesFromArrayFile($_SESSION['language'], $fileName, 'catalog', '/modules/' . $module_type . '/default');
-            $defineList = array_merge($defineList, $defineListPlugins);
+            $define_list_plugins = $this->plugin_load_defines_from_array_file($_SESSION['language'], $file_name, 'catalog', '/modules/' . $module_type . '/default');
+            $define_list = array_merge($define_list, $define_list_plugins);
         }
-
         // -----
         // Finally, gather any template-override definitions **for the current session language**. Any language
         // definitions found here overwrite any previously-loaded ones.
         //
-        $defineListTemplate = $this->loadModuleDefinesFromArrayFile($_SESSION['language'], $fileName, $module_type, $this->templateDir . '/');
-        $defineList = array_merge($defineList, $defineListTemplate);
-
+        $define_list_template = $this->load_module_defines_from_array_file($_SESSION['language'], $file_name, $module_type, $this->template_dir . '/');
+        $define_list = array_merge($define_list, $define_list_template);
         // -----
         // Create the language constants from the definitions found and return an indication of whether/not
         // constants were made (or pre-existing).
         //
-        return $this->makeConstants($defineList);
+        return $this->make_constants($define_list);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadDefinesFromArrayFile(string $rootPath, string $language, string $fileName, string $extraPath = ''): array
+    protected function load_defines_from_array_file(string $root_path, string $language, string $file_name, string $extra_path = ''): array
     {
-        $arrayFileName = 'lang.' . $fileName;
-        $mainFile = $rootPath . $language . $extraPath. '/' . $arrayFileName;
-        $fallbackFile = $rootPath . $language . '/' . $arrayFileName;
-        return $this->loadDefinesWithFallback($mainFile, $fallbackFile);
+        $array_file_name = 'lang.' . $file_name;
+        $main_file = $root_path . $language . $extra_path . '/' . $array_file_name;
+        $fallback_file = $root_path . $language . '/' . $array_file_name;
+        return $this->load_defines_with_fallback($main_file, $fallback_file);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadModuleDefinesFromArrayFile(string $language, string $fileName, string $module_type, string $templateDir = ''): array
+    protected function load_module_defines_from_array_file(string $language, string $file_name, string $module_type, string $template_dir = ''): array
     {
-        $rootPath = DIR_FS_CATALOG . DIR_WS_LANGUAGES;
-        $arrayFileName = 'lang.' . $fileName;
-
+        $root_path = DIR_FS_CATALOG . DIR_WS_LANGUAGES;
+        $array_file_name = 'lang.' . $file_name;
         if ($module_type !== '') {
             $module_type .= '/';
         }
-        $mainFile = $rootPath . $language . '/modules/' . $module_type . $templateDir . $arrayFileName;
-        $fallbackFile = $rootPath . $this->fallback . '/modules/' . $module_type . $templateDir . $arrayFileName;
-        return $this->loadDefinesWithFallback($mainFile, $fallbackFile);
+        $main_file = $root_path . $language . '/modules/' . $module_type . $template_dir . $array_file_name;
+        $fallback_file = $root_path . $this->fallback . '/modules/' . $module_type . $template_dir . $array_file_name;
+        return $this->load_defines_with_fallback($main_file, $fallback_file);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function pluginLoadDefinesFromArrayFile(string $language, string $fileName, string $context = 'admin', string $extraPath = ''): array
+    protected function plugin_load_defines_from_array_file(string $language, string $file_name, string $context = 'admin', string $extra_path = ''): array
     {
-        $defineList = [];
-        foreach ($this->pluginList as $plugin) {
-            $pluginDir = $this->zcPluginsDir . $plugin['unique_key'] . '/' . $plugin['version'];
-            $pluginDir .=  '/' . $context . '/includes/languages/';
-            $pluginDefineList = $this->loadDefinesFromArrayFile($pluginDir, $language, $fileName, $extraPath);
-            $defineList = array_merge($defineList, $pluginDefineList);
+        $define_list = [];
+        foreach ($this->plugin_list as $plugin) {
+            $plugin_dir = $this->zc_plugins_dir . $plugin['unique_key'] . '/' . $plugin['version'];
+            $plugin_dir .= '/' . $context . '/includes/languages/';
+            $plugin_define_list = $this->load_defines_from_array_file($plugin_dir, $language, $file_name, $extra_path);
+            $define_list = array_merge($define_list, $plugin_define_list);
         }
-        return $defineList;
+        return $define_list;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadDefinesWithFallback(string $mainFile, string $fallbackFile): array
+    protected function load_defines_with_fallback(string $main_file, string $fallback_file): array
     {
-        $defineListFallback = [];
-        if ($mainFile !== $fallbackFile) {
-            $defineListFallback = $this->loadArrayDefineFile($fallbackFile);
+        $define_list_fallback = [];
+        if ($main_file !== $fallback_file) {
+            $define_list_fallback = $this->load_array_define_file($fallback_file);
         }
-        $defineListMain = $this->loadArrayDefineFile($mainFile);
-        return array_merge($defineListFallback, $defineListMain);
+        $define_list_main = $this->load_array_define_file($main_file);
+        return array_merge($define_list_fallback, $define_list_main);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function addLanguageDefines($defineList): void
+    protected function add_language_defines($define_list): void
     {
-        if (!is_array($defineList)) {
+        if (!is_array($define_list)) {
             return;
         }
-        $newDefineList = array_merge($this->languageDefines, $defineList);
-        $this->languageDefines = $newDefineList;
+        $new_define_list = array_merge($this->language_defines, $define_list);
+        $this->language_defines = $new_define_list;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadArrayDefineFile(string $definesFile): array
+    protected function load_array_define_file(string $defines_file): array
     {
-        if ($this->mainLoader->isFileAlreadyLoaded($definesFile) === true || !is_file($definesFile)) {
+        if ($this->main_loader->is_file_already_loaded($defines_file) === true || !is_file($defines_file)) {
             return [];
         }
-
-        $this->mainLoader->addLanguageFilesLoaded('arrays', $definesFile);
+        $this->main_loader->add_language_files_loaded('arrays', $defines_file);
         // file should return a variable
-        $definesList = require $definesFile;
-        return $definesList;
+        $defines_list = require $defines_file;
+        return $defines_list;
     }
-
     // -----
     // Loads the specified file from the specified directory, with language fall-back.
     //
@@ -266,17 +240,15 @@ class ArraysLanguageLoader extends BaseLanguageLoader
     /**
      * @since ZC v2.1.0
      */
-    protected function loadDefinesFromDirFileWithFallback(string $directory, string $filename): void
+    protected function load_defines_from_dir_file_with_fallback(string $directory, string $filename): void
     {
-        $defineList = $this->loadDefinesFromArrayFile($directory, $this->fallback, $filename);
-        $this->addLanguageDefines($defineList);
-
+        $define_list = $this->load_defines_from_array_file($directory, $this->fallback, $filename);
+        $this->add_language_defines($define_list);
         if ($_SESSION['language'] !== $this->fallback) {
-            $defineList = $this->loadDefinesFromArrayFile($directory, $_SESSION['language'], $filename);
-            $this->addLanguageDefines($defineList);
+            $define_list = $this->load_defines_from_array_file($directory, $_SESSION['language'], $filename);
+            $this->add_language_defines($define_list);
         }
     }
-
     // -----
     // Load (and make associated constants) for a given **storefront** language file.  Used
     // primarily by admin plugins that have common admin/storefront constant definitions.
@@ -286,33 +258,25 @@ class ArraysLanguageLoader extends BaseLanguageLoader
     /**
      * @since ZC v2.1.0
      */
-    public function makeCatalogArrayConstants(string $fileName, string $extraDir = ''): void
+    public function make_catalog_array_constants(string $file_name, string $extra_dir = ''): void
     {
-        if (str_starts_with($fileName, 'lang.') === false) {
-            $fileName = 'lang.' . $fileName;
+        if (str_starts_with($file_name, 'lang.') === false) {
+            $file_name = 'lang.' . $file_name;
         }
-
-        $rootDir = DIR_FS_CATALOG . DIR_WS_LANGUAGES;
-
-        $mainFile = $rootDir . $_SESSION['language'] . $extraDir . '/' . $fileName;
-        $fallbackFile = $rootDir . $this->fallback . $extraDir . '/' . $fileName;
-
-        $defineList = $this->loadDefinesWithFallback($mainFile, $fallbackFile);
-
-        foreach ($this->pluginList as $plugin) {
-            $pluginDir = $this->zcPluginsDir . $plugin['unique_key'] . '/' . $plugin['version'];
-            $pluginDir .=  '/catalog/includes/languages/';
-
-            $mainFile = $pluginDir . $_SESSION['language'] . $extraDir . '/' . $fileName;
-            $fallbackFile = $pluginDir . $this->fallback . $extraDir . '/' . $fileName;
-
-            $pluginDefineList = $this->loadDefinesWithFallback($mainFile, $fallbackFile);
-            $defineList = array_merge($defineList, $pluginDefineList);
+        $root_dir = DIR_FS_CATALOG . DIR_WS_LANGUAGES;
+        $main_file = $root_dir . $_SESSION['language'] . $extra_dir . '/' . $file_name;
+        $fallback_file = $root_dir . $this->fallback . $extra_dir . '/' . $file_name;
+        $define_list = $this->load_defines_with_fallback($main_file, $fallback_file);
+        foreach ($this->plugin_list as $plugin) {
+            $plugin_dir = $this->zc_plugins_dir . $plugin['unique_key'] . '/' . $plugin['version'];
+            $plugin_dir .= '/catalog/includes/languages/';
+            $main_file = $plugin_dir . $_SESSION['language'] . $extra_dir . '/' . $file_name;
+            $fallback_file = $plugin_dir . $this->fallback . $extra_dir . '/' . $file_name;
+            $plugin_define_list = $this->load_defines_with_fallback($main_file, $fallback_file);
+            $define_list = array_merge($define_list, $plugin_define_list);
         }
-
-        $templateFile = $rootDir . $_SESSION['language'] . $extraDir . '/' . $this->templateDir . '/' . $fileName;
-        $defineList = array_merge($defineList, $this->loadArrayDefineFile($templateFile));
-
-        $this->makeConstants($defineList);
+        $template_file = $root_dir . $_SESSION['language'] . $extra_dir . '/' . $this->template_dir . '/' . $file_name;
+        $define_list = array_merge($define_list, $this->load_array_define_file($template_file));
+        $this->make_constants($define_list);
     }
 }

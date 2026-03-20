@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Header code file for the Address Book page
  *
@@ -11,17 +11,14 @@ declare(strict_types=1);
  */
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_START_ADDRESS_BOOK');
-
 if (!zen_is_logged_in()) {
     $_SESSION['navigation']->set_snapshot();
     zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
-require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
+require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_ACCOUNT, '', 'SSL'));
 $breadcrumb->add(NAVBAR_TITLE_2);
-
 $customer = new Customer();
-$addressArray = $customer->getFormattedAddressBookList();
-
+$address_array = $customer->get_formatted_address_book_list();
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_ADDRESS_BOOK');

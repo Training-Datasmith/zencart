@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * ezpages_bar_header - used to display links to EZ-Pages content horizontally as a header element
  *
@@ -13,24 +13,21 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 $zco_notifier->notify('NOTIFY_START_EZPAGES_HEADERBAR');
-
-$var_linksList = [];
-
+$var_links_list = [];
 // test if bar should display:
-if ($detect->isMobile() || EZPAGES_STATUS_HEADER == '1' || (EZPAGES_STATUS_HEADER == '2' && zen_is_whitelisted_admin_ip())) {
-
+if ($detect->is_mobile() || EZPAGES_STATUS_HEADER == '1' || EZPAGES_STATUS_HEADER == '2' && zen_is_whitelisted_admin_ip()) {
     if (!$sniffer->table_exists(TABLE_EZPAGES_CONTENT)) {
-        return; // early exit; db not upgraded
+        return;
+        // early exit; db not upgraded
     }
     $pages_query = $db->Execute('SELECT e.*, ec.pages_title
                               FROM  ' . TABLE_EZPAGES . ' e
                               INNER JOIN ' . TABLE_EZPAGES_CONTENT . ' ec ON (e.pages_id = ec.pages_id)
-                              WHERE ec.languages_id = ' . (int)$_SESSION['languages_id'] . '
+                              WHERE ec.languages_id = ' . (int) $_SESSION['languages_id'] . '
                               AND e.status_header = 1
                               AND e.header_sort_order > 0
                               ORDER BY e.header_sort_order, ec.pages_title');
-
-    if ($pages_query->RecordCount() > 0) {
+    if ($pages_query->record_count() > 0) {
         $rows = 0;
         $page_query_list_header = [];
         foreach ($pages_query as $page_query) {
@@ -38,32 +35,25 @@ if ($detect->isMobile() || EZPAGES_STATUS_HEADER == '1' || (EZPAGES_STATUS_HEADE
             $page_query_list_header[$rows]['id'] = $page_query['pages_id'];
             $page_query_list_header[$rows]['name'] = $page_query['pages_title'];
             $page_query_list_header[$rows]['altURL'] = '';
-
             // if altURL is specified, check to see if it starts with "http", and if so, create direct URL, otherwise use a zen href link
             switch (true) {
                 // external link new window or same window
-                case ($page_query['alt_url_external'] != ''):
-                    $page_query_list_header[$rows]['altURL']  = $page_query['alt_url_external'];
+                case $page_query['alt_url_external'] != '':
+                    $page_query_list_header[$rows]['altURL'] = $page_query['alt_url_external'];
                     break;
-                    // internal link new window
+                // internal link new window
                 case $page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '1':
-                    // internal link same window
-                case ($page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '0'):
-                    $page_query_list_header[$rows]['altURL']  = (str_starts_with((string) $page_query['alt_url'], 'http')) ?
-                    $page_query['alt_url'] :
-                    ($page_query['alt_url'] == '' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
+                // internal link same window
+                case $page_query['alt_url'] != '' && $page_query['page_open_new_window'] == '0':
+                    $page_query_list_header[$rows]['altURL'] = str_starts_with((string) $page_query['alt_url'], 'http') ? $page_query['alt_url'] : ($page_query['alt_url'] == '' ? '' : zen_href_link($page_query['alt_url'], '', 'SSL', true, true, true));
                     break;
             }
-
             // if altURL is specified, use it; otherwise, use EZPage ID to create link
-            $page_query_list_header[$rows]['link'] = ($page_query_list_header[$rows]['altURL'] == '') ?
-            zen_href_link(FILENAME_EZPAGES, 'id=' . $page_query['pages_id'] . ($page_query['toc_chapter'] > 0 ? '&chapter=' . $page_query['toc_chapter'] : ''), 'SSL') :
-            $page_query_list_header[$rows]['altURL'];
-            $page_query_list_header[$rows]['link'] .= ($page_query['page_open_new_window'] == '1' ? '" rel="noreferrer noopener" target="_blank' : '');
+            $page_query_list_header[$rows]['link'] = $page_query_list_header[$rows]['altURL'] == '' ? zen_href_link(FILENAME_EZPAGES, 'id=' . $page_query['pages_id'] . ($page_query['toc_chapter'] > 0 ? '&chapter=' . $page_query['toc_chapter'] : ''), 'SSL') : $page_query_list_header[$rows]['altURL'];
+            $page_query_list_header[$rows]['link'] .= $page_query['page_open_new_window'] == '1' ? '" rel="noreferrer noopener" target="_blank' : '';
         }
-
-        $var_linksList = $page_query_list_header;
+        $var_links_list = $page_query_list_header;
     }
-} // display
-
+}
+// display
 $zco_notifier->notify('NOTIFY_END_EZPAGES_HEADERBAR');

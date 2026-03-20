@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
@@ -8,12 +8,10 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Oct 30 Modified in v2.2.0 $
  * @since ZC v1.5.7
  */
-
 function zen_get_zcversion(): string
 {
     return PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 }
-
 /**
  * Set timeout for the current script.
  * @param int $limit seconds
@@ -21,9 +19,8 @@ function zen_get_zcversion(): string
  */
 function zen_set_time_limit($limit): void
 {
-    @set_time_limit((int)$limit);
+    @set_time_limit((int) $limit);
 }
-
 /**
  * @param string $ip
  * @since ZC v1.5.7
@@ -35,7 +32,6 @@ function zen_is_whitelisted_admin_ip($ip = null): bool
     }
     return str_contains(EXCLUDE_ADMIN_IP_FOR_MAINTENANCE, (string) $ip);
 }
-
 ////
 // Wrapper function for round()
 /**
@@ -46,7 +42,6 @@ function zen_round($value, $precision): float
     $value = round($value * 10 ** $precision, 0);
     return $value / 10 ** $precision;
 }
-
 /**
  * replacement for fmod to manage values < 1
  * @since ZC v1.2.6d
@@ -56,14 +51,13 @@ function fmod_round($x, $y): int|float
     if ($y == 0) {
         return 0;
     }
-    $x = (string)$x;
-    $y = (string)$y;
-    $zc_round = ($x * 1000) / ($y * 1000);
+    $x = (string) $x;
+    $y = (string) $y;
+    $zc_round = $x * 1000 / ($y * 1000);
     $zc_round_ceil = round($zc_round, 0);
     $multiplier = $zc_round_ceil * $y;
     return abs(round($x - $multiplier, 6));
 }
-
 /**
  * Cast an input to a desired type.
  * (Note: does not operate recursively on arrays)
@@ -72,21 +66,20 @@ function fmod_round($x, $y): int|float
 function zen_cast($input, ?string $cast_to): mixed
 {
     return match ($cast_to) {
-        'string' => (string)$input,
-        'boolean', 'bool' => (bool)$input,
-        'int', 'integer' => (int)$input,
-        'double', 'float' => (float)$input,
-        'array' => (is_array($input)) ? $input : [$input],
+        'string' => (string) $input,
+        'boolean', 'bool' => (bool) $input,
+        'int', 'integer' => (int) $input,
+        'double', 'float' => (float) $input,
+        'array' => is_array($input) ? $input : [$input],
         default => $input,
     };
 }
-
 /**
  * Convert value to a float/int -- mainly used for sanitizing and returning non-empty strings or nulls
  * @param int|float|string $input
  * @since ZC v1.5.6
  */
-function convertToFloat($input = 0): float|int
+function convert_to_float($input = 0): float|int
 {
     if ($input === null) {
         return 0;
@@ -94,14 +87,13 @@ function convertToFloat($input = 0): float|int
     if (is_float($input) || is_int($input)) {
         return $input;
     }
-    $val = preg_replace('/[^0-9,\.\-]/', '', (string)$input);
+    $val = preg_replace('/[^0-9,\.\-]/', '', (string) $input);
     // do a non-strict compare here:
     if ($val == 0 || empty($val)) {
         return 0;
     }
-    return (float)$val;
+    return (float) $val;
 }
-
 /**
  * function issetorArray
  *
@@ -111,11 +103,10 @@ function convertToFloat($input = 0): float|int
  * @return mixed
  * @since ZC v1.5.5
  */
-function issetorArray(array $array, $key, $default = null)
+function issetor_array(array $array, $key, $default = null)
 {
     return $array[$key] ?? $default;
 }
-
 /**
  * Get a shortened filename to fit within the db field constraints
  *
@@ -129,10 +120,8 @@ function zen_limit_image_filename($filename, string $table_name, string $field_n
     if ($filename === 'none') {
         return $filename;
     }
-
     $max_length = zen_field_length($table_name, $field_name);
     $filename_length = function_exists('mb_strlen') ? mb_strlen($filename) : strlen($filename);
-
     if ($filename_length <= $max_length) {
         return $filename;
     }
@@ -143,10 +132,8 @@ function zen_limit_image_filename($filename, string $table_name, string $field_n
     $chop_length = $filename_length - $max_length;
     $shorter_length = $filename_length - $suffix_length - $chop_length;
     $shorter_base = substr($base, 0, $shorter_length);
-
     return $shorter_base . $original_suffix;
 }
-
 /**
  * Get field type from database
  * @since ZC v1.0.3
@@ -154,10 +141,9 @@ function zen_limit_image_filename($filename, string $table_name, string $field_n
 function zen_field_type(string $table_name, string $field_name): string
 {
     global $db;
-    $query = $db->MetaColumns($table_name);
+    $query = $db->meta_columns($table_name);
     return $query[strtoupper($field_name)]->type;
 }
-
 /**
  * Get field length from database
  * @since ZC v1.0.3
@@ -165,10 +151,9 @@ function zen_field_type(string $table_name, string $field_name): string
 function zen_field_length(string $table_name, string $field_name): int
 {
     global $db;
-    $query = $db->MetaColumns($table_name);
-    return (int)$query[strtoupper($field_name)]->max_length;
+    $query = $db->meta_columns($table_name);
+    return (int) $query[strtoupper($field_name)]->max_length;
 }
-
 /**
  * Generate HTML FORM attributes for size="foo" maxlength="bar" based on maximum size (default 50)
  * example: zen_set_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name')
@@ -182,18 +167,14 @@ function zen_set_field_length(string $table_name, string $field_name, $max = nul
             $max = 50;
         }
     }
-    $max = (int)$max;
-
+    $max = (int) $max;
     $field_length = zen_field_length($table_name, $field_name);
     $size = $field_length + 1;
-
     if ($override !== true && $field_length > $max) {
         $size = $max + 1;
     }
-
     return 'size="' . $size . '" maxlength="' . $field_length . '"';
 }
-
 /**
  * Return all HTTP GET variables as URL param string, excluding those specified.
  * This is used to retain only relevant GET variables when building links, and not pass on things that related to prior actions that led to the current page.
@@ -218,32 +199,29 @@ function zen_get_all_get_params(array|string $exclude_array = []): string
     if (empty($_GET)) {
         return $get_url;
     }
-
     foreach ($_GET as $key => $value) {
         if (!in_array($key, $exclude_array, true)) {
             if (!is_array($value)) {
                 if (!empty($value)) {
-                    $get_url .= rawurlencode(stripslashes((string)$key)) . '=' . rawurlencode(stripslashes((string)$value)) . '&';
+                    $get_url .= rawurlencode(stripslashes((string) $key)) . '=' . rawurlencode(stripslashes((string) $value)) . '&';
                 }
             } else {
                 if (IS_ADMIN_FLAG) {
                     continue;
-                } // admin (and maybe catalog?) doesn't support passing arrays by GET, so skipping any arrays here
+                }
+                // admin (and maybe catalog?) doesn't support passing arrays by GET, so skipping any arrays here
                 foreach (array_filter($value) as $arr) {
                     if (is_array($arr)) {
                         continue;
                     }
-                    $get_url .= rawurlencode(stripslashes((string)$key)) . '[]=' . rawurlencode(stripslashes((string)$arr)) . '&';
+                    $get_url .= rawurlencode(stripslashes((string) $key)) . '[]=' . rawurlencode(stripslashes((string) $arr)) . '&';
                 }
             }
         }
     }
-
     $get_url = preg_replace('/&{2,}/', '&', $get_url);
-
     return preg_replace('/(&amp;)+/', '&amp;', (string) $get_url);
 }
-
 /**
  * Return all GET params as (usually hidden) POST params
  * Analogous to zen_get_all_get_params, but returns HTML input fields for a form, instead of URL param string.
@@ -292,7 +270,6 @@ function zen_post_all_get_params(array|string $exclude_array = [], bool $hidden 
     }
     return $fields;
 }
-
 /**
  * Perform an array multisort, based on 1 or 2 columns being passed
  * (defaults to sorting by first column ascendingly then second column ascendingly unless otherwise specified)
@@ -305,33 +282,31 @@ function zen_post_all_get_params(array|string $exclude_array = [], bool $hidden 
  * @return array   Original array sorted as specified
  * @since ZC v1.5.5
  */
-function zen_sort_array($data, $columnName1 = '', $order1 = SORT_ASC, $columnName2 = '', $order2 = SORT_ASC)
+function zen_sort_array($data, $column_name1 = '', $order1 = SORT_ASC, $column_name2 = '', $order2 = SORT_ASC)
 {
     // simple validations
     $keys = array_keys($data);
-    if ($columnName1 == '') {
-        $columnName1 = $keys[0];
+    if ($column_name1 == '') {
+        $column_name1 = $keys[0];
     }
     if (!in_array($order1, [SORT_ASC, SORT_DESC])) {
         $order1 = SORT_ASC;
     }
-    if ($columnName2 == '') {
-        $columnName2 = $keys[1];
+    if ($column_name2 == '') {
+        $column_name2 = $keys[1];
     }
     if (!in_array($order2, [SORT_ASC, SORT_DESC])) {
         $order2 = SORT_ASC;
     }
-
     // prepare sub-arrays for aiding in sorting
     foreach ($data as $val) {
-        $sort1[] = $val[$columnName1];
-        $sort2[] = $val[$columnName2];
+        $sort1[] = $val[$column_name1];
+        $sort2[] = $val[$column_name2];
     }
     // do actual sort based on specified fields.
     array_multisort($sort1, $order1, $sort2, $order2, $data);
     return $data;
 }
-
 /**
  * check to see if free shipping rules allow the specified shipping module to be enabled or to disable it in lieu of being free
  * @param $shipping_module
@@ -340,48 +315,40 @@ function zen_sort_array($data, $columnName1 = '', $order1 = SORT_ASC, $columnNam
 function zen_get_shipping_enabled(string $shipping_module): bool
 {
     if (!isset($_SESSION['cart'])) {
-        return true; // if no cart, then no shipping module is needed
+        return true;
+        // if no cart, then no shipping module is needed
     }
-
     $check_cart_free = $_SESSION['cart']->in_cart_check('product_is_always_free_shipping', '1');
     $check_cart_cnt = $_SESSION['cart']->count_contents();
     $check_cart_weight = $_SESSION['cart']->show_weight();
-
     // Free Shipping when 0 weight - enable freeshipper - ORDER_WEIGHT_ZERO_STATUS must be on
     if (ORDER_WEIGHT_ZERO_STATUS == '1' && ($check_cart_weight == 0 && $shipping_module == 'freeshipper')) {
         return true;
     }
-
     // Free Shipping when 0 weight - disable everyone - ORDER_WEIGHT_ZERO_STATUS must be on
     if (ORDER_WEIGHT_ZERO_STATUS == '1' && ($check_cart_weight == 0 && $shipping_module != 'freeshipper')) {
         return false;
     }
-
     if ($_SESSION['cart']->free_shipping_items() == $check_cart_cnt && $shipping_module == 'freeshipper') {
         return true;
     }
-
     if ($_SESSION['cart']->free_shipping_items() == $check_cart_cnt && $shipping_module != 'freeshipper') {
         return false;
     }
-
     // Always free shipping only true - enable freeshipper
     if ($check_cart_free == $check_cart_cnt && $shipping_module == 'freeshipper') {
         return true;
     }
-
     // Always free shipping only true - disable everyone
     if ($check_cart_free == $check_cart_cnt && $shipping_module != 'freeshipper') {
         return false;
     }
-
     // Always free shipping only is false - disable freeshipper
     if ($check_cart_free != $check_cart_cnt && $shipping_module == 'freeshipper') {
         return false;
     }
     return true;
 }
-
 /**
  * @param $from
  * @param $to
@@ -393,10 +360,8 @@ function zen_get_shipping_enabled(string $shipping_module): bool
 function zen_convert_linefeeds($from, $to, $string): string|array
 {
     trigger_error('Call to deprecated function zen_convert_linefeeds.', E_USER_DEPRECATED);
-
     return str_replace($from, $to, $string);
 }
-
 /**
  * Return a random value
  * @since ZC v1.0.3
@@ -404,33 +369,28 @@ function zen_convert_linefeeds($from, $to, $string): string|array
 function zen_rand(?int $min = null, ?int $max = null): int
 {
     static $seeded;
-
     if (!isset($seeded)) {
         // -----
         // By default, microtime returns a string value.  To increase the precision of the
         // random seed, have it return a float to be multiplied and then convert the value
         // to an integer, as required by the mt_srand function.
         //
-        mt_srand((int)(microtime(true) * 1000000));
+        mt_srand((int) (microtime(true) * 1000000));
         $seeded = true;
     }
-
     if (isset($min) && isset($max)) {
         if ($min >= $max) {
             return $min;
         }
-
         return random_int($min, $max);
     }
-
     return mt_rand();
 }
-
 // debug utility only
 /**
  * @since ZC v1.5.1
  */
-function utilDumpRequest($mode = 'p', $out = 'log'): void
+function util_dump_request($mode = 'p', $out = 'log'): void
 {
     if ($mode == 'p') {
         $val = '<pre>DEBUG request: ' . print_r($_REQUEST, true);
@@ -451,7 +411,6 @@ function utilDumpRequest($mode = 'p', $out = 'log'): void
         }
     }
 }
-
 /**
  * Convert a truthy/falsey string to boolean.
  * Recognizes words like Yes, No, Off, On, True/False (both string and native types); and is not case-sensitive
@@ -466,20 +425,16 @@ function zen_to_boolean(mixed $value, bool $null_on_failure = true): bool|null
     if ($null_on_failure) {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
-
     return filter_var($value, FILTER_VALIDATE_BOOLEAN);
 }
-
 /**
  * compatibility wrapper for request helper
  * @since ZC v1.5.8
  */
-
 function request()
 {
-    return \Zencart\Request\Request::getInstance();
+    return \Zencart\Request\Request::get_instance();
 }
-
 /**
  * @since ZC v1.5.6
  */
@@ -492,9 +447,8 @@ function zen_updated_by_admin($admin_id = null): string
         $admin_id = $_SESSION['admin_id'];
     }
     $name = zen_get_admin_name($admin_id);
-    return ($name ?? 'Unknown Name') . " [$admin_id]";
+    return ($name ?? 'Unknown Name') . " [{$admin_id}]";
 }
-
 /**
  * Lookup admin user name based on admin id
  * @param int $id
@@ -508,11 +462,10 @@ function zen_get_admin_name($id = null)
         $id = $_SESSION['admin_id'];
     }
     $sql = 'SELECT admin_name FROM ' . TABLE_ADMIN . ' WHERE admin_id = :adminid: LIMIT 1';
-    $sql = $db->bindVars($sql, ':adminid:', $id, 'integer');
+    $sql = $db->bind_vars($sql, ':adminid:', $id, 'integer');
     $result = $db->Execute($sql);
-    return $result->RecordCount() ? $result->fields['admin_name'] : null;
+    return $result->record_count() ? $result->fields['admin_name'] : null;
 }
-
 /**
  * The list of installed modules is cached in the database.
  * This function updates the cache for the specified module type, or all module types if no filter is provided.
@@ -525,74 +478,47 @@ function zen_get_admin_name($id = null)
  */
 function zen_update_modules_cache(string $module_type_filter = ''): void
 {
-    global $db, $languageLoader, $installedPlugins;
-
-    $module_types = [
-        'order_total' => 'MODULE_ORDER_TOTAL_INSTALLED',
-        'payment' => 'MODULE_PAYMENT_INSTALLED',
-        'shipping' => 'MODULE_SHIPPING_INSTALLED',
-    ];
+    global $db, $language_loader, $installed_plugins;
+    $module_types = ['order_total' => 'MODULE_ORDER_TOTAL_INSTALLED', 'payment' => 'MODULE_PAYMENT_INSTALLED', 'shipping' => 'MODULE_SHIPPING_INSTALLED'];
     // if a filter has been supplied, limit the array to just that element.
     $module_types = isset($module_types[$module_type_filter]) ? [$module_type_filter => $module_types[$module_type_filter]] : $module_types;
-
     foreach ($module_types as $module_type => $configuration_key) {
-        $moduleFinder = new Zencart\ResourceLoaders\ModuleFinder($module_type, new Zencart\FileSystem\FileSystem());
-        $modules_found = $moduleFinder->findFromFilesystem($installedPlugins);
-
+        $module_finder = new Zencart\Resource_Loaders\Module_Finder($module_type, new Zencart\File_System\File_System());
+        $modules_found = $module_finder->find_from_filesystem($installed_plugins);
         $temp_for_sort = [];
-
         foreach ($modules_found as $module_name => $module_file_dir) {
-            if (!$languageLoader->loadModuleLanguageFile($module_name, $module_type)) {
+            if (!$language_loader->load_module_language_file($module_name, $module_type)) {
                 continue;
             }
-
             require_once DIR_FS_CATALOG . $module_file_dir . $module_name;
             $class = pathinfo((string) $module_name, PATHINFO_FILENAME);
             if (!class_exists($class)) {
                 continue;
             }
-
             $module = new $class();
             if ($module->check() > 0) {
                 // determine cached key sort orders (using up to 6 digits, then filename) to add to list of installed modules
-                $sort = str_pad((string)(int)($module->sort_order ?? 0), 6, '0', STR_PAD_LEFT);
+                $sort = str_pad((string) (int) ($module->sort_order ?? 0), 6, '0', STR_PAD_LEFT);
                 $temp_for_sort[$module_name] = $sort . $module_name;
                 asort($temp_for_sort);
             }
         }
         $installed_modules = array_flip($temp_for_sort);
-
         // Save updated cached list of installed modules
         ksort($installed_modules);
         $installed_modules_list = zen_db_input(implode(';', $installed_modules));
-        $check = $db->Execute(
-            'SELECT configuration_value
-               FROM ' . TABLE_CONFIGURATION . "
-              WHERE configuration_key = '" . zen_db_input($configuration_key) . "'
-              LIMIT 1"
-        );
+        $check = $db->Execute('SELECT configuration_value
+               FROM ' . TABLE_CONFIGURATION . "\n              WHERE configuration_key = '" . zen_db_input($configuration_key) . "'\n              LIMIT 1");
         if (!$check->EOF) {
             if (empty($check->fields['configuration_value']) || $check->fields['configuration_value'] !== implode(';', $installed_modules)) {
-                $db->Execute(
-                    'UPDATE ' . TABLE_CONFIGURATION . "
-                    SET configuration_value = '" . $installed_modules_list . "', last_modified = now()
-                  WHERE configuration_key = '" . zen_db_input($configuration_key) . "'
-                  LIMIT 1"
-                );
+                $db->Execute('UPDATE ' . TABLE_CONFIGURATION . "\n                    SET configuration_value = '" . $installed_modules_list . "', last_modified = now()\n                  WHERE configuration_key = '" . zen_db_input($configuration_key) . "'\n                  LIMIT 1");
             }
         } else {
-            $db->Execute(
-                'INSERT INTO ' . TABLE_CONFIGURATION . "
-               (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added)
-                  VALUES
-                ('Installed Modules', '" . zen_db_input($configuration_key) . "', '" . $installed_modules_list . "', 'This is automatically updated. No need to edit.', 6, 0, now())"
-            );
+            $db->Execute('INSERT INTO ' . TABLE_CONFIGURATION . "\n               (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added)\n                  VALUES\n                ('Installed Modules', '" . zen_db_input($configuration_key) . "', '" . $installed_modules_list . "', 'This is automatically updated. No need to edit.', 6, 0, now())");
         }
     }
 }
-
 // Compatibility
-
 /**
  * @since ZC v1.0.3
  */
@@ -601,7 +527,6 @@ function zen_draw_products_pull_down(string $field_name, string $parameters = ''
     trigger_error('Call to deprecated function; please use new names', E_USER_DEPRECATED);
     return zen_draw_pulldown_products($field_name, $parameters, $exclude, $show_id, $set_selected, $show_model, $show_current_category, $order_by, $filter_by_option_name);
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -610,7 +535,6 @@ function zen_draw_products_pull_down_attributes(string $field_name, string $para
     trigger_error('Call to deprecated function; please use new names', E_USER_DEPRECATED);
     return zen_draw_pulldown_products_having_attributes($field_name, $parameters, $exclude, $order_by, $filter_by_option_name);
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -619,7 +543,6 @@ function zen_draw_products_pull_down_categories(string $field_name, string $para
     trigger_error('Call to deprecated function; please use new names', E_USER_DEPRECATED);
     return zen_draw_pulldown_categories_having_products($field_name, $parameters, $exclude, $show_id, $show_parent);
 }
-
 /**
  * @since ZC v1.0.3
  */
@@ -628,7 +551,6 @@ function zen_draw_products_pull_down_categories_attributes(string $field_name, s
     trigger_error('Call to deprecated function; please use new names', E_USER_DEPRECATED);
     return zen_draw_pulldown_categories_having_products_with_attributes($field_name, $parameters, $exclude, $show_full_path, $filter_by_option_name);
 }
-
 /**
  * @since ZC v1.0.3
  */

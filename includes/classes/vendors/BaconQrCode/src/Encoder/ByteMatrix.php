@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
-namespace BaconQrCode\Encoder;
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Encoder;
 
 use SplFixedArray;
 use Traversable;
-
 /**
  * Byte matrix.
  */
-final class ByteMatrix implements \Stringable
+final class Byte_Matrix implements \Stringable
 {
     /**
      * Bytes in the matrix, represented as array.
@@ -18,46 +16,40 @@ final class ByteMatrix implements \Stringable
      * @var SplFixedArray<SplFixedArray<int>>
      */
     private SplFixedArray $bytes;
-
     public function __construct(private readonly int $width, private readonly int $height)
     {
         $this->bytes = new SplFixedArray($height);
-
         for ($y = 0; $y < $height; ++$y) {
-            $this->bytes[$y] = SplFixedArray::fromArray(array_fill(0, $width, 0));
+            $this->bytes[$y] = SplFixedArray::from_array(array_fill(0, $width, 0));
         }
     }
-
     /**
      * Gets the width of the matrix.
      */
-    public function getWidth(): int
+    public function get_width(): int
     {
         return $this->width;
     }
-
     /**
      * Gets the height of the matrix.
      */
-    public function getHeight(): int
+    public function get_height(): int
     {
         return $this->height;
     }
-
     /**
      * Gets the internal representation of the matrix.
      *
      * @return SplFixedArray<SplFixedArray<int>>
      */
-    public function getArray(): SplFixedArray
+    public function get_array(): SplFixedArray
     {
         return $this->bytes;
     }
-
     /**
      * @return Traversable<int>
      */
-    public function getBytes(): Traversable
+    public function get_bytes(): Traversable
     {
         foreach ($this->bytes as $row) {
             foreach ($row as $byte) {
@@ -65,7 +57,6 @@ final class ByteMatrix implements \Stringable
             }
         }
     }
-
     /**
      * Gets the byte for a specific position.
      */
@@ -73,7 +64,6 @@ final class ByteMatrix implements \Stringable
     {
         return $this->bytes[$y][$x];
     }
-
     /**
      * Sets the byte for a specific position.
      */
@@ -81,7 +71,6 @@ final class ByteMatrix implements \Stringable
     {
         $this->bytes[$y][$x] = $value;
     }
-
     /**
      * Clears the matrix with a specific value.
      */
@@ -93,23 +82,19 @@ final class ByteMatrix implements \Stringable
             }
         }
     }
-
     public function __clone()
     {
         $this->bytes = clone $this->bytes;
-
         foreach ($this->bytes as $index => $row) {
             $this->bytes[$index] = clone $row;
         }
     }
-
     /**
      * Returns a string representation of the matrix.
      */
     public function __toString(): string
     {
         $result = '';
-
         for ($y = 0; $y < $this->height; $y++) {
             for ($x = 0; $x < $this->width; $x++) {
                 match ($this->bytes[$y][$x]) {
@@ -118,10 +103,8 @@ final class ByteMatrix implements \Stringable
                     default => $result .= '  ',
                 };
             }
-
             $result .= "\n";
         }
-
         return $result;
     }
 }

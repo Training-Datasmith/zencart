@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Database-Sniffer Class.
  *
@@ -12,7 +11,6 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * Database-Sniffer Class
  *
@@ -33,9 +31,8 @@ class sniffer
         global $db;
         $sql = "SHOW TABLES LIKE '" . $db->prepare_input($table_name) . "'";
         $result = $db->Execute($sql);
-        return $result->RecordCount() > 0;
+        return $result->record_count() > 0;
     }
-
     /**
      * @since ZC v2.1.0
      */
@@ -46,7 +43,6 @@ class sniffer
         $result = $db->Execute($sql);
         return $result->fields['Collation'] ?? null;
     }
-
     /**
      * Check whether the field exists in the table
      * @since ZC v1.3.0
@@ -58,12 +54,12 @@ class sniffer
         $result = $db->Execute($sql);
         foreach ($result as $record) {
             if ($record['Field'] === $field_name) {
-                return true; // exists, so return with no error
+                return true;
+                // exists, so return with no error
             }
         }
         return false;
     }
-
     /**
      * @since ZC v2.1.0
      */
@@ -79,7 +75,6 @@ class sniffer
         }
         return null;
     }
-
     /**
      * Check whether a field is a specific type
      * and optionally return what type it is, if not matching what is being checked for.
@@ -93,17 +88,17 @@ class sniffer
         foreach ($result as $record) {
             if ($record['Field'] === $field_name) {
                 if ($record['Type'] === $field_type) {
-                    return true; // exists and matches required type, so return with no error
+                    return true;
+                    // exists and matches required type, so return with no error
                 }
-
                 if ($return_found) {
-                    return $record['Type']; // doesn't match, so return what it "is", if requested
+                    return $record['Type'];
+                    // doesn't match, so return what it "is", if requested
                 }
             }
         }
         return false;
     }
-
     /**
      * Return true if the specified row exists in the table.
      *
@@ -112,17 +107,16 @@ class sniffer
      * @param int $key_value The value that key_name must equal.
      * @since ZC v2.0.0
      */
-    public function rowExists(string $table_name, string $key_name, int $key_value): bool
+    public function row_exists(string $table_name, string $key_name, int $key_value): bool
     {
         global $db;
         $sql = 'SELECT COUNT(*) AS count FROM :table_name WHERE :key_name = :key_value;';
-        $sql = $db->bindVars($sql, ':key_name', $key_name, 'noquotestring');
-        $sql = $db->bindVars($sql, ':key_value', $key_value, 'integer');
-        $sql = $db->bindVars($sql, ':table_name', $table_name, 'noquotestring');
+        $sql = $db->bind_vars($sql, ':key_name', $key_name, 'noquotestring');
+        $sql = $db->bind_vars($sql, ':key_value', $key_value, 'integer');
+        $sql = $db->bind_vars($sql, ':table_name', $table_name, 'noquotestring');
         $result = $db->Execute($sql);
-        return (int)$result->fields['count'] !== 0;
+        return (int) $result->fields['count'] !== 0;
     }
-
     /**
      * Return true if the specified row exists in the table.
      * Key column names taken from $key_names are matched against equivalent
@@ -133,39 +127,27 @@ class sniffer
      * @param array $key_values The array of values that key_names must equal.
      * @since ZC v2.0.0
      */
-    public function rowExistsComposite(string $table_name, array $key_names, array $key_values): bool
+    public function row_exists_composite(string $table_name, array $key_names, array $key_values): bool
     {
         global $db;
         $sql = 'SELECT COUNT(*) AS count FROM :table_name WHERE ';
-        $sql .= implode(
-            ' AND ',
-            array_map(
-                static function ($key, int|string $value) {
-                    global $db;
-                    $bit = ':key = :value';
-                    $bit = $db->bindVars($bit, ':key', $key, 'noquotestring');
-                    return $db->bindVars($bit, ':value', $value, 'integer');
-                },
-                $key_names,
-                $key_values
-            )
-        );
-        $sql = $db->bindVars($sql, ':table_name', $table_name, 'noquotestring');
+        $sql .= implode(' AND ', array_map(static function ($key, int|string $value) {
+            global $db;
+            $bit = ':key = :value';
+            $bit = $db->bind_vars($bit, ':key', $key, 'noquotestring');
+            return $db->bind_vars($bit, ':value', $value, 'integer');
+        }, $key_names, $key_values));
+        $sql = $db->bind_vars($sql, ':table_name', $table_name, 'noquotestring');
         $result = $db->Execute($sql);
-        return (int)$result->fields['count'] !== 0;
+        return (int) $result->fields['count'] !== 0;
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function indexExists(string $table_name, string $index_name): bool
+    public function index_exists(string $table_name, string $index_name): bool
     {
         global $db;
-
-        $check = $db->Execute(
-            'SHOW INDEX FROM `' . $db->prepare_input($table_name) . '` ' .
-            "WHERE `Key_name` = '" . $db->prepare_input($index_name) . "'"
-        );
+        $check = $db->Execute('SHOW INDEX FROM `' . $db->prepare_input($table_name) . '` ' . "WHERE `Key_name` = '" . $db->prepare_input($index_name) . "'");
         return !$check->EOF;
     }
 }

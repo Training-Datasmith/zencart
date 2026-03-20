@@ -17,7 +17,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 if (isset($_POST['zone_country_id'])) {
-    $_POST['zone_country_id'] = (int)$_POST['zone_country_id'];
+    $_POST['zone_country_id'] = (int) $_POST['zone_country_id'];
 }
 if (isset($_POST['scid'])) {
     $_POST['scid'] = preg_replace('/[^a-z_0-9\- ]/i', '', (string) $_POST['scid']);
@@ -32,36 +32,33 @@ if (isset($_POST['scid'])) {
     }
 </script>
 
-<?php
+<?php 
 // Only do when something is in the cart
 if ($_SESSION['cart']->count_contents() > 0) {
     $postcode = $_SESSION['cart_postcode'] ?? '';
-    $postcode = (isset($_POST['postcode'])) ? strip_tags(addslashes((string) $_POST['postcode'])) : $postcode;
-    $state_zone_id = (isset($_SESSION['cart_zone'])) ? (int)$_SESSION['cart_zone'] : '';
+    $postcode = isset($_POST['postcode']) ? strip_tags(addslashes((string) $_POST['postcode'])) : $postcode;
+    $state_zone_id = isset($_SESSION['cart_zone']) ? (int) $_SESSION['cart_zone'] : '';
     if (ACCOUNT_STATE_DRAW_INITIAL_DROPDOWN === 'true') {
-        $state_zone_id = (isset($_POST['zone_id'])) ? (int)$_POST['zone_id'] : $state_zone_id;
+        $state_zone_id = isset($_POST['zone_id']) ? (int) $_POST['zone_id'] : $state_zone_id;
     } elseif (isset($_POST['zone_country_id'], $_POST['state'])) {
-        $state_value_sql =
-            'SELECT zone_id
+        $state_value_sql = 'SELECT zone_id
                FROM ' . TABLE_ZONES . '
-              WHERE zone_country_id = '. (int)$_POST['zone_country_id'] . '
+              WHERE zone_country_id = ' . (int) $_POST['zone_country_id'] . '
                 AND (zone_name = :state OR zone_code = :state) LIMIT 1';
-        $state_value_sql = $db->bindVars($state_value_sql, ':state', $_POST['state'], 'stringIgnoreNull');
+        $state_value_sql = $db->bind_vars($state_value_sql, ':state', $_POST['state'], 'stringIgnoreNull');
         $state_value_id = $db->Execute($state_value_sql);
-        $state_zone_id = (isset($state_value_id->fields['zone_id'])) ? (int)$state_value_id->fields['zone_id'] : $state_zone_id;
+        $state_zone_id = isset($state_value_id->fields['zone_id']) ? (int) $state_value_id->fields['zone_id'] : $state_zone_id;
     }
-    $selectedState = (isset($_POST['state']) ? zen_output_string_protected($_POST['state']) : '');
+    $selected_state = isset($_POST['state']) ? zen_output_string_protected($_POST['state']) : '';
     // Could be placed in english.php
     // shopping cart quotes
     // shipping cost
-
     // deprecated; to be removed
     if (file_exists(DIR_WS_CLASSES . 'http_client.php')) {
-        require_once DIR_WS_CLASSES . 'http_client.php'; // shipping in basket
+        require_once DIR_WS_CLASSES . 'http_client.php';
+        // shipping in basket
     }
-
     $sendto = 0;
-
     if (zen_is_logged_in() && !zen_in_guest_checkout()) {
         // user is logged in
         if (isset($_POST['address_id'])) {
@@ -91,20 +88,15 @@ if ($_SESSION['cart']->count_contents() > 0) {
         $order = new order();
         if (!empty($_POST['zone_country_id'])) {
             // country is selected
-            $_SESSION['country_info'] = zen_get_countries((int)$_POST['zone_country_id'], true);
+            $_SESSION['country_info'] = zen_get_countries((int) $_POST['zone_country_id'], true);
             $country_info = $_SESSION['country_info'];
             $order->delivery = [
                 'postcode' => $postcode,
-                'country' => [
-                    'id' => $_POST['zone_country_id'],
-                    'title' => $country_info['countries_name'],
-                    'iso_code_2' => $country_info['countries_iso_code_2'],
-                    'iso_code_3' => $country_info['countries_iso_code_3'],
-                ],
+                'country' => ['id' => $_POST['zone_country_id'], 'title' => $country_info['countries_name'], 'iso_code_2' => $country_info['countries_iso_code_2'], 'iso_code_3' => $country_info['countries_iso_code_3']],
                 'country_id' => $_POST['zone_country_id'],
                 //add state zone_id
                 'zone_id' => $state_zone_id,
-                'format_id' => zen_get_address_format_id((int)$_POST['zone_country_id']),
+                'format_id' => zen_get_address_format_id((int) $_POST['zone_country_id']),
             ];
             $_SESSION['cart_country_id'] = $_POST['zone_country_id'];
             //add state zone_id
@@ -112,42 +104,27 @@ if ($_SESSION['cart']->count_contents() > 0) {
             $_SESSION['cart_postcode'] = $postcode;
         } elseif (!empty($_SESSION['cart_country_id'])) {
             // session is available
-            $_SESSION['country_info'] = zen_get_countries((int)$_SESSION['cart_country_id'], true);
+            $_SESSION['country_info'] = zen_get_countries((int) $_SESSION['cart_country_id'], true);
             $country_info = $_SESSION['country_info'];
             // fix here - check for error on $cart_country_id
-            $order->delivery = [
-                'postcode' => $postcode,
-                'country' => [
-                    'id' => $_SESSION['cart_country_id'],
-                    'title' => $country_info['countries_name'],
-                    'iso_code_2' => $country_info['countries_iso_code_2'],
-                    'iso_code_3' => $country_info['countries_iso_code_3'],
-                ],
-                'country_id' => $_SESSION['cart_country_id'],
-                'zone_id' => $state_zone_id,
-                'format_id' => zen_get_address_format_id((int)$_SESSION['cart_country_id']),
-            ];
+            $order->delivery = ['postcode' => $postcode, 'country' => ['id' => $_SESSION['cart_country_id'], 'title' => $country_info['countries_name'], 'iso_code_2' => $country_info['countries_iso_code_2'], 'iso_code_3' => $country_info['countries_iso_code_3']], 'country_id' => $_SESSION['cart_country_id'], 'zone_id' => $state_zone_id, 'format_id' => zen_get_address_format_id((int) $_SESSION['cart_country_id'])];
         } else {
             // first timer
             $_SESSION['cart_country_id'] = STORE_COUNTRY;
-            $_SESSION['country_info'] = zen_get_countries((int)STORE_COUNTRY, true);
+            $_SESSION['country_info'] = zen_get_countries((int) STORE_COUNTRY, true);
             $country_info = $_SESSION['country_info'];
             $order->delivery = [
                 //'postcode' => '',
-                'country' => [
-                    'id' => STORE_COUNTRY,
-                    'title' => $country_info['countries_name'],
-                    'iso_code_2' => $country_info['countries_iso_code_2'],
-                    'iso_code_3' => $country_info['countries_iso_code_3'],
-                ],
+                'country' => ['id' => STORE_COUNTRY, 'title' => $country_info['countries_name'], 'iso_code_2' => $country_info['countries_iso_code_2'], 'iso_code_3' => $country_info['countries_iso_code_3']],
                 'country_id' => STORE_COUNTRY,
                 'zone_id' => $state_zone_id,
-                'format_id' => zen_get_address_format_id((int)STORE_COUNTRY),
+                'format_id' => zen_get_address_format_id((int) STORE_COUNTRY),
             ];
         }
         // set the cost to be able to calculate free shipping
         $order->info = [
-            'total' => $_SESSION['cart']->show_total(), // TAX ????
+            'total' => $_SESSION['cart']->show_total(),
+            // TAX ????
             'currency' => $currency ?? DEFAULT_CURRENCY,
             'currency_value' => $currencies->is_set($currency ?? DEFAULT_CURRENCY) ? $currencies->get_value($currency ?? DEFAULT_CURRENCY) : 1,
         ];
@@ -161,14 +138,13 @@ if ($_SESSION['cart']->count_contents() > 0) {
     // some shipping modules need subtotal to be set.
     $order->info['subtotal'] = $_SESSION['cart']->show_total();
     $quotes = $shipping_modules->quote();
-
     // set selections for displaying
     $selected_country = $order->delivery['country']['id'];
     $selected_address = $sendto;
     // eo shipping cost
     // check free shipping based on order $total
     $free_shipping = $pass = false;
-    if (defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING') && (MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING === 'true')) {
+    if (defined('MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING') && MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING === 'true') {
         switch (MODULE_ORDER_TOTAL_SHIPPING_DESTINATION) {
             case 'national':
                 if ($order->delivery['country_id'] == STORE_COUNTRY) {
@@ -203,7 +179,6 @@ if ($_SESSION['cart']->count_contents() > 0) {
             $module = '';
             $method = '';
         }
-
         if (!empty($module)) {
             foreach ($quotes as $value) {
                 if (!isset($value['id'])) {
@@ -221,18 +196,17 @@ if ($_SESSION['cart']->count_contents() > 0) {
                     }
                 }
             }
-
-            if (!isset($selected_quote) || (isset($selected_quote[0]['error']) && $selected_quote[0]['error']) || !zen_not_null($selected_quote[0]['methods'][0]['cost'])) {
+            if (!isset($selected_quote) || isset($selected_quote[0]['error']) && $selected_quote[0]['error'] || !zen_not_null($selected_quote[0]['methods'][0]['cost'])) {
                 $order->info['shipping_method'] = $selected_shipping['title'] ?? '';
                 $order->info['shipping_cost'] = $selected_shipping['cost'] ?? 0;
                 $order->info['total'] += $selected_shipping['cost'] ?? 0;
             } else {
-                $order->info['shipping_method'] = $selected_quote[0]['module'].' ('.$selected_quote[0]['methods'][0]['title'].')';
+                $order->info['shipping_method'] = $selected_quote[0]['module'] . ' (' . $selected_quote[0]['methods'][0]['title'] . ')';
                 $order->info['shipping_cost'] = $selected_quote[0]['methods'][0]['cost'];
                 $order->info['total'] += $selected_quote[0]['methods'][0]['cost'];
                 $selected_shipping['title'] = $order->info['shipping_method'];
                 $selected_shipping['cost'] = $order->info['shipping_cost'];
-                $selected_shipping['id'] = $selected_quote[0]['id'].'_'.$selected_quote[0]['methods'][0]['id'];
+                $selected_shipping['id'] = $selected_quote[0]['id'] . '_' . $selected_quote[0]['methods'][0]['id'];
             }
         } else {
             $order->info['shipping_method'] = $selected_shipping['title'] ?? '';
@@ -242,14 +216,13 @@ if ($_SESSION['cart']->count_contents() > 0) {
     }
     // virtual products need a free shipping
     if ($_SESSION['cart']->get_content_type() === 'virtual') {
-        $order->info['shipping_method'] = CART_SHIPPING_METHOD_FREE_TEXT.' '.CART_SHIPPING_METHOD_ALL_DOWNLOADS;
+        $order->info['shipping_method'] = CART_SHIPPING_METHOD_FREE_TEXT . ' ' . CART_SHIPPING_METHOD_ALL_DOWNLOADS;
         $order->info['shipping_cost'] = 0;
     }
     if ($free_shipping) {
         $order->info['shipping_method'] = MODULE_ORDER_TOTAL_SHIPPING_TITLE;
         $order->info['shipping_cost'] = 0;
     }
-
     // set cheapest last
     $selected_shipping = $shipping_modules->cheapest();
     $shipping = $selected_shipping;
@@ -259,53 +232,53 @@ if ($_SESSION['cart']->count_contents() > 0) {
         $show_in = FILENAME_SHOPPING_CART;
     }
     if (zen_is_logged_in() && !zen_in_guest_checkout()) {
-        $addresses = $db->Execute('SELECT address_book_id, entry_city AS city, entry_postcode AS postcode, entry_state AS state, entry_zone_id AS zone_id, entry_country_id AS country_id FROM '. TABLE_ADDRESS_BOOK .' WHERE customers_id = '. (int)$_SESSION['customer_id']);
+        $addresses = $db->Execute('SELECT address_book_id, entry_city AS city, entry_postcode AS postcode, entry_state AS state, entry_zone_id AS zone_id, entry_country_id AS country_id FROM ' . TABLE_ADDRESS_BOOK . ' WHERE customers_id = ' . (int) $_SESSION['customer_id']);
         // only display addresses if more than 1
-        if ($addresses->RecordCount() > 1) {
+        if ($addresses->record_count() > 1) {
             while (!$addresses->EOF) {
-                $addresses_array[] = ['id' => $addresses->fields['address_book_id'], 'text' => zen_address_format(zen_get_address_format_id((int)$addresses->fields['country_id']), $addresses->fields, 0, ' ', ' ')];
-                $addresses->MoveNext();
+                $addresses_array[] = ['id' => $addresses->fields['address_book_id'], 'text' => zen_address_format(zen_get_address_format_id((int) $addresses->fields['country_id']), $addresses->fields, 0, ' ', ' ')];
+                $addresses->move_next();
             }
         }
     } elseif ($_SESSION['cart']->get_content_type() !== 'virtual') {
         $state_array = [];
         $state_array[] = ['id' => '', 'text' => PULL_DOWN_SHIPPING_ESTIMATOR_SELECT];
-        $state_values = $db->Execute('SELECT zone_name, zone_id FROM ' . TABLE_ZONES . ' WHERE zone_country_id = ' . (int)$selected_country . ' ORDER BY zone_country_id DESC, zone_name');
+        $state_values = $db->Execute('SELECT zone_name, zone_id FROM ' . TABLE_ZONES . ' WHERE zone_country_id = ' . (int) $selected_country . ' ORDER BY zone_country_id DESC, zone_name');
         while (!$state_values->EOF) {
-            $state_array[] = [
-                'id' => $state_values->fields['zone_id'],
-                'text' => $state_values->fields['zone_name'],
-            ];
-            $state_values->MoveNext();
+            $state_array[] = ['id' => $state_values->fields['zone_id'], 'text' => $state_values->fields['zone_name']];
+            $state_values->move_next();
         }
     }
-
     // This is done after quote-calcs in order to include Tare info accurately.
     // NOTE: tare values are *not* included in weights shown on-screen.
-    $totalsDisplay = '';
+    $totals_display = '';
     if (SHOW_SHIPPING_ESTIMATOR_BUTTON != 2) {
         switch (true) {
-            case (SHOW_TOTALS_IN_CART == '1'):
-                $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_WEIGHT . $shipping_estimator_display_weight . TEXT_PRODUCT_WEIGHT_UNIT . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
+            case SHOW_TOTALS_IN_CART == '1':
+                $totals_display = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_WEIGHT . $shipping_estimator_display_weight . TEXT_PRODUCT_WEIGHT_UNIT . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
                 break;
-            case (SHOW_TOTALS_IN_CART == '2'):
-                $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . ($shipping_estimator_display_weight > 0 ? TEXT_TOTAL_WEIGHT . $shipping_estimator_display_weight . TEXT_PRODUCT_WEIGHT_UNIT : '') . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
+            case SHOW_TOTALS_IN_CART == '2':
+                $totals_display = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . ($shipping_estimator_display_weight > 0 ? TEXT_TOTAL_WEIGHT . $shipping_estimator_display_weight . TEXT_PRODUCT_WEIGHT_UNIT : '') . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
                 break;
-            case (SHOW_TOTALS_IN_CART == '3'):
-                $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
+            case SHOW_TOTALS_IN_CART == '3':
+                $totals_display = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
                 break;
         }
     }
-
-    if (!isset($tplVars['flagShippingPopUp']) || $tplVars['flagShippingPopUp'] !== true) {
+    if (!isset($tpl_vars['flagShippingPopUp']) || $tpl_vars['flagShippingPopUp'] !== true) {
         // display the result with template tpl_modules_shipping_estimator.php
-        require $template->get_template_dir('tpl_modules_shipping_estimator.php', DIR_WS_TEMPLATE, $current_page_base, 'templates').'/'.'tpl_modules_shipping_estimator.php';
+        require $template->get_template_dir('tpl_modules_shipping_estimator.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/' . 'tpl_modules_shipping_estimator.php';
     }
-} else { // Only do when something is in the cart
+} else {
+    // Only do when something is in the cart
     ?>
-<h2><?php echo CART_SHIPPING_OPTIONS; ?></h2>
-<div class="cartTotalsDisplay important"><?php echo EMPTY_CART_TEXT_NO_QUOTE; ?></div>
-    <?php
+<h2><?php 
+    echo CART_SHIPPING_OPTIONS;
+    ?></h2>
+<div class="cartTotalsDisplay important"><?php 
+    echo EMPTY_CART_TEXT_NO_QUOTE;
+    ?></div>
+    <?php 
 }
 ?>
 

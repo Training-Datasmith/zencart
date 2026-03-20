@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * File contains the autoloader loop
  *
@@ -15,25 +15,25 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-$debugAutoload = false;
+$debug_autoload = false;
 if (defined('DEBUG_AUTOLOAD') && DEBUG_AUTOLOAD == true) {
-    $debugAutoload = true;
+    $debug_autoload = true;
 }
-if ($debugAutoload) {
+if ($debug_autoload) {
     echo '<pre>$initSystemList=<br>';
-    print_r($initSystemList);
+    print_r($init_system_list);
     echo '</pre>';
 }
-foreach ($initSystemList as $entry) {
+foreach ($init_system_list as $entry) {
     switch ($entry['type']) {
         case 'include':
             if ($entry['forceLoad']) {
-                if ($debugAutoload) {
+                if ($debug_autoload) {
                     echo 'case "include": ' . $entry['filePath'] . "<br>\n";
                 }
                 include $entry['filePath'];
             } else {
-                if ($debugAutoload) {
+                if ($debug_autoload) {
                     echo 'case "include_once": ' . $entry['filePath'] . "<br>\n";
                 }
                 include_once $entry['filePath'];
@@ -41,45 +41,45 @@ foreach ($initSystemList as $entry) {
             break;
         case 'require':
             if ($entry['forceLoad']) {
-                if ($debugAutoload) {
+                if ($debug_autoload) {
                     echo 'case "require": ' . $entry['filePath'] . "<br>\n";
                 }
                 require $entry['filePath'];
             } else {
-                if ($debugAutoload) {
+                if ($debug_autoload) {
                     echo 'case "require_once": ' . $entry['filePath'] . "<br>\n";
                 }
                 require_once $entry['filePath'];
             }
             break;
         case 'class':
-            if ($debugAutoload) {
+            if ($debug_autoload) {
                 echo 'case "class": ' . $entry['class'] . "<br>\n";
             }
-            $objectName = $entry['object'];
-            $className = $entry['class'];
-            ${$objectName} = new $className();
+            $object_name = $entry['object'];
+            $class_name = $entry['class'];
+            ${$object_name} = new $class_name();
             break;
         case 'sessionClass':
-            if ($debugAutoload) {
+            if ($debug_autoload) {
                 echo 'case "sessionClass": ' . $entry['class'] . "<br>\n";
             }
-            $objectName = $entry['object'];
-            $className = $entry['class'];
-            if (!$entry['checkInstantiated'] || !isset($_SESSION[$objectName])) {
-                $_SESSION[$objectName] = new $className();
+            $object_name = $entry['object'];
+            $class_name = $entry['class'];
+            if (!$entry['checkInstantiated'] || !isset($_SESSION[$object_name])) {
+                $_SESSION[$object_name] = new $class_name();
             }
             break;
         case 'objectMethod':
-            if ($debugAutoload) {
+            if ($debug_autoload) {
                 echo 'case "objectMethod": ' . '$entry[\'method\']=' . $entry['method'] . ', $entry[\'object\']=' . $entry['object'] . "<br>\n";
             }
-            $objectName = $entry['object'];
-            $methodName = $entry['method'];
-            if (isset($_SESSION[$objectName]) && is_object($_SESSION[$objectName])) {
-                $_SESSION[$objectName]->$methodName();
+            $object_name = $entry['object'];
+            $method_name = $entry['method'];
+            if (isset($_SESSION[$object_name]) && is_object($_SESSION[$object_name])) {
+                $_SESSION[$object_name]->{$method_name}();
             } else {
-                ${$objectName}->$methodName();
+                ${$object_name}->{$method_name}();
             }
             break;
     }

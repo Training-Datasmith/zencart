@@ -1,4 +1,5 @@
 <?php
+
 /**
  * jscript_pmt_support
  *
@@ -50,13 +51,17 @@ function doCollectsCardDataOnsite()
 $(document).ready(function(){
   $('form[name="checkout_payment"]').submit(function() {
       $('#paymentSubmit').attr('disabled', true);
-    <?php if ($flagOnSubmit) { ?>
+    <?php 
+if ($flag_on_submit) {
+    ?>
       formPassed = check_form();
       if (formPassed == false) {
           $('#paymentSubmit').attr('disabled', false);
       }
       return formPassed;
-    <?php } ?>
+    <?php 
+}
+?>
   });
 });
 

@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Detection\Exception;
 
-class MobileDetectException extends \Exception
+class Mobile_Detect_Exception extends \Exception
 {
 }

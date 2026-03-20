@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Detection\Exception;
 
-class MobileDetectExceptionCode
+class Mobile_Detect_Exception_Code
 {
     public const INVALID_USER_AGENT_ERR = 0x1;
     public const IS_MOBILE_ERR = 0x2;

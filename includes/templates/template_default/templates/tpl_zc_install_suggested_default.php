@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Page Template
  *
@@ -9,9 +10,9 @@
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License v2.0
  * @version $Id: Scott C Wilson 2024 Jun 03 Modified in v2.1.0-alpha1 $
  */
-$relPath = (file_exists('includes/templates/template_default/images/logo.gif')) ? '' : '../';
-$instPath = (file_exists('zc_install/index.php')) ? 'zc_install/index.php' : (file_exists('../zc_install/index.php') ? '../zc_install/index.php' : '');
-$docsPath = (file_exists('docs/index.html')) ? 'docs/index.html' : (file_exists('../docs/index.html') ? '../docs/index.html' : '');
+$rel_path = file_exists('includes/templates/template_default/images/logo.gif') ? '' : '../';
+$inst_path = file_exists('zc_install/index.php') ? 'zc_install/index.php' : (file_exists('../zc_install/index.php') ? '../zc_install/index.php' : '');
+$docs_path = file_exists('docs/index.html') ? 'docs/index.html' : (file_exists('../docs/index.html') ? '../docs/index.html' : '');
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
@@ -215,7 +216,9 @@ $docsPath = (file_exists('docs/index.html')) ? 'docs/index.html' : (file_exists(
 
   <body>
   <div class="container">
-    <img src="<?php echo $relPath; ?>includes/templates/template_default/images/logo.gif" alt="Zen Cart&reg; Header Logo" title="Zen Cart&reg; Header Logo" class="h-img">
+    <img src="<?php 
+echo $rel_path;
+?>includes/templates/template_default/images/logo.gif" alt="Zen Cart&reg; Header Logo" title="Zen Cart&reg; Header Logo" class="h-img">
     <h1>Welcome to Zen Cart<sup>&reg;</sup></h1>
     <div>
       <h2>You are seeing this page for one or more reasons</h2>
@@ -224,11 +227,21 @@ $docsPath = (file_exists('docs/index.html')) ? 'docs/index.html' : (file_exists(
           This is <strong>your first time</strong> using Zen Cart<sup>&reg;</sup> and you have not yet completed the normal installation procedures.
           <br>
           If this is the case for you,
-          <?php if ($instPath) { ?>
-            <a href="<?php echo $instPath; ?>">CLICK HERE</a> to begin installation.
-          <?php } else { ?>
-            you will need to upload the "zc_install" folder using your FTP program, and then run <a href="<?php echo $instPath; ?>">zc_install/index.php</a> via your browser (or reload this page to see a link to it).
-          <?php } ?>
+          <?php 
+if ($inst_path) {
+    ?>
+            <a href="<?php 
+    echo $inst_path;
+    ?>">CLICK HERE</a> to begin installation.
+          <?php 
+} else {
+    ?>
+            you will need to upload the "zc_install" folder using your FTP program, and then run <a href="<?php 
+    echo $inst_path;
+    ?>">zc_install/index.php</a> via your browser (or reload this page to see a link to it).
+          <?php 
+}
+?>
           <br><br>
         </li>
         <li>
@@ -262,35 +275,59 @@ $docsPath = (file_exists('docs/index.html')) ? 'docs/index.html' : (file_exists(
             </li>
           </ul>
         </li>
-        <?php if (isset($problemString) && $problemString != '') { ?>
+        <?php 
+if (isset($problem_string) && $problem_string != '') {
+    ?>
           <br>
           <li>
-            Additional <strong>*IMPORTANT*</strong> Details: <span class="errorDetails"><?php echo $problemString; ?></span>
+            Additional <strong>*IMPORTANT*</strong> Details: <span class="errorDetails"><?php 
+    echo $problem_string;
+    ?></span>
           </li>
-        <?php } ?>
+        <?php 
+}
+?>
       </ol>
     </div>
     <div>
       <h2>To begin installation:</h2>
       <ol>
-          <?php if ($docsPath) { ?>
+          <?php 
+if ($docs_path) {
+    ?>
           <li>
-            Installation Documentation can be read by <a href="<?php echo $docsPath; ?>">CLICKING HERE</a>
+            Installation Documentation can be read by <a href="<?php 
+    echo $docs_path;
+    ?>">CLICKING HERE</a>
           </li>
-        <?php } else { ?>
+        <?php 
+} else {
+    ?>
           <li>
             Installation documentation is normally found in the /docs folder of the Zen Cart&reg; distribution files/zip. You can also find documentation in the <a href="https://docs.zen-cart.com" rel="noopener" target="_blank">Online Help</a>.
           </li>
-        <?php } ?>
-        <?php if ($instPath) { ?>
+        <?php 
+}
+?>
+        <?php 
+if ($inst_path) {
+    ?>
           <li>
-            Navigate to <a href="<?php echo $instPath; ?>">zc_install/index.php</a> with your web browser.
+            Navigate to <a href="<?php 
+    echo $inst_path;
+    ?>">zc_install/index.php</a> with your web browser.
           </li>
-        <?php } else { ?>
+        <?php 
+} else {
+    ?>
           <li>
-            You will need to upload the "zc_install" folder using your FTP program, and then run <a href="<?php echo $instPath; ?>">zc_install/index.php</a> via your browser (or reload this page to see a link to it).
+            You will need to upload the "zc_install" folder using your FTP program, and then run <a href="<?php 
+    echo $inst_path;
+    ?>">zc_install/index.php</a> via your browser (or reload this page to see a link to it).
           </li>
-        <?php } ?>
+        <?php 
+}
+?>
         <li>
           Please refer to the <a href="https://docs.zen-cart.com" rel="noopener" target="_blank">Online Help</a> area on the Zen Cart<sup>&reg;</sup> website if you run into difficulties.
         </li>
@@ -315,7 +352,9 @@ $docsPath = (file_exists('docs/index.html')) ? 'docs/index.html' : (file_exists(
           OSI Certified is a certification mark of the Open Source Initiative.
         <p>
         <p class="zenData">
-          Copyright 2003 - <?php echo date('Y'); ?> Zen Ventures, LLC
+          Copyright 2003 - <?php 
+echo date('Y');
+?> Zen Ventures, LLC
           <br><br>
           Zen Cart&reg;
           <br>

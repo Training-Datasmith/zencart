@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * checkout_address_book.php
  *
@@ -12,10 +12,7 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 $customer = new Customer();
-$addresses = $customer->getFormattedAddressBookList();
-
+$addresses = $customer->get_formatted_address_book_list();
 $radio_buttons = count($addresses);
-
 $zco_notifier->notify('NOTIFY_MODULE_END_CHECKOUT_ADDRESS_BOOK', $customer, $addresses);

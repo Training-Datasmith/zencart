@@ -1,62 +1,48 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Renderer_Style;
 
-namespace BaconQrCode\Renderer\RendererStyle;
-
-use BaconQrCode\Exception\RuntimeException;
-use BaconQrCode\Renderer\Color\ColorInterface;
-
-final class EyeFill
+use Bacon_Qr_Code\Exception\RuntimeException;
+use Bacon_Qr_Code\Renderer\Color\Color_Interface;
+final class Eye_Fill
 {
-    private static ?EyeFill $inherit = null;
-
-    public function __construct(
-        private readonly ?ColorInterface $externalColor,
-        private readonly ?ColorInterface $internalColor
-    ) {
+    private static ?Eye_Fill $inherit = null;
+    public function __construct(private readonly ?Color_Interface $external_color, private readonly ?Color_Interface $internal_color)
+    {
     }
-
-    public static function uniform(ColorInterface $color): self
+    public static function uniform(Color_Interface $color): self
     {
         return new self($color, $color);
     }
-
     public static function inherit(): self
     {
         return self::$inherit ?: self::$inherit = new self(null, null);
     }
-
-    public function inheritsBothColors(): bool
+    public function inherits_both_colors(): bool
     {
-        return null === $this->externalColor && null === $this->internalColor;
+        return null === $this->external_color && null === $this->internal_color;
     }
-
-    public function inheritsExternalColor(): bool
+    public function inherits_external_color(): bool
     {
-        return null === $this->externalColor;
+        return null === $this->external_color;
     }
-
-    public function inheritsInternalColor(): bool
+    public function inherits_internal_color(): bool
     {
-        return null === $this->internalColor;
+        return null === $this->internal_color;
     }
-
-    public function getExternalColor(): ColorInterface
+    public function get_external_color(): Color_Interface
     {
-        if (null === $this->externalColor) {
+        if (null === $this->external_color) {
             throw new RuntimeException('External eye color inherits foreground color');
         }
-
-        return $this->externalColor;
+        return $this->external_color;
     }
-
-    public function getInternalColor(): ColorInterface
+    public function get_internal_color(): Color_Interface
     {
-        if (null === $this->internalColor) {
+        if (null === $this->internal_color) {
             throw new RuntimeException('Internal eye color inherits foreground color');
         }
-
-        return $this->internalColor;
+        return $this->internal_color;
     }
 }

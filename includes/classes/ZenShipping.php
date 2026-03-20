@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @since ZC v2.1.0
  */
-abstract class ZenShipping extends base
+abstract class Zen_Shipping extends base
 {
     /**
      * $_check is used to check the configuration key set up
@@ -55,19 +54,15 @@ abstract class ZenShipping extends base
      * @since ZC v2.1.0
      */
     public string $title;
-
     abstract public function quote($method = ''): array;
-
     /**
      * @since ZC v2.1.0
      */
     abstract public function keys(): array;
-
     /**
      * @since ZC v2.1.0
      */
     abstract public function install(): void;
-
     /**
      * Remove the module's settings
      *
@@ -76,29 +71,23 @@ abstract class ZenShipping extends base
     public function remove(): void
     {
         global $db;
-        $db->Execute(
-            'DELETE FROM ' . TABLE_CONFIGURATION . "
-              WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')"
-        );
+        $db->Execute('DELETE FROM ' . TABLE_CONFIGURATION . "\n              WHERE configuration_key IN ('" . implode("', '", $this->keys()) . "')");
     }
-
     /**
      * Disable the module if a shipping-zone has been defined and the
      * order isn't to be delivered to that zone.
      * @since ZC v2.2.0
      */
-    protected function checkEnabledForZone(string $zone_id): void
+    protected function check_enabled_for_zone(string $zone_id): void
     {
         global $db, $order;
-        if ((int)$zone_id > 0) {
+        if ((int) $zone_id > 0) {
             $check_flag = false;
-            $check = $db->Execute(
-                'SELECT zone_id
+            $check = $db->Execute('SELECT zone_id
                    FROM ' . TABLE_ZONES_TO_GEO_ZONES . '
-                  WHERE geo_zone_id = ' . (int)$zone_id . '
-                    AND zone_country_id = ' . (int)($order->delivery['country']['id'] ?? -1) . '
-                  ORDER BY zone_id'
-            );
+                  WHERE geo_zone_id = ' . (int) $zone_id . '
+                    AND zone_country_id = ' . (int) ($order->delivery['country']['id'] ?? -1) . '
+                  ORDER BY zone_id');
             foreach ($check as $next_zone) {
                 if ($next_zone['zone_id'] < 1) {
                     $check_flag = true;
@@ -108,7 +97,6 @@ abstract class ZenShipping extends base
                     break;
                 }
             }
-
             if ($check_flag === false) {
                 $this->enabled = false;
             }

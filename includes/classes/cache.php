@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * cache Class.
  *
@@ -12,7 +12,6 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * cache Class.
  * handles query caching
@@ -49,7 +48,6 @@ class cache
                 return false;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -60,12 +58,12 @@ class cache
         switch (SQL_CACHE_METHOD) {
             case 'file':
                 $filename = DIR_FS_SQL_CACHE . '/' . $zp_cache_name . '.sql';
-                if (file_exists($filename) && @filemtime($filename) > (time() - $zf_cachetime)) {
+                if (file_exists($filename) && @filemtime($filename) > time() - $zf_cachetime) {
                     return false;
                 }
                 return true;
             case 'database':
-                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name ."'";
+                $sql = 'SELECT * FROM ' . TABLE_DB_CACHE . " WHERE cache_entry_name = '" . $zp_cache_name . "'";
                 $cache_result = $db->Execute($sql);
                 if (!$cache_result->EOF) {
                     $start_time = $cache_result->fields['cache_entry_created'];
@@ -81,7 +79,6 @@ class cache
                 return true;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -108,7 +105,6 @@ class cache
             }
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -128,8 +124,8 @@ class cache
                 }
                 $result_serialize = $db->prepare_input(base64_encode(serialize($zf_result_array)));
                 $sql = 'INSERT IGNORE INTO ' . TABLE_DB_CACHE . ' (cache_entry_name, cache_data, cache_entry_created) VALUES (:cachename, :cachedata, unix_timestamp() )';
-                $sql = $db->bindVars($sql, ':cachename', $zp_cache_name, 'string');
-                $sql = $db->bindVars($sql, ':cachedata', $result_serialize, 'string');
+                $sql = $db->bind_vars($sql, ':cachename', $zp_cache_name, 'string');
+                $sql = $db->bind_vars($sql, ':cachedata', $result_serialize, 'string');
                 $db->Execute($sql);
                 break;
             case 'memory':
@@ -138,7 +134,6 @@ class cache
                 break;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -166,7 +161,6 @@ class cache
                 return true;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -194,7 +188,6 @@ class cache
                 break;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */

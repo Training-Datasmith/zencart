@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * MySQL query_factory class.
  * Class used for database abstraction to MySQL via mysqli
@@ -14,48 +14,52 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * Queryfactory - A simple database abstraction layer
  *
  * @since ZC v1.2.0d
  */
-class queryFactory extends base
+class Query_Factory extends base
 {
-    public $link; // mysqli object
+    public $link;
+    // mysqli object
     private int $count_queries;
     private float|int $total_query_time = 0;
-    public $dieOnErrors = false;
+    public $die_on_errors = false;
     public $error_number = 0;
     public $error_text = '';
-
-    public ?string $dbDefaultCharacterSet = null;
-    public ?string $dbDefaultCollation = null;
+    public ?string $db_default_character_set = null;
+    public ?string $db_default_collation = null;
     private bool $db_connected = false;
-
     private $host = '';
     private $database = '';
     private $user = '';
     private $password = '';
     private string $zf_sql = '';
     private array $ignored_error_codes = [
-        2002, // connection refused via socket
-        2003, // cannot connect to host
-        2006, // server has gone away / (MySQL server wait timeout)
-        4031, // server has gone away since MySQL 8.0.24
-        2013, // lost connection during query
-        1040, // too many connections
-        1053, // server shutdown in progress
-        1141, // grant-type not allowed
-        1203, // too many user connections
+        2002,
+        // connection refused via socket
+        2003,
+        // cannot connect to host
+        2006,
+        // server has gone away / (MySQL server wait timeout)
+        4031,
+        // server has gone away since MySQL 8.0.24
+        2013,
+        // lost connection during query
+        1040,
+        // too many connections
+        1053,
+        // server shutdown in progress
+        1141,
+        // grant-type not allowed
+        1203,
     ];
-
     public function __construct()
     {
         $this->count_queries = 0;
         $this->total_query_time = 0;
     }
-
     /**
      * @param string $db_host database server hostname
      * @param string $db_user db username
@@ -66,81 +70,67 @@ class queryFactory extends base
      * @param array $options additional configuration
      * @since ZC v1.2.0d
      */
-    public function connect(string $db_host, string $db_user, string $db_password, string $db_name, $pconnect = 'unused', bool $dieOnErrors = false, array $options = []): bool
+    public function connect(string $db_host, string $db_user, string $db_password, string $db_name, $pconnect = 'unused', bool $die_on_errors = false, array $options = []): bool
     {
         $this->database = $db_name;
         $this->user = $db_user;
         $this->host = $db_host;
         $this->password = $db_password;
-        $this->dieOnErrors = $dieOnErrors;
-
+        $this->die_on_errors = $die_on_errors;
         if (defined('DB_CHARSET')) {
-            $dbCharset = DB_CHARSET;
+            $db_charset = DB_CHARSET;
         }
         if (isset($options['dbCharset'])) {
-            $dbCharset = $options['dbCharset'];
+            $db_charset = $options['dbCharset'];
         }
-
         if (!function_exists('mysqli_connect')) {
             die('Call to undefined function: mysqli_connect().  Please install the MySQL Connector for PHP');
         }
-
         // use default reporting setting, so exceptions aren't thrown, since we attempt to catch errors here procedurally.
         mysqli_report(MYSQLI_REPORT_OFF);
-
-        $connectionRetry = 10;
-        while (!isset($this->link) || ($this->link == false && $connectionRetry > 0)) {
-            $this->link = mysqli_connect($db_host, $db_user, $db_password, $db_name, (defined('DB_PORT') ? DB_PORT : null), (defined('DB_SOCKET') ? DB_SOCKET : null));
-
+        $connection_retry = 10;
+        while (!isset($this->link) || $this->link == false && $connection_retry > 0) {
+            $this->link = mysqli_connect($db_host, $db_user, $db_password, $db_name, defined('DB_PORT') ? DB_PORT : null, defined('DB_SOCKET') ? DB_SOCKET : null);
             // handle MySQL connection errors/failures
             if (in_array(mysqli_connect_errno(), $this->ignored_error_codes)) {
-                if ($connectionRetry > 1) {
+                if ($connection_retry > 1) {
                     // if service is down, try only one more time
-                    $connectionRetry = 1;
+                    $connection_retry = 1;
                 }
-                $this->dieOnErrors = true;
+                $this->die_on_errors = true;
             }
-
-            $connectionRetry--;
+            $connection_retry--;
         }
-
         if ($this->link) {
             if (mysqli_select_db($this->link, $db_name)) {
-                if (isset($dbCharset)) {
-                    mysqli_query($this->link, "SET NAMES '" . $dbCharset . "'");
+                if (isset($db_charset)) {
+                    mysqli_query($this->link, "SET NAMES '" . $db_charset . "'");
                     if (function_exists('mysqli_set_charset')) {
-                        mysqli_set_charset($this->link, $dbCharset);
+                        mysqli_set_charset($this->link, $db_charset);
                     } else {
-                        mysqli_query($this->link, "SET CHARACTER SET '" . $dbCharset . "'");
+                        mysqli_query($this->link, "SET CHARACTER SET '" . $db_charset . "'");
                     }
                 }
                 $this->db_connected = true;
-
                 // Set time zone to match PHP, unless disabled by this constant
                 if (!defined('DISABLE_MYSQL_TZ_SET')) {
                     mysqli_query($this->link, "SET time_zone = '" . substr_replace(date('O'), ':', -2, 0) . "'");
                 }
-
                 // Set MySQL mode, if one is defined before execution. Ref: https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html (must be only A-Z or _ or , characters)
                 if (defined('DB_MYSQL_MODE') && DB_MYSQL_MODE != '') {
                     mysqli_query($this->link, "SET SESSION sql_mode = '" . preg_replace('/[^A-Z_,]/', '', DB_MYSQL_MODE) . "'");
                 }
-
                 $result = $this->Execute('SELECT @@character_set_database, @@collation_database');
-                $this->dbDefaultCharacterSet = $result->fields['@@character_set_database'] ?? null;
-                $this->dbDefaultCollation = $result->fields['@@collation_database'] ?? null;
-
+                $this->db_default_character_set = $result->fields['@@character_set_database'] ?? null;
+                $this->db_default_collation = $result->fields['@@collation_database'] ?? null;
                 return true;
             }
-
-            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $dieOnErrors);
+            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $die_on_errors);
             return false;
         }
-
-        $this->set_error(mysqli_connect_errno(), mysqli_connect_error(), $dieOnErrors);
+        $this->set_error(mysqli_connect_errno(), mysqli_connect_error(), $die_on_errors);
         return false;
     }
-
     /**
      * @param string $db_host database server hostname
      * @param string $db_user db username
@@ -148,58 +138,51 @@ class queryFactory extends base
      * @param string $db_name database name
      * @since ZC v1.5.2
      */
-    public function simpleConnect($db_host, $db_user, $db_password, $db_name): bool
+    public function simple_connect($db_host, $db_user, $db_password, $db_name): bool
     {
         // use default reporting setting, so exceptions aren't thrown, since we attempt to catch errors here procedurally.
         mysqli_report(MYSQLI_REPORT_OFF);
-
         $this->database = $db_name;
         $this->user = $db_user;
         $this->host = $db_host;
         $this->password = $db_password;
-
         // temporarily suppress E_WARNING in case of connection failure
         $error_level = error_reporting(E_ERROR | E_PARSE);
-        $this->link = mysqli_connect($db_host, $db_user, $db_password, $db_name, (defined('DB_PORT') ? DB_PORT : null), (defined('DB_SOCKET') ? DB_SOCKET : null));
+        $this->link = mysqli_connect($db_host, $db_user, $db_password, $db_name, defined('DB_PORT') ? DB_PORT : null, defined('DB_SOCKET') ? DB_SOCKET : null);
         error_reporting($error_level);
-
         if ($this->link) {
             $this->db_connected = true;
             return true;
         }
-
-        $this->set_error(mysqli_connect_errno(), mysqli_connect_error(), $this->dieOnErrors);
+        $this->set_error(mysqli_connect_errno(), mysqli_connect_error(), $this->die_on_errors);
         return false;
     }
-
     /**
      * @param bool $removeFromQueryCache Whether to skip the MySQL resource cache for repeats of the same query string during the same page-load
      * @return bool|mixed|mysqli_result
      * @since ZC v1.5.8
      */
-    protected function runQuery(string $sqlQuery, bool $removeFromQueryCache)
+    protected function run_query(string $sql_query, bool $remove_from_query_cache)
     {
         // ensure db connection
         if (!$this->db_connected) {
-            if (!$this->connect($this->host, $this->user, $this->password, $this->database, null, $this->dieOnErrors)) {
-                $this->set_error(0, DB_ERROR_NOT_CONNECTED, $this->dieOnErrors);
+            if (!$this->connect($this->host, $this->user, $this->password, $this->database, null, $this->die_on_errors)) {
+                $this->set_error(0, DB_ERROR_NOT_CONNECTED, $this->die_on_errors);
             }
         }
         // run the query
-        $zp_db_resource = $this->query($this->link, $sqlQuery, $removeFromQueryCache);
-
+        $zp_db_resource = $this->query($this->link, $sql_query, $remove_from_query_cache);
         // second attempt in case of 2006 response
         if (!$zp_db_resource) {
             if (in_array(mysqli_errno($this->link), [2006, 4031])) {
                 $this->link = false;
-                $this->connect($this->host, $this->user, $this->password, $this->database, null, $this->dieOnErrors);
+                $this->connect($this->host, $this->user, $this->password, $this->database, null, $this->die_on_errors);
                 // run the query directly, bypassing the queryCache
-                $zp_db_resource = mysqli_query($this->link, $sqlQuery);
+                $zp_db_resource = mysqli_query($this->link, $sql_query);
             }
         }
         return $zp_db_resource;
     }
-
     /**
      * Escape SQL query value for binding
      *
@@ -210,44 +193,37 @@ class queryFactory extends base
     {
         return mysqli_real_escape_string($this->link, (string) $string);
     }
-
     /**
      * Alias to prepare_input()
      * @param string|null|mixed $string
      * @see $this->prepare_input()
      * @since ZC v1.3.0
      */
-    public function prepareInput($string): string
+    public function prepare_input($string): string
     {
         return $this->prepare_input($string);
     }
-
     /**
      * @param string|int|null $limit
      * @since ZC v1.2.0d
      */
-    public function Execute(string $sqlQuery, $limit = null, bool $enableCaching = false, int $cacheSeconds = 0, bool $removeFromQueryCache = false): \queryFactoryResult
+    public function Execute(string $sql_query, $limit = null, bool $enable_caching = false, int $cache_seconds = 0, bool $remove_from_query_cache = false): \Query_Factory_Result
     {
         // do SELECT logging if enabled
-        $this->logQuery($sqlQuery);
-
+        $this->log_query($sql_query);
         global $zc_cache;
-
-        $obj = new queryFactoryResult($this->link);
-
-        $limit = (int)$limit;
+        $obj = new Query_Factory_Result($this->link);
+        $limit = (int) $limit;
         if ($limit) {
-            $sqlQuery .= ' LIMIT ' . $limit;
+            $sql_query .= ' LIMIT ' . $limit;
             $obj->limit = $limit;
         }
-
-        $this->zf_sql = $sqlQuery;
-        $obj->sql_query = $sqlQuery;
-
+        $this->zf_sql = $sql_query;
+        $obj->sql_query = $sql_query;
         // Use cached result
-        if ($enableCaching && $zc_cache->sql_cache_exists($sqlQuery, $cacheSeconds)) {
+        if ($enable_caching && $zc_cache->sql_cache_exists($sql_query, $cache_seconds)) {
             $obj->is_cached = true;
-            $zp_result_array = $zc_cache->sql_cache_read($sqlQuery);
+            $zp_result_array = $zc_cache->sql_cache_read($sql_query);
             if ($zp_result_array !== false) {
                 $obj->result = $zp_result_array;
                 if (count($zp_result_array) > 0) {
@@ -257,21 +233,17 @@ class queryFactory extends base
                 return $obj;
             }
         }
-
         $time_start = microtime(as_float: true);
-
         // Get MySQL query result
-        $zp_db_resource = $this->runQuery($sqlQuery, $removeFromQueryCache);
-
+        $zp_db_resource = $this->run_query($sql_query, $remove_from_query_cache);
         // iterate over query results and cache it before returning it
-        if ($enableCaching) {
-            $zc_cache->sql_cache_expire_now($sqlQuery);
-
+        if ($enable_caching) {
+            $zc_cache->sql_cache_expire_now($sql_query);
             if (false === $zp_db_resource) {
-                $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->dieOnErrors);
+                $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->die_on_errors);
             } else {
                 $obj->resource = $zp_db_resource;
-                $zp_rows = $obj->RecordCount();
+                $zp_rows = $obj->record_count();
                 if ($zp_rows > 0) {
                     $zp_ii = 0;
                     while ($zp_ii < $zp_rows) {
@@ -289,48 +261,41 @@ class queryFactory extends base
                 }
                 unset($zp_ii);
             }
-            $zc_cache->sql_cache_store($sqlQuery, $obj->result);
+            $zc_cache->sql_cache_store($sql_query, $obj->result);
             $obj->is_cached = true;
             $time_end = microtime(as_float: true);
             $query_time = $time_end - $time_start;
             $this->total_query_time += $query_time;
             $this->count_queries++;
-
             return $obj;
         }
-
         // process query results without caching them
-
         if (false === $zp_db_resource) {
-            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->dieOnErrors);
+            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->die_on_errors);
         } else {
             $obj->resource = $zp_db_resource;
-            if ($obj->RecordCount() > 0) {
+            if ($obj->record_count() > 0) {
                 $zp_result_array = mysqli_fetch_assoc($zp_db_resource);
                 if ($zp_result_array) {
                     $obj->fields = array_replace($obj->fields, $zp_result_array);
                     $obj->EOF = false;
                 }
             }
-
             $time_end = microtime(as_float: true);
             $query_time = $time_end - $time_start;
             $this->total_query_time += $query_time;
             $this->count_queries++;
         }
-
         return $obj;
     }
-
     /**
      * Use this form of the Execute method to ensure that any SELECT result is pulled from the database, bypassing the cache.
      * @since ZC v1.5.5f
      */
-    public function ExecuteNoCache(string $sqlQuery): \queryFactoryResult
+    public function execute_no_cache(string $sql_query): \Query_Factory_Result
     {
-        return $this->Execute($sqlQuery, false, false, 0, true);
+        return $this->Execute($sql_query, false, false, 0, true);
     }
-
     /**
      * Execute a SELECT query and return the results in a random order
      * The results should be iterated with MoveNextRandom()
@@ -338,23 +303,20 @@ class queryFactory extends base
      * @param int $limit
      * @since ZC v1.2.0d
      */
-    public function ExecuteRandomMulti(string $sqlQuery, $limit = 0): \queryFactoryResult
+    public function execute_random_multi(string $sql_query, $limit = 0): \Query_Factory_Result
     {
         $time_start = microtime(as_float: true);
-        $this->zf_sql = $sqlQuery;
-        $obj = new queryFactoryResult($this->link);
-        $obj->sql_query = $sqlQuery;
-        $limit = (int)$limit;
+        $this->zf_sql = $sql_query;
+        $obj = new Query_Factory_Result($this->link);
+        $obj->sql_query = $sql_query;
+        $limit = (int) $limit;
         $obj->limit = $limit;
-
-        $zp_db_resource = $this->runQuery($sqlQuery, true);
-
+        $zp_db_resource = $this->run_query($sql_query, true);
         if (false === $zp_db_resource) {
-            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->dieOnErrors);
+            $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->die_on_errors);
         } else {
             $obj->resource = $zp_db_resource;
-
-            $zp_rows = $obj->RecordCount();
+            $zp_rows = $obj->record_count();
             if (empty($limit)) {
                 $limit = $zp_rows;
             }
@@ -377,7 +339,6 @@ class queryFactory extends base
                 }
                 unset($zp_ii);
                 $obj->EOF = false;
-
                 $obj->result_random = array_rand($obj->result, count($obj->result));
                 if (is_array($obj->result_random)) {
                     shuffle($obj->result_random);
@@ -385,28 +346,24 @@ class queryFactory extends base
                     $obj->result_random = [0 => $obj->result_random];
                 }
                 $obj->cursor = -1;
-                $obj->MoveNextRandom();
+                $obj->move_next_random();
             }
         }
-
         $time_end = microtime(as_float: true);
         $query_time = $time_end - $time_start;
         $this->total_query_time += $query_time;
         $this->count_queries++;
         return $obj;
     }
-
     /**
      * @deprecated since 1.5.8 use ExecuteRandomMulti
      * @since ZC v1.5.5f
      */
-    public function ExecuteRandomMultiNoCache(string $sqlQuery): \queryFactoryResult
+    public function execute_random_multi_no_cache(string $sql_query): \Query_Factory_Result
     {
         trigger_error('Call to deprecated function ExecuteRandomMultiNoCache. Use ExecuteRandomMulti() instead', E_USER_DEPRECATED);
-
-        return $this->ExecuteRandomMulti($sqlQuery, 0);
+        return $this->execute_random_multi($sql_query, 0);
     }
-
     /**
      * Execute the database query, using the queryCache memoization cache to re-use same Resource for repeat queries
      *
@@ -414,31 +371,25 @@ class queryFactory extends base
      * @return bool|mixed|mysqli_result
      * @since ZC v1.5.1
      */
-    protected function query($link, string $query, bool $removeFromQueryCache = false)
+    protected function query($link, string $query, bool $remove_from_query_cache = false)
     {
-        global $queryCache;
-
-        if (isset($queryCache)) {
-            if ($removeFromQueryCache) {
-                $queryCache->reset($query);
+        global $query_cache;
+        if (isset($query_cache)) {
+            if ($remove_from_query_cache) {
+                $query_cache->reset($query);
             }
-
-            if ($queryCache->inCache($query)) {
-                $cached_value = $queryCache->getFromCache($query);
+            if ($query_cache->in_cache($query)) {
+                $cached_value = $query_cache->get_from_cache($query);
                 $this->count_queries--;
                 return $cached_value;
             }
         }
-
         $result = mysqli_query($link, $query);
-
-        if (isset($queryCache)) {
-            $queryCache->cache($query, $result);
+        if (isset($query_cache)) {
+            $query_cache->cache($query, $result);
         }
-
         return $result;
     }
-
     /**
      * Get ID of last inserted record
      *
@@ -448,34 +399,30 @@ class queryFactory extends base
     {
         return @mysqli_insert_id($this->link);
     }
-
     /**
      * Return the number of rows affected by the last INSERT, UPDATE, REPLACE or DELETE query.
      * @since ZC v1.5.5f
      */
-    public function affectedRows()
+    public function affected_rows()
     {
-        return ($this->link) ? $this->link->affected_rows : 0;
+        return $this->link ? $this->link->affected_rows : 0;
     }
-
     /**
      * Return the number of queries executed since the counter started
      * @since ZC v1.2.0d
      */
-    public function queryCount(): int
+    public function query_count(): int
     {
         return $this->count_queries;
     }
-
     /**
      * Return the number of seconds elapsed for querying, since the counter started
      * @since ZC v1.2.0d
      */
-    public function queryTime(): float
+    public function query_time(): float
     {
-        return (float)$this->total_query_time;
+        return (float) $this->total_query_time;
     }
-
     /**
      * Performs an INSERT or UPDATE based on a supplied array of field data
      *
@@ -486,61 +433,55 @@ class queryFactory extends base
      * @param false $debug developer use only
      * @since ZC v1.3.0
      */
-    public function perform(string $tableName, array $tableData, string $performType = 'INSERT', string $whereCondition = '', ?bool $debug = false): void
+    public function perform(string $table_name, array $table_data, string $perform_type = 'INSERT', string $where_condition = '', ?bool $debug = false): void
     {
-        switch (strtolower($performType)) {
+        switch (strtolower($perform_type)) {
             case 'insertignore':
-                $insertString = 'INSERT IGNORE';
-                // no break
+                $insert_string = 'INSERT IGNORE';
+            // no break
             case 'insert':
-                $insertString ??= 'INSERT';
-                $insertString .= " INTO $tableName (";
-                foreach ($tableData as $value) {
+                $insert_string ??= 'INSERT';
+                $insert_string .= " INTO {$table_name} (";
+                foreach ($table_data as $value) {
                     if ($debug === true) {
                         echo $value['fieldName'] . '#';
                     }
-                    $insertString .= $value['fieldName'] . ', ';
+                    $insert_string .= $value['fieldName'] . ', ';
                 }
-                $insertString = substr($insertString, 0, -2) . ') VALUES (';
-                foreach ($tableData as $value) {
-                    $bindVarValue = $this->getBindVarValue($value['value'], $value['type']);
-                    $insertString .= $bindVarValue . ', ';
+                $insert_string = substr($insert_string, 0, -2) . ') VALUES (';
+                foreach ($table_data as $value) {
+                    $bind_var_value = $this->get_bind_var_value($value['value'], $value['type']);
+                    $insert_string .= $bind_var_value . ', ';
                 }
-                $insertString = substr($insertString, 0, -2) . ')';
+                $insert_string = substr($insert_string, 0, -2) . ')';
                 if ($debug === true) {
-                    echo $insertString;
-                    die();
+                    echo $insert_string;
+                    die;
                 }
-
-                $this->Execute($insertString);
-
+                $this->Execute($insert_string);
                 break;
-
             case 'updateignore':
-                $updateString = 'UPDATE IGNORE ';
-                // no break
+                $update_string = 'UPDATE IGNORE ';
+            // no break
             case 'update':
-                $updateString ??= 'UPDATE ';
-                $updateString .= " $tableName SET ";
-                foreach ($tableData as $value) {
-                    $bindVarValue = $this->getBindVarValue($value['value'], $value['type']);
-                    $updateString .= $value['fieldName'] . '=' . $bindVarValue . ', ';
+                $update_string ??= 'UPDATE ';
+                $update_string .= " {$table_name} SET ";
+                foreach ($table_data as $value) {
+                    $bind_var_value = $this->get_bind_var_value($value['value'], $value['type']);
+                    $update_string .= $value['fieldName'] . '=' . $bind_var_value . ', ';
                 }
-                $updateString = substr($updateString, 0, -2);
-                if (!empty($whereCondition)) {
-                    $updateString .= ' WHERE ' . $whereCondition;
+                $update_string = substr($update_string, 0, -2);
+                if (!empty($where_condition)) {
+                    $update_string .= ' WHERE ' . $where_condition;
                 }
                 if ($debug === true) {
-                    echo $updateString;
-                    die();
+                    echo $update_string;
+                    die;
                 }
-
-                $this->Execute($updateString);
-
+                $this->Execute($update_string);
                 break;
         }
     }
-
     /**
      * bind variables to a query
      * @param string $sql SQL query fragment to perform binding substitution on
@@ -550,12 +491,11 @@ class queryFactory extends base
      * @return string original $sql query fragment with patterns substituted
      * @since ZC v1.3.0
      */
-    public function bindVars(string $sql, string $parameterToReplace, $valueToBind, string $bindingRule): string
+    public function bind_vars(string $sql, string $parameter_to_replace, $value_to_bind, string $binding_rule): string
     {
-        $sqlNew = $this->getBindVarValue($valueToBind, $bindingRule);
-        return str_replace($parameterToReplace, $sqlNew, $sql);
+        $sql_new = $this->get_bind_var_value($value_to_bind, $binding_rule);
+        return str_replace($parameter_to_replace, $sql_new, $sql);
     }
-
     /**
      * Applies binding/sanitization to values in preparation for safe execution
      *
@@ -564,72 +504,57 @@ class queryFactory extends base
      * @return float|int|string
      * @since ZC v1.3.0
      */
-    protected function getBindVarValue($value, string $type)
+    protected function get_bind_var_value($value, string $type)
     {
-        $typeArray = explode(':', $type);
-        $type = $typeArray[0];
+        $type_array = explode(':', $type);
+        $type = $type_array[0];
         switch ($type) {
             case 'inConstructInteger':
                 $list = explode(',', (string) $value);
-                $newList = array_map(fn ($value): int => (int)$value, $list);
-
-                return implode(',', $newList);
-
+                $new_list = array_map(fn($value): int => (int) $value, $list);
+                return implode(',', $new_list);
             case 'inConstructString':
                 $list = explode(',', (string) $value);
-                $newList = array_map(fn ($value): string => '\'' . $this->prepare_input($value) . '\'', $list);
-
-                return implode(',', $newList);
-
+                $new_list = array_map(fn($value): string => '\'' . $this->prepare_input($value) . '\'', $list);
+                return implode(',', $new_list);
             case 'csv':
-
             case 'passthru':
                 return $value;
-
             case 'float':
-                return (!zen_not_null($value) || $value == '' || $value == 0) ? 0 : (float)$value;
-
+                return !zen_not_null($value) || $value == '' || $value == 0 ? 0 : (float) $value;
             case 'integer':
-                return (int)$value;
-
+                return (int) $value;
             case 'string':
                 if (preg_match('/NULL/', (string) $value)) {
                     return 'null';
                 }
                 return '\'' . $this->prepare_input($value) . '\'';
-
             case 'stringIgnoreNull':
-
             case 'currency':
                 return '\'' . $this->prepare_input($value) . '\'';
             case 'noquotestring':
                 return $this->prepare_input($value);
-
             case 'date':
                 if (preg_match('/null/i', (string) $value)) {
                     return 'null';
                 }
                 return '\'' . $this->prepare_input($value) . '\'';
-
             case 'enum':
-                if (isset($typeArray[1])) {
-                    $enumArray = explode('|', $typeArray[1]);
+                if (isset($type_array[1])) {
+                    $enum_array = explode('|', $type_array[1]);
                 }
                 return '\'' . $this->prepare_input($value) . '\'';
-
             case 'regexp':
-                $searchArray = ['[', ']', '(', ')', '{', '}', '|', '*', '?', '.', '$', '^'];
-                foreach ($searchArray as $searchTerm) {
-                    $value = str_replace($searchTerm, '\\' . $searchTerm, $value);
+                $search_array = ['[', ']', '(', ')', '{', '}', '|', '*', '?', '.', '$', '^'];
+                foreach ($search_array as $search_term) {
+                    $value = str_replace($search_term, '\\' . $search_term, $value);
                 }
                 return $this->prepare_input($value);
-
             default:
-                trigger_error("FATAL ERROR: var-type undefined: $type ($value).", E_USER_WARNING);
-                exit();
+                trigger_error("FATAL ERROR: var-type undefined: {$type} ({$value}).", E_USER_WARNING);
+                exit;
         }
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -637,16 +562,14 @@ class queryFactory extends base
     {
         $result = mysqli_select_db($this->link, $db_name);
         if ($result) {
-            $collationQuery = $this->Execute('SELECT @@character_set_database, @@collation_database');
-            $this->dbDefaultCharacterSet = $collationQuery->fields['@@character_set_database'] ?? null;
-            $this->dbDefaultCollation = $collationQuery->fields['@@collation_database'] ?? null;
+            $collation_query = $this->Execute('SELECT @@character_set_database, @@collation_database');
+            $this->db_default_character_set = $collation_query->fields['@@character_set_database'] ?? null;
+            $this->db_default_collation = $collation_query->fields['@@collation_database'] ?? null;
             return true;
         }
-
-        $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->dieOnErrors);
+        $this->set_error(mysqli_errno($this->link), mysqli_error($this->link), $this->die_on_errors);
         return false;
     }
-
     /**
      * Close db connection
      * @since ZC v1.2.0d
@@ -660,7 +583,6 @@ class queryFactory extends base
         @mysqli_close($this->link);
         unset($this->link);
     }
-
     /**
      * Close db connection on destroy/shutdown/exit
      * @since ZC v1.5.5f
@@ -669,23 +591,22 @@ class queryFactory extends base
     {
         $this->close();
     }
-
     /**
      * Internal queryfactory error handling
      * @since ZC v1.2.0d
      */
-    protected function set_error($err_num, $err_text, $dieOnErrors = true): void
+    protected function set_error($err_num, $err_text, $die_on_errors = true): void
     {
         $this->error_number = $err_num;
         $this->error_text = $err_text;
-        if ($dieOnErrors && $err_num != 1141) { // error 1141 is okay ... should not die on 1141, but just continue on instead
+        if ($die_on_errors && $err_num != 1141) {
+            // error 1141 is okay ... should not die on 1141, but just continue on instead
             $this->show_error();
             if (!defined('DIR_FS_INSTALL')) {
-                die();
+                die;
             }
         }
     }
-
     /**
      * Display DB Connection Failure error message
      * and trigger error logging
@@ -696,22 +617,18 @@ class queryFactory extends base
         if (!headers_sent()) {
             header('HTTP/1.1 503 Service Unavailable');
         }
-
         if (!defined('FILENAME_DATABASE_TEMPORARILY_DOWN')) {
             define('FILENAME_DATABASE_TEMPORARILY_DOWN', (defined('DIR_FS_CATALOG') ? DIR_FS_CATALOG : DIR_FS_ROOT) . '/nddbc.html');
         }
         if (file_exists(FILENAME_DATABASE_TEMPORARILY_DOWN)) {
-            if (($this->error_number == 0 && $this->error_text == DB_ERROR_NOT_CONNECTED)
-                || in_array($this->error_number, [2002, 2003])) {
-                include(FILENAME_DATABASE_TEMPORARILY_DOWN);
+            if ($this->error_number == 0 && $this->error_text == DB_ERROR_NOT_CONNECTED || in_array($this->error_number, [2002, 2003])) {
+                include FILENAME_DATABASE_TEMPORARILY_DOWN;
             }
         }
-
         // suppress backtrace for MariaDB connection errors: not logging these because they usually come hundreds at a time
         if (in_array($this->error_number, $this->ignored_error_codes) || defined('DIR_FS_INSTALL')) {
             return;
         }
-
         // display error details if appropriate
         echo '<div class="systemError">';
         if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
@@ -724,7 +641,6 @@ class queryFactory extends base
             echo ' If you were entering information, press the BACK button in your browser and re-check the information you had entered to be sure you entered valid data.<br>';
         }
         echo '</div>';
-
         // logging
         $backtrace_array = debug_backtrace();
         $query_factory_caller = '';
@@ -735,24 +651,22 @@ class queryFactory extends base
             }
         }
         trigger_error('FATAL MySQL error ' . $this->error_number . ': ' . $this->error_text . ' :: ' . $this->zf_sql . $query_factory_caller, E_USER_WARNING);
-        exit();
+        exit;
     }
-
     /**
      * Get column properties for a table
      * @since ZC v1.2.0d
      */
-    public function metaColumns(string $tablename): array
+    public function meta_columns(string $tablename): array
     {
         $sql = 'SHOW COLUMNS FROM `:tableName:`';
-        $sql = $this->bindVars($sql, ':tableName:', $tablename, 'noquotestring');
+        $sql = $this->bind_vars($sql, ':tableName:', $tablename, 'noquotestring');
         $res = $this->Execute($sql);
         foreach ($res as $result) {
-            $obj [strtoupper((string) $result['Field'])] = new queryFactoryMeta($result);
+            $obj[strtoupper((string) $result['Field'])] = new Query_Factory_Meta($result);
         }
         return $obj ?? [];
     }
-
     /**
      * @since ZC v1.2.0d
      */
@@ -761,34 +675,29 @@ class queryFactory extends base
         if ($this->link) {
             return mysqli_get_server_info($this->link);
         }
-
         return defined('UNKNOWN') ? UNKNOWN : 'UNKNOWN';
     }
-
     /**
      * If logging is enabled, log SELECT queries for later analysis
      * @param $sqlQuery
      * @since ZC v1.5.8
      */
-    protected function logQuery(string $sqlQuery)
+    protected function log_query(string $sql_query)
     {
         if (!defined('STORE_DB_TRANSACTIONS') || STORE_DB_TRANSACTIONS === 'false' || STORE_DB_TRANSACTIONS === false) {
             return;
         }
         global $PHP_SELF, $box_id, $current_page_base;
-
-        if (strtoupper(substr($sqlQuery, 0, 6)) != 'SELECT' /*&& strstr($sqlQuery,'products_id')*/) {
+        if (strtoupper(substr($sql_query, 0, 6)) != 'SELECT') {
             return;
         }
         // optional isolation
         //        if (strpos($sqlQuery, 'products_id') === false) {
         //            return;
         //        }
-
         $f = @fopen(DIR_FS_LOGS . '/query_selects_' . $current_page_base . '_' . time() . '.txt', 'ab');
         if ($f) {
             $backtrace = '';
-
             if (STORE_DB_TRANSACTIONS == 'backtrace') {
                 ob_start();
                 debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -796,18 +705,16 @@ class queryFactory extends base
                 $backtrace = preg_replace('/^#0\s+' . __FUNCTION__ . '[^\n]*\n/', '', $backtrace, 1);
                 $backtrace = 'query trace: ' . "\n" . $backtrace . "\n";
             }
-
-            fwrite($f, "\n\n" . 'I AM HERE ' . $current_page_base . /*zen_get_all_get_params() .*/ "\n" . $backtrace . 'sidebox: ' . $box_id . "\n\n" . "Explain \n" . $sqlQuery . ";\n\n");
+            fwrite($f, "\n\n" . 'I AM HERE ' . $current_page_base . "\n" . $backtrace . 'sidebox: ' . $box_id . "\n\n" . "Explain \n" . $sql_query . ";\n\n");
             fclose($f);
         }
         unset($f);
     }
 }
-
 /**
  * @since ZC v1.2.0d
  */
-class queryFactoryResult implements Countable, Iterator
+class Query_Factory_Result implements Countable, Iterator
 {
     /**
      * Indicates if the result has reached the last row of data.
@@ -815,109 +722,87 @@ class queryFactoryResult implements Countable, Iterator
      * @var boolean
      */
     public $EOF = true;
-
     /**
      * Indicates the current database row.
      *
      * @var int
      */
     public $cursor = 0;
-
     /**
      * Contains the data for the current database row (fields + values).
      *
      * @var array of field => value pairs
      */
     public $fields = [];
-
     /**
      * Indicates if the result is cached.
      *
      * @var boolean
      */
     public $is_cached = false;
-
     /**
      * Contains stored results of query
      *
      * @var array
      */
     public $result = [];
-
     /**
      * Contains randomized results if ExecuteRandomMulti was called
      *
      * @var array
      */
     public $result_random = [];
-
     /**
      * The maximum number of rows allowed to be iterated over.
      *
      * @var int
      */
     public $limit;
-
     /**
      * The raw result returned by the mysqli call.
      *
      * @var mysqli_result
      */
     public $resource;
-
     /**
      * @var string
      */
     public $sql_query = '';
-
     /**
      * @param mysqli $link
      */
     public function __construct(public $link)
     {
     }
-
     /* (non-PHPdoc)
      * @see Iterator::current()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function current()
     {
         return $this->fields;
     }
-
     /* (non-PHPdoc)
      * @see Iterator::key()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function key()
     {
         return $this->cursor;
     }
-
     /* (non-PHPdoc)
      * @see Iterator::next()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function next(): void
     {
-        $this->MoveNext();
+        $this->move_next();
     }
-
     /**
      * Moves the cursor to the next row.
      * @since ZC v1.2.0d
      */
-    public function MoveNext(): void
+    public function move_next(): void
     {
         $this->cursor++;
         if (!$this->valid()) {
@@ -943,12 +828,11 @@ class queryFactoryResult implements Countable, Iterator
             }
         }
     }
-
     /**
      * Moves to the next randomized result. Typically only used on a result generated by ExecuteRandomMulti
      * @since ZC v1.2.0d
      */
-    public function MoveNextRandom(): void
+    public function move_next_random(): void
     {
         $this->cursor++;
         if ($this->cursor < $this->limit) {
@@ -957,64 +841,49 @@ class queryFactoryResult implements Countable, Iterator
             $this->EOF = true;
         }
     }
-
     /* (non-PHPdoc)
      * @see Iterator::rewind()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function rewind(): void
     {
-        $this->EOF = ($this->RecordCount() == 0);
-        if ($this->RecordCount() !== 0) {
+        $this->EOF = $this->record_count() == 0;
+        if ($this->record_count() !== 0) {
             $this->Move(0);
         }
     }
-
     /* (non-PHPdoc)
      * @see Iterator::valid()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function valid()
     {
-        return $this->cursor < $this->RecordCount() && !$this->EOF;
+        return $this->cursor < $this->record_count() && !$this->EOF;
     }
-
     /* (non-PHPdoc)
      * @see Iterator::count()
      */
-    #[ReturnTypeWillChange]
-    /**
-     * @since ZC v1.5.5
-     */
+    #[Return_Type_Will_Change]
     public function count()
     {
-        return $this->RecordCount();
+        return $this->record_count();
     }
-
     /**
      * Returns the number of rows (records).
      *
      * @return int
      * @since ZC v1.2.0d
      */
-    public function RecordCount()
+    public function record_count()
     {
         if ($this->is_cached && is_countable($this->result)) {
             return count($this->result);
         }
-
         if (!empty($this->resource) && $this->resource instanceof mysqli_result) {
             return @mysqli_num_rows($this->resource);
         }
         return 0;
     }
-
     /**
      * Moves the cursor to the specified row. If the row is not valid,
      * the cursor will be moved past the last row and EOF will be set false.
@@ -1042,11 +911,10 @@ class queryFactoryResult implements Countable, Iterator
         }
     }
 }
-
 /**
  * @since ZC v1.2.0d
  */
-class queryFactoryMeta extends base
+class Query_Factory_Meta extends base
 {
     public string $field;
     public string $type;
@@ -1055,17 +923,14 @@ class queryFactoryMeta extends base
     public bool $indexed;
     public ?string $default;
     public ?string $extra;
-    public string $nativeType;
-
+    public string $native_type;
     public function __construct(array $field)
     {
         $this->field = $field['Field'];
-
         $type = $field['Type'];
         preg_match('/^[a-z]*/', (string) $type, $matches);
         $this->type = $matches[0];
-
-        $this->max_length = (int)preg_replace('/[a-z\(\)]/', '', (string) $type);
+        $this->max_length = (int) preg_replace('/[a-z\(\)]/', '', (string) $type);
         if (empty($this->max_length)) {
             switch (strtoupper((string) $type)) {
                 case 'DATE':
@@ -1073,7 +938,8 @@ class queryFactoryMeta extends base
                     break;
                 case 'DATETIME':
                 case 'TIMESTAMP':
-                    $this->max_length = 19; // ignores fractional which would be 26
+                    $this->max_length = 19;
+                    // ignores fractional which would be 26
                     break;
                 case 'TINYTEXT':
                     $this->max_length = 255;
@@ -1093,19 +959,16 @@ class queryFactoryMeta extends base
                     break;
             }
         }
-
         $this->nullable = strtoupper((string) $field['Null']) === 'YES';
         $this->indexed = !empty($field['Key']);
         $this->default = $field['Default'];
         $this->extra = $field['Extra'];
-
-        $this->nativeType = $this->match_native_type($this->type);
+        $this->native_type = $this->match_native_type($this->type);
         // reasonable to treat tinyint(1) as boolean
         if ($this->type === 'tinyint' && $this->max_length === 1) {
-            $this->nativeType = 'bool';
+            $this->native_type = 'bool';
         }
     }
-
     /**
      * Determine native scalar PHP type which most closely matches the db field type.
      * Basically anything that's not int|float will be treated as string here.
@@ -1115,7 +978,6 @@ class queryFactoryMeta extends base
     protected function match_native_type(string $mysql_field_type): string
     {
         $mysql_field_type = strtoupper($mysql_field_type);
-
         if (preg_match('/(INT|BOOL)/', $mysql_field_type)) {
             return 'int';
         }

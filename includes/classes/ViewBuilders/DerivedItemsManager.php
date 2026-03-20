@@ -1,84 +1,77 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
+namespace Zencart\View_Builders;
 
-namespace Zencart\ViewBuilders;
-
-use Zencart\FileSystem\FileSystem;
-
+use Zencart\File_System\File_System;
 /**
  * @since ZC v1.5.8
  */
-class DerivedItemsManager
+class Derived_Items_Manager
 {
     /**
      * @since ZC v1.5.8
      */
-    public function process(array $tableRow, string $colName, array $columnInfo): string
+    public function process(array $table_row, string $col_name, array $column_info): string
     {
-        if (!isset($columnInfo['derivedItem'])) {
-            return $tableRow[$colName];
+        if (!isset($column_info['derivedItem'])) {
+            return $table_row[$col_name];
         }
-        return $this->processDerivedItem($tableRow, $colName, $columnInfo);
+        return $this->process_derived_item($table_row, $col_name, $column_info);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function processDerivedItem($tableRow, string $colName, array $columnInfo): string
+    protected function process_derived_item($table_row, string $col_name, array $column_info): string
     {
-        $type = $columnInfo['derivedItem']['type'];
+        $type = $column_info['derivedItem']['type'];
         switch ($type) {
             case 'local':
-                return $this->{$columnInfo['derivedItem']['method']}($tableRow, $colName, $columnInfo);
+                return $this->{$column_info['derivedItem']['method']}($table_row, $col_name, $column_info);
             case 'closure':
-                return $columnInfo['derivedItem']['method']($tableRow, $colName, $columnInfo);
+                return $column_info['derivedItem']['method']($table_row, $col_name, $column_info);
         }
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function booleanReplace(array $tableRow, string $colName, array $columnInfo): string
+    protected function boolean_replace(array $table_row, string $col_name, array $column_info): string
     {
-        $params = $columnInfo['derivedItem']['params'];
-        $listValue = $tableRow[$colName];
-        if ($listValue) {
+        $params = $column_info['derivedItem']['params'];
+        $list_value = $table_row[$col_name];
+        if ($list_value) {
             return $params['true'];
         }
         return $params['false'];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function arrayReplace(array $tableRow, string $colName, array $columnInfo): string
+    protected function array_replace(array $table_row, string $col_name, array $column_info): string
     {
-        $params = $columnInfo['derivedItem']['params'];
-        $listValue = $tableRow[$colName];
-        return $params[$listValue];
+        $params = $column_info['derivedItem']['params'];
+        $list_value = $table_row[$col_name];
+        return $params[$list_value];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function getPluginFileSize(array $tableRow, string $colName, array $columnInfo): string
+    protected function get_plugin_file_size(array $table_row, string $col_name, array $column_info): string
     {
-        $filePath = DIR_FS_CATALOG . 'zc_plugins/' . $tableRow['unique_key'] . '/';
-        $fs = new FileSystem();
-        return $fs->getDirectorySize($filePath);
+        $file_path = DIR_FS_CATALOG . 'zc_plugins/' . $table_row['unique_key'] . '/';
+        $fs = new File_System();
+        return $fs->get_directory_size($file_path);
     }
-
     /**
      * @since ZC v2.1.0
      */
-    protected function getLanguageTranslationForName(array $tableRow, string $colName, array $columnInfo): string
+    protected function get_language_translation_for_name(array $table_row, string $col_name, array $column_info): string
     {
-        return zen_lookup_admin_menu_language_override('plugin_name', $tableRow['unique_key'], $tableRow['name']);
+        return zen_lookup_admin_menu_language_override('plugin_name', $table_row['unique_key'], $table_row['name']);
     }
 }

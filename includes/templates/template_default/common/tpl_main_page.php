@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Common Template - tpl_main_page.php
  *
@@ -36,11 +37,9 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: Scott Wilson 2024 Sep 30 Modified in v2.2.0 $
  */
-
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /** bof DESIGNER TESTING ONLY: */
 // $messageStack->add('header', 'this is a sample error message', 'error');
 // $messageStack->add('header', 'this is a sample caution message', 'caution');
@@ -49,7 +48,6 @@ if (!defined('IS_ADMIN_FLAG')) {
 // $messageStack->add('main', 'this is a sample caution message', 'caution');
 // $messageStack->add('main', 'this is a sample success message', 'success');
 /** eof DESIGNER TESTING ONLY */
-
 // the following statements can be modified as needed to set additional flags
 if (in_array($current_page_base, explode(',', 'list_pages_to_skip_all_left_sideboxes_on_here,separated_by_commas,and_no_spaces'))) {
     $flag_disable_left = true;
@@ -57,43 +55,50 @@ if (in_array($current_page_base, explode(',', 'list_pages_to_skip_all_left_sideb
 if (in_array($current_page_base, explode(',', 'list_pages_to_skip_all_right_sideboxes_on_here,separated_by_commas,and_no_spaces'))) {
     $flag_disable_right = true;
 }
-
 $header_template = 'tpl_header.php';
 $footer_template = 'tpl_footer.php';
 $left_column_file = 'column_left.php';
 $right_column_file = 'column_right.php';
-$body_id = ($this_is_home_page) ? 'indexHome' : str_replace('_', '', $_GET['main_page']);
+$body_id = $this_is_home_page ? 'indexHome' : str_replace('_', '', $_GET['main_page']);
 ?>
-<body id="<?php echo $body_id . 'Body'; ?>"<?php if ($zv_onload != '') {
-    echo ' onload="'.$zv_onload.'"';
-} ?> class="<?= 'tpl_' . $template_dir ?>">
-<?php /* add any start-of-body-section code via an observer class */
+<body id="<?php 
+echo $body_id . 'Body';
+?>"<?php 
+if ($zv_onload != '') {
+    echo ' onload="' . $zv_onload . '"';
+}
+?> class="<?php 
+echo 'tpl_' . $template_dir;
+?>">
+<?php 
+/* add any start-of-body-section code via an observer class */
 $zco_notifier->notify('NOTIFY_PAGE_BODY_BEGIN', $current_page);
-?>
-<?php
 if (SHOW_BANNERS_GROUP_SET1 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET1)) {
-    if ($banner->RecordCount() > 0) {
+    if ($banner->record_count() > 0) {
         ?>
-<div id="bannerOne" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
-<?php
+<div id="bannerOne" class="banners"><?php 
+        echo zen_display_banner('static', $banner);
+        ?></div>
+<?php 
     }
 }
 ?>
 
 <div id="mainWrapper">
-<?php
- /**
-  * prepares and displays header output
-  *
-  */
-  if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_HEADER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in())) {
-      $flag_disable_header = true;
-  }
-require($template->get_template_dir('tpl_header.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_header.php');?>
+<?php 
+/**
+ * prepares and displays header output
+ *
+ */
+if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_HEADER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in())) {
+    $flag_disable_header = true;
+}
+require $template->get_template_dir('tpl_header.php', DIR_WS_TEMPLATE, $current_page_base, 'common') . '/tpl_header.php';
+?>
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" id="contentMainWrapper">
   <tr>
-<?php
+<?php 
 if (COLUMN_LEFT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in()) || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_LEFT_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in()))) {
     // global disable of column_left
     $flag_disable_left = true;
@@ -101,64 +106,84 @@ if (COLUMN_LEFT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in(
 if (!isset($flag_disable_left) || !$flag_disable_left) {
     ?>
 
- <td id="navColumnOne" class="columnLeft" style="width: <?php echo (int)COLUMN_WIDTH_LEFT; ?>px">
-<?php
-     /**
-      * prepares and displays left column sideboxes
-      *
-      */
+ <td id="navColumnOne" class="columnLeft" style="width: <?php 
+    echo (int) COLUMN_WIDTH_LEFT;
+    ?>px">
+<?php 
+    /**
+     * prepares and displays left column sideboxes
+     *
+     */
     ?>
-<div id="navColumnOneWrapper" style="width: <?php echo (int)BOX_WIDTH_LEFT; ?>px"><?php require(DIR_WS_MODULES . zen_get_module_directory('column_left.php')); ?></div>
+<div id="navColumnOneWrapper" style="width: <?php 
+    echo (int) BOX_WIDTH_LEFT;
+    ?>px"><?php 
+    require DIR_WS_MODULES . zen_get_module_directory('column_left.php');
+    ?></div>
 </td>
-<?php
+<?php 
 }
 ?>
     <td valign="top">
 <!-- bof  breadcrumb -->
-<?php if (DEFINE_BREADCRUMB_STATUS == '1' || (DEFINE_BREADCRUMB_STATUS == '2' && !$this_is_home_page)) { ?>
-    <div id="navBreadCrumb"><?php echo $breadcrumb->trail(BREAD_CRUMBS_SEPARATOR); ?></div>
-<?php } ?>
+<?php 
+if (DEFINE_BREADCRUMB_STATUS == '1' || DEFINE_BREADCRUMB_STATUS == '2' && !$this_is_home_page) {
+    ?>
+    <div id="navBreadCrumb"><?php 
+    echo $breadcrumb->trail(BREAD_CRUMBS_SEPARATOR);
+    ?></div>
+<?php 
+}
+?>
 <!-- eof breadcrumb -->
 
-<?php
-  if (SHOW_BANNERS_GROUP_SET3 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET3)) {
-      if ($banner->RecordCount() > 0) {
-          ?>
-<div id="bannerThree" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
-<?php
-      }
-  }
+<?php 
+if (SHOW_BANNERS_GROUP_SET3 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET3)) {
+    if ($banner->record_count() > 0) {
+        ?>
+<div id="bannerThree" class="banners"><?php 
+        echo zen_display_banner('static', $banner);
+        ?></div>
+<?php 
+    }
+}
 ?>
 
 <!-- bof upload alerts -->
-<?php if ($messageStack->size('upload') > 0) {
-    echo $messageStack->output('upload');
-} ?>
+<?php 
+if ($message_stack->size('upload') > 0) {
+    echo $message_stack->output('upload');
+}
+?>
 <!-- eof upload alerts -->
-<?php if ($messageStack->size('main_content') > 0) {
-    echo $messageStack->output('main_content');
-} ?>
-
-<?php
- /**
-  * prepares and displays center column
-  *
-  */
- require($body_code);
+<?php 
+if ($message_stack->size('main_content') > 0) {
+    echo $message_stack->output('main_content');
+}
 ?>
 
-<?php
-  if (SHOW_BANNERS_GROUP_SET4 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET4)) {
-      if ($banner->RecordCount() > 0) {
-          ?>
-<div id="bannerFour" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
-<?php
-      }
-  }
+<?php 
+/**
+ * prepares and displays center column
+ *
+ */
+require $body_code;
+?>
+
+<?php 
+if (SHOW_BANNERS_GROUP_SET4 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET4)) {
+    if ($banner->record_count() > 0) {
+        ?>
+<div id="bannerFour" class="banners"><?php 
+        echo zen_display_banner('static', $banner);
+        ?></div>
+<?php 
+    }
+}
 ?>
     </td>
 
-<?php
+<?php 
 //if (COLUMN_RIGHT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and $_SESSION['customer_id'] == '') || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF == 'true' && $_SESSION['customers_authorization'] != 0)) {
 if (COLUMN_RIGHT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in()) || (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or !zen_is_logged_in()))) {
     // global disable of column_right
@@ -166,46 +191,55 @@ if (COLUMN_RIGHT_STATUS == 0 || (CUSTOMERS_APPROVAL == '1' and !zen_is_logged_in
 }
 if (!isset($flag_disable_right) || !$flag_disable_right) {
     ?>
-<td id="navColumnTwo" class="columnRight" style="width: <?php echo (int)COLUMN_WIDTH_RIGHT; ?>px">
-<?php
-     /**
-      * prepares and displays right column sideboxes
-      *
-      */
+<td id="navColumnTwo" class="columnRight" style="width: <?php 
+    echo (int) COLUMN_WIDTH_RIGHT;
+    ?>px">
+<?php 
+    /**
+     * prepares and displays right column sideboxes
+     *
+     */
     ?>
-<div id="navColumnTwoWrapper" style="width: <?php echo (int)BOX_WIDTH_RIGHT; ?>px"><?php require(DIR_WS_MODULES . zen_get_module_directory('column_right.php')); ?></div>
+<div id="navColumnTwoWrapper" style="width: <?php 
+    echo (int) BOX_WIDTH_RIGHT;
+    ?>px"><?php 
+    require DIR_WS_MODULES . zen_get_module_directory('column_right.php');
+    ?></div>
 </td>
-<?php
+<?php 
 }
 ?>
   </tr>
 </table>
 
-<?php
- /**
-  * prepares and displays footer output
-  *
-  */
-  if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_FOOTER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or $_SESSION['customer_id'] == '')) {
-      $flag_disable_footer = true;
-  }
-require($template->get_template_dir('tpl_footer.php', DIR_WS_TEMPLATE, $current_page_base, 'common'). '/tpl_footer.php');
+<?php 
+/**
+ * prepares and displays footer output
+ *
+ */
+if (CUSTOMERS_APPROVAL_AUTHORIZATION == 1 && CUSTOMERS_AUTHORIZATION_FOOTER_OFF == 'true' and ($_SESSION['customers_authorization'] != 0 or $_SESSION['customer_id'] == '')) {
+    $flag_disable_footer = true;
+}
+require $template->get_template_dir('tpl_footer.php', DIR_WS_TEMPLATE, $current_page_base, 'common') . '/tpl_footer.php';
 ?>
 
 </div>
 <!--bof- banner #6 display -->
-<?php
-  if (SHOW_BANNERS_GROUP_SET6 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET6)) {
-      if ($banner->RecordCount() > 0) {
-          ?>
-<div id="bannerSix" class="banners"><?php echo zen_display_banner('static', $banner); ?></div>
-<?php
-      }
-  }
+<?php 
+if (SHOW_BANNERS_GROUP_SET6 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET6)) {
+    if ($banner->record_count() > 0) {
+        ?>
+<div id="bannerSix" class="banners"><?php 
+        echo zen_display_banner('static', $banner);
+        ?></div>
+<?php 
+    }
+}
 ?>
 <!--eof- banner #6 display -->
 
-<?php /* add any end-of-page code via an observer class */
-  $zco_notifier->notify('NOTIFY_FOOTER_END', $current_page);
+<?php 
+/* add any end-of-page code via an observer class */
+$zco_notifier->notify('NOTIFY_FOOTER_END', $current_page);
 ?>
 </body>

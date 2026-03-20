@@ -1,57 +1,42 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Module;
 
-namespace BaconQrCode\Renderer\Module;
-
-use BaconQrCode\Encoder\ByteMatrix;
-use BaconQrCode\Exception\InvalidArgumentException;
-use BaconQrCode\Renderer\Path\Path;
-
+use Bacon_Qr_Code\Encoder\Byte_Matrix;
+use Bacon_Qr_Code\Exception\InvalidArgumentException;
+use Bacon_Qr_Code\Renderer\Path\Path;
 /**
  * Renders individual modules as dots.
  */
-final readonly class DotsModule implements ModuleInterface
+final readonly class Dots_Module implements Module_Interface
 {
     public const LARGE = 1;
-    public const MEDIUM = .8;
-    public const SMALL = .6;
-
+    public const MEDIUM = 0.8;
+    public const SMALL = 0.6;
     public function __construct(private float $size)
     {
         if ($size <= 0 || $size > 1) {
             throw new InvalidArgumentException('Size must between 0 (exclusive) and 1 (inclusive)');
         }
     }
-
-    public function createPath(ByteMatrix $matrix): Path
+    public function create_path(Byte_Matrix $matrix): Path
     {
-        $width = $matrix->getWidth();
-        $height = $matrix->getHeight();
+        $width = $matrix->get_width();
+        $height = $matrix->get_height();
         $path = new Path();
-        $halfSize = $this->size / 2;
+        $half_size = $this->size / 2;
         $margin = (1 - $this->size) / 2;
-
         for ($y = 0; $y < $height; ++$y) {
             for ($x = 0; $x < $width; ++$x) {
-                if (! $matrix->get($x, $y)) {
+                if (!$matrix->get($x, $y)) {
                     continue;
                 }
-
-                $pathX = $x + $margin;
-                $pathY = $y + $margin;
-
-                $path = $path
-                    ->move($pathX + $this->size, $pathY + $halfSize)
-                    ->ellipticArc($halfSize, $halfSize, 0, false, true, $pathX + $halfSize, $pathY + $this->size)
-                    ->ellipticArc($halfSize, $halfSize, 0, false, true, $pathX, $pathY + $halfSize)
-                    ->ellipticArc($halfSize, $halfSize, 0, false, true, $pathX + $halfSize, $pathY)
-                    ->ellipticArc($halfSize, $halfSize, 0, false, true, $pathX + $this->size, $pathY + $halfSize)
-                    ->close()
-                ;
+                $path_x = $x + $margin;
+                $path_y = $y + $margin;
+                $path = $path->move($path_x + $this->size, $path_y + $half_size)->elliptic_arc($half_size, $half_size, 0, false, true, $path_x + $half_size, $path_y + $this->size)->elliptic_arc($half_size, $half_size, 0, false, true, $path_x, $path_y + $half_size)->elliptic_arc($half_size, $half_size, 0, false, true, $path_x + $half_size, $path_y)->elliptic_arc($half_size, $half_size, 0, false, true, $path_x + $this->size, $path_y + $half_size)->close();
             }
         }
-
         return $path;
     }
 }

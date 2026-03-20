@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * counter.php
  *
@@ -10,23 +10,14 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Oct 06 Modified in v2.2.0 $
  * @private
  */
-
 /**
  * This module is used to count the number of visitors to the site.
  * And should only increment for customer-initiated traffic, and only once per session.
  * Therefore it excludes ajax calls and webhooks, etc. And doesn't get called from admin.
  */
-if ($loaderPrefix !== 'config'
-    || !class_exists('zcDate')
-    || !empty($spider_flag)
-    || !defined('IS_ADMIN_FLAG')
-    || function_exists('ajaxAbort')
-    || defined('IS_AJAX_REQUEST')
-    || defined('IS_WEBHOOK_REQUEST')
-) {
+if ($loader_prefix !== 'config' || !class_exists('zcDate') || !empty($spider_flag) || !defined('IS_ADMIN_FLAG') || function_exists('ajaxAbort') || defined('IS_AJAX_REQUEST') || defined('IS_WEBHOOK_REQUEST')) {
     return;
 }
-
 if (isset($_SESSION['session_counter']) && $_SESSION['session_counter'] == true) {
     $session_counter = 0;
 } else {
@@ -38,20 +29,18 @@ $counter_query = 'select startdate, counter, session_counter from ' . TABLE_COUN
 $counter = $db->Execute($counter_query);
 $sql = 'INSERT IGNORE INTO ' . TABLE_COUNTER_HISTORY . " (startdate, counter, session_counter) values ('" . $date_now . "', '1', '1')";
 $db->Execute($sql);
-$sql = 'SELECT * FROM '  . TABLE_COUNTER_HISTORY . " WHERE startdate = '" .  $date_now . "' AND counter = 1 AND session_counter = 1 LIMIT 1";
+$sql = 'SELECT * FROM ' . TABLE_COUNTER_HISTORY . " WHERE startdate = '" . $date_now . "' AND counter = 1 AND session_counter = 1 LIMIT 1";
 $result = $db->execute($sql);
-if ($result->recordCount() <= 0 || $counter->RecordCount() > 0) {
+if ($result->record_count() <= 0 || $counter->record_count() > 0) {
     $counter_startdate = $counter->fields['startdate'];
-    $counter_now = ($counter->fields['counter'] + 1);
-    $session_counter_now = ($counter->fields['session_counter'] + $session_counter);
+    $counter_now = $counter->fields['counter'] + 1;
+    $session_counter_now = $counter->fields['session_counter'] + $session_counter;
     $sql = 'update ' . TABLE_COUNTER_HISTORY . " set counter = '" . $counter_now . "', session_counter ='" . $session_counter_now . "' where startdate='" . $date_now . "'";
-
     $db->Execute($sql);
 }
-
 $counter_query = 'select startdate, counter from ' . TABLE_COUNTER;
 $counter = $db->Execute($counter_query);
-if ($counter->RecordCount() <= 0) {
+if ($counter->record_count() <= 0) {
     $date_now = date('Ymd');
     $sql = 'insert into ' . TABLE_COUNTER . " (startdate, counter) values ('" . $date_now . "', '1')";
     $db->Execute($sql);
@@ -59,9 +48,8 @@ if ($counter->RecordCount() <= 0) {
     $counter_now = 1;
 } else {
     $counter_startdate = $counter->fields['startdate'];
-    $counter_now = ($counter->fields['counter'] + 1);
+    $counter_now = $counter->fields['counter'] + 1;
     $sql = 'update ' . TABLE_COUNTER . " set counter = '" . $counter_now . "'";
     $db->Execute($sql);
 }
-
-$counter_startdate_formatted = $zcDate->output(DATE_FORMAT_LONG, mktime(0, 0, 0, substr((string) $counter_startdate, 4, 2), substr((string) $counter_startdate, -2), substr((string) $counter_startdate, 0, 4)));
+$counter_startdate_formatted = $zc_date->output(DATE_FORMAT_LONG, mktime(0, 0, 0, substr((string) $counter_startdate, 4, 2), substr((string) $counter_startdate, -2), substr((string) $counter_startdate, 0, 4)));

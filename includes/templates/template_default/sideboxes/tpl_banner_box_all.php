@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Side Box Template
  *
@@ -10,27 +10,23 @@ declare(strict_types=1);
  * @version $Id: Scott Wilson 2024 Sep 30 Modified in v2.2.0 $
  */
 $content = '';
-
 // select banners_group to be used
 $new_banner_search = zen_build_banners_group(SHOW_BANNERS_GROUP_SET_ALL);
-
 $my_banner_filter = '';
-
 $sql = 'select banners_id from ' . TABLE_BANNERS . ' where status = 1 ' . $new_banner_search . $my_banner_filter . ' order by banners_sort_order';
 $banners_all = $db->Execute($sql);
-
 // if no active banner in the specified banner group then the box will not show
-if ($banners_all->RecordCount() > 0) {
+if ($banners_all->record_count() > 0) {
     $content .= '<div id="' . str_replace('_', '-', $box_id . 'Content') . '" class="sideBoxContent centeredContent">';
     $banner_cnt = 0;
     while (!$banners_all->EOF) {
         $banner_cnt++;
         $content .= zen_display_banner('static', $banners_all->fields['banners_id']);
         // add spacing between banners
-        if ($banner_cnt < $banners_all->RecordCount()) {
+        if ($banner_cnt < $banners_all->record_count()) {
             $content .= '<br><br>';
         }
-        $banners_all->MoveNext();
+        $banners_all->move_next();
     }
     $content .= '</div>';
 }

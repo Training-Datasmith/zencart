@@ -1,17 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: lat9 2025 Oct 01 Modified in v2.2.0 $
  */
-
 /**
  * @since ZC v1.0.3
  */
-class flat extends ZenShipping
+class flat extends Zen_Shipping
 {
     public function __construct()
     {
@@ -22,21 +21,17 @@ class flat extends ZenShipping
         if (null === $this->sort_order) {
             return;
         }
-
         $this->icon = '';
         $this->tax_class = MODULE_SHIPPING_FLAT_TAX_CLASS;
         $this->tax_basis = MODULE_SHIPPING_FLAT_TAX_BASIS;
-
         // disable only when entire cart is free shipping
         if (zen_get_shipping_enabled($this->code)) {
-            $this->enabled = (MODULE_SHIPPING_FLAT_STATUS == 'True');
+            $this->enabled = MODULE_SHIPPING_FLAT_STATUS == 'True';
         } else {
             $this->enabled = false;
         }
-
         $this->update_status();
     }
-
     /**
      * Perform various checks to see whether this module should be visible
      * @since ZC v1.5.7a
@@ -46,9 +41,7 @@ class flat extends ZenShipping
         if ($this->enabled === false || IS_ADMIN_FLAG === true) {
             return;
         }
-
-        $this->checkEnabledForZone(MODULE_SHIPPING_FLAT_ZONE);
-
+        $this->check_enabled_for_zone(MODULE_SHIPPING_FLAT_ZONE);
         if ($this->enabled) {
             // -----
             // Give a watching observer the opportunity to disable the overall shipping module.
@@ -56,36 +49,21 @@ class flat extends ZenShipping
             $this->notify('NOTIFY_SHIPPING_FLAT_UPDATE_STATUS', [], $this->enabled);
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function quote($method = ''): array
     {
         global $order;
-
-        $this->quotes = [
-            'id' => $this->code,
-            'module' => MODULE_SHIPPING_FLAT_TEXT_TITLE,
-            'methods' => [
-                [
-                    'id' => $this->code,
-                    'title' => MODULE_SHIPPING_FLAT_TEXT_WAY,
-                    'cost' => MODULE_SHIPPING_FLAT_COST,
-                ],
-            ],
-        ];
+        $this->quotes = ['id' => $this->code, 'module' => MODULE_SHIPPING_FLAT_TEXT_TITLE, 'methods' => [['id' => $this->code, 'title' => MODULE_SHIPPING_FLAT_TEXT_WAY, 'cost' => MODULE_SHIPPING_FLAT_COST]]];
         if ($this->tax_class > 0) {
             $this->quotes['tax'] = zen_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
         }
-
         if (!empty($this->icon)) {
             $this->quotes['icon'] = zen_image($this->icon, $this->title);
         }
-
         return $this->quotes;
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -94,25 +72,23 @@ class flat extends ZenShipping
         global $db;
         if (!isset($this->_check)) {
             $check_query = $db->Execute('select configuration_value from ' . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_SHIPPING_FLAT_STATUS'");
-            $this->_check = $check_query->RecordCount();
+            $this->_check = $check_query->record_count();
         }
         return $this->_check;
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function install(): void
     {
         global $db;
-        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Flat Shipping', 'MODULE_SHIPPING_FLAT_STATUS', 'True', 'Do you want to offer flat rate shipping?', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Flat Shipping', 'MODULE_SHIPPING_FLAT_STATUS', 'True', 'Do you want to offer flat rate shipping?', '6', '0', 'zen_cfg_select_option(array(\\'True\\', \\'False\\'), ', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, val_function, date_added) values ('Shipping Cost', 'MODULE_SHIPPING_FLAT_COST', '5.00', 'The shipping cost for all orders using this shipping method.', '6', '0', '" . '{"error":"TEXT_POSITIVE_FLOAT","id":"FILTER_VALIDATE_FLOAT","options":{"options":{"min_range":0}}}' . "', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_SHIPPING_FLAT_TAX_CLASS', '0', 'Use the following tax class on the shipping fee.', '6', '0', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
-        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_FLAT_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br>Shipping - Based on customers Shipping Address<br>Billing Based on customers Billing address<br>Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\'Shipping\', \'Billing\', \'Store\'), ', now())");
+        $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_FLAT_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br>Shipping - Based on customers Shipping Address<br>Billing Based on customers Billing address<br>Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\\'Shipping\\', \\'Billing\\', \\'Store\\'), ', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Shipping Zone', 'MODULE_SHIPPING_FLAT_ZONE', '0', 'If a zone is selected, only enable this shipping method for that zone.', '6', '0', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
         $db->Execute('insert into ' . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_SHIPPING_FLAT_SORT_ORDER', '0', 'Sort order of display.', '6', '0', now())");
     }
-
     /**
      * @since ZC v1.0.3
      */

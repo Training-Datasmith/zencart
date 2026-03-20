@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * column_single module
  *
@@ -18,17 +18,18 @@ $column_single_display = $db->Execute('SELECT layout_box_name FROM ' . TABLE_LAY
 // safety row stop
 $box_cnt = 0;
 if (defined('BOX_WIDTH_SINGLE')) {
-    $column_width = (int)BOX_WIDTH_SINGLE;
+    $column_width = (int) BOX_WIDTH_SINGLE;
 } else {
-    $column_width = (int)BOX_WIDTH_LEFT;
+    $column_width = (int) BOX_WIDTH_LEFT;
 }
 while (!$column_single_display->EOF and $box_cnt < 100) {
     $box_cnt++;
     $box_file = DIR_WS_MODULES . zen_get_module_sidebox_directory($column_single_display->fields['layout_box_name']);
     if (file_exists($box_file)) {
         $box_id = zen_get_box_id($column_single_display->fields['layout_box_name']);
-        require($box_file);
+        require $box_file;
     }
-    $column_single_display->MoveNext();
-} // while column_single
+    $column_single_display->move_next();
+}
+// while column_single
 $box_id = '';

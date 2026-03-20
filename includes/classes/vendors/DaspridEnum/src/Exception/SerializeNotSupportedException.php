@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
-namespace DASPRiD\Enum\Exception;
+declare (strict_types=1);
+namespace Dasp_Ri_D\Enum\Exception;
 
 use Exception;
-
-final class SerializeNotSupportedException extends Exception implements ExceptionInterface
+final class Serialize_Not_Supported_Exception extends Exception implements Exception_Interface
 {
 }

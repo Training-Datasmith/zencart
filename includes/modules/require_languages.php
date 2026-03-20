@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * loads template- and page-specific language override files
  *
@@ -11,6 +11,5 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
-$languageLoader->setCurrentPage($current_page);
-$languageLoader->loadLanguageForView();
+$language_loader->set_current_page($current_page);
+$language_loader->load_language_for_view();

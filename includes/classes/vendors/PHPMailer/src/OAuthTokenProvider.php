@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * PHPMailer - PHP email creation and transport class.
  * PHP Version 5.5.
@@ -20,8 +19,7 @@ declare(strict_types=1);
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-namespace PHPMailer\PHPMailer;
+namespace Php_Mailer\Php_Mailer;
 
 /**
  * OAuthTokenProvider - OAuth2 token provider interface.
@@ -33,7 +31,7 @@ namespace PHPMailer\PHPMailer;
  * @author  Peter Scopes (pdscopes)
  * @author  Marcus Bointon (Synchro/coolbru) <phpmailer@synchromedia.co.uk>
  */
-interface OAuthTokenProvider
+interface O_Auth_Token_Provider
 {
     /**
      * Generate a base64-encoded OAuth token ensuring that the access token has not expired.
@@ -42,5 +40,5 @@ interface OAuthTokenProvider
      *
      * @return string
      */
-    public function getOauth64();
+    public function get_oauth64();
 }

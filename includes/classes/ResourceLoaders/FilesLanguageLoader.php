@@ -1,69 +1,63 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  *
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 29 Modified in v2.2.0 $
  */
-
-namespace Zencart\LanguageLoader;
+namespace Zencart\Language_Loader;
 
 /**
  * @since ZC v1.5.8
  */
-class FilesLanguageLoader extends BaseLanguageLoader
+class Files_Language_Loader extends Base_Language_Loader
 {
-    protected $mainLoader;
-
+    protected $main_loader;
     /**
      * @since ZC v1.5.8
      */
-    public function loadExtraLanguageFiles(string $rootPath, string $language, string $fileName, string $extraPath = ''): void
+    public function load_extra_language_files(string $root_path, string $language, string $file_name, string $extra_path = ''): void
     {
-        if ($this->mainLoader->hasLanguageFile($rootPath, $language, $fileName, $extraPath .  '/' . $this->templateDir)) {
-            $this->loadFileDefineFile($rootPath . $language . $extraPath . '/' . $this->templateDir . '/' . $fileName);
+        if ($this->main_loader->has_language_file($root_path, $language, $file_name, $extra_path . '/' . $this->template_dir)) {
+            $this->load_file_define_file($root_path . $language . $extra_path . '/' . $this->template_dir . '/' . $file_name);
         } else {
-            $this->loadFileDefineFile($rootPath . $language . $extraPath . '/' . $fileName);
+            $this->load_file_define_file($root_path . $language . $extra_path . '/' . $file_name);
         }
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function loadModuleLanguageFile(string $fileName, string $module_type): bool
+    public function load_module_language_file(string $file_name, string $module_type): bool
     {
-        $rootPath = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'];
+        $root_path = DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'];
         if ($module_type !== '') {
             $module_type .= '/';
         }
-        $extraPath = '/modules/' . $module_type;
-
-        if ($this->loadFileDefineFile($rootPath . $extraPath . $this->templateDir . '/' . $fileName) === true) {
+        $extra_path = '/modules/' . $module_type;
+        if ($this->load_file_define_file($root_path . $extra_path . $this->template_dir . '/' . $file_name) === true) {
             return true;
         }
-
-        return $this->loadFileDefineFile($rootPath . $extraPath . $fileName);
+        return $this->load_file_define_file($root_path . $extra_path . $file_name);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function loadFileDefineFile(string $defineFile): bool
+    protected function load_file_define_file(string $define_file): bool
     {
-        $pathInfo = pathinfo(($defineFile));
-        if (preg_match('~^lang\.~i', $pathInfo['basename'])) {
+        $path_info = pathinfo($define_file);
+        if (preg_match('~^lang\.~i', $path_info['basename'])) {
             return false;
         }
-        if (!is_file($defineFile)) {
+        if (!is_file($define_file)) {
             return false;
         }
-        if ($this->mainLoader->isFileAlreadyLoaded($defineFile)) {
+        if ($this->main_loader->is_file_already_loaded($define_file)) {
             return false;
         }
-        $this->mainLoader->addLanguageFilesLoaded('legacy', $defineFile);
-        include_once $defineFile;
+        $this->main_loader->add_language_files_loaded('legacy', $define_file);
+        include_once $define_file;
         return true;
     }
 }

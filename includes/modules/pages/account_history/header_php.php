@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Header code file for the Account History page
  *
@@ -11,20 +11,16 @@ declare(strict_types=1);
  */
 // This should be first line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_START_ACCOUNT_HISTORY');
-
 if (!zen_is_logged_in() && !zen_in_guest_checkout()) {
     $_SESSION['navigation']->set_snapshot();
     zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
-
 require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
 $breadcrumb->add(NAVBAR_TITLE_1, zen_href_link(FILENAME_ACCOUNT, '', 'SSL'));
 $breadcrumb->add(NAVBAR_TITLE_2);
-
 $history_split = [];
 $customer = new Customer();
-$accountHistory = $customer->getOrderHistory(MAX_DISPLAY_ORDER_HISTORY, $history_split);
-$accountHasHistory = !empty($accountHistory);
-
+$account_history = $customer->get_order_history(MAX_DISPLAY_ORDER_HISTORY, $history_split);
+$account_has_history = !empty($account_history);
 // This should be last line of the script:
 $zco_notifier->notify('NOTIFY_HEADER_END_ACCOUNT_HISTORY');

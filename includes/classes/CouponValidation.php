@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  * @since ZC v2.0.0
  */
-
-class CouponValidation
+class Coupon_Validation
 {
     /**
      * Check whether the product is valid for the specified coupon, according to model/category/product restrictions assigned to the coupon
@@ -18,33 +17,25 @@ class CouponValidation
     {
         global $db;
         global $zco_notifier;
-
         $coupons_query = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . '
                           WHERE coupon_id = ' . $coupon_id . '
                           ORDER BY coupon_restrict ASC';
-
         $coupons = $db->Execute($coupons_query);
-
-        $product_query = 'SELECT * FROM ' . TABLE_PRODUCTS . "
-                          WHERE products_id = $product_id";
-
+        $product_query = 'SELECT * FROM ' . TABLE_PRODUCTS . "\n                          WHERE products_id = {$product_id}";
         $product = $db->Execute($product_query);
-
         if (str_starts_with($product->fields['products_model'] ?? '', 'GIFT')) {
             return false;
         }
-
         $product_can_use_coupon = true;
         $zco_notifier->notify('NOTIFY_COUPON_ADDITIONAL_CHECKS', $product->fields, $coupon_id, $product_can_use_coupon);
         if ($product_can_use_coupon === false) {
             return false;
         }
-
         // modified to manage restrictions better - leave commented for now
-        if ($coupons->RecordCount() === 0) {
+        if ($coupons->record_count() === 0) {
             return true;
         }
-        if ($coupons->RecordCount() === 1) {
+        if ($coupons->record_count() === 1) {
             // If product is restricted(deny) and is same as tested product deny
             if ($coupons->fields['product_id'] > 0 && $coupons->fields['product_id'] == $product_id && $coupons->fields['coupon_restrict'] === 'Y') {
                 return false;
@@ -63,7 +54,6 @@ class CouponValidation
             }
             return true;
         }
-
         $allow_for_category = self::validate_for_category($product_id, $coupon_id);
         $allow_for_product = self::validate_for_product($product_id, $coupon_id);
         //    echo '#'.$product_id . '#' . $allow_for_category;
@@ -101,9 +91,9 @@ class CouponValidation
                 return false;
             }
         }
-        return false; //should never get here
+        return false;
+        //should never get here
     }
-
     /**
      * Check whether the product is assigned to a category which is allowed for the coupon ID
      * @since ZC v2.0.0
@@ -111,20 +101,17 @@ class CouponValidation
     public static function validate_for_category(int $product_id, int $coupon_id): bool|string
     {
         global $db;
-        $productCatPath = zen_get_product_path($product_id);
-        $catPathArray = array_reverse(explode('_', $productCatPath));
+        $product_cat_path = zen_get_product_path($product_id);
+        $cat_path_array = array_reverse(explode('_', $product_cat_path));
         $sql = 'SELECT count(*) AS total
-                FROM ' . TABLE_COUPON_RESTRICT . "
-                WHERE category_id = -1
-                AND coupon_restrict = 'Y'
-                AND coupon_id = " . $coupon_id;
-        $checkQuery = $db->Execute($sql, 1);
-        foreach ($catPathArray as $catPath) {
+                FROM ' . TABLE_COUPON_RESTRICT . "\n                WHERE category_id = -1\n                AND coupon_restrict = 'Y'\n                AND coupon_id = " . $coupon_id;
+        $check_query = $db->Execute($sql, 1);
+        foreach ($cat_path_array as $cat_path) {
             $sql = 'SELECT * FROM ' . TABLE_COUPON_RESTRICT . '
-                    WHERE category_id = ' . (int)$catPath . '
+                    WHERE category_id = ' . (int) $cat_path . '
                     AND coupon_id = ' . $coupon_id;
             $result = $db->Execute($sql, 1);
-            if ($result->RecordCount()) {
+            if ($result->record_count()) {
                 if ($result->fields['coupon_restrict'] === 'N') {
                     return true;
                 }
@@ -133,13 +120,11 @@ class CouponValidation
                 }
             }
         }
-        if ($checkQuery->fields['total'] > 0) {
+        if ($check_query->fields['total'] > 0) {
             return false;
         }
-
         return 'none';
     }
-
     /**
      * is coupon valid for specials and sales
      * @since ZC v2.0.0
@@ -150,18 +135,14 @@ class CouponValidation
         $sql = 'SELECT coupon_id, coupon_is_valid_for_sales
                 FROM ' . TABLE_COUPONS . '
                 WHERE coupon_id = ' . $coupon_id;
-
         $result = $db->Execute($sql);
-
         if ($result->EOF) {
             return false;
         }
-
         // check whether coupon has been flagged for not valid with sales
         if (!empty($result->fields['coupon_is_valid_for_sales'])) {
             return true;
         }
-
         // check for any special on $product_id
         $chk_product_on_sale = zen_get_products_special_price($product_id, true);
         if (!$chk_product_on_sale) {
@@ -171,9 +152,9 @@ class CouponValidation
         if ($chk_product_on_sale) {
             return false;
         }
-        return true; // is on special or sale
+        return true;
+        // is on special or sale
     }
-
     /**
      * Check whether coupon ID is valid for the specified product
      * @since ZC v2.0.0
@@ -185,7 +166,7 @@ class CouponValidation
                 WHERE product_id = ' . $product_id . '
                 AND coupon_id = ' . $coupon_id . ' LIMIT 1';
         $result = $db->Execute($sql);
-        if ($result->RecordCount()) {
+        if ($result->record_count()) {
             if ($result->fields['coupon_restrict'] === 'N') {
                 return true;
             }
@@ -195,7 +176,6 @@ class CouponValidation
         }
         return 'none';
     }
-
     /**
      * Check if a referrer is already assigned to a coupon.
      * Because only one coupon can be active at a time, we can only support
@@ -213,13 +193,11 @@ class CouponValidation
                 FROM ' . TABLE_COUPONS . ' c
                 LEFT JOIN ' . TABLE_COUPON_REFERRERS . ' r ON (c.coupon_id = r.coupon_id)
                 WHERE referrer_domain = :referrer';
-        $sql = $db->bindVars($sql, ':referrer', $referrer, 'string');
+        $sql = $db->bind_vars($sql, ':referrer', $referrer, 'string');
         if (!empty($exclude_coupon_id)) {
-            $sql .= " AND c.coupon_id <> $exclude_coupon_id";
+            $sql .= " AND c.coupon_id <> {$exclude_coupon_id}";
         }
-
         $result = $db->Execute($sql);
-
-        return $result->RecordCount() !== 0 ? $result->fields : null;
+        return $result->record_count() !== 0 ? $result->fields : null;
     }
 }

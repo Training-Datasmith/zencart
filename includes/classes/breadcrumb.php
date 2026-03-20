@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * breadcrumb Class.
  *
@@ -12,7 +12,6 @@ declare(strict_types=1);
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * The following switch simply checks to see if the setting is already defined, and if not, sets it to true
  * If you desire to have the older behaviour of having all product and category items in the breadcrumb be shown as links
@@ -21,7 +20,6 @@ if (!defined('IS_ADMIN_FLAG')) {
 if (!defined('DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM')) {
     define('DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM', 'true');
 }
-
 /**
  * Handle page breadcrumbs
  * @since ZC v1.0.3
@@ -29,12 +27,10 @@ if (!defined('DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM')) {
 class breadcrumb extends base
 {
     protected $_trail = [];
-
     public function __construct()
     {
         $this->reset();
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -42,7 +38,6 @@ class breadcrumb extends base
     {
         $this->_trail = [];
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -50,18 +45,16 @@ class breadcrumb extends base
     {
         $this->_trail[] = ['title' => $title, 'link' => $link];
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function trail(string $separator = '&nbsp;&nbsp;', string $prefix = '', string $suffix = ''): string
     {
         $trail_string = '';
-
         for ($i = 0, $n = count($this->_trail); $i < $n; $i++) {
             // echo 'breadcrumb ' . $i . ' of ' . $n . ': ' . $this->_trail[$i]['title'] . '<br>';
             $skip_link = false;
-            if ($i == ($n - 1) && DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM == 'true') {
+            if ($i == $n - 1 && DISABLE_BREADCRUMB_LINKS_ON_LAST_ITEM == 'true') {
                 $skip_link = true;
             }
             if (!empty($this->_trail[$i]['link']) && !$skip_link) {
@@ -71,21 +64,16 @@ class breadcrumb extends base
                 } else {
                     $trail_string .= '  ' . $prefix . '<a href="' . $this->_trail[$i]['link'] . '">' . $this->_trail[$i]['title'] . '</a>' . $suffix;
                 }
-            } else {
-                if (isset($this->_trail[$i]['title'])) {
-                    $trail_string .= $prefix . $this->_trail[$i]['title'] . $suffix;
-                }
+            } else if (isset($this->_trail[$i]['title'])) {
+                $trail_string .= $prefix . $this->_trail[$i]['title'] . $suffix;
             }
-
-            if (($i + 1) < $n) {
+            if ($i + 1 < $n) {
                 $trail_string .= $separator;
             }
             $trail_string .= "\n";
         }
-
         return $trail_string;
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -94,25 +82,22 @@ class breadcrumb extends base
         $trail_size = count($this->_trail);
         return $this->_trail[$trail_size - 1]['title'];
     }
-
     /**
      * @since ZC v1.5.7c
      */
-    public function removeLast(): void
+    public function remove_last(): void
     {
         $trail_size = count($this->_trail);
         unset($this->_trail[$trail_size - 1]);
     }
-
     /**
      * @since ZC v1.5.7c
      */
-    public function replaceLast($title = null, $link = null)
+    public function replace_last($title = null, $link = null)
     {
         if ($title === null && $link === null) {
-            return $this->removeLast();
+            return $this->remove_last();
         }
-
         $trail_size = count($this->_trail);
         if ($title !== null) {
             $this->_trail[$trail_size - 1]['title'] = $title;
@@ -121,15 +106,13 @@ class breadcrumb extends base
             $this->_trail[$trail_size - 1]['link'] = $link;
         }
     }
-
     /**
      * @since ZC v1.5.7
      */
-    public function isEmpty(): bool
+    public function is_empty(): bool
     {
         return empty($this->_trail);
     }
-
     /**
      * @since ZC v1.5.7
      */
@@ -140,7 +123,7 @@ class breadcrumb extends base
     /**
      * @since ZC v1.5.8a
      */
-    public function getTrail()
+    public function get_trail()
     {
         return $this->_trail;
     }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * File contains just the zcPassword class
  *
@@ -17,7 +17,7 @@ declare(strict_types=1);
  *
  * @since ZC v1.5.3
  */
-class zcPassword extends base
+class Zc_Password extends base
 {
     /**
      *
@@ -30,11 +30,11 @@ class zcPassword extends base
      * @param string $phpVersion
      * @since ZC v1.5.3
      */
-    public static function getInstance($phpVersion)
+    public static function get_instance($php_version)
     {
-        if (! self::$instance) {
+        if (!self::$instance) {
             $class = self::class;
-            self::$instance = new $class($phpVersion);
+            self::$instance = new $class($php_version);
         }
         return self::$instance;
     }
@@ -54,14 +54,14 @@ class zcPassword extends base
      * @param string $encryptedPassword
      * @since ZC v1.5.3
      */
-    public function detectPasswordType($encryptedPassword): string
+    public function detect_password_type($encrypted_password): string
     {
         $type = 'unknown';
-        $tmp = explode(':', $encryptedPassword);
+        $tmp = explode(':', $encrypted_password);
         if (count($tmp) == 2) {
-            if (strlen($tmp [1]) > 2) {
+            if (strlen($tmp[1]) > 2) {
                 $type = 'compatSha256';
-            } elseif (strlen($tmp [1]) == 2) {
+            } elseif (strlen($tmp[1]) == 2) {
                 $type = 'oldMd5';
             }
         }
@@ -75,9 +75,9 @@ class zcPassword extends base
      * @return boolean
      * @since ZC v1.5.3
      */
-    public function validatePassword($plain, $encrypted)
+    public function validate_password($plain, $encrypted)
     {
-        $type = $this->detectPasswordType($encrypted);
+        $type = $this->detect_password_type($encrypted);
         if ($type != 'unknown') {
             $method = 'validatePassword' . ucfirst($type);
             return $this->{$method}($plain, $encrypted);
@@ -90,14 +90,14 @@ class zcPassword extends base
      * @param string $encrypted
      * @since ZC v1.5.3
      */
-    public function validatePasswordOldMd5(string $plain, $encrypted): bool
+    public function validate_password_old_md5(string $plain, $encrypted): bool
     {
         if (zen_not_null($plain) && zen_not_null($encrypted)) {
             $stack = explode(':', $encrypted);
             if (sizeof($stack) != 2) {
                 return false;
             }
-            if (hash('md5', $stack [1] . $plain) == $stack [0]) {
+            if (hash('md5', $stack[1] . $plain) == $stack[0]) {
                 return true;
             }
         }
@@ -109,20 +109,19 @@ class zcPassword extends base
      * @param string $encrypted
      * @since ZC v1.5.3
      */
-    public function validatePasswordCompatSha256(string $plain, $encrypted): bool
+    public function validate_password_compat_sha256(string $plain, $encrypted): bool
     {
         if (zen_not_null($plain) && zen_not_null($encrypted)) {
             $stack = explode(':', $encrypted);
             if (sizeof($stack) != 2) {
                 return false;
             }
-            if (hash('sha256', $stack [1] . $plain) == $stack [0]) {
+            if (hash('sha256', $stack[1] . $plain) == $stack[0]) {
                 return true;
             }
         }
         return false;
     }
-
     /**
      * Update a not logged in Admin password.
      *
@@ -130,26 +129,25 @@ class zcPassword extends base
      * @param string $admin
      * @since ZC v1.5.3
      */
-    public function updateNotLoggedInAdminPassword($plain, $admin): string
+    public function update_not_logged_in_admin_password($plain, $admin): string
     {
-        $this->confirmDbSchema('admin');
+        $this->confirm_db_schema('admin');
         global $db;
-        $updatedPassword = password_hash($plain, PASSWORD_DEFAULT);
+        $updated_password = password_hash($plain, PASSWORD_DEFAULT);
         $sql = 'UPDATE ' . TABLE_ADMIN . '
               SET admin_pass = :password:
               WHERE admin_name = :adminName:';
-
-        $sql = $db->bindVars($sql, ':adminName:', $admin, 'string');
-        $sql = $db->bindVars($sql, ':password:', $updatedPassword, 'string');
+        $sql = $db->bind_vars($sql, ':adminName:', $admin, 'string');
+        $sql = $db->bind_vars($sql, ':password:', $updated_password, 'string');
         $db->Execute($sql);
-        return $updatedPassword;
+        return $updated_password;
     }
     /**
      * Ensure db schema has been updated to support the required password lengths
      * @param string $mode
      * @since ZC v1.5.3
      */
-    public function confirmDbSchema($mode = ''): void
+    public function confirm_db_schema($mode = ''): void
     {
         global $db;
         if ($mode == '' || $mode == 'admin') {
@@ -172,7 +170,7 @@ class zcPassword extends base
                 if ($result->fields['Field'] == 'customers_password' && strtoupper((string) $result->fields['Type']) == 'VARCHAR(255)') {
                     $found = true;
                 }
-                $result->MoveNext();
+                $result->move_next();
             }
             if (!$found) {
                 $sql = 'ALTER TABLE ' . TABLE_CUSTOMERS . " MODIFY customers_password VARCHAR( 255 ) NOT NULL DEFAULT ''";

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Page Template
  *
@@ -12,29 +13,43 @@
  */
 ?>
 <div class="centerColumn" id="createAcctSuccess">
-<h1 id="createAcctSuccessHeading"><?php echo HEADING_TITLE; ?></h1>
+<h1 id="createAcctSuccessHeading"><?php 
+echo HEADING_TITLE;
+?></h1>
 
-<div id="createAcctSuccessMainContent" class="content"><?php echo TEXT_ACCOUNT_CREATED; ?></div>
+<div id="createAcctSuccessMainContent" class="content"><?php 
+echo TEXT_ACCOUNT_CREATED;
+?></div>
 
 <fieldset>
-<legend><?php echo PRIMARY_ADDRESS_TITLE; ?></legend>
-<?php
+<legend><?php 
+echo PRIMARY_ADDRESS_TITLE;
+?></legend>
+<?php 
 /**
  * Used to loop thru and display address book entries
  */
-  foreach ($addressArray as $addresses) {
-      ?>
-<h3 class="addressBookDefaultName"><?php echo zen_output_string_protected($addresses['firstname'] . ' ' . $addresses['lastname']); ?></h3>
+foreach ($address_array as $addresses) {
+    ?>
+<h3 class="addressBookDefaultName"><?php 
+    echo zen_output_string_protected($addresses['firstname'] . ' ' . $addresses['lastname']);
+    ?></h3>
 
-<address><?php echo zen_address_format($addresses['format_id'], $addresses['address'], true, ' ', '<br>'); ?></address>
+<address><?php 
+    echo zen_address_format($addresses['format_id'], $addresses['address'], true, ' ', '<br>');
+    ?></address>
 
-<div class="buttonRow forward"><?php echo '<a href="' . zen_href_link(FILENAME_ADDRESS_BOOK_PROCESS, 'edit=' . $addresses['address_book_id'], 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a> <a href="' . zen_href_link(FILENAME_ADDRESS_BOOK_PROCESS, 'delete=' . $addresses['address_book_id'], 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_DELETE, BUTTON_DELETE_ALT) . '</a>'; ?></div>
+<div class="buttonRow forward"><?php 
+    echo '<a href="' . zen_href_link(FILENAME_ADDRESS_BOOK_PROCESS, 'edit=' . $addresses['address_book_id'], 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a> <a href="' . zen_href_link(FILENAME_ADDRESS_BOOK_PROCESS, 'delete=' . $addresses['address_book_id'], 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_DELETE, BUTTON_DELETE_ALT) . '</a>';
+    ?></div>
 <br class="clearBoth">
-<?php
-  }
+<?php 
+}
 ?>
 </fieldset>
 
 
-<div class="buttonRow forward"><?php echo '<a href="' . $origin_href . '">' . zen_image_button(BUTTON_IMAGE_CONTINUE, BUTTON_CONTINUE_ALT) . '</a>'; ?></div>
+<div class="buttonRow forward"><?php 
+echo '<a href="' . $origin_href . '">' . zen_image_button(BUTTON_IMAGE_CONTINUE, BUTTON_CONTINUE_ALT) . '</a>';
+?></div>
 </div>

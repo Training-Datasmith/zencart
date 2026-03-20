@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
-namespace DASPRiD\Enum\Exception;
+declare (strict_types=1);
+namespace Dasp_Ri_D\Enum\Exception;
 
 use Exception;
-
-final class ExpectationException extends Exception implements ExceptionInterface
+final class Expectation_Exception extends Exception implements Exception_Interface
 {
 }

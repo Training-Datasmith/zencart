@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Customer Authorization
  *
@@ -15,16 +15,15 @@ declare(strict_types=1);
 // is waiting for the customer to respond to an account auth-token email!
 //
 if (!empty($_GET['reset_token'])) {
-    $auth_token_info = Customer::getAuthTokenValid($_GET['reset_token']);
+    $auth_token_info = Customer::get_auth_token_valid($_GET['reset_token']);
     if ($auth_token_info === false) {
         // -----
         // Enable a site to control the number of failed auth-token requests.
         //
-        $max_auth_token_activation_attempts = (int)($max_auth_token_activation_attempts ?? 5);
+        $max_auth_token_activation_attempts = (int) ($max_auth_token_activation_attempts ?? 5);
         if ($max_auth_token_activation_attempts < 2) {
             $max_auth_token_activation_attempts = 5;
         }
-
         $_SESSION['auth_token_activation_attempts'] ??= 0;
         $_SESSION['auth_token_activation_attempts']++;
         if ($_SESSION['auth_token_activation_attempts'] > $max_auth_token_activation_attempts) {
@@ -33,48 +32,39 @@ if (!empty($_GET['reset_token'])) {
         }
         zen_redirect(zen_href_link(CUSTOMERS_AUTHORIZATION_FILENAME, '', 'SSL'));
     }
-
     unset($_SESSION['auth_token_activation_attempts']);
-
     require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
-    $messageStack->add_session('header', SUCCESS_AUTHORIZED, 'success');
-
-    $customer_data = Customer::authorizeCustomer((int)$auth_token_info['customers_id']);
+    $message_stack->add_session('header', SUCCESS_AUTHORIZED, 'success');
+    $customer_data = Customer::authorize_customer((int) $auth_token_info['customers_id']);
     if ($customer_data['welcome_email_sent'] === '0') {
         $firstname = $customer_data['customers_firstname'];
         $lastname = $customer_data['customers_lastname'];
         $gender = $customer_data['customers_gender'];
         $email_address = $customer_data['customers_email_address'];
-
         require DIR_WS_MODULES . zen_get_module_directory(FILENAME_CREATE_ACCOUNT_SEND_EMAIL);
-        Customer::setWelcomeEmailSent((int)$auth_token_info['customers_id']);
+        Customer::set_welcome_email_sent((int) $auth_token_info['customers_id']);
         zen_redirect(zen_href_link(FILENAME_CREATE_ACCOUNT_SUCCESS, '', 'SSL'));
     }
     zen_redirect(zen_href_link(FILENAME_ACCOUNT, '', 'SSL'));
 }
-
 if (!zen_is_logged_in() || zen_in_guest_checkout()) {
     zen_redirect(zen_href_link(FILENAME_LOGIN, '', 'SSL'));
 }
-
 $customer = new Customer();
-$customer_data = $customer->refreshCustomerAuthorization();
-
+$customer_data = $customer->refresh_customer_authorization();
 if (!in_array($_SESSION['customers_authorization'], [Customer::AUTH_NO_BROWSE, Customer::AUTH_NO_PRICES, Customer::AUTH_NO_PURCHASE])) {
     zen_redirect(zen_href_link(FILENAME_ACCOUNT, '', 'SSL'));
 }
-
 if (empty($customer_data['activation_required'])) {
     require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
     $customer_authorization_heading_title = HEADING_TITLE;
     $main_content = CUSTOMERS_AUTHORIZATION_TEXT_INFORMATION;
 } else {
     $resend_requested = ($_GET['action'] ?? '') === 'resend';
-    $auth_token_info = $customer->getAuthTokenInfo();
-    $token = ($auth_token_info['token'] ?? null);
-
+    $auth_token_info = $customer->get_auth_token_info();
+    $token = $auth_token_info['token'] ?? null;
     if ($token === null || $resend_requested) {
-        $max_auth_token_emails = (int)($max_auth_token_emails ?? 5);
+        $max_auth_token_emails = (int) ($max_auth_token_emails ?? 5);
         if ($max_auth_token_emails < 2) {
             $max_auth_token_emails = 5;
         }
@@ -84,30 +74,24 @@ if (empty($customer_data['activation_required'])) {
             header('HTTP/1.1 406 Not Acceptable');
             zen_exit();
         }
-
         require DIR_WS_MODULES . zen_get_module_directory(FILENAME_SEND_AUTH_TOKEN_EMAIL);
-        $auth_token_info = $customer->getAuthTokenInfo();
+        $auth_token_info = $customer->get_auth_token_info();
     }
-
     require DIR_WS_MODULES . zen_get_module_directory('require_languages.php');
     $customer_authorization_heading_title = HEADING_TITLE_ACTIVATE;
     $main_content = sprintf(TEXT_INFORMATION_ACTIVATE, '<b>' . $auth_token_info['email_address'] . '</b>');
-
-    $auth_token_time_remaining = strtotime((string) $auth_token_info['created_at']) + (Customer::getAuthTokenMinutesValid() * 60) - time();
+    $auth_token_time_remaining = strtotime((string) $auth_token_info['created_at']) + Customer::get_auth_token_minutes_valid() * 60 - time();
     if ($auth_token_time_remaining < 0) {
         $main_content .= ' ' . TEXT_INFORMATION_LINK_EXPIRED;
     } else {
         $main_content .= ' ' . TEXT_INFORMATION_LINK_ACTIVE . ' <span id="countdown">&nbsp;</span>';
     }
-
     $resend_activation_link = '<a href="' . zen_href_link(CUSTOMERS_AUTHORIZATION_FILENAME, 'action=resend', 'SSL') . '">' . TEXT_HERE . '</a>';
     $account_edit_link = '<a href="' . zen_href_link(FILENAME_ACCOUNT_EDIT, '', 'SSL') . '">' . TEXT_HERE . '</a>';
     $main_content .= '<br><br>' . sprintf(TEXT_INFORMATION_RESEND, $resend_activation_link, $account_edit_link) . '<br><br>';
 }
-
 $breadcrumb->add(NAVBAR_TITLE);
-
-$flag_disable_right ??= (CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF === 'true');
-$flag_disable_left ??= (CUSTOMERS_AUTHORIZATION_COLUMN_LEFT_OFF === 'true');
-$flag_disable_footer ??= (CUSTOMERS_AUTHORIZATION_FOOTER_OFF === 'true');
-$flag_disable_header ??= (CUSTOMERS_AUTHORIZATION_HEADER_OFF === 'true');
+$flag_disable_right ??= CUSTOMERS_AUTHORIZATION_COLUMN_RIGHT_OFF === 'true';
+$flag_disable_left ??= CUSTOMERS_AUTHORIZATION_COLUMN_LEFT_OFF === 'true';
+$flag_disable_footer ??= CUSTOMERS_AUTHORIZATION_FOOTER_OFF === 'true';
+$flag_disable_header ??= CUSTOMERS_AUTHORIZATION_HEADER_OFF === 'true';

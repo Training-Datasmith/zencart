@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Common Template - tpl_footer.php
  *
@@ -16,60 +17,71 @@
  * @version $Id: Scott Wilson 2024 Nov 23 Modified in v2.2.0 $
  */
 require DIR_WS_MODULES . zen_get_module_directory('footer.php');
-
 if (!isset($flag_disable_footer) || !$flag_disable_footer) {
     ?>
 <!--bof-navigation display -->
 <div id="navSuppWrapper">
     <div id="navSupp">
         <ul>
-            <li><a href="<?= HTTP_SERVER . DIR_WS_CATALOG ?>"><?= HEADER_TITLE_CATALOG ?></a></li>
-<?php
-        if (EZPAGES_STATUS_FOOTER === '1' || (EZPAGES_STATUS_FOOTER === '2' && zen_is_whitelisted_admin_ip())) {
-            require $template->get_template_dir('tpl_ezpages_bar_footer.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_ezpages_bar_footer.php';
-        }
+            <li><a href="<?php 
+    echo HTTP_SERVER . DIR_WS_CATALOG;
+    ?>"><?php 
+    echo HEADER_TITLE_CATALOG;
+    ?></a></li>
+<?php 
+    if (EZPAGES_STATUS_FOOTER === '1' || EZPAGES_STATUS_FOOTER === '2' && zen_is_whitelisted_admin_ip()) {
+        require $template->get_template_dir('tpl_ezpages_bar_footer.php', DIR_WS_TEMPLATE, $current_page_base, 'templates') . '/tpl_ezpages_bar_footer.php';
+    }
     ?>
         </ul>
     </div>
 </div>
 <!--eof-navigation display -->
-<?php
-        // -----
-        // Add notification for plugin content insertion.
-        //
-        $zco_notifier->notify('NOTIFY_FOOTER_AFTER_NAVSUPP', []);
+<?php 
+    // -----
+    // Add notification for plugin content insertion.
+    //
+    $zco_notifier->notify('NOTIFY_FOOTER_AFTER_NAVSUPP', []);
     ?>
 <!--bof-ip address display -->
-<?php
-        if (SHOW_FOOTER_IP === '1') {
-            ?>
-<div id="siteinfoIP"><?= TEXT_YOUR_IP_ADDRESS . ' ' . $_SERVER['REMOTE_ADDR'] ?></div>
-<?php
-        }
+<?php 
+    if (SHOW_FOOTER_IP === '1') {
+        ?>
+<div id="siteinfoIP"><?php 
+        echo TEXT_YOUR_IP_ADDRESS . ' ' . $_SERVER['REMOTE_ADDR'];
+        ?></div>
+<?php 
+    }
     ?>
 <!--eof-ip address display -->
 
 <!--bof-banner #5 display -->
-<?php
-        if (SHOW_BANNERS_GROUP_SET5 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET5)) {
-            if (!$banner->EOF) {
-                ?>
-<div id="bannerFive" class="banners"><?= zen_display_banner('static', $banner) ?></div>
-<?php
-            }
+<?php 
+    if (SHOW_BANNERS_GROUP_SET5 != '' && $banner = zen_banner_exists('dynamic', SHOW_BANNERS_GROUP_SET5)) {
+        if (!$banner->EOF) {
+            ?>
+<div id="bannerFive" class="banners"><?php 
+            echo zen_display_banner('static', $banner);
+            ?></div>
+<?php 
         }
+    }
     ?>
 <!--eof-banner #5 display -->
 
 <!--bof- site copyright display -->
-<div id="siteinfoLegal" class="legalCopyright"><?= FOOTER_TEXT_BODY ?></div>
+<div id="siteinfoLegal" class="legalCopyright"><?php 
+    echo FOOTER_TEXT_BODY;
+    ?></div>
 <!--eof- site copyright display -->
 
-<?php
-} // flag_disable_footer
-
-if (!empty($showValidatorLink)) {
+<?php 
+}
+// flag_disable_footer
+if (!empty($show_validator_link)) {
     ?>
-<a href="https://validator.w3.org/nu/?doc=<?= urlencode('http' . ($request_type == 'SSL' ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . (strstr((string) $_SERVER['REQUEST_URI'], '?') ? '&' : '?') . zen_session_name() . '=' . zen_session_id()) ?>" rel="noopener" target="_blank">VALIDATOR</a>
-<?php
+<a href="https://validator.w3.org/nu/?doc=<?php 
+    echo urlencode('http' . ($request_type == 'SSL' ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] . (strstr((string) $_SERVER['REQUEST_URI'], '?') ? '&' : '?') . zen_session_name() . '=' . zen_session_id());
+    ?>" rel="noopener" target="_blank">VALIDATOR</a>
+<?php 
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * zcAjaxAdminDateCheck
  *
@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  * @since ZC v2.0.0
  */
-class zcAjaxAdminDatePickerDateCheck extends base
+class Zc_Ajax_Admin_Date_Picker_Date_Check extends base
 {
     /**
      * check.  Checks a 'datepicker' date for validity
@@ -24,7 +24,6 @@ class zcAjaxAdminDatePickerDateCheck extends base
         if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true || !isset($_POST['date_to_check'])) {
             return 'false';
         }
-
         // -----
         // If the submitted date is an empty string, that's valid.
         //
@@ -32,15 +31,14 @@ class zcAjaxAdminDatePickerDateCheck extends base
         if ($date_raw === '') {
             return 'true';
         }
-
         if (DATE_FORMAT_DATE_PICKER !== 'yy-mm-dd') {
             $local_fmt = zen_datepicker_format_fordate();
-            $dt = DateTime::createFromFormat($local_fmt, $date_raw);
+            $dt = DateTime::create_from_format($local_fmt, $date_raw);
             $date_raw = false;
             if (!empty($dt)) {
                 $date_raw = $dt->format('Y-m-d');
             }
         }
-        return ($date_raw !== false && zcDate::validateDate($date_raw) === true) ? 'true' : 'false';
+        return $date_raw !== false && Zc_Date::validate_date($date_raw) === true ? 'true' : 'false';
     }
 }

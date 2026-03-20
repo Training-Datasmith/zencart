@@ -1,130 +1,115 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
+namespace Zencart\View_Builders;
 
-namespace Zencart\ViewBuilders;
-
-use Zencart\Traits\NotifierManager;
-
+use Zencart\Traits\Notifier_Manager;
 /**
  * @since ZC v1.5.8
  */
-class BaseController
+class Base_Controller
 {
-    use NotifierManager;
-    protected array $infoBox;
-
-    public function __construct(protected \Zencart\Request\Request $request, protected $messageStack, protected \Zencart\ViewBuilders\TableViewDefinition $tableDefinition, protected $formatter)
+    use Notifier_Manager;
+    protected array $info_box;
+    public function __construct(protected \Zencart\Request\Request $request, protected $message_stack, protected \Zencart\View_Builders\Table_View_Definition $table_definition, protected $formatter)
     {
-        $this->infoBox = ['header' => [], 'content' => []];
+        $this->info_box = ['header' => [], 'content' => []];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function processRequest(): void
+    public function process_request(): void
     {
-        $action = $this->getAction();
-        $method = ($action == '') ? 'processDefaultAction' : 'processAction' . ucfirst($action);
+        $action = $this->get_action();
+        $method = $action == '' ? 'processDefaultAction' : 'processAction' . ucfirst($action);
         if (method_exists($this, $method)) {
-            $this->$method();
+            $this->{$method}();
         }
         $this->notify('NOTIFY_TABLEVIEW_PROCESSREQUEST', [], $method);
     }
-
     /**
      * @since ZC v1.5.8
      */
-    protected function getAction(): string
+    protected function get_action(): string
     {
         return $this->request->input('action', '');
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxHeader(string $content, array $params = []): void
+    public function set_box_header(string $content, array $params = []): void
     {
-        $this->infoBox['header'][] = ['text' => $content, 'params' => $params];
+        $this->info_box['header'][] = ['text' => $content, 'params' => $params];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxForm(string $content): void
+    public function set_box_form(string $content): void
     {
-        $this->infoBox['content']['form'] = $content;
+        $this->info_box['content']['form'] = $content;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function getBoxHeader()
+    public function get_box_header()
     {
-        return $this->infoBox['header'];
+        return $this->info_box['header'];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function setBoxContent(string $content, array $params = []): void
+    public function set_box_content(string $content, array $params = []): void
     {
-        $this->infoBox['content'][] = ['text' => $content, 'params' => $params];
+        $this->info_box['content'][] = ['text' => $content, 'params' => $params];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function getBoxContent()
+    public function get_box_content()
     {
-        return $this->infoBox['content'];
+        return $this->info_box['content'];
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function pageLink(): string
+    public function page_link(): string
     {
-        $page = $this->request->input($this->tableDefinition->getParameter('pagerVariable'), 1);
-        return $this->tableDefinition->getParameter('pagerVariable') . '=' . $page;
+        $page = $this->request->input($this->table_definition->get_parameter('pagerVariable'), 1);
+        return $this->table_definition->get_parameter('pagerVariable') . '=' . $page;
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function colKeyLink(): string
+    public function col_key_link(): string
     {
-        return $this->tableDefinition->colKeyName() . '=' . $this->currentFieldValue($this->tableDefinition->getParameter('colKey'));
+        return $this->table_definition->col_key_name() . '=' . $this->current_field_value($this->table_definition->get_parameter('colKey'));
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function currentFieldValue($field)
+    public function current_field_value($field)
     {
-        $currentRow = $this->formatter->currentRowFromRequest();
-        if (is_null($currentRow)) {
+        $current_row = $this->formatter->current_row_from_request();
+        if (is_null($current_row)) {
             return null;
         }
-        return $currentRow->$field;
+        return $current_row->{$field};
     }
-
     /**
      * @since ZC v1.5.8
      */
-    public function outputMessageList($errorList, $errorType): void
+    public function output_message_list($error_list, $error_type): void
     {
-        if (!count($errorList)) {
+        if (!count($error_list)) {
             return;
         }
-        foreach ($errorList as $error) {
-            $this->messageStack->add_session($error, $errorType);
+        foreach ($error_list as $error) {
+            $this->message_stack->add_session($error, $error_type);
         }
     }
-
 }

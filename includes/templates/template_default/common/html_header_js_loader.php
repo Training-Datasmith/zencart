@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Common Template
  *
@@ -11,30 +11,25 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: lat9 2025 May 16 Modified in v2.2.0 $
  */
-use Zencart\PageLoader\PageLoader;
-
+use Zencart\Page_Loader\Page_Loader;
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
-$pageLoader = PageLoader::getInstance();
-
+$page_loader = Page_Loader::get_instance();
 /**
  * load all site-wide jscript_*.js files from includes/templates/YOURTEMPLATE/jscript, alphabetically
  */
 $directory_array = $template->get_template_part($template->get_template_dir('^jscript_.*\.js', DIR_WS_TEMPLATE, $current_page_base, 'jscript'), '/^jscript_/', '.js');
 foreach ($directory_array as $value) {
-    echo '<script src="' .  $template->get_template_dir('^' . $value, DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/' . $value . '"></script>' . "\n";
+    echo '<script src="' . $template->get_template_dir('^' . $value, DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/' . $value . '"></script>' . "\n";
 }
-
 /**
  * load all page-specific jscript_*.js files from includes/modules/pages/PAGENAME, alphabetically
  */
-$directory_array = $pageLoader->listModulePagesFiles('jscript_', '.js');
+$directory_array = $page_loader->list_module_pages_files('jscript_', '.js');
 foreach ($directory_array as $value) {
     echo '<script src="' . $value . '"></script>' . "\n";
 }
-
 /**
  * load all site-wide jscript_*.php files from includes/templates/YOURTEMPLATE/jscript, alphabetically
  */
@@ -47,11 +42,10 @@ foreach ($directory_array as $value) {
     require $template->get_template_dir('^' . $value, DIR_WS_TEMPLATE, $current_page_base, 'jscript') . '/' . $value;
     echo "\n";
 }
-
 /**
  * include content from all page-specific jscript_*.php files from includes/modules/pages/PAGENAME, alphabetically.
  */
-$directory_array = $pageLoader->listModulePagesFiles('jscript_', '.php');
+$directory_array = $page_loader->list_module_pages_files('jscript_', '.php');
 foreach ($directory_array as $value) {
     /**
      * include content from all page-specific jscript_*.php files from includes/modules/pages/PAGENAME, alphabetically.

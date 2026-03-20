@@ -1,45 +1,38 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Color;
 
-namespace BaconQrCode\Renderer\Color;
-
-use BaconQrCode\Exception;
-
-final readonly class Alpha implements ColorInterface
+use Bacon_Qr_Code\Exception;
+final readonly class Alpha implements Color_Interface
 {
     /**
      * @param int $alpha the alpha value, 0 to 100
      */
-    public function __construct(private int $alpha, private ColorInterface $baseColor)
+    public function __construct(private int $alpha, private Color_Interface $base_color)
     {
         if ($alpha < 0 || $alpha > 100) {
             throw new Exception\InvalidArgumentException('Alpha must be between 0 and 100');
         }
     }
-
-    public function getAlpha(): int
+    public function get_alpha(): int
     {
         return $this->alpha;
     }
-
-    public function getBaseColor(): ColorInterface
+    public function get_base_color(): Color_Interface
     {
-        return $this->baseColor;
+        return $this->base_color;
     }
-
-    public function toRgb(): Rgb
+    public function to_rgb(): Rgb
     {
-        return $this->baseColor->toRgb();
+        return $this->base_color->to_rgb();
     }
-
-    public function toCmyk(): Cmyk
+    public function to_cmyk(): Cmyk
     {
-        return $this->baseColor->toCmyk();
+        return $this->base_color->to_cmyk();
     }
-
-    public function toGray(): Gray
+    public function to_gray(): Gray
     {
-        return $this->baseColor->toGray();
+        return $this->base_color->to_gray();
     }
 }

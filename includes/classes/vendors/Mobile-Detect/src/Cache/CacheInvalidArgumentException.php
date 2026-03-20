@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Detection\Cache;
 
-use Psr\SimpleCache\InvalidArgumentException;
-
-class CacheInvalidArgumentException extends CacheException implements InvalidArgumentException
+use Psr\Simple_Cache\InvalidArgumentException;
+class Cache_Invalid_Argument_Exception extends Cache_Exception implements InvalidArgumentException
 {
 }

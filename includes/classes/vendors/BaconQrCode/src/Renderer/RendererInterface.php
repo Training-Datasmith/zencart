@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer;
 
-namespace BaconQrCode\Renderer;
-
-use BaconQrCode\Encoder\QrCode;
-
-interface RendererInterface
+use Bacon_Qr_Code\Encoder\Qr_Code;
+interface Renderer_Interface
 {
-    public function render(QrCode $qrCode): string;
+    public function render(Qr_Code $qr_code): string;
 }

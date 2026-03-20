@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * This observer class is intended to allow downloadable files to be served
  * by streaming as a direct memory-feed from disk-to-browser, handled
@@ -14,7 +13,7 @@ declare(strict_types=1);
  *
  * @since ZC v1.5.6
  */
-class zcObserverDownloadsViaStreaming extends base
+class Zc_Observer_Downloads_Via_Streaming extends base
 {
     /**
      * Class constructor
@@ -23,7 +22,6 @@ class zcObserverDownloadsViaStreaming extends base
     {
         $this->attach($this, ['NOTIFY_DOWNLOAD_READY_TO_STREAM']);
     }
-
     /**
      * This fires when the download module is ready to stream a download to the browser
      *
@@ -35,49 +33,38 @@ class zcObserverDownloadsViaStreaming extends base
      * @param integer $downloadFilesize (mutable)
      * @since ZC v1.5.6
      */
-    protected function updateNotifyDownloadReadyToStream(&$class, $eventID, $array, &$service, string &$origin_filename, &$browser_filename, string &$source_directory, &$downloadFilesize)
+    protected function update_notify_download_ready_to_stream(&$class, $event_id, $array, &$service, string &$origin_filename, &$browser_filename, string &$source_directory, &$download_filesize)
     {
-        global $messageStack;
-
-        if ((int)$downloadFilesize > 0) {
-            header('Content-Length: ' . $downloadFilesize);
+        global $message_stack;
+        if ((int) $download_filesize > 0) {
+            header('Content-Length: ' . $download_filesize);
         }
-
         $disabled_funcs = @ini_get('disable_functions');
-
         if (DOWNLOAD_IN_CHUNKS != 'true' && !strstr($disabled_funcs, 'readfile')) {
             $this->notify('NOTIFY_DOWNLOAD_WITHOUT_REDIRECT___COMPLETED', $origin_filename);
-
             // close the session, since it is not needed for streaming the file contents
             session_write_close();
-
             // Dump the file to the browser. This will work on all systems, but will need considerable resources
             readfile($source_directory . $origin_filename);
-
         } else {
             // override PHP timeout to 25 minutes, if allowed
             @set_time_limit(1500);
-
             $this->notify('NOTIFY_DOWNLOAD_IN_CHUNKS___COMPLETED', $origin_filename);
-
             // loop with fread($fp, xxxx) to allow streaming in chunk sizes below the PHP memory_limit
             $handle = @fopen($source_directory . $origin_filename, 'rb');
             if ($handle) {
-
                 // close the session, since it is not needed for streaming the file contents
                 session_write_close();
-
                 // stream the file in 4K chunks
                 while (!@feof($handle)) {
-                    echo(fread($handle, 4096));
+                    echo fread($handle, 4096);
                     @flush();
                 }
                 fclose($handle);
-
             } else {
                 // Throw error condition -- this should never happen!
                 $msg = 'Please contact store owner.  ERROR: Cannot read file: ' . $origin_filename;
-                $messageStack->add_session('default', $msg, 'error');
+                $message_stack->add_session('default', $msg, 'error');
                 error_log($msg);
                 zen_mail('', STORE_OWNER_EMAIL_ADDRESS, ERROR_CUSTOMER_DOWNLOAD_FAILURE, "Unable to open file '" . $origin_filename . ' for reading.  Check the file permissions.', STORE_NAME, EMAIL_FROM);
             }
@@ -85,5 +72,4 @@ class zcObserverDownloadsViaStreaming extends base
         }
         zen_exit();
     }
-
 }

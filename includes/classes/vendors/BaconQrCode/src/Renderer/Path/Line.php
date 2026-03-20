@@ -1,37 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Bacon_Qr_Code\Renderer\Path;
 
-namespace BaconQrCode\Renderer\Path;
-
-final readonly class Line implements OperationInterface
+final readonly class Line implements Operation_Interface
 {
     public function __construct(private float $x, private float $y)
     {
     }
-
-    public function getX(): float
+    public function get_x(): float
     {
         return $this->x;
     }
-
-    public function getY(): float
+    public function get_y(): float
     {
         return $this->y;
     }
-
     /**
      * @return self
      */
-    public function translate(float $x, float $y): OperationInterface
+    public function translate(float $x, float $y): Operation_Interface
     {
         return new self($this->x + $x, $this->y + $y);
     }
-
     /**
      * @return self
      */
-    public function rotate(int $degrees): OperationInterface
+    public function rotate(int $degrees): Operation_Interface
     {
         $radians = deg2rad($degrees);
         $sin = sin($radians);

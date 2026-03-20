@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Navigation_history Class.
  *
@@ -18,16 +18,14 @@ if (!defined('IS_ADMIN_FLAG')) {
  *
  * @since ZC v1.0.3
  */
-class navigationHistory extends base
+class Navigation_History extends base
 {
     public $path;
     public $snapshot;
-
     public function __construct()
     {
         $this->reset();
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -36,7 +34,6 @@ class navigationHistory extends base
         $this->path = [];
         $this->snapshot = [];
     }
-
     // -----
     // Since the 'path' and 'snapshot' properties are public, make sure that their
     // values are set and an array, resetting if not.
@@ -44,13 +41,12 @@ class navigationHistory extends base
     /**
      * @since ZC v2.2.0
      */
-    protected function checkProperties(): void
+    protected function check_properties(): void
     {
         if (!is_array($this->path ?? '') || !is_array($this->snapshot ?? '')) {
             $this->reset();
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -60,32 +56,28 @@ class navigationHistory extends base
         if (preg_match('|ajax\.php$|', (string) $_SERVER['SCRIPT_NAME']) && $_GET['act'] !== '') {
             return;
         }
-
-        $this->checkProperties();
-
-        global $request_type, $cPath;
+        $this->check_properties();
+        global $request_type, $c_path;
         $get_vars = $_GET;
         unset($get_vars['main_page']);
-
         $set = 'true';
         for ($i = 0, $n = count($this->path); $i < $n; $i++) {
             if (isset($_GET['main_page']) && $this->path[$i]['page'] === $_GET['main_page']) {
-                if (isset($cPath)) {
+                if (isset($c_path)) {
                     if (!isset($this->path[$i]['get']['cPath'])) {
                         continue;
                     }
-                    if ($this->path[$i]['get']['cPath'] == $cPath) {
-                        array_splice($this->path, ($i + 1));
+                    if ($this->path[$i]['get']['cPath'] == $c_path) {
+                        array_splice($this->path, $i + 1);
                         $set = 'false';
                         break;
                     } else {
-                        $old_cPath = explode('_', (string) $this->path[$i]['get']['cPath']);
-                        $new_cPath = explode('_', $cPath);
-
+                        $old_c_path = explode('_', (string) $this->path[$i]['get']['cPath']);
+                        $new_c_path = explode('_', $c_path);
                         $exit_loop = false;
-                        for ($j = 0, $n2 = sizeof($old_cPath); $j < $n2; $j++) {
-                            if ($old_cPath[$j] != $new_cPath[$j]) {
-                                array_splice($this->path, ($i));
+                        for ($j = 0, $n2 = sizeof($old_c_path); $j < $n2; $j++) {
+                            if ($old_c_path[$j] != $new_c_path[$j]) {
+                                array_splice($this->path, $i);
                                 $set = 'true';
                                 $exit_loop = true;
                                 break;
@@ -96,37 +88,28 @@ class navigationHistory extends base
                         }
                     }
                 } else {
-                    array_splice($this->path, ($i));
+                    array_splice($this->path, $i);
                     $set = 'true';
                     break;
                 }
             }
         }
-
         if ($set === 'true') {
             $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
-            $this->path[] = [
-               'page' => $page,
-               'mode' => $request_type,
-               'get' => $get_vars,
-               'post' => [], /*$_POST*/
-            ];
+            $this->path[] = ['page' => $page, 'mode' => $request_type, 'get' => $get_vars, 'post' => []];
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function remove_current_page(): void
     {
-        $this->checkProperties();
-
+        $this->check_properties();
         $last_entry_position = count($this->path) - 1;
         if (isset($this->path[$last_entry_position]['page']) && isset($_GET['main_page']) && $this->path[$last_entry_position]['page'] === $_GET['main_page']) {
             unset($this->path[$last_entry_position]);
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -139,15 +122,9 @@ class navigationHistory extends base
             $get_vars = $_GET;
             unset($get_vars['main_page']);
             $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
-            $this->snapshot = [
-                'page' => $page,
-                'mode' => $request_type,
-                'get' => $get_vars,
-                'post' => [], /*$_POST*/
-            ];
+            $this->snapshot = ['page' => $page, 'mode' => $request_type, 'get' => $get_vars, 'post' => []];
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -155,30 +132,21 @@ class navigationHistory extends base
     {
         $this->snapshot = [];
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function set_path_as_snapshot($history = 0): void
     {
-        $this->checkProperties();
-
+        $this->check_properties();
         $pos = count($this->path) - 1 - $history;
-        $this->snapshot = [
-            'page' => $this->path[$pos]['page'],
-            'mode' => $this->path[$pos]['mode'],
-            'get' => $this->path[$pos]['get'],
-            'post' => $this->path[$pos]['post'],
-        ];
+        $this->snapshot = ['page' => $this->path[$pos]['page'], 'mode' => $this->path[$pos]['mode'], 'get' => $this->path[$pos]['get'], 'post' => $this->path[$pos]['post']];
     }
-
     /**
      * @since ZC v1.0.3
      */
     public function debug(): void
     {
-        $this->checkProperties();
-
+        $this->check_properties();
         for ($i = 0, $n = count($this->path); $i < $n; $i++) {
             echo $this->path[$i]['page'] . '?';
             foreach ($this->path[$i]['get'] as $key => $value) {
@@ -192,14 +160,11 @@ class navigationHistory extends base
             }
             echo '<br>';
         }
-
         if (count($this->snapshot) !== 0) {
             echo '<br><br>';
-
             echo $this->snapshot['mode'] . ' ' . $this->snapshot['page'] . '?' . zen_array_to_string($this->snapshot['get'], [zen_session_name()]) . '<br>';
         }
     }
-
     /**
      * @since ZC v1.0.3
      */
@@ -207,8 +172,8 @@ class navigationHistory extends base
     {
         foreach ($broken as $kv) {
             $key = $kv['key'];
-            if (gettype($this->$key) !== 'user function') {
-                $this->$key = $kv['value'];
+            if (gettype($this->{$key}) !== 'user function') {
+                $this->{$key} = $kv['value'];
             }
         }
     }

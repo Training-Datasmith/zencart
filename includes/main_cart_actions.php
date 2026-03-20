@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Main Shopping Cart actions supported.
  *
@@ -15,78 +15,72 @@ declare(strict_types=1);
  *
  * @var shoppingCart $_SESSION['cart']
  */
-
-use Zencart\FileSystem\FileSystem;
-
+use Zencart\File_System\File_System;
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 /**
  * NOTE: the $goto and $parameters variables are set by init_cart_handler.php
  */
-
 /**
  * Load all PHP files present in the extra_cart_actions subdirectory.
  */
-$baseDir = DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_cart_actions/';
-$mca_filesystem = new FileSystem();
-$files = $mca_filesystem->listFilesFromDirectoryAlphaSorted($baseDir);
+$base_dir = DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_cart_actions/';
+$mca_filesystem = new File_System();
+$files = $mca_filesystem->list_files_from_directory_alpha_sorted($base_dir);
 foreach ($files as $file) {
-    require $baseDir . $file;
+    require $base_dir . $file;
 }
-
 /**
  * Load all PHP files present in enabled zc_plugins' extra_cart_actions subdirectories.
  */
-foreach ($installedPlugins as $plugin) {
-    $pluginDir = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/extra_cart_actions/';
-    $files = $mca_filesystem->listFilesFromDirectoryAlphaSorted($pluginDir);
+foreach ($installed_plugins as $plugin) {
+    $plugin_dir = DIR_FS_CATALOG . 'zc_plugins/' . $plugin['unique_key'] . '/' . $plugin['version'] . '/catalog/includes/extra_cart_actions/';
+    $files = $mca_filesystem->list_files_from_directory_alpha_sorted($plugin_dir);
     foreach ($files as $file) {
-        require $pluginDir . $file;
+        require $plugin_dir . $file;
     }
 }
-
 switch ($_GET['action']) {
     /**
      * customer wants to update the product quantity in their shopping cart
      * delete checkbox or 0 quantity removes from cart
      */
     case 'update_product':
-        $_SESSION['cart']->actionUpdateProduct($goto, $parameters);
+        $_SESSION['cart']->action_update_product($goto, $parameters);
         break;
-        /**
-         * customer adds a product from the products page
-         */
+    /**
+     * customer adds a product from the products page
+     */
     case 'add_product':
-        $_SESSION['cart']->actionAddProduct($goto, $parameters);
+        $_SESSION['cart']->action_add_product($goto, $parameters);
         break;
     case 'buy_now':
         /**
          * performed by the 'buy now' button in product listings and review page
          */
-        $_SESSION['cart']->actionBuyNow($goto, $parameters);
+        $_SESSION['cart']->action_buy_now($goto, $parameters);
         break;
     case 'multiple_products_add_product':
         /**
          * performed by the multiple-add-products button
          */
-        $_SESSION['cart']->actionMultipleAddProduct($goto, $parameters);
+        $_SESSION['cart']->action_multiple_add_product($goto, $parameters);
         break;
     case 'notify':
-        $_SESSION['cart']->actionNotify($goto, $parameters);
+        $_SESSION['cart']->action_notify($goto, $parameters);
         break;
     case 'notify_remove':
-        $_SESSION['cart']->actionNotifyRemove($goto, $parameters);
+        $_SESSION['cart']->action_notify_remove($goto, $parameters);
         break;
     case 'cust_order':
-        $_SESSION['cart']->actionCustomerOrder($goto, $parameters);
+        $_SESSION['cart']->action_customer_order($goto, $parameters);
         break;
     case 'remove_product':
-        $_SESSION['cart']->actionRemoveProduct($goto, $parameters);
+        $_SESSION['cart']->action_remove_product($goto, $parameters);
         break;
     case 'cart':
-        $_SESSION['cart']->actionCartUserAction($goto, $parameters);
+        $_SESSION['cart']->action_cart_user_action($goto, $parameters);
         break;
     case 'empty_cart':
         $_SESSION['cart']->reset(true);

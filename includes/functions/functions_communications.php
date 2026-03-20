@@ -1,9 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-use http\Exception\BadQueryStringException;
-
+declare (strict_types=1);
+use http\Exception\Bad_Query_String_Exception;
 /*
  * Communication-related functions, such as for making CURL requests
  *
@@ -11,7 +9,6 @@ use http\Exception\BadQueryStringException;
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 30 New in v2.2.0 $
  */
-
 /**
  * Make connection to $url and get a response back.
  * For GET requests only the $url is needed. $payload is optional.
@@ -29,101 +26,73 @@ use http\Exception\BadQueryStringException;
  *
  * @since ZC v2.2.0
  */
-function zenDoCurlRequest(
-    string $url,
-    string $method = 'GET',
-    string|array|null $payload = null,
-    bool $encodePayloadArraysAsJson = false,
-    bool $decodeJsonResponses = false,
-    ?array $extraCurlOptions = [],
-    bool $returnWithMetadata = false
-): string|array|false {
+function zen_do_curl_request(string $url, string $method = 'GET', string|array|null $payload = null, bool $encode_payload_arrays_as_json = false, bool $decode_json_responses = false, ?array $extra_curl_options = [], bool $return_with_metadata = false): string|array|false
+{
     $base_UA_host = defined('HTTP_CATALOG_SERVER') ? HTTP_CATALOG_SERVER : HTTP_SERVER;
     $referrer = $base_UA_host . DIR_WS_CATALOG;
-    $userAgent = empty($_SERVER['HTTP_USER_AGENT']) ? $base_UA_host . DIR_WS_CATALOG : $_SERVER['HTTP_USER_AGENT'];
-
-    $curlDefaultOptions = [
-        CURLOPT_CONNECTTIMEOUT => 10,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_FORBID_REUSE => true,
-        CURLOPT_FRESH_CONNECT => true,
-        CURLOPT_HEADER => false,
-        CURLOPT_REFERER => $referrer,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 45,
-        CURLOPT_USERAGENT => $userAgent,
-        CURLOPT_VERBOSE => false,
-    ];
-
+    $user_agent = empty($_SERVER['HTTP_USER_AGENT']) ? $base_UA_host . DIR_WS_CATALOG : $_SERVER['HTTP_USER_AGENT'];
+    $curl_default_options = [CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_FOLLOWLOCATION => true, CURLOPT_FORBID_REUSE => true, CURLOPT_FRESH_CONNECT => true, CURLOPT_HEADER => false, CURLOPT_REFERER => $referrer, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 45, CURLOPT_USERAGENT => $user_agent, CURLOPT_VERBOSE => false];
     if (is_array($payload)) {
-        if ($encodePayloadArraysAsJson) {
+        if ($encode_payload_arrays_as_json) {
             $payload = json_encode($payload);
         } else {
             $payload = http_build_query($payload);
         }
         if ($payload === false) {
-            throw new BadQueryStringException('Could not encode the provided array $payload.');
+            throw new Bad_Query_String_Exception('Could not encode the provided array $payload.');
         }
     }
-
     if (!empty($payload) && strtoupper($method) === 'GET') {
         $url .= (str_contains($url, '?') ? '&' : '?') . $payload;
-        $payload = null; // clear payload now that we've appended it to the URL
+        $payload = null;
+        // clear payload now that we've appended it to the URL
     }
-
     $ch = curl_init();
     if (empty($ch)) {
         if (IS_ADMIN_FLAG === true) {
-            global $messageStack;
-            if (is_object($messageStack)) {
-                $messageStack->add_session('Communications curl_init() failed. Contact server administrator.', 'error');
+            global $message_stack;
+            if (is_object($message_stack)) {
+                $message_stack->add_session('Communications curl_init() failed. Contact server administrator.', 'error');
             }
         }
         trigger_error('CURL instantiation error. Could not do curl_init().', E_USER_WARNING);
         return false;
     }
-
-    curl_setopt_array($ch, array_replace($curlDefaultOptions, $extraCurlOptions ?? []));
+    curl_setopt_array($ch, array_replace($curl_default_options, $extra_curl_options ?? []));
     curl_setopt($ch, CURLOPT_URL, $url);
-
     if (!empty($payload) && strtoupper($method) === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     }
-
     $proxy = false;
     if (CURL_PROXY_REQUIRED === 'True') {
         $proxy = true;
-        $proxy_tunnel_flag = !((defined('CURL_PROXY_TUNNEL_FLAG') && strtoupper((string) CURL_PROXY_TUNNEL_FLAG) === 'FALSE'));
+        $proxy_tunnel_flag = !(defined('CURL_PROXY_TUNNEL_FLAG') && strtoupper((string) CURL_PROXY_TUNNEL_FLAG) === 'FALSE');
         curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, $proxy_tunnel_flag);
         curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
         curl_setopt($ch, CURLOPT_PROXY, CURL_PROXY_SERVER_DETAILS);
     }
-
     $response = curl_exec($ch);
     $error = curl_error($ch);
     $info = curl_getinfo($ch);
-    $httpCode = curl_getinfo($ch, $proxy ? CURLINFO_HTTP_CONNECTCODE : CURLINFO_RESPONSE_CODE);
-
+    $http_code = curl_getinfo($ch, $proxy ? CURLINFO_HTTP_CONNECTCODE : CURLINFO_RESPONSE_CODE);
     if (!empty($error)) {
         // only give messageStack responses on admin-side
         if (IS_ADMIN_FLAG === true) {
-            global $messageStack;
-            if (is_object($messageStack)) {
-                $messageStack->add_session("CURL communication ERROR: $error", 'error');
+            global $message_stack;
+            if (is_object($message_stack)) {
+                $message_stack->add_session("CURL communication ERROR: {$error}", 'error');
             }
         }
         // log the error, and return false
-        trigger_error("CURL communication error: $error; HTTP Response Code: $httpCode.\n\n" . print_r($info, true), E_USER_WARNING);
+        trigger_error("CURL communication error: {$error}; HTTP Response Code: {$http_code}.\n\n" . print_r($info, true), E_USER_WARNING);
         return false;
     }
-
     // json decode if requested and if possible
-    if ($response !== false && $decodeJsonResponses && str_contains((string) $info['content_type'], 'application/json')) {
-        $rawResponse = $response;
-        $jsonResponse = json_decode($response, true);
-        return $returnWithMetadata ? compact('jsonResponse', 'httpCode', 'info', 'error', 'rawResponse') : $jsonResponse;
+    if ($response !== false && $decode_json_responses && str_contains((string) $info['content_type'], 'application/json')) {
+        $raw_response = $response;
+        $json_response = json_decode($response, true);
+        return $return_with_metadata ? compact('jsonResponse', 'httpCode', 'info', 'error', 'rawResponse') : $json_response;
     }
-
-    return $returnWithMetadata ? compact('response', 'httpCode', 'info', 'error') : $response;
+    return $return_with_metadata ? compact('response', 'httpCode', 'info', 'error') : $response;
 }

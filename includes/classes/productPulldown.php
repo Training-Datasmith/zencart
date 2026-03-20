@@ -1,72 +1,52 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  *
  * @since ZC v1.5.8
  */
-class productPulldown extends pulldown
+class Product_Pulldown extends pulldown
 {
     /**
      * @var string[]
      */
-    private array $keyed_allowed_sort_array = [
-        'products_name' => 'pd',
-        'products_model' => 'p',
-        'products_id' => 'p',
-        'products_price' => 'p',
-        'products_price_sorter' => 'p',
-        'products_sort_order' => 'p',
-    ];
-
+    private array $keyed_allowed_sort_array = ['products_name' => 'pd', 'products_model' => 'p', 'products_id' => 'p', 'products_price' => 'p', 'products_price_sorter' => 'p', 'products_sort_order' => 'p'];
     protected string $categories_join;
     protected $output_string;
     protected bool $show_model;
     protected bool $show_price;
-
     /**
      *
      */
     public function __construct()
     {
         parent::__construct();
-
         $this->show_model = false;
         $this->show_price = true;
         $this->set_selected = 0;
         $this->categories_join = '';
-
         $this->sort = ' ORDER BY pd.products_name';
-
-        $this->keyword_search_fields = [
-            'pd.products_name',
-            'p.products_model',
-            'pd.products_description',
-            'p.products_id',
-        ];
+        $this->keyword_search_fields = ['pd.products_name', 'p.products_model', 'pd.products_description', 'p.products_id'];
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function setSort(array $fieldnameArray): static
+    public function set_sort(array $fieldname_array): static
     {
-        if (empty($fieldnameArray)) {
+        if (empty($fieldname_array)) {
             return $this;
         }
-
         $first = true;
         $this->sort = '';
-        foreach ($fieldnameArray as $fieldname) {
+        foreach ($fieldname_array as $fieldname) {
             if (array_key_exists($fieldname, $this->keyed_allowed_sort_array)) {
                 $this->sort .= ($first ? ' ORDER BY ' : ', ') . $this->keyed_allowed_sort_array[$fieldname] . '.' . $fieldname;
                 $first = false;
@@ -74,47 +54,43 @@ class productPulldown extends pulldown
         }
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function setCategory(int $category_id): static
+    public function set_category(int $category_id): static
     {
         $this->categories_join = ' LEFT JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc ON (ptc.products_id = p.products_id)';
         $this->condition .= ' AND ptc.categories_id = ' . $category_id;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function showModel(bool $status): static
+    public function show_model(bool $status): static
     {
         $this->show_model = $status;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function showPrice(bool $status): static
+    public function show_price(bool $status): static
     {
         $this->show_price = $status;
         return $this;
     }
-
     /**
      *
      * @return $this
      * @since ZC v1.5.8
      */
-    public function onlyActive(bool $status): static
+    public function only_active(bool $status): static
     {
         $condition = ' AND p.products_status = 1';
         $this->condition = str_replace($condition, '', $this->condition);
@@ -123,64 +99,49 @@ class productPulldown extends pulldown
         }
         return $this;
     }
-
     /**
      * @return mixed|void
      * @since ZC v1.5.8
      */
-    protected function setSQL()
+    protected function set_sql()
     {
         $this->sql = 'SELECT DISTINCT pd.products_id, p.products_sort_order, p.products_price, p.products_model, pd.products_name
-                FROM ' . TABLE_PRODUCTS . ' p'
-            . $this->categories_join . '
+                FROM ' . TABLE_PRODUCTS . ' p' . $this->categories_join . '
                 INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' pd ON (p.products_id = pd.products_id)
                 ' . $this->attributes_join . '
-                WHERE pd.language_id = ' . (int)$_SESSION['languages_id'];
+                WHERE pd.language_id = ' . (int) $_SESSION['languages_id'];
     }
-
     /**
      * @return mixed|void
      * @since ZC v1.5.8
      */
-    protected function processSQL()
+    protected function process_sql()
     {
         global $currencies;
-
-        $this->setSQL();
-        $this->runSQL();
-
+        $this->set_sql();
+        $this->run_sql();
         $parm_2 = '';
         $parm_3 = '';
-
         if ($this->show_model) {
             $parm_2 = '%2$s';
         }
-
         if ($this->show_price) {
             $parm_3 = ' (%3$s)';
         }
-
-        $this->output_string = '%1$s ' . $parm_2 . $parm_3;  // format string with name first
-
-        if (strpos((string) $this->sort, 'model')) {                  // show model first when sorted by model
-            $this->output_string = (!empty($parm_2) ? $parm_2 . '-' : '') . ' %1$s' . $parm_3; // format string with model first
+        $this->output_string = '%1$s ' . $parm_2 . $parm_3;
+        // format string with name first
+        if (strpos((string) $this->sort, 'model')) {
+            // show model first when sorted by model
+            $this->output_string = (!empty($parm_2) ? $parm_2 . '-' : '') . ' %1$s' . $parm_3;
+            // format string with model first
         }
-
         foreach ($this->results as $result) {
             if (in_array($result['products_id'], $this->exclude)) {
                 continue;
             }
             $display_price = $this->show_price ? zen_get_products_base_price($result['products_id']) : '';
             $name = zen_get_products_name($result['products_id']);
-            $this->values[] = [
-                'id' => $result['products_id'],
-                'text' => sprintf(
-                    $this->output_string,
-                    trim(zen_clean_html($name)),
-                    ($this->show_model ? ' [' . $result['products_model'] . '] ' : ''),
-                    $currencies->format($display_price)
-                ) . ($this->show_id ? ' - ID# ' . $result['products_id'] : ''),
-            ];
+            $this->values[] = ['id' => $result['products_id'], 'text' => sprintf($this->output_string, trim(zen_clean_html($name)), $this->show_model ? ' [' . $result['products_model'] . '] ' : '', $currencies->format($display_price)) . ($this->show_id ? ' - ID# ' . $result['products_id'] : '')];
         }
     }
 }

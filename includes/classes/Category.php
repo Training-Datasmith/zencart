@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -11,84 +10,69 @@ declare(strict_types=1);
  * @var queryFactory $db
  * @since ZC v2.1.0
  */
-
-use Zencart\Traits\NotifierManager;
-
+use Zencart\Traits\Notifier_Manager;
 class Category
 {
-    use NotifierManager;
-
+    use Notifier_Manager;
     protected array $data;
     protected array $languages;
-
     /** @deprecated use ->get('property') or ->getData()  */
     public array $fields;
-
     /** @deprecated use !exists()  */
     public bool $EOF = true;
-
     public function __construct(protected ?int $category_id = null)
     {
-        $this->initLanguages();
-
+        $this->init_languages();
         if ($this->category_id !== null) {
-            $this->data = $this->loadCategoryDetails($this->category_id);
-
+            $this->data = $this->load_category_details($this->category_id);
             // set some backward compatibility properties
             $this->fields = $this->data;
             $this->EOF = empty($this->data);
         }
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function forLanguage(?int $language_id): self
+    public function for_language(?int $language_id): self
     {
-        $this->data = $this->getDataForLanguage($language_id);
+        $this->data = $this->get_data_for_language($language_id);
         $this->fields = $this->data;
-
         return $this;
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function withDefaultLanguage(): self
+    public function with_default_language(): self
     {
-        $this->data = $this->getDataForLanguage();
+        $this->data = $this->get_data_for_language();
         $this->fields = $this->data;
-
         return $this;
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function getData(): ?array
+    public function get_data(): ?array
     {
         return $this->data;
     }
-
     /**
      * @since ZC v2.1.0
      */
     public function get(string $name)
     {
-        return $this->data[$name] ?? $this->data['lang'][$this->languages[(int)$_SESSION['languages_id']]][$name] ?? null;
+        return $this->data[$name] ?? $this->data['lang'][$this->languages[(int) $_SESSION['languages_id']]][$name] ?? null;
     }
-
     /**
      * Same as getData(), but for specific language only
      * @since ZC v2.1.0
      */
-    public function getDataForLanguage(?int $language_id = null): ?array
+    public function get_data_for_language(?int $language_id = null): ?array
     {
-        if (empty($language_id)) { // empty allows for 0 which might occur if null is pre-casted to int before passing to this function
-            $language_id = (int)$_SESSION['languages_id'];
+        if (empty($language_id)) {
+            // empty allows for 0 which might occur if null is pre-casted to int before passing to this function
+            $language_id = (int) $_SESSION['languages_id'];
         }
         $data = $this->data;
-
         // -----
         // If this request is for a category being created, it might not yet have
         // its language elements (e.g. categories_name) stored.  In this case, simply
@@ -97,24 +81,20 @@ class Category
         if (!isset($data['lang'])) {
             return $data;
         }
-
         // strip all languages except specified one, and merge into parent array instead of sub-array
         foreach ($data['lang'][$this->languages[$language_id]] as $key => $value) {
             $data[$key] = $value;
         }
         unset($data['lang']);
-
         return $data;
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function getId(): ?int
+    public function get_id(): ?int
     {
         return $this->category_id;
     }
-
     /**
      * @since ZC v2.1.0
      */
@@ -125,27 +105,24 @@ class Category
     /**
      * @since ZC v2.1.0
      */
-    public function isValid(): bool
+    public function is_valid(): bool
     {
         return !empty($this->data);
     }
-
     /**
      * @since ZC v2.1.0
      */
     public function status(): int
     {
-        return (int)($this->data['categories_status'] ?? 0);
+        return (int) ($this->data['categories_status'] ?? 0);
     }
-
     /**
      * @since ZC v2.1.0
      */
-    public function getInfoPage(): string
+    public function get_info_page(): string
     {
-        return $this->getTypeHandler() . '_info';
+        return $this->get_type_handler() . '_info';
     }
-
     /**
      * @since ZC v2.1.0
      */
@@ -153,28 +130,23 @@ class Category
     {
         return $this->get($name);
     }
-
     /**
      * @since ZC v2.1.0
      */
-    protected function loadCategoryDetails(int $category_id, ?int $language_id = null): array
+    protected function load_category_details(int $category_id, ?int $language_id = null): array
     {
         global $db;
-
         $sql = 'SELECT c.*, pt.product_type_id
                 FROM ' . TABLE_CATEGORIES . ' c 
                 LEFT JOIN ' . TABLE_PRODUCT_TYPES_TO_CATEGORY . ' pt ON (c.categories_id = pt.category_id)
                 WHERE categories_id = ' . $category_id;
         $category = $db->Execute($sql, 1, true, 900);
-
         if ($category->EOF) {
             return [];
         }
-
         $data = $category->fields;
         $data['id'] = $data['categories_id'];
         $data['category_id'] = $data['categories_id'];
-
         /**
          * Add $data['lang'][code] = [categories_name, categories_description, etc] for each language
          * @since ZC v2.1.0
@@ -188,21 +160,17 @@ class Category
             unset($result['categories_id']);
             $data['lang'][$this->languages[$result['language_id']]] = $result;
         }
-
         //Allow an observer to modify details
         $this->notify('NOTIFY_GET_CATEGORY_OBJECT_DETAILS', $category_id, $data);
-
         return $data;
     }
-
-    protected function initLanguages(): void
+    protected function init_languages(): void
     {
         global $lng;
-
         if ($lng === null) {
             $lng = new language();
         }
-
-        $this->languages = $lng->get_language_list();  // [1 => 'en', 2 => 'fr']
+        $this->languages = $lng->get_language_list();
+        // [1 => 'en', 2 => 'fr']
     }
 }

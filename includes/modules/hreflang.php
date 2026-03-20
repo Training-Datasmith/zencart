@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * hreflang module
  *
@@ -23,29 +23,26 @@ if (method_exists($lng, 'get_language_list')) {
     // fallback for pre-v2.0.0 with old language class
     $languages = array_keys($lng->catalog_languages);
 }
-
 $bypass = false;
-$zco_notifier->notify('NOTIFY_MODULE_START_HREFLANG', $current_page_base, $bypass, $lng, $languages, $canonicalLink);
+$zco_notifier->notify('NOTIFY_MODULE_START_HREFLANG', $current_page_base, $bypass, $lng, $languages, $canonical_link);
 if ($bypass) {
     return;
 }
-
 if (count($languages) <= 1) {
     // skip when site has only one language
     return;
 }
-if (empty($canonicalLink)) {
+if (empty($canonical_link)) {
     // canonical link is needed
     return;
 }
-
 foreach ($languages as $key) {
     if ($this_is_home_page) {
         $link = zen_href_link(FILENAME_DEFAULT, 'language=' . $key, $request_type, false);
     } else {
-        $link = $canonicalLink . (str_contains((string) $canonicalLink, '?') ? '&amp;' : '?') . 'language=' . $key;
+        $link = $canonical_link . (str_contains((string) $canonical_link, '?') ? '&amp;' : '?') . 'language=' . $key;
     }
     echo '<link rel="alternate" hreflang="' . $key . '" href="' . $link . '"/>' . "\n";
 }
 // include x-default
-echo '<link rel="alternate" hreflang="x-default" href="' . $canonicalLink . '"/>' . "\n";
+echo '<link rel="alternate" hreflang="x-default" href="' . $canonical_link . '"/>' . "\n";

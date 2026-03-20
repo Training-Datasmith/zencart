@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Common Template main_template_vars handler
  *
@@ -15,24 +15,21 @@ declare(strict_types=1);
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2024 Jan 31 Modified in v2.0.0-beta1 $
  */
-
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
-
 $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_START', $template_dir);
-
 /**
  * set some variables used by templates
  */
-if (!isset($layoutType)) {
-    $layoutType = 'legacy';
+if (!isset($layout_type)) {
+    $layout_type = 'legacy';
 }
 if (!isset($max_display_page_links)) {
-    $max_display_page_links = ($layoutType == 'mobile' ? MAX_DISPLAY_PAGE_LINKS_MOBILE : MAX_DISPLAY_PAGE_LINKS);
+    $max_display_page_links = $layout_type == 'mobile' ? MAX_DISPLAY_PAGE_LINKS_MOBILE : MAX_DISPLAY_PAGE_LINKS;
 }
-if (!isset($paginateAsUL)) {
-    $paginateAsUL = $layoutType == 'mobile' || (isset($isMobile) && $isMobile) || (isset($isTablet) && $isTablet);
+if (!isset($paginate_as_ul)) {
+    $paginate_as_ul = $layout_type == 'mobile' || isset($is_mobile) && $is_mobile || isset($is_tablet) && $is_tablet;
 }
 if (!isset($flag_disable_left)) {
     $flag_disable_left = false;
@@ -40,22 +37,18 @@ if (!isset($flag_disable_left)) {
 if (!isset($flag_disable_right)) {
     $flag_disable_right = false;
 }
-
 if (!class_exists('MobileDetect')) {
-    include_once(DIR_WS_CLASSES . 'Mobile_Detect.php');
+    include_once DIR_WS_CLASSES . 'Mobile_Detect.php';
 }
 if (!isset($detect)) {
-    $detect = new Detection\MobileDetect();
+    $detect = new Detection\Mobile_Detect();
 }
 if (!isset($_SESSION['layoutType'])) {
     $_SESSION['layoutType'] = 'legacy';
 }
-
-$display_as_mobile = ($detect->isMobile() || $detect->isTablet() || $_SESSION['layoutType'] == 'mobile' || $_SESSION['layoutType'] == 'tablet');
-
+$display_as_mobile = $detect->is_mobile() || $detect->is_tablet() || $_SESSION['layoutType'] == 'mobile' || $_SESSION['layoutType'] == 'tablet';
 /**
  * load page-specific main_template_vars if present, or jump directly to template file
  */
-$body_code = $pageLoader->getBodyCode();
-
+$body_code = $page_loader->get_body_code();
 $zco_notifier->notify('NOTIFY_MAIN_TEMPLATE_VARS_END', $template_dir, $body_code);

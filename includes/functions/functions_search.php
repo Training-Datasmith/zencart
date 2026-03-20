@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * @copyright Copyright 2003-2025 Zen Cart Development Team
  * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2025 Sep 18 Modified in v2.2.0 $
  */
-
 /**
  * Parse search string into individual objects
  * @since ZC v1.0.3
@@ -14,13 +13,11 @@ declare(strict_types=1);
 function zen_parse_search_string($search_str = '', array &$objects = []): bool
 {
     $search_str = trim(strtolower((string) $search_str));
-
     // Break up $search_str on whitespace; quoted string will be reconstructed later
     $pieces = preg_split('/[[:space:]]+/', $search_str);
     $objects = [];
     $tmpstring = '';
     $flag = '';
-
     for ($k = 0, $p_count = count($pieces); $k < $p_count; $k++) {
         while (str_starts_with($pieces[$k], '(') && !str_contains(substr($pieces[$k], 1), ')')) {
             $objects[] = '(';
@@ -30,9 +27,7 @@ function zen_parse_search_string($search_str = '', array &$objects = []): bool
                 $pieces[$k] = '';
             }
         }
-
         $post_objects = [];
-
         while (str_ends_with($pieces[$k], ')') && !str_contains($pieces[$k], '(')) {
             $post_objects[] = ')';
             if (strlen($pieces[$k]) > 1) {
@@ -41,50 +36,37 @@ function zen_parse_search_string($search_str = '', array &$objects = []): bool
                 $pieces[$k] = '';
             }
         }
-
         // Check individual words
-
-        if ((!str_ends_with($pieces[$k], '"')) && (!str_starts_with($pieces[$k], '"'))) {
+        if (!str_ends_with($pieces[$k], '"') && !str_starts_with($pieces[$k], '"')) {
             $objects[] = trim($pieces[$k]);
-
             for ($j = 0, $n = count($post_objects); $j < $n; $j++) {
                 $objects[] = $post_objects[$j];
             }
         } else {
             /* This means that the $piece is either the beginning or the end of a string.
-               So, we'll slurp up the $pieces and stick them together until we get to the
-               end of the string or run out of pieces.
-            */
-
+                  So, we'll slurp up the $pieces and stick them together until we get to the
+                  end of the string or run out of pieces.
+               */
             // Add this word to the $tmpstring, starting the $tmpstring
             $tmpstring = trim((string) preg_replace('/"/', ' ', $pieces[$k]));
-
             // Check for one possible exception to the rule. That there is a single quoted word.
             if (str_ends_with($pieces[$k], '"')) {
                 // Turn the flag off for future iterations
                 $flag = 'off';
-
                 $objects[] = trim($pieces[$k]);
-
                 for ($j = 0, $n = count($post_objects); $j < $n; $j++) {
                     $objects[] = $post_objects[$j];
                 }
-
                 unset($tmpstring);
-
                 // Stop looking for the end of the string and move onto the next word.
                 continue;
             }
-
             // Otherwise, turn on the flag to indicate no quotes have been found attached to this word in the string.
             $flag = 'on';
-
             // Move on to the next word
             $k++;
-
             // Keep reading until the end of the string as long as the $flag is on
-
-            while (($flag == 'on') && ($k < $p_count)) {
+            while ($flag == 'on' && $k < $p_count) {
                 while (str_ends_with($pieces[$k], ')')) {
                     $post_objects[] = ')';
                     if (strlen($pieces[$k]) > 1) {
@@ -93,12 +75,10 @@ function zen_parse_search_string($search_str = '', array &$objects = []): bool
                         $pieces[$k] = '';
                     }
                 }
-
                 // If the word doesn't end in double quotes, append it to the $tmpstring.
                 if (!str_ends_with($pieces[$k], '"')) {
                     // Tack this word onto the current string entity
                     $tmpstring .= ' ' . $pieces[$k];
-
                     // Move on to the next word
                     $k++;
                     continue;
@@ -119,23 +99,16 @@ function zen_parse_search_string($search_str = '', array &$objects = []): bool
             }
         }
     }
-
     // add default logical operators if needed
     $temp = [];
     for ($i = 0, $j = count($objects) - 1; $i < $j; $i++) {
         $temp[] = $objects[$i];
-        if (($objects[$i] != 'and') &&
-            ($objects[$i] != 'or') &&
-            ($objects[$i] != '(') &&
-            ($objects[$i + 1] != 'and') &&
-            ($objects[$i + 1] != 'or') &&
-            ($objects[$i + 1] != ')')) {
+        if ($objects[$i] != 'and' && $objects[$i] != 'or' && $objects[$i] != '(' && $objects[$i + 1] != 'and' && $objects[$i + 1] != 'or' && $objects[$i + 1] != ')') {
             $temp[] = ADVANCED_SEARCH_DEFAULT_OPERATOR;
         }
     }
     $temp[] = $objects[$i] ?? [];
     $objects = $temp;
-
     $keyword_count = 0;
     $operator_count = 0;
     $balance = 0;
@@ -146,33 +119,29 @@ function zen_parse_search_string($search_str = '', array &$objects = []): bool
         if ($objects[$i] == ')') {
             $balance++;
         }
-        if (($objects[$i] == 'and') || ($objects[$i] == 'or')) {
+        if ($objects[$i] == 'and' || $objects[$i] == 'or') {
             $operator_count++;
-        } elseif ((is_string($objects[$i]) && $objects[$i] == '0') || ($objects[$i]) && ($objects[$i] != '(') && ($objects[$i] != ')')) {
+        } elseif (is_string($objects[$i]) && $objects[$i] == '0' || $objects[$i] && $objects[$i] != '(' && $objects[$i] != ')') {
             $keyword_count++;
         }
     }
-
     if ($operator_count < $keyword_count && $balance < 1) {
         return true;
     }
-
     return false;
 }
-
 /**
  * @since ZC v1.5.8
  */
-function zen_build_keyword_where_clause($fields, $string, $startWithWhere = false): string
+function zen_build_keyword_where_clause($fields, $string, $start_with_where = false): string
 {
     global $db, $zco_notifier;
-
     $zco_notifier->notify('NOTIFY_BUILD_KEYWORD_SEARCH', '', $fields, $string);
     $where_str = '';
-    $validWhere = false;
+    $valid_where = false;
     if (zen_parse_search_string(stripslashes((string) $string), $search_keywords)) {
         $where_str = ' AND (';
-        if ($startWithWhere) {
+        if ($start_with_where) {
             $where_str = ' WHERE (';
         }
         for ($i = 0, $n = count($search_keywords); $i < $n; $i++) {
@@ -193,37 +162,32 @@ function zen_build_keyword_where_clause($fields, $string, $startWithWhere = fals
                             $sql_or = ' OR ';
                         }
                         if (strpos((string) $field_name, '_id')) {
-                            if ((int)$search_keywords[$i] != 0) {
+                            if ((int) $search_keywords[$i] != 0) {
                                 $first_field = false;
                                 $sql_add .= $sql_or;
                                 $sql_add .= ' :field_name = :numeric_keyword';
-                                $validWhere = true;
+                                $valid_where = true;
                             }
                         } else {
                             $first_field = false;
                             $sql_add .= $sql_or;
                             $sql_add .= " :field_name LIKE '%:keyword%'";
-                            $validWhere = true;
+                            $valid_where = true;
                         }
-                        $sql_add = $db->bindVars($sql_add, ':field_name', $field_name, 'noquotestring');
+                        $sql_add = $db->bind_vars($sql_add, ':field_name', $field_name, 'noquotestring');
                     }
                     $sql_add .= ') ';
-
                     $where_str .= $sql_add;
-
-                    $where_str = $db->bindVars($where_str, ':keyword', addslashes((string) $search_keywords[$i]), 'noquotestring');
-                    $where_str = $db->bindVars($where_str, ':numeric_keyword', $search_keywords[$i], 'integer');
+                    $where_str = $db->bind_vars($where_str, ':keyword', addslashes((string) $search_keywords[$i]), 'noquotestring');
+                    $where_str = $db->bind_vars($where_str, ':numeric_keyword', $search_keywords[$i], 'integer');
                     break;
             }
         }
         $where_str .= ' )';
     }
-    if (str_ends_with($where_str, '( ()  )') || !$validWhere) {
+    if (str_ends_with($where_str, '( ()  )') || !$valid_where) {
         return ' ';
     }
-    $problemArray = [
-        ' ()  AND ',
-        ' AND  () ',
-    ];
-    return str_replace($problemArray, ' ', $where_str);
+    $problem_array = [' ()  AND ', ' AND  () '];
+    return str_replace($problem_array, ' ', $where_str);
 }
