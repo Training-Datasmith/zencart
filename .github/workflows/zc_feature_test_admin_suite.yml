@@ -81,7 +81,7 @@ jobs:
         run: sudo service apache2 status
 
       - name: Execute Admin Feature Tests
-        run: php vendor/bin/phpunit  --verbose --testsuite FeatureAdmin --printer 'Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9'
+        run: php vendor/bin/phpunit  --verbose --testsuite FeatureAdmin --printer 'Sempro\PHP_Unit_Pretty_Printer\Pretty_Printer_For_Php_Unit9'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
